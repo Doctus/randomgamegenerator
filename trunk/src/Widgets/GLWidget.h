@@ -5,6 +5,10 @@
 #include <QtGui/QImage>
 #include <QtCore/QRect>
 
+#ifdef WINDOWS
+  #include <glext.h>
+#endif
+
 #include <iostream>
 
 #include "../cEventManager.h"
