@@ -6,16 +6,19 @@ std::string translateGLError(GLenum errorcode)
   return errorStr;
 }
 
+//QGLWidget doesn't do Alpha by default(and neither does it do DoubleBuffering, I think), so I forced it.
 GLWidget::GLWidget(QWidget* parent) : QGLWidget(QGLFormat(QGL::FormatOptions(QGL::DoubleBuffer | QGL::AlphaChannel)), parent)
 {
     resize(parent->width(), parent->height());
     grabKeyboard();
+
+    //OpenGL is initialized here, instead of somewhere inside Qt4, otherwise it Segfaults due to doing stuff prior to OpenGL being initialized. Or something.
     glInit();
 }
 
 void GLWidget::initializeGL()
 {
-    setAutoBufferSwap(false);
+    setAutoBufferSwap(false); //Otherwise we can't sync buffer swapping to clearing. Resulting in total darkness.
 
     glEnable(GL_TEXTURE_RECTANGLE_ARB);
     glEnable(GL_BLEND);
@@ -29,7 +32,7 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
-    if(doubleBuffer())
+    if(doubleBuffer()) //This check seems a bit redundant...as we force it to double buffer. But nonetheless.
         swapBuffers();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -143,7 +146,7 @@ GLuint GLWidget::createTexture(QImage *image)
         cout << "GLError: " << translateGLError(error);
         glDeleteTextures(1, &texture);
         throw "GL error"; //replace with an inherited exception.
-        return 0; //exception?
+        return 0;
     }
 
     //cout << "created texture " << texture << endl;
