@@ -1,8 +1,8 @@
 #ifndef MENUBAR_H
 #define MENUBAR_H
 
-#include <QtGui>
-#include <QtCore>
+#include <QtGui/QWidget>
+#include <QtCore/QObject>
 
 class cMenuBar;
 
@@ -20,9 +20,11 @@ class cMenuBar : public QObject
     QAction *loadServer; //unused
     QAction *connectServer; //unused
     QAction *showAboutDialog;
+    QAction *showTextDockWidget;
 
     QMenu *fileMenu;
     QMenu *serverMenu;
+    QMenu *viewMenu;
     QMenu *helpMenu;
 
     public:
@@ -34,6 +36,7 @@ class cMenuBar : public QObject
     private slots:
     void saveMapSlot();
     void loadMapSlot();
+    void showTextDockWidgetSlot();
 };
 
 #endif // MENUBAR_H

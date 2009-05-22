@@ -15,6 +15,10 @@ void cMenuBar::initActions()
     loadMap->setShortcut(tr("Ctrl+L"));
     QAction::connect(loadMap, SIGNAL(triggered()), this, SLOT(loadMapSlot()));
 
+    showTextDockWidget = new QAction(tr("&Text Widget..."), windowWidget);
+    showTextDockWidget->setShortcut(tr("Ctrl+T"));
+    QAction::connect(showTextDockWidget, SIGNAL(triggered()), this, SLOT(showTextDockWidgetSlot()));
+
 }
 
 void cMenuBar::initBars()
@@ -22,8 +26,12 @@ void cMenuBar::initBars()
     fileMenu = new QMenu(tr("&File"), windowWidget);
     fileMenu->addAction(loadMap);
 
+    viewMenu = new QMenu(tr("&View"), windowWidget);
+    viewMenu->addAction(showTextDockWidget);
+
     QMenuBar *bar = ((QMainWindow*)windowWidget)->menuBar();
     bar->addMenu(fileMenu);
+    bar->addMenu(viewMenu);
 }
 
 
@@ -37,4 +45,9 @@ void cMenuBar::loadMapSlot()
 
     if (!fileName.isEmpty())
         mGame->loadMap(fileName.toStdString());
+}
+
+void cMenuBar::showTextDockWidgetSlot()
+{
+    mGame->showTextDockWidget();
 }

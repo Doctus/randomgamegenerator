@@ -9,6 +9,7 @@ class cGame;
 #include "cTileManager.h"
 #include "cTilesetManager.h"
 #include "Widgets/MenuBar.h"
+#include "Widgets/DockWidgets.h"
 
 using namespace std;
 
@@ -21,9 +22,8 @@ class cGame : public QObject
     cTileManager *mTileManager;
     cTilesetManager *mTilesetManager;
     cMenuBar *mMenuBar;
-
-    QWidget *parent;
     GLWidget *mGLWidget;
+    cDockWidgets *mDockWidgets;
 
     friend class cMenuBar;
 
@@ -39,6 +39,7 @@ class cGame : public QObject
     public:
     void loadMap(string fileName);
     void saveMap(string fileName);
+    void showTextDockWidget();
 };
 
 #endif

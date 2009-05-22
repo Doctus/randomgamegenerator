@@ -5,14 +5,12 @@ unsigned int FPScounter = 0;
 
 cGame::cGame(QWidget *parent) : QObject(parent)
 {
-    //QHBoxLayout *layout = new QHBoxLayout();
-    //testWidget = new QWidget(parent);
     mGLWidget = new GLWidget(parent);
+    ((QMainWindow*)parent)->setCentralWidget(mGLWidget);
+
     mMenuBar = new cMenuBar(parent, this);
 
-    //layout->addWidget(mGLWidget);
-    //layout->addWidget(testWidget);
-    //parent->setLayout(layout);
+    mDockWidgets = new cDockWidgets((QMainWindow*)parent);
 
     mTileManager = new cTileManager();
     mTilesetManager = new cTilesetManager();
@@ -66,5 +64,10 @@ void cGame::loadMap(string fileName)
 
 void cGame::saveMap(string fileName)
 {
+}
+
+void cGame::showTextDockWidget()
+{
+    this->mDockWidgets->showTextDockWidgets();
 }
 
