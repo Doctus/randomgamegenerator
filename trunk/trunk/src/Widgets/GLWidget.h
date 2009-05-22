@@ -11,8 +11,6 @@
 
 #include <iostream>
 
-#include "../cEventManager.h"
-
 using namespace std;
 
 class GLWidget : public QGLWidget
@@ -28,10 +26,6 @@ class GLWidget : public QGLWidget
 
     GLuint createTexture(QImage *image);
     void deleteTexture(GLuint texture);
-
-    private:
-    void keyPressEvent(QKeyEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
 };
 
 #endif

@@ -10,7 +10,8 @@ std::string translateGLError(GLenum errorcode)
 GLWidget::GLWidget(QWidget* parent) : QGLWidget(QGLFormat(QGL::FormatOptions(QGL::DoubleBuffer | QGL::AlphaChannel)), parent)
 {
     resize(parent->width(), parent->height());
-    grabKeyboard();
+
+    this->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
     //OpenGL is initialized here, instead of somewhere inside Qt4, otherwise it Segfaults due to doing stuff prior to OpenGL being initialized. Or something.
     glInit();
@@ -121,7 +122,7 @@ void GLWidget::resizeGL(int w, int h)
     glViewport (0, 0, w, h);
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0, 640, 480, 0, -1, 1);
+    glOrtho(0, w, h, 0, -1, 1);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -157,18 +158,5 @@ GLuint GLWidget::createTexture(QImage *image)
 void GLWidget::deleteTexture(GLuint texture)
 {
     glDeleteTextures(1, &texture);
-}
-
-
-
-void GLWidget::keyPressEvent(QKeyEvent *event)
-{
-    event->accept();
-    cEventManager::getInstance()->keyPress(event->key());
-}
-
-void GLWidget::keyReleaseEvent(QKeyEvent *event)
-{
-    cEventManager::getInstance()->keyRelease(event->key());
 }
 
