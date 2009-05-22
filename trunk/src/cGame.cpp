@@ -14,6 +14,7 @@ cGame::cGame(QWidget *parent) : QObject(parent)
 
     mTileManager = new cTileManager();
     mTilesetManager = new cTilesetManager();
+    //mTilesetManager->loadTileset(mGLWidget, 32, 32, "town.png");
     mCurrentMap = new cMap(0, mGLWidget, mTileManager, mTilesetManager);
     //mCurrentMap->loadMap("Example.cfg");
 
@@ -23,7 +24,7 @@ cGame::cGame(QWidget *parent) : QObject(parent)
     connect(timer , SIGNAL(timeout()), this, SLOT(draw()));
     connect(timer2, SIGNAL(timeout()), this, SLOT(logic()));
     connect(timer3, SIGNAL(timeout()), this, SLOT(displayFPS()));
-    timer ->start(40);
+    //timer ->start(40);
     timer2->start(20);
     timer3->start(5000);
 }
@@ -59,7 +60,8 @@ void cGame::displayFPS()
 
 void cGame::loadMap(string fileName)
 {
-    mCurrentMap->loadMap(fileName);
+    if(mCurrentMap != NULL)
+        mCurrentMap->loadMap(fileName);
 }
 
 void cGame::saveMap(string fileName)

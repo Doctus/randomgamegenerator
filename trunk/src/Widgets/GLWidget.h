@@ -5,7 +5,7 @@
 #include <QtGui/QImage>
 #include <QtCore/QRect>
 
-#ifdef WINDOWS
+#ifdef _WINDOWS
   #define GL_TEXTURE_RECTANGLE_ARB 0x84F5 //HAR HAR. VEE BE EVUL. VEE IS NUT CHECKING IF IT IS SUPPORTED ON PLATFORM.
 #endif
 

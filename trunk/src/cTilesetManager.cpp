@@ -8,7 +8,14 @@ cTilesetManager::cTilesetManager()
 int cTilesetManager::loadTileset(GLWidget *mGLWidget, int tileWidth, int tileHeight, string filename)
 {
     id++;
-    tilesets.push_back(new cTileset(id, mGLWidget, tileWidth, tileHeight, filename));
+    try
+    {
+        tilesets.push_back(new cTileset(id, mGLWidget, tileWidth, tileHeight, filename));
+    }
+    catch (...) //this needs to be handled better than just catching any and all exception...although it works <_<
+    {
+        return -1;
+    }
     return id;
 }
 

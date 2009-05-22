@@ -81,6 +81,7 @@ void cTileset::loadImage()
                 throw;
                 return;
             }
+
             tile++;
         }
     }
