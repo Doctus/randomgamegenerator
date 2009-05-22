@@ -1,10 +1,12 @@
 # -------------------------------------------------
-# Project created by QtCreator 2009-04-30T16:15:26
+# Project created by Oipo 2009-05-22
 # -------------------------------------------------
-QT += opengl
+QT += opengl gui core
 TARGET = random-name-generator
 TEMPLATE = app
-LIBS = -lconfig++
+LIBS = -L../libs -lconfig++
+INCPATH = ../include
+DEFINES = WINDOWS
 SOURCES += ../src/main.cpp \
     ../src/cTilesetManager.cpp \
     ../src/cTileset.cpp \
@@ -24,4 +26,4 @@ HEADERS += ../src/cTilesetManager.h \
     ../src/cCamera.h \
     ../src/Widgets/GLWidget.h \
     ../src/cEventManager.h
-FORMS += 
+FORMS +=

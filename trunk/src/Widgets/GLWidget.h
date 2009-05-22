@@ -6,7 +6,7 @@
 #include <QtCore/QRect>
 
 #ifdef WINDOWS
-  #include <glext.h>
+  #define GL_TEXTURE_RECTANGLE_ARB 0x84F5 //HAR HAR. VEE BE EVUL. VEE IS NUT CHECKING IF IT IS SUPPORTED ON PLATFORM.
 #endif
 
 #include <iostream>
