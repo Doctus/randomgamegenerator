@@ -109,7 +109,6 @@ void GLWidget::drawImage(GLuint texture, int x, int y, int w, int h)
         glVertex3i(x, y+h, 0);
     glEnd();
 
-
     if((error = glGetError()) != GL_NO_ERROR)
     {
         cout << "GLError: " << translateGLError(error);
@@ -142,15 +141,20 @@ GLuint GLWidget::createTexture(QImage *image)
     glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, img.width(), img.height(), 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
 
+
+
     if((error = glGetError()) != GL_NO_ERROR)
     {
-        cout << "GLError: " << translateGLError(error);
         glDeleteTextures(1, &texture);
+
+        QMessageBox lol((QWidget*)parent());
+        lol.setDetailedText("OpenGL Error: " + QString::fromStdString(translateGLError(error)) +
+                            "\r\n\r\n" + "Please contact the author with this message.");
+        lol.exec();
+
         throw "GL error"; //replace with an inherited exception.
         return 0;
     }
-
-    //cout << "created texture " << texture << endl;
 
     return texture;
 }

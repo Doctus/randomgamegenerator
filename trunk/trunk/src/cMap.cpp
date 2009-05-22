@@ -99,7 +99,8 @@ bool cMap::loadMap(string filename)
 
         actualId = mTilesetManager->loadTileset(mGLWidget, tileWidth, tileHeight, tilesetFilename);
 
-        mTilesetConverter.push_back(tilesetConverter(requestId, actualId));
+        if(actualId != -1)
+            mTilesetConverter.push_back(tilesetConverter(requestId, actualId));
     }
 
     int currx = 0, curry = 0, prevlayer = 0;
@@ -140,8 +141,10 @@ bool cMap::loadMap(string filename)
 
         //cout << "tile: " << tile << " - " << id << " - " << currx << " - " << curry << " - " << tilesetId << " - " << tileWidth << " - " << tileHeight << endl;
 
-        if(tile != -1)
-            mTileManager->addTile(tile, layer, id, QPoint(currx*tileWidth, curry*tileHeight), mTilesetManager->findTileset(findActualId(mTilesetConverter, tilesetId)));
+        cTileset *tempTileset = mTilesetManager->findTileset(findActualId(mTilesetConverter, tilesetId));
+
+        if(tile != -1 && tempTileset != NULL)
+            mTileManager->addTile(tile, layer, id, QPoint(currx*tileWidth, curry*tileHeight), tempTileset);
 
         if(++currx >= mapx)
         {
