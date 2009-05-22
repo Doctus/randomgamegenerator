@@ -8,6 +8,7 @@ cGame::cGame(QWidget *parent) : QObject(parent)
     //QHBoxLayout *layout = new QHBoxLayout();
     //testWidget = new QWidget(parent);
     mGLWidget = new GLWidget(parent);
+    mMenuBar = new cMenuBar(parent, this);
 
     //layout->addWidget(mGLWidget);
     //layout->addWidget(testWidget);
@@ -16,7 +17,7 @@ cGame::cGame(QWidget *parent) : QObject(parent)
     mTileManager = new cTileManager();
     mTilesetManager = new cTilesetManager();
     mCurrentMap = new cMap(0, mGLWidget, mTileManager, mTilesetManager);
-    mCurrentMap->loadMap("Example.cfg");
+    //mCurrentMap->loadMap("Example.cfg");
 
     QTimer *timer = new QTimer(this);
     QTimer *timer2 = new QTimer(this);
@@ -55,5 +56,15 @@ void cGame::displayFPS()
 {
     cout << FPScounter << " frames per 5 seconds" << endl;
     FPScounter = 0;
+}
+
+
+void cGame::loadMap(string fileName)
+{
+    mCurrentMap->loadMap(fileName);
+}
+
+void cGame::saveMap(string fileName)
+{
 }
 
