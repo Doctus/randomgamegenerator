@@ -15,7 +15,8 @@ SOURCES += ../src/main.cpp \
     ../src/cCamera.cpp \
     ../src/Widgets/GLWidget.cpp \
     ../src/cEventManager.cpp \
-    ../src/Widgets/MenuBar.cpp
+    ../src/Widgets/MenuBar.cpp \
+    ../src/Widgets/DockWidgets.cpp
 HEADERS += ../src/cTilesetManager.h \
     ../src/cTileset.h \
     ../src/cTileManager.h \
@@ -25,5 +26,6 @@ HEADERS += ../src/cTilesetManager.h \
     ../src/cCamera.h \
     ../src/Widgets/GLWidget.h \
     ../src/cEventManager.h \
-    ../src/Widgets/MenuBar.h
+    ../src/Widgets/MenuBar.h \
+    ../src/Widgets/DockWidgets.h
 FORMS += 
