@@ -18,37 +18,32 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
-#ifndef CTILEMANAGER_H
-#define CTILEMANAGER_H
+#ifndef DOCKWIDGETS_H
+#define DOCKWIDGETS_H
 
-#include <vector>
-#include <QtCore/QPoint>
+#include <QtGui/QMainWindow>
+#include <QtGui/QTextBrowser>
+#include <QtGui/QLineEdit>
+#include <QtGui/QDockWidget>
+#include <QtGui/QVBoxLayout>
+#include <QtCore/QObject>
 
-#include "cTile.h"
-#include "cTileset.h"
-
-using namespace std;
-
-class cTileManager
+class wDockWidgets : public QObject
 {
+    Q_OBJECT;
+
     private:
-    vector<cTile*> tiles;
-    int id;
+    QTextBrowser *dockWidgetEditor;
+    QLineEdit *dockWidgetLineInput;
+    QDockWidget *dockWidget;
 
     public:
-    cTileManager();
+    wDockWidgets(QMainWindow *mainWindow);
 
-    int addTile(int tile, int layer, int mapId, QPoint pos, cTileset *tileset);
-    void removeTile(cTile *tile);
-    void removeTile(int id);
+    void showTextDockWidgets();
 
-    cTile* findTile(int id);
-    vector<cTile*> getTilesByTilesetId(int id);
-    vector<cTile*> getTilesByMapId(int id);
-
-    private:
-    int getPos(int id);
+    private slots:
+    void processInput();
 };
 
-#endif
-
+#endif // DOCKWIDGETS_H

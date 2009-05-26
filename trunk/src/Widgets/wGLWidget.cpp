@@ -1,4 +1,24 @@
-#include "GLWidget.h"
+/*
+Random Game Generator - The generation of time transcending tabletop games!
+Copyright (C) 2009 Michael de Lang
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+
+#include "wGLWidget.h"
 
 std::string translateGLError(GLenum errorcode)
 {
@@ -6,8 +26,8 @@ std::string translateGLError(GLenum errorcode)
   return errorStr;
 }
 
-//QGLWidget doesn't do Alpha by default(and neither does it do DoubleBuffering, I think), so I forced it.
-GLWidget::GLWidget(QWidget* parent) : QGLWidget(QGLFormat(QGL::FormatOptions(QGL::DoubleBuffer | QGL::AlphaChannel)), parent)
+//QwGLWidget doesn't do Alpha by default(and neither does it do DoubleBuffering, I think), so I forced it.
+wGLWidget::wGLWidget(QWidget* parent) : QGLWidget(QGLFormat(QGL::FormatOptions(QGL::DoubleBuffer | QGL::AlphaChannel)), parent)
 {
     resize(parent->width(), parent->height());
 
@@ -17,7 +37,7 @@ GLWidget::GLWidget(QWidget* parent) : QGLWidget(QGLFormat(QGL::FormatOptions(QGL
     glInit();
 }
 
-void GLWidget::initializeGL()
+void wGLWidget::initializeGL()
 {
     setAutoBufferSwap(false); //Otherwise we can't sync buffer swapping to clearing. Resulting in total darkness.
 
@@ -31,7 +51,7 @@ void GLWidget::initializeGL()
 }
 
 
-void GLWidget::paintGL()
+void wGLWidget::paintGL()
 {
     if(doubleBuffer()) //This check seems a bit redundant...as we force it to double buffer. But nonetheless.
         swapBuffers();
@@ -39,7 +59,7 @@ void GLWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void GLWidget::drawImage(QImage *originalImage, int x, int y)
+void wGLWidget::drawImage(QImage *originalImage, int x, int y)
 {
     GLuint texture;
     GLenum error;
@@ -82,7 +102,7 @@ void GLWidget::drawImage(QImage *originalImage, int x, int y)
     }
 }
 
-void GLWidget::drawImage(GLuint texture, int x, int y, int w, int h)
+void wGLWidget::drawImage(GLuint texture, int x, int y, int w, int h)
 {
     GLenum error;
 
@@ -115,7 +135,7 @@ void GLWidget::drawImage(GLuint texture, int x, int y, int w, int h)
     }
 }
 
-void GLWidget::resizeGL(int w, int h)
+void wGLWidget::resizeGL(int w, int h)
 {
     //resize(w, h);
     glViewport (0, 0, w, h);
@@ -125,7 +145,7 @@ void GLWidget::resizeGL(int w, int h)
     glMatrixMode(GL_MODELVIEW);
 }
 
-GLuint GLWidget::createTexture(QImage *image)
+GLuint wGLWidget::createTexture(QImage *image)
 {
     GLuint texture;
     GLenum error;
@@ -159,7 +179,7 @@ GLuint GLWidget::createTexture(QImage *image)
     return texture;
 }
 
-void GLWidget::deleteTexture(GLuint texture)
+void wGLWidget::deleteTexture(GLuint texture)
 {
     glDeleteTextures(1, &texture);
 }

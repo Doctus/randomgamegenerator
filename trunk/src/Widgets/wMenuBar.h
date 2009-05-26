@@ -18,48 +18,52 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
-#ifndef CGAME_H
-#define CGAME_H
+#ifndef MENUBAR_H
+#define MENUBAR_H
 
 #include <QtGui/QWidget>
+#include <QtGui/QInputDialog>
+#include <QtCore/QObject>
 
-class cGame;
+class wMenuBar;
 
-#include "cMap.h"
-#include "cTileManager.h"
-#include "cTilesetManager.h"
-#include "Widgets/wMenuBar.h"
-#include "Widgets/wDockWidgets.h"
+#include "../cGame.h"
+#include "../Network/nConnectionManager.h"
 
-using namespace std;
-
-class cGame : public QObject
+class wMenuBar : public QObject
 {
     Q_OBJECT;
 
-    private:
-    cMap *mCurrentMap;
-    cTileManager *mTileManager;
-    cTilesetManager *mTilesetManager;
-    wMenuBar *mMenuBar;
-    wGLWidget *mGLWidget;
-    wDockWidgets *mDockWidgets;
+    QWidget *windowWidget;
+    cGame *mGame;
+    nConnectionManager *mConnectionManager;
 
-    friend class wMenuBar;
+    QAction *loadMap;
+    QAction *saveMap;
+    QAction *hostServer;
+    QAction *connectToServer;
+    QAction *showAboutDialog;
+    QAction *showTextDockWidget;
+
+    QMenu *fileMenu;
+    QMenu *internetMenu;
+    QMenu *viewMenu;
+    QMenu *helpMenu;
 
     public:
-    cGame(QWidget *parent);
-    ~cGame();
+    wMenuBar(QWidget *windowWidget, cGame *game);
+
+    void initActions();
+    void initBars();
 
     private slots:
-    void draw();
-    void logic();
-    void displayFPS();
+    void saveMapSlot();
+    void loadMapSlot();
 
-    public:
-    void loadMap(string fileName);
-    void saveMap(string fileName);
-    void showTextDockWidget();
+    void showTextDockWidgetSlot();
+
+    void hostServerSlot();
+    void connectToServerSlot();
 };
 
-#endif
+#endif // MENUBAR_H

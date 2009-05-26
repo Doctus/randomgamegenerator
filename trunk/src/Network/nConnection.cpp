@@ -18,37 +18,40 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
-#ifndef CTILEMANAGER_H
-#define CTILEMANAGER_H
+#include "nConnection.h"
 
-#include <vector>
-#include <QtCore/QPoint>
-
-#include "cTile.h"
-#include "cTileset.h"
-
-using namespace std;
-
-class cTileManager
+nConnection::nConnection(QTcpSocket *tcpSocket)
 {
-    private:
-    vector<cTile*> tiles;
-    int id;
+    this->tcpSocket = tcpSocket;
+    handle = "";
 
-    public:
-    cTileManager();
+    connect(tcpSocket, SIGNAL(readyRead()), this, SLOT(readData()));
+}
 
-    int addTile(int tile, int layer, int mapId, QPoint pos, cTileset *tileset);
-    void removeTile(cTile *tile);
-    void removeTile(int id);
 
-    cTile* findTile(int id);
-    vector<cTile*> getTilesByTilesetId(int id);
-    vector<cTile*> getTilesByMapId(int id);
+void nConnection::sendData(QByteArray out)
+{
+    if(tcpSocket->write(out) != out.length())
+        cout << "not all bytes were sent" << endl;
+}
 
-    private:
-    int getPos(int id);
-};
+void nConnection::setHandle(QString handle)
+{
+    this->handle = handle;
+}
 
-#endif
+QString nConnection::getHandle()
+{
+    return handle;
+}
 
+void nConnection::disconnectConnections()
+{
+    tcpSocket->disconnectFromHost();
+}
+
+void nConnection::readData()
+{
+    QByteArray data = tcpSocket->readAll();
+    emit newData(data, this);
+}

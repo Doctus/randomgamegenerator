@@ -1,3 +1,23 @@
+/*
+Random Game Generator - The generation of time transcending tabletop games!
+Copyright (C) 2009 Michael de Lang
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+
 #include "cTilesetManager.h"
 
 cTilesetManager::cTilesetManager()
@@ -5,7 +25,7 @@ cTilesetManager::cTilesetManager()
     id = 0;
 }
 
-int cTilesetManager::loadTileset(GLWidget *mGLWidget, int tileWidth, int tileHeight, string filename)
+int cTilesetManager::loadTileset(wGLWidget *mGLWidget, int tileWidth, int tileHeight, string filename)
 {
     id++;
     try
@@ -14,6 +34,7 @@ int cTilesetManager::loadTileset(GLWidget *mGLWidget, int tileWidth, int tileHei
     }
     catch (...) //this needs to be handled better than just catching any and all exception...although it works <_<
     {
+        id--;
         return -1;
     }
     return id;

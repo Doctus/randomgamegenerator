@@ -18,37 +18,44 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
-#ifndef CTILEMANAGER_H
-#define CTILEMANAGER_H
+#ifndef NCONNECTION_H
+#define NCONNECTION_H
 
-#include <vector>
-#include <QtCore/QPoint>
+class nConnection;
 
-#include "cTile.h"
-#include "cTileset.h"
+#include <QtNetwork/QTcpSocket>
+#include <QtCore/QObject>
+#include <QtCore/QByteArray>
+#include <iostream>
+
+#include "nConnectionManager.h"
 
 using namespace std;
 
-class cTileManager
+class nConnection : public QObject
 {
+    Q_OBJECT;
+
     private:
-    vector<cTile*> tiles;
-    int id;
+    QTcpSocket *tcpSocket;
+    QString handle;
+
+    friend class nConnectionManager;
 
     public:
-    cTileManager();
+    nConnection(QTcpSocket *tcpSocket);
 
-    int addTile(int tile, int layer, int mapId, QPoint pos, cTileset *tileset);
-    void removeTile(cTile *tile);
-    void removeTile(int id);
+    void sendData(QByteArray out);
+    void setHandle(QString handle);
+    QString getHandle();
+    void disconnectConnections();
 
-    cTile* findTile(int id);
-    vector<cTile*> getTilesByTilesetId(int id);
-    vector<cTile*> getTilesByMapId(int id);
+    private slots:
+    void readData();
 
-    private:
-    int getPos(int id);
+    signals:
+    void newData(QByteArray in, nConnection *mConnection); //not implented in nConnection.cpp, but in the auto-generated moc
 };
 
-#endif
 
+#endif // NCONNECTION_H

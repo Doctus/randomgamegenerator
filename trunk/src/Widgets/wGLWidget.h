@@ -18,37 +18,34 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
-#ifndef CTILEMANAGER_H
-#define CTILEMANAGER_H
+#ifndef wGLWidget_H
+#define wGLWidget_H
 
-#include <vector>
-#include <QtCore/QPoint>
+#include <QtOpenGL/QtOpenGL>
+#include <QtGui/QImage>
+#include <QtCore/QRect>
 
-#include "cTile.h"
-#include "cTileset.h"
+#ifdef _WINDOWS
+  #define GL_TEXTURE_RECTANGLE_ARB 0x84F5 //HAR HAR. VEE BE EVUL. VEE IS NUT CHECKING IF IT IS SUPPORTED ON PLATFORM.
+#endif
+
+#include <iostream>
 
 using namespace std;
 
-class cTileManager
+class wGLWidget : public QGLWidget
 {
-    private:
-    vector<cTile*> tiles;
-    int id;
-
     public:
-    cTileManager();
+    wGLWidget(QWidget* parent);
 
-    int addTile(int tile, int layer, int mapId, QPoint pos, cTileset *tileset);
-    void removeTile(cTile *tile);
-    void removeTile(int id);
+    void initializeGL();
+    void paintGL();
+    void drawImage(QImage *originalImage, int x, int y);
+    void drawImage(GLuint texture, int x, int y, int w, int h);
+    void resizeGL(int w, int h);
 
-    cTile* findTile(int id);
-    vector<cTile*> getTilesByTilesetId(int id);
-    vector<cTile*> getTilesByMapId(int id);
-
-    private:
-    int getPos(int id);
+    GLuint createTexture(QImage *image);
+    void deleteTexture(GLuint texture);
 };
 
 #endif
-
