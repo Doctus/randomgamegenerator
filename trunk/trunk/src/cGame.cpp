@@ -1,22 +1,39 @@
+/*
+Random Game Generator - The generation of time transcending tabletop games!
+Copyright (C) 2009 Michael de Lang
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+
 #include "cGame.h"
-//#include "cGame.moc" //this is not needed? Qmake handles this itself?
 
 unsigned int FPScounter = 0;
 
 cGame::cGame(QWidget *parent) : QObject(parent)
 {
-    mGLWidget = new GLWidget(parent);
+    mGLWidget = new wGLWidget(parent);
     ((QMainWindow*)parent)->setCentralWidget(mGLWidget);
 
-    mMenuBar = new cMenuBar(parent, this);
+    mMenuBar = new wMenuBar(parent, this);
 
-    mDockWidgets = new cDockWidgets((QMainWindow*)parent);
+    mDockWidgets = new wDockWidgets((QMainWindow*)parent);
 
     mTileManager = new cTileManager();
     mTilesetManager = new cTilesetManager();
-    //mTilesetManager->loadTileset(mGLWidget, 32, 32, "town.png");
     mCurrentMap = new cMap(0, mGLWidget, mTileManager, mTilesetManager);
-    //mCurrentMap->loadMap("Example.cfg");
 
     QTimer *timer = new QTimer(this);
     QTimer *timer2 = new QTimer(this);
@@ -24,7 +41,7 @@ cGame::cGame(QWidget *parent) : QObject(parent)
     connect(timer , SIGNAL(timeout()), this, SLOT(draw()));
     connect(timer2, SIGNAL(timeout()), this, SLOT(logic()));
     connect(timer3, SIGNAL(timeout()), this, SLOT(displayFPS()));
-    //timer ->start(40);
+    timer ->start(40);
     timer2->start(20);
     timer3->start(5000);
 }

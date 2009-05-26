@@ -1,8 +1,8 @@
 # -------------------------------------------------
 # Project created by QtCreator 2009-04-30T16:15:26
 # -------------------------------------------------
-QT += opengl
-TARGET = random-name-generator
+QT += opengl network
+TARGET = random-game-generator
 TEMPLATE = app
 LIBS = -lconfig++
 SOURCES += ../src/main.cpp \
@@ -13,10 +13,12 @@ SOURCES += ../src/main.cpp \
     ../src/cMap.cpp \
     ../src/cGame.cpp \
     ../src/cCamera.cpp \
-    ../src/Widgets/GLWidget.cpp \
+    ../src/Widgets/wGLWidget.cpp \
     ../src/cEventManager.cpp \
-    ../src/Widgets/MenuBar.cpp \
-    ../src/Widgets/DockWidgets.cpp
+    ../src/Widgets/wMenuBar.cpp \
+    ../src/Widgets/wDockWidgets.cpp \
+    ../src/Network/nConnection.cpp \
+    ../src/Network/nConnectionManager.cpp
 HEADERS += ../src/cTilesetManager.h \
     ../src/cTileset.h \
     ../src/cTileManager.h \
@@ -24,8 +26,10 @@ HEADERS += ../src/cTilesetManager.h \
     ../src/cMap.h \
     ../src/cGame.h \
     ../src/cCamera.h \
-    ../src/Widgets/GLWidget.h \
+    ../src/Widgets/wGLWidget.h \
     ../src/cEventManager.h \
-    ../src/Widgets/MenuBar.h \
-    ../src/Widgets/DockWidgets.h
+    ../src/Widgets/wMenuBar.h \
+    ../src/Widgets/wDockWidgets.h \
+    ../src/Network/nConnection.h \
+    ../src/Network/nConnectionManager.h
 FORMS += 
