@@ -63,6 +63,7 @@ class nConnectionManager : public QObject
     void failedConnectionSlot(QAbstractSocket::SocketError error);
     void succeededConnectionSlot();
     void disconnectedSlot();
+    void stateChangedSlot(QAbstractSocket::SocketState state);
 };
 
 #endif // NCONNECTIONMANAGER_H

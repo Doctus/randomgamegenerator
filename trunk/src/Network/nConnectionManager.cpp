@@ -63,14 +63,15 @@ void nConnectionManager::connectTo(QString host, uint port)
         disconnectConnections();
     }
 
-    QTcpSocket sock(this);
-    sock.connectToHost(host, port);
+    QTcpSocket *sock = new QTcpSocket(this);
 
-    connect(&sock, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(failedConnectionSlot(QAbstractSocket::SocketError)));
-    connect(&sock, SIGNAL(connected()), this, SLOT(succeededConnectionSlot()));
-    connect(&sock, SIGNAL(disconnected()), this, SLOT(disconnectedSlot()));
+    connect(sock, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(failedConnectionSlot(QAbstractSocket::SocketError)));
+    connect(sock, SIGNAL(connected()), this, SLOT(succeededConnectionSlot()));
+    connect(sock, SIGNAL(disconnected()), this, SLOT(disconnectedSlot()));
 
-    mConnections.append(new nConnection(&sock));
+    mConnections.append(new nConnection(sock));
+
+    sock->connectToHost(host, port);
 }
 
 /*
@@ -173,18 +174,18 @@ void nConnectionManager::ping()
 
 void nConnectionManager::failedConnectionSlot(QAbstractSocket::SocketError error)
 {
-    mConnections.clear();
-
     QMessageBox errorDialog((QWidget*)parent());
-    errorDialog.setText("Could not connect to host: " + QString(error));
-    errorDialog.exec();
+    errorDialog.setText("Could not connect to host: " + QString(error) + "/" + mConnections.at(0)->tcpSocket->errorString());
+    errorDialog.show();
+
+    mConnections.clear();
 }
 
 void nConnectionManager::succeededConnectionSlot()
 {
     QMessageBox infoDialog((QWidget*)parent());
     infoDialog.setText("Connected to host!");
-    infoDialog.exec();
+    infoDialog.show();
 
     connected = 1;
 
@@ -194,7 +195,7 @@ void nConnectionManager::succeededConnectionSlot()
     {
         QMessageBox errorDialog((QWidget*)parent());
         errorDialog.setText("Something wrong with mConnections.");
-        errorDialog.exec();
+        errorDialog.show();
         connected = 0;
     }
 }
@@ -203,9 +204,42 @@ void nConnectionManager::disconnectedSlot()
 {
     QMessageBox errorDialog((QWidget*)parent());
     errorDialog.setText("Got disconnected from host: " + mConnections.at(0)->tcpSocket->errorString());
+    errorDialog.show();
 
     mConnections.clear();
     connected = 0;
+}
 
-    errorDialog.exec();
+void nConnectionManager::stateChangedSlot(QAbstractSocket::SocketState state)
+{
+    /*QMessageBox errorDialog((QWidget*)parent());
+    switch (state)
+    {
+        case QAbstractSocket::UnconnectedState:
+            errorDialog.setText("State changed: UnconnectedState");
+            break;
+        case QAbstractSocket::HostLookupState:
+            errorDialog.setText("State changed: HostLookupState");
+            break;
+        case QAbstractSocket::ConnectedState:
+            errorDialog.setText("State changed: ConnectedState");
+            break;
+        case QAbstractSocket::ConnectingState:
+            errorDialog.setText("State changed: ConnectingState");
+            break;
+        case QAbstractSocket::BoundState:
+            errorDialog.setText("State changed: BoundState");
+            break;
+        case QAbstractSocket::ClosingState:
+            errorDialog.setText("State changed: ClosingState");
+            break;
+        case QAbstractSocket::ListeningState:
+            errorDialog.setText("State changed: ListeningState");
+            break;
+        default:
+            errorDialog.setText("State changed: ERROR, DEFAULT!?");
+            break;
+    }
+
+    errorDialog.exec();*/
 }
