@@ -20,6 +20,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "wGLWidget.h"
 
+#ifdef _WINDOWS
+  #define GL_TEXTURE_RECTANGLE_ARB GL_TEXTURE_2D //This abolishes POT textures, but at least it works! (god damn microsoft and its shitty products)
+#endif
+
 std::string translateGLError(GLenum errorcode)
 {
   std::string errorStr = (char*)gluErrorString(errorcode);
@@ -78,15 +82,27 @@ void wGLWidget::drawImage(QImage *originalImage, int x, int y)
     //note, Somehow, qt4 reverses bottom and top. Somehow.
     glBegin(GL_QUADS);
         //Top-left vertex (corner)
+#ifdef _WINDOWS
+        glTexCoord2i(0, 1);
+#else
         glTexCoord2i(0, image.height()); //image/texture
+#endif
         glVertex3i(x, y, 0); //screen coordinates
 
         //Bottom-left vertex (corner)
+#ifdef _WINDOWS
+        glTexCoord2i(1, 1);
+#else
         glTexCoord2i(image.width(), image.height());
+#endif
         glVertex3i(x+image.width(), y, 0);
 
         //Bottom-right vertex (corner)
+#ifdef _WINDOWS
+        glTexCoord2i(1, 0);
+#else
         glTexCoord2i(image.width(), 0);
+#endif
         glVertex3i(x+image.width(), y+image.height(), 0);
 
         //Top-right vertex (corner)
@@ -113,15 +129,27 @@ void wGLWidget::drawImage(GLuint texture, int x, int y, int w, int h)
     //note, Somehow, qt4 reverses bottom and top. Somehow.
     glBegin(GL_QUADS);
         //Top-left vertex (corner)
+#ifdef _WINDOWS
+        glTexCoord2i(0, 1);
+#else
         glTexCoord2i(0, h); //image/texture
+#endif
         glVertex3i(x, y, 0); //screen coordinates
 
         //Bottom-left vertex (corner)
+#ifdef _WINDOWS
+        glTexCoord2i(1, 1);
+#else
         glTexCoord2i(w, h);
+#endif
         glVertex3i(x+w, y, 0);
 
         //Bottom-right vertex (corner)
+#ifdef _WINDOWS
+        glTexCoord2i(1, 0);
+#else
         glTexCoord2i(w, 0);
+#endif
         glVertex3i(x+w, y+h, 0);
 
         //Top-right vertex (corner)
