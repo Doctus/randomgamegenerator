@@ -53,7 +53,6 @@ class cGame : public QObject
 
     private slots:
     void draw();
-    void logic();
     void displayFPS();
 
     public:

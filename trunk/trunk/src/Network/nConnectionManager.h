@@ -31,7 +31,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <iostream>
 
+class nConnectionManager;
+
 #include "nConnection.h"
+#include "../cEventManager.h"
 
 using namespace std;
 
@@ -43,6 +46,7 @@ class nConnectionManager : public QObject
     QList<nConnection*> mConnections;
     QTcpServer *tcpServer;
     QTimer pingTimer;
+    cEventManager *mEventManager;
     int connected;
 
     public:
@@ -53,7 +57,6 @@ class nConnectionManager : public QObject
     void disconnectConnections();
 
     private slots:
-
     //server slots
     void newConnection();
     void newData(QByteArray in, nConnection *mConnection); //server AND client slot

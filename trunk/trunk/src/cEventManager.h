@@ -23,10 +23,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <map>
 #include <iostream>
+#include <libconfig.h++>
 
 class cEventManager;
 
-#include "Widgets/wGLWidget.h"
+#include "cGame.h"
 
 using namespace std;
 
@@ -34,15 +35,22 @@ class cEventManager
 {
     private:
     map<int, int> keymaps;
+    cGame *mGame;
+    enum {REQUEST_INFO, PING, MESSAGE};
+
     static cEventManager* instance;
 
     cEventManager();
 
-    friend class wGLWidget;
+    friend class cGame;
 
     public:
     bool isKeyPressed(int key);
     static cEventManager* getInstance();
+
+    QString requestInfo();
+    QString sendMessage(QString message);
+    void handleMessage(QString message);
 
     private:
     void keyPress(int key);

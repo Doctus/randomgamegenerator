@@ -37,13 +37,10 @@ cGame::cGame(QWidget *parent) : QObject(parent)
 
     QTimer *timer = new QTimer(this);
     QTimer *timer2 = new QTimer(this);
-    QTimer *timer3 = new QTimer(this);
     connect(timer , SIGNAL(timeout()), this, SLOT(draw()));
-    connect(timer2, SIGNAL(timeout()), this, SLOT(logic()));
-    connect(timer3, SIGNAL(timeout()), this, SLOT(displayFPS()));
+    connect(timer2, SIGNAL(timeout()), this, SLOT(displayFPS()));
     timer ->start(40);
-    timer2->start(20);
-    timer3->start(5000);
+    timer2->start(5000);
 }
 
 cGame::~cGame()
@@ -62,15 +59,9 @@ void cGame::draw()
     FPScounter++;
 }
 
-void cGame::logic()
-{
-    if(mCurrentMap != NULL)
-        mCurrentMap->logic();
-}
-
 void cGame::displayFPS()
 {
-    cout << FPScounter << " frames per 5 seconds" << endl;
+    ((QMainWindow*)parent())->setWindowTitle(QString("Random Game Generator | FPS: ") + QString::number(FPScounter));
     FPScounter = 0;
 }
 

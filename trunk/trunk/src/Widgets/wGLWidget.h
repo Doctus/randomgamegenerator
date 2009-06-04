@@ -25,10 +25,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <QtGui/QImage>
 #include <QtCore/QRect>
 
-#ifdef _WINDOWS
-  #define GL_TEXTURE_RECTANGLE_ARB 0x84F5 //HAR HAR. VEE BE EVUL. VEE IS NUT CHECKING IF IT IS SUPPORTED ON PLATFORM.
-#endif
-
 #include <iostream>
 
 using namespace std;

@@ -1,10 +1,11 @@
 # -------------------------------------------------
 # Project created by QtCreator 2009-04-30T16:15:26
 # -------------------------------------------------
-QT += opengl network
+QT += opengl \
+    network
 TARGET = random-game-generator
 TEMPLATE = app
-LIBS = -lconfig++
+LIBS = -lconfig++ -lconfuse
 SOURCES += ../src/main.cpp \
     ../src/cTilesetManager.cpp \
     ../src/cTileset.cpp \

@@ -122,7 +122,7 @@ void wGLWidget::drawImage(GLuint texture, int x, int y, int w, int h)
 {
     GLenum error;
 
-    //cout << "drawing texture " << texture << endl;
+    //cout << "drawing texture " << texture << " at (" << x << "," << y << ") (" << w << "," << h << ")" << endl;
 
     glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture);
 
