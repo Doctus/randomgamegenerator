@@ -91,6 +91,8 @@ void cTileset::loadImage()
             QRect rect(x, y, tileWidth, tileHeight);
             QImage texture = image->copy(rect);
 
+            cout << "Creating texture from " << filename << " at (" << x << "," << y << ")" << endl;
+
             try
             {
                 textureIds.insert(pair<unsigned int, GLuint>(tile, mGLWidget->createTexture(&texture)));

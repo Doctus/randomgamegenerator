@@ -17,7 +17,6 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
 #include "cEventManager.h"
 
 cEventManager *cEventManager::instance;
@@ -41,6 +40,22 @@ bool cEventManager::isKeyPressed(int key)
         return true;
 
     return false;
+}
+
+QString cEventManager::requestInfo()
+{
+    QString str = "message: {type: " + QString(REQUEST_INFO) + ";};";
+    return str;
+}
+
+QString cEventManager::sendMessage(QString message)
+{
+    QString str = "message: {type: " + QString(MESSAGE) + "; content: \"" + message + "\";};";
+    return str;
+}
+
+void cEventManager::handleMessage(QString message)
+{
 }
 
 

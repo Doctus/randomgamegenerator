@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <string>
 #include <sstream>
 #include <vector>
-#include <libconfig.h++>
+#include <confuse.h>
 
 class cMap;
 
@@ -57,7 +57,6 @@ class cMap
 
     bool loadMap(string filename);
     void draw();
-    void logic();
 };
 
 #endif

@@ -25,6 +25,7 @@ nConnectionManager::nConnectionManager(QWidget *parent) : QObject(parent)
     connected = 0;
 
     tcpServer = new QTcpServer(this);
+    mEventManager = cEventManager::getInstance();
 
     connect(&pingTimer , SIGNAL(timeout()), this, SLOT(ping()));
     pingTimer.setInterval(5000);
@@ -69,7 +70,10 @@ void nConnectionManager::connectTo(QString host, uint port)
     connect(sock, SIGNAL(connected()), this, SLOT(succeededConnectionSlot()));
     connect(sock, SIGNAL(disconnected()), this, SLOT(disconnectedSlot()));
 
-    mConnections.append(new nConnection(sock));
+    nConnection *conn = new nConnection(sock);
+    connect(conn, SIGNAL(newData(QByteArray, nConnection)), this, SLOT(newData(QByteArray,nConnection*)));
+
+    mConnections.append(conn);
 
     sock->connectToHost(host, port);
 }
@@ -145,18 +149,14 @@ void nConnectionManager::newConnection()
 
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_0);
-    out << QString("Hello from server!");
+    out.setVersion(QDataStream::Qt_4_5);
+    out << mEventManager->requestInfo();
 
     sock->write(block);
 
     nConnection *conn = new nConnection(sock);
     connect(conn, SIGNAL(newData(QByteArray, nConnection*)), this, SLOT(newData(QByteArray, nConnection*)));
     mConnections.append(conn);
-
-    QMessageBox infoDialog((QWidget*)parent());
-    infoDialog.setText("Got new connection.");
-    infoDialog.exec();
 }
 
 void nConnectionManager::newData(QByteArray in, nConnection *mConnection)
@@ -167,7 +167,10 @@ void nConnectionManager::newData(QByteArray in, nConnection *mConnection)
 
 void nConnectionManager::ping()
 {
-    cout << "something" << endl;
+    foreach(nConnection *conn, mConnections)
+    {
+        conn->sendData(QByteArray("ping: {}"));
+    }
 }
 
 
@@ -188,16 +191,6 @@ void nConnectionManager::succeededConnectionSlot()
     infoDialog.show();
 
     connected = 1;
-
-    if(mConnections.size() > 0)
-        mConnections.at(0)->sendData(QByteArray("Hello!"));
-    else
-    {
-        QMessageBox errorDialog((QWidget*)parent());
-        errorDialog.setText("Something wrong with mConnections.");
-        errorDialog.show();
-        connected = 0;
-    }
 }
 
 void nConnectionManager::disconnectedSlot()

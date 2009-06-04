@@ -77,7 +77,7 @@ void wMenuBar::loadMapSlot()
 {
     QString fileName = QFileDialog::getOpenFileName(windowWidget, tr("Open File"), QDir::currentPath());
 
-    if (!fileName.isEmpty())
+    if(!fileName.isEmpty())
     {
         mGame->loadMap(fileName.toStdString());
     }
