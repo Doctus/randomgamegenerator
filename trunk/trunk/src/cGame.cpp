@@ -24,12 +24,14 @@ unsigned int FPScounter = 0;
 
 cGame::cGame(QWidget *parent) : QObject(parent)
 {
+    mConnectionManager = new nConnectionManager(parent, this);
+
     mGLWidget = new wGLWidget(parent);
     ((QMainWindow*)parent)->setCentralWidget(mGLWidget);
 
-    mMenuBar = new wMenuBar(parent, this);
+    mMenuBar = new wMenuBar(parent, this, mConnectionManager);
 
-    mDockWidgets = new wDockWidgets((QMainWindow*)parent);
+    mDockWidgets = new wDockWidgets((QMainWindow*)parent, this);
 
     mTileManager = new cTileManager();
     mTilesetManager = new cTilesetManager();
@@ -39,7 +41,7 @@ cGame::cGame(QWidget *parent) : QObject(parent)
     QTimer *timer2 = new QTimer(this);
     connect(timer , SIGNAL(timeout()), this, SLOT(draw()));
     connect(timer2, SIGNAL(timeout()), this, SLOT(displayFPS()));
-    timer ->start(40);
+    timer ->start(16);
     timer2->start(5000);
 }
 
@@ -48,6 +50,18 @@ cGame::~cGame()
     delete mTileManager;
     delete mTilesetManager;
 }
+
+void cGame::newExternalChatMessage(QString message, QString handle)
+{
+    cout << "external chat message: " << handle.toStdString() << " - " << message.toStdString() << endl;
+    mDockWidgets->externalMessage(message, handle);
+}
+
+void cGame::newInternalChatMessage(QString message)
+{
+    mConnectionManager->sendChatMessage(message);
+}
+
 
 void cGame::draw()
 {

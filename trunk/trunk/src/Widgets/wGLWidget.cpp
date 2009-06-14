@@ -36,7 +36,7 @@ wGLWidget::wGLWidget(QWidget* parent) : QGLWidget(QGLFormat(QGL::FormatOptions(Q
     resize(parent->width(), parent->height());
 
     this->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-
+    
     //OpenGL is initialized here, instead of somewhere inside Qt4, otherwise it Segfaults due to doing stuff prior to OpenGL being initialized. Or something.
     glInit();
 }

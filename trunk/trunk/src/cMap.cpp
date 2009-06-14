@@ -58,7 +58,6 @@ cMap::cMap(int id, wGLWidget *mGLWidget, cTileManager *tileManager, cTilesetMana
     tileHeight = 0;
     mTileManager = tileManager;
     mTilesetManager = tilesetManager;
-    mEventManager = cEventManager::getInstance();
     mCamera = new cCamera(0, 0, 640, 480);
 }
 

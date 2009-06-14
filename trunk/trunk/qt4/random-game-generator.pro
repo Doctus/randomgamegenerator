@@ -5,7 +5,8 @@ QT += opengl \
     network
 TARGET = random-game-generator
 TEMPLATE = app
-LIBS = -lconfig++ -lconfuse
+LIBS = -lconfig++ \
+    -lconfuse
 SOURCES += ../src/main.cpp \
     ../src/cTilesetManager.cpp \
     ../src/cTileset.cpp \
@@ -15,7 +16,6 @@ SOURCES += ../src/main.cpp \
     ../src/cGame.cpp \
     ../src/cCamera.cpp \
     ../src/Widgets/wGLWidget.cpp \
-    ../src/cEventManager.cpp \
     ../src/Widgets/wMenuBar.cpp \
     ../src/Widgets/wDockWidgets.cpp \
     ../src/Network/nConnection.cpp \
@@ -28,7 +28,6 @@ HEADERS += ../src/cTilesetManager.h \
     ../src/cGame.h \
     ../src/cCamera.h \
     ../src/Widgets/wGLWidget.h \
-    ../src/cEventManager.h \
     ../src/Widgets/wMenuBar.h \
     ../src/Widgets/wDockWidgets.h \
     ../src/Network/nConnection.h \

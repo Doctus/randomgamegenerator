@@ -51,7 +51,7 @@ class wMenuBar : public QObject
     QMenu *helpMenu;
 
     public:
-    wMenuBar(QWidget *windowWidget, cGame *game);
+    wMenuBar(QWidget *windowWidget, cGame *game, nConnectionManager *mConnectionManager);
 
     void initActions();
     void initBars();

@@ -20,11 +20,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "wMenuBar.h"
 
-wMenuBar::wMenuBar(QWidget *windowWidget, cGame *game)
+wMenuBar::wMenuBar(QWidget *windowWidget, cGame *game, nConnectionManager *mConnectionManager)
 {
     this->windowWidget = windowWidget;
     this->mGame = game;
-    mConnectionManager = new nConnectionManager(windowWidget);
+    this->mConnectionManager = mConnectionManager;
 
     initActions();
     initBars();
@@ -92,17 +92,27 @@ void wMenuBar::showTextDockWidgetSlot()
 void wMenuBar::hostServerSlot()
 {
     bool okStuff = false;
+    QString handle = QInputDialog::getText(windowWidget, "Name", "Which handle are you going to use?", QLineEdit::Normal, "Host", &okStuff);
+
+    if(!okStuff) //if user pressed cancel
+        return;
+
     int port = QInputDialog::getInt(windowWidget, "Port", "Which port to host on?", 6812, 1025, 65535, 1, &okStuff);
 
     if(!okStuff)
         return;
 
-    mConnectionManager->startServer(port);
+    mConnectionManager->startServer(port, handle);
 }
 
 void wMenuBar::connectToServerSlot()
 {
     bool okStuff = false;
+    QString handle = QInputDialog::getText(windowWidget, "Name", "Which handle are you going to use?", QLineEdit::Normal, "Guest", &okStuff);
+
+    if(!okStuff) //if user pressed cancel
+        return;
+
     QString host = QInputDialog::getText(windowWidget, "Host", "Which host to connect to?", QLineEdit::Normal, "localhost", &okStuff);
 
     if(!okStuff)
@@ -113,5 +123,5 @@ void wMenuBar::connectToServerSlot()
     if(!okStuff)
         return;
 
-    mConnectionManager->connectTo(host, port);
+    mConnectionManager->connectTo(host, port, handle);
 }

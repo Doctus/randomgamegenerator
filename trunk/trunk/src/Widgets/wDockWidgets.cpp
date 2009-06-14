@@ -20,8 +20,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "wDockWidgets.h"
 
-wDockWidgets::wDockWidgets(QMainWindow *mainWindow) : QObject(mainWindow)
+wDockWidgets::wDockWidgets(QMainWindow *mainWindow, cGame *mGame) : QObject(mainWindow)
 {
+    this->mGame = mGame;
+
     dockWidgetEditor = new QTextBrowser(mainWindow);
     dockWidgetLineInput = new QLineEdit(mainWindow);
     dockWidget = new QDockWidget(QObject::tr("Dock Widget"), mainWindow);
@@ -46,11 +48,26 @@ void wDockWidgets::showTextDockWidgets()
     dockWidget->show();
 }
 
+void wDockWidgets::externalMessage(QString message, QString handle)
+{
+    insertMessage(message, handle);
+}
+
+void wDockWidgets::insertMessage(QString message, QString handle)
+{
+    bool scroll = (dockWidgetEditor->verticalScrollBar()->value() == dockWidgetEditor->verticalScrollBar()->maximum()) ?
+                    true : false;
+
+    dockWidgetEditor->insertHtml("<font color=\"red\">" + handle + ":</font> " + message + "<br />");
+
+    if(scroll)
+        dockWidgetEditor->verticalScrollBar()->setValue(dockWidgetEditor->verticalScrollBar()->maximum());
+}
+
 void wDockWidgets::processInput()
 {
-
     QString str = dockWidgetLineInput->text();
-
-    dockWidgetEditor->insertHtml("<div style=\"background-color: #00ff00\">" + str + "</div><br />");
+    insertMessage(str, "You");
     dockWidgetLineInput->clear();
+    mGame->newInternalChatMessage(str);
 }
