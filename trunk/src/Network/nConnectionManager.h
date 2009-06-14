@@ -25,16 +25,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <QtCore/QObject>
 #include <QtCore/QByteArray>
 #include <QtCore/QTimer>
+#include <QtCore/QXmlStreamReader>
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QTcpSocket>
 #include <QtGui/QMessageBox>
+
+#include <confuse.h>
 
 #include <iostream>
 
 class nConnectionManager;
 
+#include "../cGame.h"
 #include "nConnection.h"
-#include "../cEventManager.h"
 
 using namespace std;
 
@@ -46,14 +49,20 @@ class nConnectionManager : public QObject
     QList<nConnection*> mConnections;
     QTcpServer *tcpServer;
     QTimer pingTimer;
-    cEventManager *mEventManager;
+    QString ourHandle;
     int connected;
+    cGame *mGame;
 
     public:
-    nConnectionManager(QWidget *parent);
+    nConnectionManager(QWidget *parent, cGame *mGame);
 
-    void connectTo(QString host, uint port);
-    void startServer(uint port);
+    void connectTo(QString host, uint port, QString handle);
+    void startServer(uint port, QString handle);
+    void sendChatMessage(QString message);
+
+    private:
+    void sendMessageToAll(QString message);
+    void sendMessageExceptThisone(QString message, nConnection *leftOut);
     void disconnectConnections();
 
     private slots:
@@ -65,7 +74,7 @@ class nConnectionManager : public QObject
     //client slots
     void failedConnectionSlot(QAbstractSocket::SocketError error);
     void succeededConnectionSlot();
-    void disconnectedSlot();
+    void disconnectedSlot(nConnection *conn);
     void stateChangedSlot(QAbstractSocket::SocketState state);
 };
 

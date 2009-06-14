@@ -20,12 +20,32 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "nConnectionManager.h"
 
-nConnectionManager::nConnectionManager(QWidget *parent) : QObject(parent)
+namespace MessageTypes
 {
-    connected = 0;
+    enum Types
+    {
+        HANDLE = 0,
+        PING = 1,
+        CHAT_MESSAGE = 2
+    };
+}
+
+namespace Connection
+{
+    enum conn
+    {
+        NONE = 0,
+        CLIENT = 1,
+        SERVER = 2
+    };
+}
+
+nConnectionManager::nConnectionManager(QWidget *parent, cGame *mGame) : QObject(parent)
+{
+    connected = Connection::NONE;
 
     tcpServer = new QTcpServer(this);
-    mEventManager = cEventManager::getInstance();
+    this->mGame = mGame;
 
     connect(&pingTimer , SIGNAL(timeout()), this, SLOT(ping()));
     pingTimer.setInterval(5000);
@@ -35,9 +55,9 @@ nConnectionManager::nConnectionManager(QWidget *parent) : QObject(parent)
  * Can't be hosting a server and connect to somewhere at the same time. So it checks for connected to not equal 2(server)
  * and if not, it sets connected to 1(client)
  */
-void nConnectionManager::connectTo(QString host, uint port)
+void nConnectionManager::connectTo(QString host, uint port, QString handle)
 {
-    if(connected == 2)
+    if(connected == Connection::SERVER)
     {
         QMessageBox warningDialog((QWidget*)parent());
         warningDialog.setText("You can't be hosting and being connected to a host at the same time. Continueing will disconnect your current connection.");
@@ -50,7 +70,7 @@ void nConnectionManager::connectTo(QString host, uint port)
 
         disconnectConnections();
     }
-    else if(connected == 1)
+    else if(connected == Connection::CLIENT)
     {
         QMessageBox warningDialog((QWidget*)parent());
         warningDialog.setText("You're already connected. Continueing will disconnect your current connection.");
@@ -64,14 +84,17 @@ void nConnectionManager::connectTo(QString host, uint port)
         disconnectConnections();
     }
 
+    ourHandle = handle;
+
     QTcpSocket *sock = new QTcpSocket(this);
 
     connect(sock, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(failedConnectionSlot(QAbstractSocket::SocketError)));
     connect(sock, SIGNAL(connected()), this, SLOT(succeededConnectionSlot()));
-    connect(sock, SIGNAL(disconnected()), this, SLOT(disconnectedSlot()));
 
     nConnection *conn = new nConnection(sock);
-    connect(conn, SIGNAL(newData(QByteArray, nConnection)), this, SLOT(newData(QByteArray,nConnection*)));
+    connect(conn, SIGNAL(newData(QByteArray, nConnection*)), this, SLOT(newData(QByteArray,nConnection*)));
+    connect(conn, SIGNAL(disconnected(nConnection*)), this, SLOT(disconnectedSlot(nConnection*)));
+    conn->setHandle(handle);
 
     mConnections.append(conn);
 
@@ -82,9 +105,9 @@ void nConnectionManager::connectTo(QString host, uint port)
  * Can't be hosting a server and connect to somewhere at the same time. So it checks for connected to not equal 1(client)
  * and if not, it sets connected to 2(server)
  */
-void nConnectionManager::startServer(uint port)
+void nConnectionManager::startServer(uint port, QString handle)
 {
-    if(connected == 1)
+    if(connected == Connection::CLIENT)
     {
         QMessageBox warningDialog((QWidget*)parent());
         warningDialog.setText("You can't be hosting and being connected to a host at the same time. Continueing will disconnect your current connection.");
@@ -97,7 +120,7 @@ void nConnectionManager::startServer(uint port)
 
         disconnectConnections();
     }
-    else if(connected == 2)
+    else if(connected == Connection::SERVER)
     {
         QMessageBox errorDialog((QWidget*)parent());
         errorDialog.setText("You are already hosting!");
@@ -113,14 +136,44 @@ void nConnectionManager::startServer(uint port)
         return;
     }
 
+    ourHandle = handle;
+
     pingTimer.start();
-    connected = 2;
+    connected = Connection::SERVER;
 
     connect(tcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 
     QMessageBox infoDialog((QWidget*)parent());
     infoDialog.setText("The server has been started.");
     infoDialog.exec();
+}
+
+void nConnectionManager::sendChatMessage(QString message)
+{
+    sendMessageToAll("<message type=\"" + QString::number(MessageTypes::CHAT_MESSAGE) + "\">"+
+                "<handle>" + ourHandle + "</handle>" +
+                "<content>" + message + "</content>" +
+                "</message>");
+}
+
+//private
+void nConnectionManager::sendMessageToAll(QString message)
+{
+    QByteArray out(message.toUtf8());
+    foreach(nConnection *conn, mConnections)
+    {
+        conn->sendData(out);
+    }
+}
+
+void nConnectionManager::sendMessageExceptThisone(QString message, nConnection *leftout)
+{
+    QByteArray out(message.toUtf8());
+    foreach(nConnection *conn, mConnections)
+    {
+        if(conn != leftout)
+            conn->sendData(out);
+    }
 }
 
 void nConnectionManager::disconnectConnections()
@@ -140,6 +193,7 @@ void nConnectionManager::disconnectConnections()
     }
 
     mConnections.clear();
+    connected = Connection::NONE;
 }
 
 
@@ -147,60 +201,123 @@ void nConnectionManager::newConnection()
 {
     QTcpSocket *sock = tcpServer->nextPendingConnection();
 
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_5);
-    out << mEventManager->requestInfo();
-
-    sock->write(block);
-
     nConnection *conn = new nConnection(sock);
     connect(conn, SIGNAL(newData(QByteArray, nConnection*)), this, SLOT(newData(QByteArray, nConnection*)));
+    connect(conn, SIGNAL(disconnected(nConnection*)), this, SLOT(disconnectedSlot(nConnection*)));
     mConnections.append(conn);
 }
 
 void nConnectionManager::newData(QByteArray in, nConnection *mConnection)
 {
-    QString str = mConnection->getHandle() + ": \"" + QString(in);
-    cout << "new data arrived from: " << str.toStdString() << endl;
+    QXmlStreamReader *xml = new QXmlStreamReader();
+    int type = -1;
+    QString customContent1, customContent2;
+    QString element;
+
+    xml->addData(QString::fromUtf8(in));
+
+    while (!xml->atEnd()) {
+        QXmlStreamReader::TokenType tokentype = xml->readNext();
+
+        if(tokentype == QXmlStreamReader::StartElement)
+        {
+            if(xml->name().toString() == "message")
+            {
+                type = xml->attributes().value("type").toString().toInt();
+                cout << "type changed to " << type << endl;
+            }
+
+            element = xml->name().toString();
+        }
+        else if(tokentype == QXmlStreamReader::Characters) //characters don't have a name set. Therefore we use element.
+        {
+            if(type == MessageTypes::HANDLE)
+            {
+                customContent1 = xml->text().toString();
+            }
+            else if(type == MessageTypes::CHAT_MESSAGE)
+            {
+                if(element == "handle")
+                {
+                    customContent1 = xml->text().toString();
+                }
+                else if(element == "content")
+                {
+                    customContent2 = xml->text().toString();
+                }
+            }
+        }
+        else if(tokentype == QXmlStreamReader::EndDocument)
+        {
+            if(type == MessageTypes::HANDLE)
+                mConnection->setHandle(customContent1);
+            if(type == MessageTypes::CHAT_MESSAGE)
+            {
+                cout << "chat message: " << customContent1.toStdString() << " - " << customContent2.toStdString() << endl;
+                mGame->newExternalChatMessage(customContent2, customContent1);
+
+                if(connected == Connection::SERVER)
+                {
+                    sendMessageExceptThisone(QString::fromUtf8(in), mConnection);
+                }
+            }
+        }
+   }
 }
 
 void nConnectionManager::ping()
 {
+    /*QString message = "<message type=\"" + MessageTypes::PING + "\">0</message>";
+    QByteArray out(message.toUtf8());
     foreach(nConnection *conn, mConnections)
     {
-        conn->sendData(QByteArray("ping: {}"));
-    }
+        conn->sendPing(out);
+    }*/
 }
 
 
-
+//Note that this is only used when initiating a connection to a server, not when hosting one.
 void nConnectionManager::failedConnectionSlot(QAbstractSocket::SocketError error)
 {
     QMessageBox errorDialog((QWidget*)parent());
-    errorDialog.setText("Could not connect to host: " + QString(error) + "/" + mConnections.at(0)->tcpSocket->errorString());
-    errorDialog.show();
+    errorDialog.setText("Could not connect to host: " + QString::number(error) + "/" + mConnections.at(0)->tcpSocket->errorString());
+    errorDialog.exec();
 
     mConnections.clear();
 }
 
+//Note that this is only used when initiating a connection to a server, not when hosting one.
 void nConnectionManager::succeededConnectionSlot()
 {
+    nConnection *conn = mConnections.at(0); //unsafe?
+
+    this->sendMessageToAll("<message type=\"" + QString::number(MessageTypes::HANDLE) + "\">" + conn->getHandle() + "</message>");
+
     QMessageBox infoDialog((QWidget*)parent());
     infoDialog.setText("Connected to host!");
-    infoDialog.show();
+    infoDialog.exec();
 
-    connected = 1;
+    connected = Connection::CLIENT;
 }
 
-void nConnectionManager::disconnectedSlot()
+void nConnectionManager::disconnectedSlot(nConnection *conn)
 {
-    QMessageBox errorDialog((QWidget*)parent());
-    errorDialog.setText("Got disconnected from host: " + mConnections.at(0)->tcpSocket->errorString());
-    errorDialog.show();
+    if(connected == Connection::CLIENT)
+    {
+        QMessageBox errorDialog((QWidget*)parent());
+        errorDialog.setText("Got disconnected from host: " + conn->tcpSocket->errorString());
+        errorDialog.exec();
 
-    mConnections.clear();
-    connected = 0;
+        connected = 0;
+    }
+    else if(connected == Connection::SERVER)
+    {
+        QMessageBox errorDialog((QWidget*)parent());
+        errorDialog.setText("\"" + conn->getHandle() + "\" has disconnected");
+        errorDialog.exec();
+    }
+
+    mConnections.removeOne(conn);
 }
 
 void nConnectionManager::stateChangedSlot(QAbstractSocket::SocketState state)

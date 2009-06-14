@@ -31,11 +31,9 @@ class cMap;
 
 #include "cTilesetManager.h"
 #include "cTileManager.h"
-#include "cEventManager.h"
 #include "cCamera.h"
 #include "Widgets/wGLWidget.h"
 
-using namespace libconfig;
 using namespace std;
 
 class cMap
@@ -43,7 +41,6 @@ class cMap
     private:
     cTilesetManager *mTilesetManager;
     cTileManager *mTileManager;
-    cEventManager *mEventManager;
     vector<int> tilesetIds;
     vector<int> layers;
     int id;

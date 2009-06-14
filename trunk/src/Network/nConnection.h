@@ -52,9 +52,11 @@ class nConnection : public QObject
 
     private slots:
     void readData();
+    void disconnectedSlot();
 
     signals:
     void newData(QByteArray in, nConnection *mConnection); //not implented in nConnection.cpp, but in the auto-generated moc
+    void disconnected(nConnection *conn);
 };
 
 

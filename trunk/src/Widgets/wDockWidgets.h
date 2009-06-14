@@ -28,6 +28,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <QtGui/QVBoxLayout>
 #include <QtCore/QObject>
 
+class wDockWidgets;
+
+#include "../cGame.h"
+
 class wDockWidgets : public QObject
 {
     Q_OBJECT;
@@ -36,11 +40,16 @@ class wDockWidgets : public QObject
     QTextBrowser *dockWidgetEditor;
     QLineEdit *dockWidgetLineInput;
     QDockWidget *dockWidget;
+    cGame *mGame;
 
     public:
-    wDockWidgets(QMainWindow *mainWindow);
+    wDockWidgets(QMainWindow *mainWindow, cGame *mGame);
 
     void showTextDockWidgets();
+    void externalMessage(QString message, QString handle);
+
+    private:
+    void insertMessage(QString message, QString handle);
 
     private slots:
     void processInput();

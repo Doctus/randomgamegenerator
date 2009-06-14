@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #define CGAME_H
 
 #include <QtGui/QWidget>
+#include <QtGui/QScrollArea>
 
 class cGame;
 
@@ -30,6 +31,7 @@ class cGame;
 #include "cTilesetManager.h"
 #include "Widgets/wMenuBar.h"
 #include "Widgets/wDockWidgets.h"
+#include "Network/nConnectionManager.h"
 
 using namespace std;
 
@@ -44,12 +46,18 @@ class cGame : public QObject
     wMenuBar *mMenuBar;
     wGLWidget *mGLWidget;
     wDockWidgets *mDockWidgets;
+    nConnectionManager *mConnectionManager;
+
+    QScrollArea *GLArea;
 
     friend class wMenuBar;
 
     public:
     cGame(QWidget *parent);
     ~cGame();
+
+    void newExternalChatMessage(QString message, QString handle);
+    void newInternalChatMessage(QString message);
 
     private slots:
     void draw();

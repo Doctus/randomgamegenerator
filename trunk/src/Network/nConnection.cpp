@@ -26,6 +26,7 @@ nConnection::nConnection(QTcpSocket *tcpSocket)
     handle = "";
 
     connect(tcpSocket, SIGNAL(readyRead()), this, SLOT(readData()));
+    connect(tcpSocket, SIGNAL(disconnected()), this, SLOT(disconnectedSlot()));
 }
 
 
@@ -54,4 +55,9 @@ void nConnection::readData()
 {
     QByteArray data = tcpSocket->readAll();
     emit newData(data, this);
+}
+
+void nConnection::disconnectedSlot()
+{
+    emit disconnected(this);
 }
