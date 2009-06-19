@@ -39,8 +39,9 @@ def _loadFromString(s):
   #image.drawClippedAt(x, y, rect_clip) //not sure how interaction will
   #                                    work; should the ID/tileset be
   #                                    passed or the xywh of the tile or?
-    
-  result.append(mapname)
+  print mapname
+  print authorname
+  print tiles
 
 def DEBUGLoadFromFile():
   f = open('test.txt', 'r')
@@ -53,6 +54,6 @@ def DEBUGSaveToFile():
   #inputs, format them properly, and write to a specified file.
   #It will of course be important to implement the same RLE.
   f = open('test.txt', 'w')
-  f.write('n! Example Map !n a! Doctus !a m! 5 5 t! town.png s!'+
+  f.write('n! Example Map !n a! Doctus !a m! 5 5 t! town.png s! '+
           '32 32 5 1~15 12 5 8 9 6~5')
   f.close()
