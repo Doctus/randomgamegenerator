@@ -24,6 +24,7 @@ nConnection::nConnection(QTcpSocket *tcpSocket)
 {
     this->tcpSocket = tcpSocket;
     handle = "";
+    properlyConnected = false;
 
     connect(tcpSocket, SIGNAL(readyRead()), this, SLOT(readData()));
     connect(tcpSocket, SIGNAL(disconnected()), this, SLOT(disconnectedSlot()));
@@ -44,6 +45,16 @@ void nConnection::setHandle(QString handle)
 QString nConnection::getHandle()
 {
     return handle;
+}
+
+bool nConnection::getProperlyConnected()
+{
+    return properlyConnected;
+}
+
+void nConnection::setProperlyConnected(bool pc)
+{
+    properlyConnected = pc;
 }
 
 void nConnection::disconnectConnections()

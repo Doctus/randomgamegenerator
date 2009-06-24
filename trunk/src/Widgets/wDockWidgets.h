@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #define DOCKWIDGETS_H
 
 #include <QtGui/QMainWindow>
-#include <QtGui/QTextBrowser>
+#include <QtGui/QTextEdit>
 #include <QtGui/QLineEdit>
 #include <QtGui/QDockWidget>
 #include <QtGui/QVBoxLayout>
@@ -37,7 +37,7 @@ class wDockWidgets : public QObject
     Q_OBJECT;
 
     private:
-    QTextBrowser *dockWidgetEditor;
+    QTextEdit *dockWidgetEditor;
     QLineEdit *dockWidgetLineInput;
     QDockWidget *dockWidget;
     cGame *mGame;
@@ -46,13 +46,13 @@ class wDockWidgets : public QObject
     wDockWidgets(QMainWindow *mainWindow, cGame *mGame);
 
     void showTextDockWidgets();
-    void externalMessage(QString message, QString handle);
-
-    private:
-    void insertMessage(QString message, QString handle);
+    void insertMessage(QString message);
 
     private slots:
     void processInput();
+
+    signals:
+    void newChatInputSignal(QString msg);
 };
 
 #endif // DOCKWIDGETS_H

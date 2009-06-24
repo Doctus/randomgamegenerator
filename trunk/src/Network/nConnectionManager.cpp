@@ -148,14 +148,6 @@ void nConnectionManager::startServer(uint port, QString handle)
     infoDialog.exec();
 }
 
-void nConnectionManager::sendChatMessage(QString message)
-{
-    sendMessageToAll("<message type=\"" + QString::number(MessageTypes::CHAT_MESSAGE) + "\">"+
-                "<handle>" + ourHandle + "</handle>" +
-                "<content>" + message + "</content>" +
-                "</message>");
-}
-
 //private
 void nConnectionManager::sendMessageToAll(QString message)
 {
@@ -173,6 +165,19 @@ void nConnectionManager::sendMessageExceptThisone(QString message, nConnection *
     {
         if(conn != leftout)
             conn->sendData(out);
+    }
+}
+
+void nConnectionManager::sendMessageToHandle(QString message, QString handle)
+{
+    QByteArray out(message.toUtf8());
+    foreach(nConnection *conn, mConnections)
+    {
+        if(conn->getHandle() == handle)
+        {
+            conn->sendData(out);
+            break;
+        }
     }
 }
 
@@ -209,7 +214,8 @@ void nConnectionManager::newConnection()
 
 void nConnectionManager::newData(QByteArray in, nConnection *mConnection)
 {
-    QXmlStreamReader *xml = new QXmlStreamReader();
+    emit newNetMessage(QString::fromUtf8(in), mConnection->getHandle());
+    /*QXmlStreamReader *xml = new QXmlStreamReader();
     int type = -1;
     QString customContent1, customContent2;
     QString element;
@@ -262,7 +268,7 @@ void nConnectionManager::newData(QByteArray in, nConnection *mConnection)
                 }
             }
         }
-   }
+   }*/
 }
 
 void nConnectionManager::ping()
@@ -291,7 +297,7 @@ void nConnectionManager::succeededConnectionSlot()
 {
     nConnection *conn = mConnections.at(0); //unsafe?
 
-    this->sendMessageToAll("<message type=\"" + QString::number(MessageTypes::HANDLE) + "\">" + conn->getHandle() + "</message>");
+    sendMessageToAll("<message type=\"" + QString::number(MessageTypes::HANDLE) + "\">" + conn->getHandle() + "</message>");
 
     QMessageBox infoDialog((QWidget*)parent());
     infoDialog.setText("Connected to host!");

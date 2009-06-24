@@ -39,6 +39,7 @@ class nConnection : public QObject
     private:
     QTcpSocket *tcpSocket;
     QString handle;
+    bool properlyConnected;
 
     friend class nConnectionManager;
 
@@ -48,6 +49,8 @@ class nConnection : public QObject
     void sendData(QByteArray out);
     void setHandle(QString handle);
     QString getHandle();
+    bool getProperlyConnected();
+    void setProperlyConnected(bool pc);
     void disconnectConnections();
 
     private slots:

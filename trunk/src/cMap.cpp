@@ -224,9 +224,9 @@ bool cMap::loadMap(string filename)
 
     cfg_t *cfg = cfg_init(opts, CFGF_NONE);
 
-    if(cfg_parse(cfg, filename.c_str()) == CFG_PARSE_ERROR)
+    if(cfg_parse(cfg, filename.c_str()) != CFG_SUCCESS)
     {
-        cout << "couldn't parse file" << endl;
+        cout << "couldn't parse file " << filename << endl;
         return false;
     }
 
