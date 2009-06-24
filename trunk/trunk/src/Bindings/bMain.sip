@@ -16,10 +16,16 @@ public:
     bMain();
     void start();
     void insertChatMessage(QString str);
-    void sendChatMessageToAll(QString msg);
-    void sendChatMessageToHandle(QString msg, QString handle);
+    void sendNetMessageToAll(QString msg);
+    void sendNetMessageToHandle(QString msg, QString handle);
+
+    QString getLocalUserList();
+    QString getLocalHandle();
+    bool isClient();
+    bool isServer();
 
 signals:
     void newNetMessageSignal(QString str, QString handle);
-    void newChatInput(QString str);
+    void newChatInputSignal(QString str);
+    void connectedSignal(QString handle);
 };

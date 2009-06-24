@@ -21,9 +21,13 @@ def newEvent(str):
 
 def newNetEvent(str, handle):
     print unicode(handle) + ": " + unicode(str)
-    c.insertChatMessage(unicode(handle) + ":" + unicode(str))
+    c.insertChatMessage(unicode(handle) + ": " + unicode(str))
 
-c.newChatInput.connect(newEvent)
+def newConnection(handle):
+    c.insertChatMessage(unicode(handle) + " has joined")
+
+c.newChatInputSignal.connect(newEvent)
 c.newNetMessageSignal.connect(newNetEvent)
+c.connectedSignal.connect(newConnection)
 
 c.start()

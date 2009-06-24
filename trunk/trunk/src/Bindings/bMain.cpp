@@ -21,6 +21,7 @@ bMain::bMain()
 
     connect(mGame->mDockWidgets, SIGNAL(newChatInputSignal(QString)), this, SLOT(chatInputTrigger(QString)));
     connect(mGame->mConnectionManager, SIGNAL(newNetMessage(QString,QString)), this, SLOT(netMessageTrigger(QString, QString)));
+    connect(mGame->mConnectionManager, SIGNAL(connectedSignal(QString)), this, SLOT(connectedTrigger(QString)));
 }
 
 void bMain::start()
@@ -42,22 +43,47 @@ void bMain::insertChatMessage(QString str)
     mGame->mDockWidgets->insertMessage(str);
 }
 
-void bMain::sendChatMessageToAll(QString msg)
+void bMain::sendNetMessageToAll(QString msg)
 {
     mGame->mConnectionManager->sendMessageToAll(msg);
 }
 
-void bMain::sendChatMessageToHandle(QString msg, QString handle)
+void bMain::sendNetMessageToHandle(QString msg, QString handle)
 {
     mGame->mConnectionManager->sendMessageToHandle(msg, handle);
 }
 
+QString bMain::getLocalUserList()
+{
+    return mGame->mConnectionManager->getLocalUserList();
+}
+
+QString bMain::getLocalHandle()
+{
+    return mGame->mConnectionManager->getLocalHandle();
+}
+
+bool bMain::isClient()
+{
+    return mGame->mConnectionManager->isConnectionType(Connection::CLIENT);
+}
+
+bool bMain::isServer()
+{
+    return mGame->mConnectionManager->isConnectionType(Connection::SERVER);
+}
+
 void bMain::chatInputTrigger(QString msg)
 {
-    emit newChatInput(msg);
+    emit newChatInputSignal(msg);
 }
 
 void bMain::netMessageTrigger(QString msg, QString handle)
 {
     emit newNetMessageSignal(msg, handle);
+}
+
+void bMain::connectedTrigger(QString handle)
+{
+    emit connectedSignal(handle);
 }
