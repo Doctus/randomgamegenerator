@@ -24,11 +24,12 @@ wDockWidgets::wDockWidgets(QMainWindow *mainWindow, cGame *mGame) : QObject(main
 {
     this->mGame = mGame;
 
-    dockWidgetEditor = new QTextEdit(mainWindow);
+    dockWidgetEditor = new QTextBrowser(mainWindow);
     dockWidgetLineInput = new QLineEdit(mainWindow);
     dockWidget = new QDockWidget(QObject::tr("Dock Widget"), mainWindow);
 
     dockWidgetEditor->setReadOnly(true);
+    dockWidgetEditor->setOpenLinks(false);
 
     QWidget *dockWidgetContents = new QWidget(mainWindow);
     QVBoxLayout *layout = new QVBoxLayout(dockWidgetContents);
