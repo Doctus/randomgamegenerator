@@ -81,11 +81,11 @@ def newNetEvent(str, handle):
 
 def newConnection(handle):
     c.insertChatMessage(unicode(handle) + " has joined")
-    c.sendNetMessageToAll('u!' + 'join' + unicode(handle))
+    c.sendNetMessageToAll('u!' + ' join ' + unicode(handle))
 
 def disConnection(handle):
     c.insertChatMessage(unicode(handle) + " has left the game")
-    c.sendNetMessageToAll('u!' + 'leave' + unicode(handle))
+    c.sendNetMessageToAll('u!' + ' leave ' + unicode(handle))
     
 c.newChatInputSignal.connect(newEvent)
 c.newNetMessageSignal.connect(newNetEvent)
