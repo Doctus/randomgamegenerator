@@ -70,8 +70,8 @@ class nConnectionManager : public QObject
     void startServer(uint port, QString handle);
 
     void sendMessageToAll(QString message);
-    void sendMessageExceptThisone(QString message, nConnection *leftOut);
-    void sendMessageToHandle(QString message, QString handle);
+    void sendNetMessageToAllButOne(QString message, QString handle);
+    bool sendMessageToHandle(QString message, QString handle);
 
     QString getLocalUserList();
     QString getLocalHandle();
@@ -95,6 +95,7 @@ class nConnectionManager : public QObject
     signals:
     void newNetMessage(QString msg, QString handle);
     void connectedSignal(QString handle);
+    void disconnectedSignal(QString handle);
 };
 
 #endif // NCONNECTIONMANAGER_H
