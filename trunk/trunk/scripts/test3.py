@@ -64,10 +64,10 @@ def newNetEvent(str, handle):
             elif str[0] == 'u': #User message
                 words = unicode(str).split()
                 if words[1] == 'join':
-                    c.insertChatMessage('<b>' + unicode(words[2:]) +
+                    c.insertChatMessage('<b>' + " ".join(unicode(words[2:])) +
                                         " has joined the game" + '</b>')
                 elif words[1] == 'leave':
-                    c.insertChatMessage('<b>' + unicode(words[2:]) +
+                    c.insertChatMessage('<b>' + " ".join(unicode(words[2:])) +
                                         " has left the game" + '</b>')
             elif str[0] == 'n': #Map file
                 #This isn't useful, just demonstrating principle
