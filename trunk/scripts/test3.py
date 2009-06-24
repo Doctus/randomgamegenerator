@@ -32,7 +32,10 @@ def newEvent(str):
                 mesg = " ".join(words[2:])
                 c.insertChatMessage('To ' + unicode(target) + ': ' +
                                     unicode(mesg))
-                c.sendNetMessageToHandle('w!' + unicode(mesg), target)
+                if isServer():
+                    c.sendNetMessageToHandle('w!' + unicode(mesg), target)
+                else:
+                    c.sendNetMessageToAll('W! ' + target + ' ' + unicode(mesg))
     else:
         c.insertChatMessage(c.getLocalHandle() + ": " + unicode(str))
         c.sendNetMessageToAll("t!" + unicode(str))
@@ -42,12 +45,22 @@ def newNetEvent(str, handle):
         if str[1] == '!':
             if str[0] == 't': #Ordinary chat message
                 c.insertChatMessage(unicode(handle) + ": " + unicode(str[2:]))
+                if isServer():
+                    c.sendNetMessageToAllButOne('t!' + unicode(str),
+                                                unicode(handle))
             elif str[0] == 'T': #Emote message
                 c.insertChatMessage('<i>' + unicode(handle) + " " +
                                     unicode(str[2:]) + '</i>')
+                if isServer():
+                    c.sendNetMessageToAllButOne('T!' + unicode(str),
+                                                unicode(handle))
             elif str[0] == 'w': #Whisper/tell
                 c.insertChatMessage('From ' + unicode(handle) + ': ' +
                                     unicode(str[2:]))
+            elif str[0] == 'W': #Whisper/tell requiring relay
+                words = unicode(str).split()
+                c.sendNetMessageToHandle('w!' + unicode(" ".join(words[2:])),
+                                         words[1])
             elif str[0] == 'u': #User message
                 words = unicode(str).split()
                 if words[1] == 'join':
