@@ -21,10 +21,10 @@ def newEvent(str):
                 action = ''.join(words[1:])
             c.insertChatMessage('<i>' + c.getLocalHandle() + ' ' +
                                 unicode(action) + '</i>')
-            c.sendChatMessageToAll('T!' + unicode(action))
+            c.sendNetMessageToAll('T!' + unicode(action))
     else:
         c.insertChatMessage(c.getLocalHandle() + ": " + unicode(str))
-        c.sendChatMessageToAll("t!" + unicode(str))
+        c.sendNetMessageToAll("t!" + unicode(str))
 
 def newNetEvent(str, handle):
     if len(str) > 1:
