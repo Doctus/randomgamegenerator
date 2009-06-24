@@ -4,7 +4,7 @@ c = bmainmod.bMain()
 
 def newEvent(str):
     if str[0] == '/':
-        words = str.split()
+        words = unicode(str).split()
         if words[0] == '/randomname':
             if len(words) == 1:
                 name = ("Syntax: /randomname NAMETYPE. Caps and spaces" +

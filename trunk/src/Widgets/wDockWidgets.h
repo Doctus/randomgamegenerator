@@ -37,7 +37,7 @@ class wDockWidgets : public QObject
     Q_OBJECT;
 
     private:
-    QTextEdit *dockWidgetEditor;
+    QTextBrowser *dockWidgetEditor;
     QLineEdit *dockWidgetLineInput;
     QDockWidget *dockWidget;
     cGame *mGame;
