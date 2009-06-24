@@ -32,7 +32,7 @@ def newEvent(str):
                 mesg = " ".join(words[2:])
                 c.insertChatMessage('To ' + unicode(target) + ': ' +
                                     unicode(mesg))
-                if isServer():
+                if c.isServer():
                     c.sendNetMessageToHandle('w!' + unicode(mesg), target)
                 else:
                     c.sendNetMessageToAll('W! ' + target + ' ' + unicode(mesg))
@@ -45,13 +45,13 @@ def newNetEvent(str, handle):
         if str[1] == '!':
             if str[0] == 't': #Ordinary chat message
                 c.insertChatMessage(unicode(handle) + ": " + unicode(str[2:]))
-                if isServer():
+                if c.isServer():
                     c.sendNetMessageToAllButOne('t!' + unicode(str),
                                                 unicode(handle))
             elif str[0] == 'T': #Emote message
                 c.insertChatMessage('<i>' + unicode(handle) + " " +
                                     unicode(str[2:]) + '</i>')
-                if isServer():
+                if c.isServer():
                     c.sendNetMessageToAllButOne('T!' + unicode(str),
                                                 unicode(handle))
             elif str[0] == 'w': #Whisper/tell
