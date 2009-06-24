@@ -30,9 +30,9 @@ def newNetEvent(str, handle):
     if len(str) > 1:
         if str[1] == '!':
             if str[0] == 't': #Ordinary chat message
-                c.insertChatMessage(unicode(handle) + ":" + unicode(str[2:]))
+                c.insertChatMessage(unicode(handle) + ": " + unicode(str[2:]))
             elif str[0] == 'T': #Emote message
-                c.insertChatMessage('<i>' + unicode(handle) +
+                c.insertChatMessage('<i>' + unicode(handle) + " " +
                                     unicode(str[2:]) + '</i>')
             elif str[0] == 'n': #Map file
                 #This isn't useful, just demonstrating principle
@@ -43,8 +43,12 @@ def newNetEvent(str, handle):
             print 'Malformed data received.'
     else:
         print 'Malformed data received.'
+
+def newConnection(handle):
+    c.insertChatMessage(unicode(handle) + " has joined")
     
-c.newChatInput.connect(newEvent)
+c.newChatInputSignal.connect(newEvent)
 c.newNetMessageSignal.connect(newNetEvent)
+c.connectedSignal.connect(newConnection)
 
 c.start()

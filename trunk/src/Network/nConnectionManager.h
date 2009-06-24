@@ -41,6 +41,16 @@ class nConnectionManager;
 
 using namespace std;
 
+namespace Connection
+{
+    enum conn
+    {
+        NONE = 0,
+        CLIENT = 1,
+        SERVER = 2
+    };
+}
+
 class nConnectionManager : public QObject
 {
     Q_OBJECT;
@@ -63,6 +73,10 @@ class nConnectionManager : public QObject
     void sendMessageExceptThisone(QString message, nConnection *leftOut);
     void sendMessageToHandle(QString message, QString handle);
 
+    QString getLocalUserList();
+    QString getLocalHandle();
+    bool isConnectionType(Connection::conn type);
+
     private:
     void disconnectConnections();
 
@@ -80,6 +94,7 @@ class nConnectionManager : public QObject
 
     signals:
     void newNetMessage(QString msg, QString handle);
+    void connectedSignal(QString handle);
 };
 
 #endif // NCONNECTIONMANAGER_H
