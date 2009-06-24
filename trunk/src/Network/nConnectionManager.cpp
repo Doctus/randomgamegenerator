@@ -138,27 +138,32 @@ void nConnectionManager::sendMessageToAll(QString message)
     }
 }
 
-void nConnectionManager::sendMessageExceptThisone(QString message, nConnection *leftout)
+void nConnectionManager::sendNetMessageToAllButOne(QString message, QString handle)
 {
     QByteArray out(message.toUtf8());
     foreach(nConnection *conn, mConnections)
     {
-        if(conn != leftout)
+        if(conn->getHandle() != handle)
             conn->sendData(out);
     }
 }
 
-void nConnectionManager::sendMessageToHandle(QString message, QString handle)
+bool nConnectionManager::sendMessageToHandle(QString message, QString handle)
 {
     QByteArray out(message.toUtf8());
+
+    cout << "Sending \"" << message.toStdString() << "\" to \"" << handle.toStdString() << "\"" << endl;
+
     foreach(nConnection *conn, mConnections)
     {
         if(conn->getHandle() == handle)
         {
             conn->sendData(out);
-            break;
+            return true;
         }
     }
+
+    return false;
 }
 
 QString nConnectionManager::getLocalUserList()
@@ -251,9 +256,9 @@ void nConnectionManager::failedConnectionSlot(QAbstractSocket::SocketError error
 //Note that this is only used when initiating a connection to a server, not when hosting one.
 void nConnectionManager::succeededConnectionSlot()
 {
-    QMessageBox infoDialog((QWidget*)parent());
+    /*QMessageBox infoDialog((QWidget*)parent());
     infoDialog.setText("Connected to host!");
-    infoDialog.exec();
+    infoDialog.exec();*/
 
     connected = Connection::CLIENT;
 
@@ -266,18 +271,20 @@ void nConnectionManager::disconnectedSlot(nConnection *conn)
 {
     if(connected == Connection::CLIENT)
     {
-        QMessageBox errorDialog((QWidget*)parent());
+        /*QMessageBox errorDialog((QWidget*)parent());
         errorDialog.setText("Got disconnected from host: " + conn->tcpSocket->errorString());
-        errorDialog.exec();
+        errorDialog.show();*/
 
         connected = 0;
     }
-    else if(connected == Connection::SERVER)
+    /*else if(connected == Connection::SERVER)
     {
         QMessageBox errorDialog((QWidget*)parent());
         errorDialog.setText("\"" + conn->getHandle() + "\" has disconnected");
-        errorDialog.exec();
-    }
+        errorDialog.show();
+    }*/
+
+    emit disconnectedSignal(conn->getHandle());
 
     mConnections.removeOne(conn);
 }

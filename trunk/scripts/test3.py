@@ -13,7 +13,7 @@ def newEvent(str):
             else:
                 name = rggNameGen.getName(''.join(words[1:]).lower())
             c.insertChatMessage(unicode(name))
-        elif words[0].lower() == '/me' or '/emote':
+        elif words[0].lower() == '/me' or words[0].lower() == '/emote':
             if len(words) == 1:
                 action = ("Syntax: /me DOES ACTION. Displays '[HANDLE] DOES "
                         "ACTION' in italic font.")
@@ -22,7 +22,7 @@ def newEvent(str):
             c.insertChatMessage('<i>' + c.getLocalHandle() + ' ' +
                                 unicode(action) + '</i>')
             c.sendNetMessageToAll('T!' + unicode(action))
-        elif words[0].lower() == '/w' or '/t' or '/whisper' or '/tell':
+        elif words[0].lower() == '/w' or words[0].lower() == '/t' or words[0].lower() == '/whisper' or words[0].lower() == '/tell':
             if len(words) == 1:
                 mesg = ("Syntax: /whisper HANDLE MESSAGE. Sends a message " +
                         "only to the specified user. Spaces MUST be correct.")
@@ -37,47 +37,47 @@ def newEvent(str):
                 else:
                     c.sendNetMessageToAll('W! ' + target + ' ' + unicode(mesg))
     else:
-        c.insertChatMessage(c.getLocalHandle() + ": " + unicode(str))
-        c.sendNetMessageToAll("t!" + unicode(str))
+        c.insertChatMessage(c.getLocalHandle() + ": " + str)
+        c.sendNetMessageToAll("t!" + str)
 
 def newNetEvent(str, handle):
     if len(str) > 1:
         if str[1] == '!':
             if str[0] == 't': #Ordinary chat message
-                c.insertChatMessage(unicode(handle) + ": " + unicode(str[2:]))
+                c.insertChatMessage(unicode(handle) + ": " + str[2:])
                 if c.isServer():
-                    c.sendNetMessageToAllButOne('s!' + ' ' + unicode(handle) +
-                                                ' ' + unicode(str[2:]),
-                                                unicode(handle))
+                    c.sendNetMessageToAllButOne('s!' + ' ' + handle +
+                                                ' ' + str[2:],
+                                                handle)
             elif str[0] == 'T': #Emote message
                 c.insertChatMessage('<i>' + unicode(handle) + " " +
-                                    unicode(str[2:]) + '</i>')
+                                    str[2:] + '</i>')
                 if c.isServer():
-                    c.sendNetMessageToAllButOne('S!' + ' ' + unicode(handle) +
-                                                ' ' + unicode(str[2:]),
-                                                unicode(handle))
+                    c.sendNetMessageToAllButOne('S!' + ' ' + handle +
+                                                ' ' + str[2:],
+                                                handle)
             elif str[0] == 's': #Spoofed talk
                 words = unicode(str).split()
-                c.insertChatMessage(unicode(words[1]) + ": " +
-                                    " ".join(unicode(words[2:])))
+                c.insertChatMessage(words[1] + ": " +
+                                    " ".join(words[2:]))
             elif str[0] == 'S': #Spoofed emote
                 words = unicode(str).split()
-                c.insertChatMessage('<i>' + unicode(words[1]) + " " +
-                                    " ".join(unicode(words[2:])) + '</i>')
+                c.insertChatMessage('<i>' + words[1] + " " +
+                                    " ".join(words[2:]) + '</i>')
             elif str[0] == 'w': #Whisper/tell
-                c.insertChatMessage('From ' + unicode(handle) + ': ' +
-                                    unicode(str[2:]))
+                c.insertChatMessage('From ' + handle + ': ' +
+                                    str[2:])
             elif str[0] == 'W': #Whisper/tell requiring relay
                 words = unicode(str).split()
-                c.sendNetMessageToHandle('w!' + unicode(" ".join(words[2:])),
+                c.sendNetMessageToHandle('w!' + " ".join(words[2:]),
                                          words[1])
             elif str[0] == 'u': #User message
                 words = unicode(str).split()
                 if words[1] == 'join':
-                    c.insertChatMessage('<b>' + " ".join(unicode(words[2:])) +
+                    c.insertChatMessage('<b>' + " ".join(words[2:]) +
                                         " has joined the game" + '</b>')
                 elif words[1] == 'leave':
-                    c.insertChatMessage('<b>' + " ".join(unicode(words[2:])) +
+                    c.insertChatMessage('<b>' + " ".join(words[2:]) +
                                         " has left the game" + '</b>')
             elif str[0] == 'n': #Map file
                 #This isn't useful, just demonstrating principle
@@ -90,12 +90,14 @@ def newNetEvent(str, handle):
         print 'Malformed data received.'
 
 def newConnection(handle):
-    c.insertChatMessage(unicode(handle) + " has joined")
-    c.sendNetMessageToAll('u!' + ' join ' + unicode(handle))
+    c.insertChatMessage("<b>" + handle + " has joined" + "</b>")
+    if c.isServer():
+        c.sendNetMessageToAllButOne('u!' + ' join ' + handle, handle)
 
 def disConnection(handle):
-    c.insertChatMessage(unicode(handle) + " has left the game")
-    c.sendNetMessageToAll('u!' + ' leave ' + unicode(handle))
+    c.insertChatMessage("<b>" + handle + " has left the game" + "</b>")
+    if c.isServer():
+        c.sendNetMessageToAllButOne('u!' + ' leave ' + handle, handle)
     
 c.newChatInputSignal.connect(newEvent)
 c.newNetMessageSignal.connect(newNetEvent)
