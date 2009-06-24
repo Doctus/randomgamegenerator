@@ -79,7 +79,6 @@ void wMenuBar::loadMapSlot()
 
     if(!fileName.isEmpty())
     {
-        mGame->loadMap(fileName.toStdString());
     }
 }
 

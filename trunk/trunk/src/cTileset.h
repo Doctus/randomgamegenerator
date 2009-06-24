@@ -30,7 +30,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 class cTileset;
 
 #include "cTilesetManager.h"
-#include "cTile.h"
 #include "Widgets/wGLWidget.h"
 
 using namespace std;

@@ -58,11 +58,12 @@ class nConnectionManager : public QObject
 
     void connectTo(QString host, uint port, QString handle);
     void startServer(uint port, QString handle);
-    void sendChatMessage(QString message);
 
-    private:
     void sendMessageToAll(QString message);
     void sendMessageExceptThisone(QString message, nConnection *leftOut);
+    void sendMessageToHandle(QString message, QString handle);
+
+    private:
     void disconnectConnections();
 
     private slots:
@@ -76,6 +77,9 @@ class nConnectionManager : public QObject
     void succeededConnectionSlot();
     void disconnectedSlot(nConnection *conn);
     void stateChangedSlot(QAbstractSocket::SocketState state);
+
+    signals:
+    void newNetMessage(QString msg, QString handle);
 };
 
 #endif // NCONNECTIONMANAGER_H

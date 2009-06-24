@@ -26,12 +26,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 class cGame;
 
-#include "cMap.h"
-#include "cTileManager.h"
 #include "cTilesetManager.h"
 #include "Widgets/wMenuBar.h"
+#include "Widgets/wGLWidget.h"
 #include "Widgets/wDockWidgets.h"
 #include "Network/nConnectionManager.h"
+#include "Bindings/bMain.h"
 
 using namespace std;
 
@@ -40,8 +40,6 @@ class cGame : public QObject
     Q_OBJECT;
 
     private:
-    cMap *mCurrentMap;
-    cTileManager *mTileManager;
     cTilesetManager *mTilesetManager;
     wMenuBar *mMenuBar;
     wGLWidget *mGLWidget;
@@ -51,21 +49,17 @@ class cGame : public QObject
     QScrollArea *GLArea;
 
     friend class wMenuBar;
+    friend class bMain;
 
     public:
     cGame(QWidget *parent);
     ~cGame();
-
-    void newExternalChatMessage(QString message, QString handle);
-    void newInternalChatMessage(QString message);
 
     private slots:
     void draw();
     void displayFPS();
 
     public:
-    void loadMap(string fileName);
-    void saveMap(string fileName);
     void showTextDockWidget();
 };
 

@@ -33,9 +33,7 @@ cGame::cGame(QWidget *parent) : QObject(parent)
 
     mDockWidgets = new wDockWidgets((QMainWindow*)parent, this);
 
-    mTileManager = new cTileManager();
     mTilesetManager = new cTilesetManager();
-    mCurrentMap = new cMap(0, mGLWidget, mTileManager, mTilesetManager);
 
     QTimer *timer = new QTimer(this);
     QTimer *timer2 = new QTimer(this);
@@ -47,26 +45,11 @@ cGame::cGame(QWidget *parent) : QObject(parent)
 
 cGame::~cGame()
 {
-    delete mTileManager;
     delete mTilesetManager;
 }
 
-void cGame::newExternalChatMessage(QString message, QString handle)
-{
-    cout << "external chat message: " << handle.toStdString() << " - " << message.toStdString() << endl;
-    mDockWidgets->externalMessage(message, handle);
-}
-
-void cGame::newInternalChatMessage(QString message)
-{
-    mConnectionManager->sendChatMessage(message);
-}
-
-
 void cGame::draw()
 {
-    if(mCurrentMap != NULL)
-        mCurrentMap->draw();
 
     mGLWidget->updateGL();
 
@@ -75,19 +58,9 @@ void cGame::draw()
 
 void cGame::displayFPS()
 {
-    ((QMainWindow*)parent())->setWindowTitle(QString("Random Game Generator | FPS: ") + QString::number(FPScounter));
+    QString str = QString("Random Game Generator | FPS: ") + QString::number(FPScounter);
+    ((QMainWindow*)parent())->setWindowTitle(str);
     FPScounter = 0;
-}
-
-
-void cGame::loadMap(string fileName)
-{
-    if(mCurrentMap != NULL)
-        mCurrentMap->loadMap(fileName);
-}
-
-void cGame::saveMap(string fileName)
-{
 }
 
 void cGame::showTextDockWidget()

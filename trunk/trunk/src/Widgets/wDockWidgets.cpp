@@ -24,9 +24,11 @@ wDockWidgets::wDockWidgets(QMainWindow *mainWindow, cGame *mGame) : QObject(main
 {
     this->mGame = mGame;
 
-    dockWidgetEditor = new QTextBrowser(mainWindow);
+    dockWidgetEditor = new QTextEdit(mainWindow);
     dockWidgetLineInput = new QLineEdit(mainWindow);
     dockWidget = new QDockWidget(QObject::tr("Dock Widget"), mainWindow);
+
+    dockWidgetEditor->setReadOnly(true);
 
     QWidget *dockWidgetContents = new QWidget(mainWindow);
     QVBoxLayout *layout = new QVBoxLayout(dockWidgetContents);
@@ -48,17 +50,12 @@ void wDockWidgets::showTextDockWidgets()
     dockWidget->show();
 }
 
-void wDockWidgets::externalMessage(QString message, QString handle)
-{
-    insertMessage(message, handle);
-}
-
-void wDockWidgets::insertMessage(QString message, QString handle)
+void wDockWidgets::insertMessage(QString message)
 {
     bool scroll = (dockWidgetEditor->verticalScrollBar()->value() == dockWidgetEditor->verticalScrollBar()->maximum()) ?
                     true : false;
 
-    dockWidgetEditor->insertHtml("<font color=\"red\">" + handle + ":</font> " + message + "<br />");
+    dockWidgetEditor->insertHtml(message + "<br />");
 
     if(scroll)
         dockWidgetEditor->verticalScrollBar()->setValue(dockWidgetEditor->verticalScrollBar()->maximum());
@@ -67,7 +64,6 @@ void wDockWidgets::insertMessage(QString message, QString handle)
 void wDockWidgets::processInput()
 {
     QString str = dockWidgetLineInput->text();
-    insertMessage(str, "You");
     dockWidgetLineInput->clear();
-    mGame->newInternalChatMessage(str);
+    emit newChatInputSignal(str);
 }
