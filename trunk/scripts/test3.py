@@ -46,14 +46,24 @@ def newNetEvent(str, handle):
             if str[0] == 't': #Ordinary chat message
                 c.insertChatMessage(unicode(handle) + ": " + unicode(str[2:]))
                 if c.isServer():
-                    c.sendNetMessageToAllButOne('t!' + unicode(str),
+                    c.sendNetMessageToAllButOne('s!' + ' ' + unicode(handle) +
+                                                ' ' + unicode(str[2:]),
                                                 unicode(handle))
             elif str[0] == 'T': #Emote message
                 c.insertChatMessage('<i>' + unicode(handle) + " " +
                                     unicode(str[2:]) + '</i>')
                 if c.isServer():
-                    c.sendNetMessageToAllButOne('T!' + unicode(str),
+                    c.sendNetMessageToAllButOne('S!' + ' ' + unicode(handle) +
+                                                ' ' + unicode(str[2:]),
                                                 unicode(handle))
+            elif str[0] == 's': #Spoofed talk
+                words = unicode(str).split()
+                c.insertChatMessage(unicode(words[1]) + ": " +
+                                    " ".join(unicode(words[2:])))
+            elif str[0] == 'S': #Spoofed emote
+                words = unicode(str).split()
+                c.insertChatMessage('<i>' + unicode(words[1]) + " " +
+                                    " ".join(unicode(words[2:])) + '</i>')
             elif str[0] == 'w': #Whisper/tell
                 c.insertChatMessage('From ' + unicode(handle) + ': ' +
                                     unicode(str[2:]))
