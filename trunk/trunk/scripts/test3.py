@@ -5,7 +5,7 @@ c = bmainmod.bMain()
 def newEvent(str):
     if str[0] == '/':
         words = unicode(str).split()
-        if words[0] == '/randomname':
+        if words[0].lower() == '/randomname':
             if len(words) == 1:
                 name = ("Syntax: /randomname NAMETYPE. Caps and spaces " +
                         "are ignored. Some valid arguments are " +
@@ -13,7 +13,7 @@ def newEvent(str):
             else:
                 name = rggNameGen.getName(''.join(words[1:]).lower())
             c.insertChatMessage(unicode(name))
-        elif words[0] == '/me' or words[0] == '/emote':
+        elif words[0].lower() == '/me' or '/emote':
             if len(words) == 1:
                 action = ("Syntax: /me DOES ACTION. Displays '[HANDLE] DOES "
                         "ACTION' in italic font.")
@@ -22,14 +22,14 @@ def newEvent(str):
             c.insertChatMessage('<i>' + c.getLocalHandle() + ' ' +
                                 unicode(action) + '</i>')
             c.sendNetMessageToAll('T!' + unicode(action))
-        elif words[0] == '/w' or '/t' or '/whisper' or '/tell':
+        elif words[0].lower() == '/w' or '/t' or '/whisper' or '/tell':
             if len(words) == 1:
                 mesg = ("Syntax: /whisper HANDLE MESSAGE. Sends a message " +
                         "only to the specified user. Spaces MUST be correct.")
                 c.insertChatMessage(unicode(mesg))
             else:
                 target = words[1]
-                mesg = words[2:]
+                mesg = " ".join(words[2:])
                 c.insertChatMessage('To ' + unicode(target) + ': ' +
                                     unicode(mesg))
                 c.sendNetMessageToHandle('w!' + unicode(mesg), target)
@@ -48,6 +48,14 @@ def newNetEvent(str, handle):
             elif str[0] == 'w': #Whisper/tell
                 c.insertChatMessage('From ' + unicode(handle) + ': ' +
                                     unicode(str[2:]))
+            elif str[0] == 'u': #User message
+                words = unicode(str).split()
+                if words[1] == 'join':
+                    c.insertChatMessage('<b>' + unicode(words[2:]) +
+                                        " has joined the game" + </b>)
+                elif words[1] == 'leave':
+                    c.insertChatMessage('<b>' + unicode(words[2:]) +
+                                        " has left the game" + </b>)
             elif str[0] == 'n': #Map file
                 #This isn't useful, just demonstrating principle
                 loadedmappe = rggTileLoader.loadFromString(str[2:])
@@ -60,9 +68,15 @@ def newNetEvent(str, handle):
 
 def newConnection(handle):
     c.insertChatMessage(unicode(handle) + " has joined")
+    c.sendNetMessageToAll('u!' + 'join' + unicode(handle))
+
+def disConnection(handle):
+    c.insertChatMessage(unicode(handle) + " has left the game")
+    c.sendNetMessageToAll('u!' + 'leave' + unicode(handle))
     
 c.newChatInputSignal.connect(newEvent)
 c.newNetMessageSignal.connect(newNetEvent)
 c.connectedSignal.connect(newConnection)
+c.disconnectedSignal.connect(disConnection)
 
 c.start()
