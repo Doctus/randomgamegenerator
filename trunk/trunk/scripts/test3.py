@@ -1,4 +1,4 @@
-import bmainmod, rggNameGen, rggTileLoader
+import bmainmod, rggNameGen, rggTileLoader, rggDice
 from PyQt4 import QtCore
 
 c = bmainmod.bMain()
@@ -14,34 +14,56 @@ def newEvent(str):
             else:
                 name = rggNameGen.getName(''.join(words[1:]).lower())
             c.insertChatMessage(unicode(name))
+        elif words[0].lower() == '/roll':
+            if len(words) == 1:
+                c.insertChatMessage("Syntax: /roll DICE. Dice can be " +
+                                    "like '3d4 - 2 + 1d20' or '5k3' or" +
+                                    " other variants depending on " +
+                                    "development. See also /troll")
+            else:
+                rolltext = (c.getLocalHandle() + " rolls " +
+                            rggDice.roll(" ".join(words[1:])))
+                c.insertChatMessage(rolltext)
+                c.sendNetMessageToAll('r!' + rolltext)
+        elif words[0].lower() == '/troll':
+            rolltext = (c.getLocalHandle() + " rolls " + rggDice.roll('2d6'))
+            c.insertChatMessage(rolltext)
+            c.sendNetMessageToAll('r!' + rolltext)
         elif words[0].lower() == '/me' or words[0].lower() == '/emote':
             if len(words) == 1:
                 action = ("Syntax: /me DOES ACTION. Displays '[HANDLE] DOES "
                         "ACTION' in italic font.")
             else:
-                action = ''.join(words[1:])
+                action = ' '.join(words[1:])
             c.insertChatMessage('<i>' + c.getLocalHandle() + ' ' +
                                 unicode(action) + '</i>')
             c.sendNetMessageToAll('T!' + unicode(action))
         elif words[0].lower() == '/w' or words[0].lower() == '/t' or words[0].lower() == '/whisper' or words[0].lower() == '/tell':
             if len(words) == 1:
                 mesg = ("Syntax: /whisper HANDLE MESSAGE. Sends a message " +
-                        "only to the specified user. Spaces MUST be correct.")
+                        "only to the specified user. Spaces MUST be correct." +
+                        " Handle may be caps-sensitive.")
                 c.insertChatMessage(unicode(mesg))
             else:
                 target = words[1]
                 mesg = " ".join(words[2:])
-                c.insertChatMessage('To ' + unicode(target) + ': ' +
-                                    unicode(mesg))
                 if c.isServer():
-                    c.sendNetMessageToHandle('w!' + unicode(mesg), target)
+                    if not c.sendNetMessageToHandle('w! ' + c.getLocalHandle() +
+                                             ' ' + unicode(mesg), target):
+                        c.insertChatMessage("Error: could not find that handle.")
+                    else:
+                        c.insertChatMessage('To ' + unicode(target) + ': ' +
+                                    unicode(mesg))
                 else:
+                    c.insertChatMessage('To ' + unicode(target) + ': ' +
+                                    unicode(mesg))
                     c.sendNetMessageToAll('W! ' + target + ' ' + unicode(mesg))
     else:
         c.insertChatMessage(c.getLocalHandle() + ": " + str)
         c.sendNetMessageToAll("t!" + str)
 
 def newNetEvent(str, handle):
+    #c.insertChatMessage("DEBUG: " + str)
     if len(str) > 1:
         if str[1] == '!':
             if str[0] == 't': #Ordinary chat message
@@ -66,12 +88,21 @@ def newNetEvent(str, handle):
                 c.insertChatMessage('<i>' + words[1] + " " +
                                     " ".join(words[2:]) + '</i>')
             elif str[0] == 'w': #Whisper/tell
-                c.insertChatMessage('From ' + handle + ': ' +
-                                    str[2:])
+                words = unicode(str).split()
+                c.insertChatMessage('From ' + words[1] + ': ' +
+                                    " ".join(words[2:]))
             elif str[0] == 'W': #Whisper/tell requiring relay
                 words = unicode(str).split()
-                c.sendNetMessageToHandle('w!' + " ".join(words[2:]),
-                                         words[1])
+                if words[1] == c.getLocalHandle():
+                    c.insertChatMessage('From ' + handle + ': ' +
+                                        " ".join(words[2:]))
+                else:
+                    c.sendNetMessageToHandle('w!' + " " + handle + " " +
+                                             " ".join(words[2:]), words[1])
+            elif str[0] == 'r': #Die roll
+                c.insertChatMessage(str[2:])
+                if c.isServer():
+                    c.sendNetMessageToAllButOne(str, handle)
             elif str[0] == 'u': #User message
                 words = unicode(str).split()
                 if words[1] == 'join':
@@ -88,7 +119,7 @@ def newNetEvent(str, handle):
         else:
             print 'Malformed data received.'
     else:
-        print 'Malformed data received.'
+        print 'Badly malformed data received.'
 
 def newConnection(handle):
     c.insertChatMessage("<b>" + handle + " has joined" + "</b>")
