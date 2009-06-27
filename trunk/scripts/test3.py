@@ -1,4 +1,5 @@
 import bmainmod, rggNameGen, rggTileLoader
+from PyQt4 import QtCore
 
 c = bmainmod.bMain()
 
@@ -99,9 +100,9 @@ def disConnection(handle):
     if c.isServer():
         c.sendNetMessageToAllButOne('u!' + ' leave ' + handle, handle)
     
-c.newChatInputSignal.connect(newEvent)
-c.newNetMessageSignal.connect(newNetEvent)
-c.connectedSignal.connect(newConnection)
-c.disconnectedSignal.connect(disConnection)
+QtCore.QObject.connect(c, QtCore.SIGNAL("newNetMessageSignal(QString, QString)"), newNetEvent)
+QtCore.QObject.connect(c, QtCore.SIGNAL("connectedSignal(QString)"), newConnection)
+QtCore.QObject.connect(c, QtCore.SIGNAL("disconnectedSignal(QString)"), disConnection)
+QtCore.QObject.connect(c, QtCore.SIGNAL("newChatInputSignal(QString)"), newEvent)
 
 c.start()
