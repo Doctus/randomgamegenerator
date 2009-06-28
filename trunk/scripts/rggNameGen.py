@@ -48,11 +48,8 @@ def _getDwarvenMaleName():
   return _assembleName(phonemes, random.choice(patterns))
 
 def _getDwarvenFemaleName():
-  '''Data drawn from:'''
-  return 'NYI'
-  phonemes = []
-  patterns = []
-  return _assembleName(phonemes, random.choice(patterns))
+  '''lolz, I don't know of any!'''
+  return _getDwarvenMaleName()
 
 def _getJapaneseMaleName():
   '''Data drawn from personal knowledge (special case)'''
@@ -70,7 +67,7 @@ def _getJapaneseFemaleName():
   names = ['Yohko', 'Megumi', 'Sakura', 'Hanako', 'Ai', 'Hirano',
            'Takako', 'Nana', 'Izumi', 'Aki', 'Yuki', 'Yoshiko',
            'Aya', 'Yuri', 'Hina', 'Rina', 'Yuuna', 'Yukiko', 'Mai',
-           'Aoi']
+           'Aoi', 'Nanase', 'Natsumi']
   return random.choice(names)
 
 def _getJapaneseSurname():
@@ -90,6 +87,132 @@ def _getJapaneseSurname():
 def _getJapaneseFullName(g=False):
   if g: return (_getJapaneseSurname() + " " + _getJapaneseMaleName())
   return (_getJapaneseSurname() + " " + _getJapaneseFemaleName())
+
+def getTechniqueName(typ='rand', elemnt='rand', moral='rand',
+                      complexity=-1, hotblood=False):
+  if complexity == -1:
+    complexity = random.randrange(2, 5)
+  fireadj = [['burning', 'flaring', 'flaming'],
+             ['blazing', 'purifying'],
+             ['searing', 'scorching', 'consuming', 'ashmaking']]
+  firenoun = [['fireball', 'nova', 'ember', 'incineration'],
+              ['flame', 'flare'],
+              ['blaze', 'blast']]
+  iceadj = [['north', 'ice', 'freezing', 'cold', 'arctic'],
+            ['boreal', 'snow'],
+            ['glacial', 'shivering']]
+  icenoun = [['spike', 'glacier', 'iceberg', 'freeze'],
+             ['blizzard', 'snowflake'],
+             ['frostbite', 'winter']]
+  lightadj = [['glowing', 'flourescent', 'shimmering'],
+              ['shining', 'glittering', 'iridescent'],
+              ['blinding', 'erasing']]
+  lightnoun = [['ray', 'beam', 'aura', 'glow'],
+               ['projection', 'flash'],
+               ['laser', 'emanation']]
+  darkadj = [['shadow', 'shade', 'dim', 'void', 'fading'],
+             ['moonlight', 'faint'],
+             ['darkness', 'stygian', 'hell', 'abyssal']]
+  darknoun = [['veil', 'shadow', 'murk'],
+              ['nocturne', 'eclipse'],
+              ['propagation', 'wave']]
+  psiadj = [['mind', 'mental', 'telekinetic', 'psychic'],
+            ['psionic'],
+            ['brain', 'thought']]
+  psinoun = [['thrust', 'force', 'blast'],
+             ['mind'],
+             ['probe', 'invasion']]
+  violentadj = [['slashing', 'crushing', 'bursting', 'vorpal'],
+                ['disintegrating', 'annihilating', 'piercing'],
+                ['decapitating', 'mauling', 'slaughtering']]
+  violentnoun = [['killer', 'death', 'slash', 'thrust', 'crush'],
+                 ['finisher', 'pierce'],
+                 ['massacre', 'slaughter', 'murder']]
+  elindex = {'fire':[fireadj, firenoun],
+             'darkness':[darkadj, darknoun],
+             'ice':[iceadj, icenoun],
+             'light':[lightadj, lightnoun],
+             'psionic':[psiadj, psinoun],
+             'violent':[violentadj, violentnoun],
+             'rand':[random.choice([fireadj, darkadj, iceadj, lightadj, psiadj, violentadj]),
+                     random.choice([firenoun, darknoun, icenoun, lightnoun, psinoun, violentnoun])]}
+  if moral == 'rand':
+    morality = random.choice([[0, 0, 1], [0], [0, 0, 2]])
+  elif moral == 'neutral':
+    morality = [0]
+  elif moral == 'good':
+    morality = [0, 0, 1]
+  elif moral == 'evil':
+    morality = [0, 0, 2]
+  martialnoun = ['fist', 'kick', 'slam', 'technique', 'style', 'way', 'grasp', 'hold', 'grapple']
+  magicnoun = ['ritual', 'spell', 'hex', 'curse', 'geas', 'invocation', 'evocation', 'conjuration',
+               'abjuration']
+  typindex = {'martial':martialnoun,
+              'magic':magicnoun,
+              'rand':random.choice([martialnoun, magicnoun])}
+  impressiveAdjectives = ['invulnerable', 'invincible', 'forgotten',
+                          'forbidden', 'extraordinary', 'kaleidoscopic',
+                          'vaulting', 'unrivalled', 'thousand', 'unlimited']
+  impressiveAuxNouns = ['gods', 'star', 'blade']
+  impressiveNouns = ['progression', 'barrage', 'works']
+  if complexity <= 2:
+    result = " ".join([random.choice(elindex[elemnt][0][random.choice(morality)]).capitalize(),
+                      random.choice([random.choice(elindex[elemnt][1][random.choice(morality)]),
+                                    random.choice(typindex[typ])]).capitalize()])
+  elif complexity == 3:
+    if hotblood:
+      if random.choice([True, False]):
+        result = " ".join([random.choice(elindex[elemnt][0][random.choice(morality)]+impressiveAdjectives).capitalize(),
+                           random.choice(elindex[elemnt][0][random.choice(morality)]+impressiveAdjectives+impressiveAuxNouns).capitalize(),
+                            random.choice([random.choice(elindex[elemnt][1][random.choice(morality)]+impressiveNouns),
+                                      random.choice(typindex[typ])]+impressiveNouns).capitalize()])
+      else:
+        result = " ".join([random.choice(typindex[typ]+impressiveNouns).capitalize(), 'of the',
+                           random.choice(elindex[elemnt][0][random.choice(morality)]+impressiveAdjectives).capitalize(),
+                            random.choice([random.choice(elindex[elemnt][1][random.choice(morality)]+impressiveAuxNouns),
+                                      random.choice(typindex[typ])]+impressiveAuxNouns).capitalize()])
+    else:
+      if random.choice([True, False]):
+        result = " ".join([random.choice(elindex[elemnt][0][random.choice(morality)]).capitalize(),
+                           random.choice(elindex[elemnt][0][random.choice(morality)]).capitalize(),
+                            random.choice([random.choice(elindex[elemnt][1][random.choice(morality)]),
+                                      random.choice(typindex[typ])]).capitalize()])
+      else:
+        result = " ".join([random.choice(typindex[typ]).capitalize(), 'of the',
+                           random.choice(elindex[elemnt][0][random.choice(morality)]).capitalize(),
+                            random.choice([random.choice(elindex[elemnt][1][random.choice(morality)]),
+                                      random.choice(typindex[typ])]).capitalize()])
+  elif complexity >= 4:
+    if hotblood:
+      if random.choice([True, False]):
+        result = " ".join([random.choice(elindex[elemnt][0][random.choice(morality)]+impressiveAdjectives).capitalize(),
+                            random.choice([random.choice(elindex[elemnt][1][random.choice(morality)]+impressiveNouns),
+                                      random.choice(typindex[typ]+impressiveNouns)]).capitalize(), 'of the',
+                           random.choice(elindex[elemnt][0][random.choice(morality)]+impressiveAdjectives).capitalize(),
+                            random.choice([random.choice(elindex[elemnt][1][random.choice(morality)]+impressiveAuxNouns),
+                                      random.choice(typindex[typ]+impressiveAuxNouns)]).capitalize()])
+      else:
+        result = " ".join([random.choice(elindex[elemnt][0][random.choice(morality)]+impressiveAdjectives).capitalize(),
+                           random.choice(elindex[elemnt][0][random.choice(morality)]+impressiveAdjectives).capitalize(),
+                            random.choice(elindex[elemnt][1][random.choice(morality)]+impressiveAuxNouns).capitalize(),
+                            random.choice(typindex[typ]+impressiveNouns).capitalize()])
+    else:
+      if random.choice([True, False]):
+        result = " ".join([random.choice(elindex[elemnt][0][random.choice(morality)]).capitalize(),
+                            random.choice([random.choice(elindex[elemnt][1][random.choice(morality)]),
+                                      random.choice(typindex[typ])]).capitalize(), 'of the',
+                           random.choice(elindex[elemnt][0][random.choice(morality)]).capitalize(),
+                            random.choice([random.choice(elindex[elemnt][1][random.choice(morality)]),
+                                      random.choice(typindex[typ])]).capitalize()])
+      else:
+        result = " ".join([random.choice(elindex[elemnt][0][random.choice(morality)]).capitalize(),
+                           random.choice(elindex[elemnt][0][random.choice(morality)]).capitalize(),
+                            random.choice(elindex[elemnt][1][random.choice(morality)]).capitalize(),
+                            random.choice(typindex[typ]).capitalize()])
+  if typ == 'magic' or (typ == 'rand' and typindex['rand'] == magicnoun):
+    if random.choice([True, False, False]):
+      result = (random.choice([_getJapaneseSurname(), _getDwarvenMaleName()]) + "'s ") + result
+  return result
 
 def getName(nametype):
   '''Return a random name of a type defined by the input string.
