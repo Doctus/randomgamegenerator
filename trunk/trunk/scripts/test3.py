@@ -3,10 +3,16 @@ from PyQt4 import QtCore
 
 c = bmainmod.bMain()
 
-def newEvent(str):
-    if str[0] == '/':
-        words = unicode(str).split()
-        if words[0].lower() == '/randomname':
+def newEvent(st):
+    if st[0] == '/':
+        words = unicode(st).split()
+        if words[0].lower() == '/help' or words[0].lower() == '/h':
+            c.insertChatMessage("Command Help:<br> Typing ordinary text and pressing 'enter' " +
+                                "will display to all players. Other commands may be invoked " +
+                                "with '/' plus the name of the command plus any arguments." +
+                                "<br>Commands<br>/randomname<br>/techname<br>/roll<br>/troll"+
+                                "<br>/emote<br>/tell")
+        elif words[0].lower() == '/randomname':
             if len(words) == 1:
                 name = ("Syntax: /randomname NAMETYPE. Caps and spaces " +
                         "are ignored. Some valid arguments are " +
@@ -14,6 +20,44 @@ def newEvent(str):
             else:
                 name = rggNameGen.getName(''.join(words[1:]).lower())
             c.insertChatMessage(unicode(name))
+        elif words[0].lower() == '/techname' or words[0].lower() == '/techniquename':
+            if len(words) == 1:
+                c.insertChatMessage(rggNameGen.getTechniqueName())
+            else: #it's a pain but doing it this way ensures order doesn't need to be memorised...
+                argCompilation = ['rand', 'rand', 'rand', -1, False]
+                parse = str(st) #Needs to be done for find() to be invoked
+                if parse.find("martial") != -1:
+                    argCompilation[0] = 'martial'
+                elif parse.find("magic") != -1:
+                    argCompilation[0] = 'magic'
+                if parse.find("fire") != -1:
+                    argCompilation[1] = 'fire'
+                elif parse.find("ice") != -1:
+                    argCompilation[1] = 'ice'
+                elif parse.find("darkness") != -1:
+                    argCompilation[1] = 'darkness'
+                elif parse.find("light") != -1:
+                    argCompilation[1] = 'light'
+                elif parse.find("psionic") != -1:
+                    argCompilation[1] = 'psionic'
+                elif parse.find("violent") != -1:
+                    argCompilation[1] = 'violent'
+                if parse.find("good") != -1:
+                    argCompilation[2] = 'good'
+                elif parse.find("neutral") != -1:
+                    argCompilation[2] = 'neutral'
+                elif parse.find("evil") != -1:
+                    argCompilation[2] = 'evil'
+                if parse.find("simple") != -1:
+                    argCompilation[3] = 2
+                elif parse.find("moderate") != -1:
+                    argCompilation[3] = 3
+                elif parse.find("complex") != -1:
+                    argCompilation[3] = 4
+                if parse.find("awesome") != -1 or parse.find("hotblood") != -1 or parse.find("cool") != -1:
+                    argCompilation[4] = True
+                c.insertChatMessage(rggNameGen.getTechniqueName(argCompilation[0], argCompilation[1], argCompilation[2],
+                                                                argCompilation[3], argCompilation[4]))
         elif words[0].lower() == '/roll':
             if len(words) == 1:
                 c.insertChatMessage("Syntax: /roll DICE. Dice can be " +
@@ -59,61 +103,61 @@ def newEvent(str):
                                     unicode(mesg))
                     c.sendNetMessageToAll('W! ' + target + ' ' + unicode(mesg))
     else:
-        c.insertChatMessage(c.getLocalHandle() + ": " + str)
-        c.sendNetMessageToAll("t!" + str)
+        c.insertChatMessage(c.getLocalHandle() + ": " + st)
+        c.sendNetMessageToAll("t!" + st)
 
-def newNetEvent(str, handle):
+def newNetEvent(st, handle):
     #c.insertChatMessage("DEBUG: " + str)
-    if len(str) > 1:
-        if str[1] == '!':
-            if str[0] == 't': #Ordinary chat message
-                c.insertChatMessage(unicode(handle) + ": " + str[2:])
+    if len(st) > 1:
+        if st[1] == '!':
+            if st[0] == 't': #Ordinary chat message
+                c.insertChatMessage(unicode(handle) + ": " + st[2:])
                 if c.isServer():
                     c.sendNetMessageToAllButOne('s!' + ' ' + handle +
-                                                ' ' + str[2:],
+                                                ' ' + st[2:],
                                                 handle)
-            elif str[0] == 'T': #Emote message
+            elif st[0] == 'T': #Emote message
                 c.insertChatMessage('<i>' + unicode(handle) + " " +
-                                    str[2:] + '</i>')
+                                    st[2:] + '</i>')
                 if c.isServer():
                     c.sendNetMessageToAllButOne('S!' + ' ' + handle +
-                                                ' ' + str[2:],
+                                                ' ' + st[2:],
                                                 handle)
-            elif str[0] == 's': #Spoofed talk
-                words = unicode(str).split()
+            elif st[0] == 's': #Spoofed talk
+                words = unicode(st).split()
                 c.insertChatMessage(words[1] + ": " +
                                     " ".join(words[2:]))
-            elif str[0] == 'S': #Spoofed emote
-                words = unicode(str).split()
+            elif st[0] == 'S': #Spoofed emote
+                words = unicode(st).split()
                 c.insertChatMessage('<i>' + words[1] + " " +
                                     " ".join(words[2:]) + '</i>')
-            elif str[0] == 'w': #Whisper/tell
-                words = unicode(str).split()
+            elif st[0] == 'w': #Whisper/tell
+                words = unicode(st).split()
                 c.insertChatMessage('From ' + words[1] + ': ' +
                                     " ".join(words[2:]))
-            elif str[0] == 'W': #Whisper/tell requiring relay
-                words = unicode(str).split()
+            elif st[0] == 'W': #Whisper/tell requiring relay
+                words = unicode(st).split()
                 if words[1] == c.getLocalHandle():
                     c.insertChatMessage('From ' + handle + ': ' +
                                         " ".join(words[2:]))
                 else:
                     c.sendNetMessageToHandle('w!' + " " + handle + " " +
                                              " ".join(words[2:]), words[1])
-            elif str[0] == 'r': #Die roll
-                c.insertChatMessage(str[2:])
+            elif st[0] == 'r': #Die roll
+                c.insertChatMessage(st[2:])
                 if c.isServer():
-                    c.sendNetMessageToAllButOne(str, handle)
-            elif str[0] == 'u': #User message
-                words = unicode(str).split()
+                    c.sendNetMessageToAllButOne(st, handle)
+            elif st[0] == 'u': #User message
+                words = unicode(st).split()
                 if words[1] == 'join':
                     c.insertChatMessage('<b>' + " ".join(words[2:]) +
                                         " has joined the game" + '</b>')
                 elif words[1] == 'leave':
                     c.insertChatMessage('<b>' + " ".join(words[2:]) +
                                         " has left the game" + '</b>')
-            elif str[0] == 'n': #Map file
+            elif st[0] == 'n': #Map file
                 #This isn't useful, just demonstrating principle
-                loadedmappe = rggTileLoader.loadFromString(str[2:])
+                loadedmappe = rggTileLoader.loadFromString(st[2:])
             else:
                 print 'Malformed or unrecognised data received.'
         else:
