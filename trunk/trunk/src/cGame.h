@@ -32,6 +32,7 @@ class cGame;
 #include "Widgets/wDockWidgets.h"
 #include "Network/nConnectionManager.h"
 #include "Bindings/bMain.h"
+#include "Bindings/bImage.h"
 
 using namespace std;
 
@@ -49,7 +50,9 @@ class cGame : public QObject
     QScrollArea *GLArea;
 
     friend class wMenuBar;
+    friend class wGLWidget;
     friend class bMain;
+    friend class bImage;
 
     public:
     cGame(QWidget *parent);

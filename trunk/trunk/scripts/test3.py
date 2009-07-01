@@ -1,11 +1,17 @@
-import bmainmod, rggNameGen, rggTileLoader, rggDice
+import bmainmod, rggNameGen, rggTileLoader, rggDice, rggTile
 from PyQt4 import QtCore
 
 c = bmainmod.bMain()
 
+testimage = rggTile.tile(0, 0, 32, 32, 0, "../data/town.png")
+
 def newEvent(st):
+    if len(st) <= 0:
+        return
     if st[0] == '/':
         words = unicode(st).split()
+        if words[0].lower() == '/test':
+            testimage.setTile(testimage.getTile() + 1)
         if words[0].lower() == '/help' or words[0].lower() == '/h':
             c.insertChatMessage("Command Help:<br> Typing ordinary text and pressing 'enter' " +
                                 "will display to all players. Other commands may be invoked " +

@@ -26,14 +26,14 @@ cGame::cGame(QWidget *parent) : QObject(parent)
 {
     mConnectionManager = new nConnectionManager(parent, this);
 
-    mGLWidget = new wGLWidget(parent);
+    mGLWidget = new wGLWidget(parent, this);
     ((QMainWindow*)parent)->setCentralWidget(mGLWidget);
 
     mMenuBar = new wMenuBar(parent, this, mConnectionManager);
 
     mDockWidgets = new wDockWidgets((QMainWindow*)parent, this);
 
-    mTilesetManager = new cTilesetManager();
+    mTilesetManager = new cTilesetManager(mGLWidget);
 
     QTimer *timer = new QTimer(this);
     QTimer *timer2 = new QTimer(this);

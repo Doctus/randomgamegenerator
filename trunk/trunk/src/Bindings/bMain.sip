@@ -20,9 +20,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 %Module bmainmod
 
 %Import QtCore/QtCoremod.sip
-%Import QtGui/QtGuimod.sip
-%Import QtOpenGL/QtOpenGLmod.sip
-%Import QtNetwork/QtNetworkmod.sip
+//%Import QtGui/QtGuimod.sip
+//%Import QtOpenGL/QtOpenGLmod.sip
+//%Import QtNetwork/QtNetworkmod.sip
 
 class bMain : QObject {
 
@@ -49,4 +49,29 @@ signals:
     void newChatInputSignal(QString str);
     void connectedSignal(QString handle);
     void disconnectedSignal(QString handle);
+};
+
+class bImage
+{
+
+%TypeHeaderCode
+#include <bImage.h>
+%End
+
+    public:
+    bImage(int x, int y, int w, int h, int tile, QString filename);
+    //virtual ~bImage();
+
+    int getX();
+    int getY();
+    int getW();
+    int getH();
+    int getTile();
+    QString getFilename();
+
+    void setX(int x);
+    void setY(int y);
+    void setW(int w);
+    void setH(int h);
+    void setTile(int tile);
 };

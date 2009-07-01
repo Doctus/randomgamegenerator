@@ -24,16 +24,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <QtGui/QMainWindow>
 #include <QtCore/QObject>
 
+#include "../cGame.h"
+
+
 
 class bMain : public QObject
 {
     Q_OBJECT;
+
+    private:
+    static cGame *mainGame;
 
     public:
     bMain();
     //virtual ~bMain() {}
 
     void start();
+    static cGame* getGameInstance();
     void insertChatMessage(QString str);
     void sendNetMessageToAll(QString msg);
     bool sendNetMessageToHandle(QString msg, QString handle);

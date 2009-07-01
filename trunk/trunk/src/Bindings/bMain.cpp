@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 QApplication app(NULL, NULL);
 QMainWindow *widget;
-cGame *mGame;
+cGame* bMain::mainGame;
 
 bMain::bMain()
 {
@@ -34,12 +34,14 @@ bMain::bMain()
     widget = new QMainWindow(); //parent widget
     widget->resize(640, 480);
 
-    mGame = new cGame(widget);
+    mainGame = new cGame(widget);
 
-    connect(mGame->mDockWidgets, SIGNAL(newChatInputSignal(QString)), this, SLOT(chatInputTrigger(QString)));
-    connect(mGame->mConnectionManager, SIGNAL(newNetMessage(QString,QString)), this, SLOT(netMessageTrigger(QString, QString)));
-    connect(mGame->mConnectionManager, SIGNAL(connectedSignal(QString)), this, SLOT(connectedTrigger(QString)));
-    connect(mGame->mConnectionManager, SIGNAL(disconnectedSignal(QString)), this, SLOT(disconnectedTrigger(QString)));
+    cout << "mainGame initialised" << endl;
+
+    connect(mainGame->mDockWidgets, SIGNAL(newChatInputSignal(QString)), this, SLOT(chatInputTrigger(QString)));
+    connect(mainGame->mConnectionManager, SIGNAL(newNetMessage(QString,QString)), this, SLOT(netMessageTrigger(QString, QString)));
+    connect(mainGame->mConnectionManager, SIGNAL(connectedSignal(QString)), this, SLOT(connectedTrigger(QString)));
+    connect(mainGame->mConnectionManager, SIGNAL(disconnectedSignal(QString)), this, SLOT(disconnectedTrigger(QString)));
 }
 
 void bMain::start()
@@ -51,44 +53,49 @@ void bMain::start()
     return;
 }
 
+cGame* bMain::getGameInstance()
+{
+    return mainGame;
+}
+
 void bMain::insertChatMessage(QString str)
 {
-    mGame->mDockWidgets->insertMessage(str);
+    mainGame->mDockWidgets->insertMessage(str);
 }
 
 void bMain::sendNetMessageToAll(QString msg)
 {
-    mGame->mConnectionManager->sendMessageToAll(msg);
+    mainGame->mConnectionManager->sendMessageToAll(msg);
 }
 
 bool bMain::sendNetMessageToHandle(QString msg, QString handle)
 {
-    return mGame->mConnectionManager->sendMessageToHandle(msg, handle);
+    return mainGame->mConnectionManager->sendMessageToHandle(msg, handle);
 }
 
 void bMain::sendNetMessageToAllButOne(QString msg, QString handle)
 {
-    mGame->mConnectionManager->sendNetMessageToAllButOne(msg, handle);
+    mainGame->mConnectionManager->sendNetMessageToAllButOne(msg, handle);
 }
 
 QString bMain::getLocalUserList()
 {
-    return mGame->mConnectionManager->getLocalUserList();
+    return mainGame->mConnectionManager->getLocalUserList();
 }
 
 QString bMain::getLocalHandle()
 {
-    return mGame->mConnectionManager->getLocalHandle();
+    return mainGame->mConnectionManager->getLocalHandle();
 }
 
 bool bMain::isClient()
 {
-    return mGame->mConnectionManager->isConnectionType(Connection::CLIENT);
+    return mainGame->mConnectionManager->isConnectionType(Connection::CLIENT);
 }
 
 bool bMain::isServer()
 {
-    return mGame->mConnectionManager->isConnectionType(Connection::SERVER);
+    return mainGame->mConnectionManager->isConnectionType(Connection::SERVER);
 }
 
 void bMain::chatInputTrigger(QString msg)

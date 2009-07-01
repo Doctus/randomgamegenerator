@@ -78,6 +78,11 @@ GLuint cTileset::getTextureId(int tile)
     return textureIds[tile];
 }
 
+GLuint cTileset::getTextureId(int x, int y)
+{
+    return textureIds[(image->height()/tileHeight)*(y/tileHeight)  +  (x/tileWidth)];
+}
+
 
 void cTileset::loadImage()
 {
@@ -91,7 +96,7 @@ void cTileset::loadImage()
             QRect rect(x, y, tileWidth, tileHeight);
             QImage texture = image->copy(rect);
 
-            cout << "Creating texture from " << filename << " at (" << x << "," << y << ")" << endl;
+            //cout << "Creating texture from " << filename << " at (" << x << "," << y << ")" << endl;
 
             try
             {
