@@ -31,8 +31,11 @@ std::string translateGLError(GLenum errorcode)
 }
 
 //QwGLWidget doesn't do Alpha by default(and neither does it do DoubleBuffering, I think), so I forced it.
-wGLWidget::wGLWidget(QWidget* parent) : QGLWidget(QGLFormat(QGL::FormatOptions(QGL::DoubleBuffer | QGL::AlphaChannel)), parent)
+wGLWidget::wGLWidget(QWidget* parent, cGame *mGame) : QGLWidget(QGLFormat(QGL::FormatOptions(QGL::DoubleBuffer | QGL::AlphaChannel)), parent)
 {
+    this->mGame = mGame;
+    cam = new cCamera(0, 0, 640, 480);
+
     resize(parent->width(), parent->height());
 
     this->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -57,10 +60,17 @@ void wGLWidget::initializeGL()
 
 void wGLWidget::paintGL()
 {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    vector<bImage*> images = mGame->mTilesetManager->getImages();
+
+    foreach(bImage *img, images)
+    {
+        drawImage(img->getTextureId(), img->getX(), img->getY(), img->getW(), img->getH());
+    }
+
     if(doubleBuffer()) //This check seems a bit redundant...as we force it to double buffer. But nonetheless.
         swapBuffers();
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void wGLWidget::drawImage(QImage *originalImage, int x, int y)

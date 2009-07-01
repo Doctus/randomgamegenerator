@@ -20,24 +20,26 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "cTilesetManager.h"
 
-cTilesetManager::cTilesetManager()
+cTilesetManager::cTilesetManager(wGLWidget *mGLWidget)
 {
     id = 0;
+    this->mGLWidget = mGLWidget;
 }
 
-int cTilesetManager::loadTileset(wGLWidget *mGLWidget, int tileWidth, int tileHeight, string filename)
+cTileset* cTilesetManager::loadTileset(int tileWidth, int tileHeight, string filename)
 {
     id++;
+    cTileset* set = NULL;
     try
     {
-        tilesets.push_back(new cTileset(id, mGLWidget, tileWidth, tileHeight, filename));
+        set = new cTileset(id, mGLWidget, tileWidth, tileHeight, filename);
+        tilesets.push_back(set);
     }
     catch (...) //this needs to be handled better than just catching any and all exception...although it works <_<
     {
         id--;
-        return -1;
     }
-    return id;
+    return set;
 }
 
 void cTilesetManager::removeTileset(cTileset *tileset)
@@ -75,6 +77,40 @@ cTileset* cTilesetManager::findTileset(string filename)
 
     return NULL; //exception?
 }
+
+
+void cTilesetManager::addImage(bImage* img)
+{
+    cTileset *set = findTileset(img->getFilename().toStdString());
+
+    if(set == NULL)
+        set = loadTileset(img->getW(), img->getH(), img->getFilename().toStdString()); //this can still return NULL.
+
+    if(set != NULL)
+    {
+        img->setTextureId(set->getTextureId(img->getTile()));
+        images.push_back(img);
+    }
+}
+
+bool cTilesetManager::changeTileOfImage(bImage *img, int tile)
+{
+    cTileset *set = findTileset(img->getFilename().toStdString());
+
+    if(set != NULL)
+    {
+        img->setTextureId(set->getTextureId(tile));
+        return true;
+    }
+
+    return false;
+}
+
+vector<bImage*> cTilesetManager::getImages()
+{
+    return images;
+}
+
 
 int cTilesetManager::getPosition(int id)
 {

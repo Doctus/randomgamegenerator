@@ -24,8 +24,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <vector>
 #include <string>
 
+class cTilesetManager;
+
 #include "cTileset.h"
 #include "Widgets/wGLWidget.h"
+#include "Bindings/bImage.h"
 
 using namespace std;
 
@@ -34,16 +37,22 @@ class cTilesetManager
     private:
     vector<cTileset*> tilesets;
     int id;
+    vector<bImage*> images;
+    wGLWidget *mGLWidget;
 
     public:
-    cTilesetManager();
+    cTilesetManager(wGLWidget *mGLWidget);
 
-    int loadTileset(wGLWidget *mGLWidget, int tileWidth, int tileHeight, string filename);
+    cTileset* loadTileset(int tileWidth, int tileHeight, string filename);
     void removeTileset(cTileset *tileset);
     void removeTileset(int id);
 
     cTileset* findTileset(int id);
     cTileset* findTileset(string filename);
+
+    void addImage(bImage *img);
+    bool changeTileOfImage(bImage *img, int tile);
+    vector<bImage*> getImages();
 
     private:
     int getPosition(int id);

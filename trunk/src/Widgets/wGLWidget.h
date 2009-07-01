@@ -27,12 +27,22 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <iostream>
 
+class wGLWidget;
+
+#include "../cCamera.h"
+#include "../cGame.h"
+#include "../Bindings/bImage.h"
+
 using namespace std;
 
 class wGLWidget : public QGLWidget
 {
+    private:
+    cCamera *cam;
+    cGame *mGame;
+
     public:
-    wGLWidget(QWidget* parent);
+    wGLWidget(QWidget* parent, cGame *mGame);
 
     void initializeGL();
     void paintGL();

@@ -55,6 +55,7 @@ class cTileset
     int getTileWidth();
     int getTileHeight();
     GLuint getTextureId(int tile);
+    GLuint getTextureId(int x, int y);
 
     string getFilename();
 

@@ -21,11 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef CAMERA_H
 #define CAMERA_H
 
-class cCamera;
-
 #include <QtCore/QPoint>
-
-#include "cMap.h"
 
 class cCamera
 {
@@ -33,11 +29,9 @@ class cCamera
     QPoint cam;
     QPoint bounds;
 
-    friend class cMap;
-
+    public:
     cCamera(int x, int y, int w, int h);
 
-    public:
     QPoint getCam();
     QPoint getBounds();
     void setCam(QPoint newCam);
