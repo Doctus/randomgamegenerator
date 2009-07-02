@@ -2,16 +2,22 @@ import bmainmod, rggNameGen, rggTileLoader, rggDice, rggTile
 from PyQt4 import QtCore
 
 c = bmainmod.bMain()
+testMappe = rggTileLoader.Map()
 
-testimage = rggTile.tile(0, 0, 32, 32, 0, "../data/town.png")
+#testimage = rggTile.tile(0, 0, 32, 32, 0, "../data/town.png")
+
+def _linkedName(inp):
+    return str('<a href="/tell ' + inp + '" title="' + inp + '">' + inp + '</a>')
 
 def newEvent(st):
-    if len(st) <= 0:
+    if (len(st) <= 0) or ('title=' in st):
         return
     if st[0] == '/':
         words = unicode(st).split()
         if words[0].lower() == '/test':
-            testimage.setTile(testimage.getTile() + 1)
+            #testimage.setTile(testimage.getTile() + 1)
+            testMappe.DEBUGSaveToFile()
+            testMappe.DEBUGLoadFromFile()
         if words[0].lower() == '/help' or words[0].lower() == '/h':
             c.insertChatMessage("Command Help:<br> Typing ordinary text and pressing 'enter' " +
                                 "will display to all players. Other commands may be invoked " +
@@ -71,7 +77,7 @@ def newEvent(st):
                                     " other variants depending on " +
                                     "development. See also /troll")
             else:
-                rolltext = (c.getLocalHandle() + " rolls " +
+                rolltext = (_linkedName(c.getLocalHandle()) + " rolls " +
                             rggDice.roll(" ".join(words[1:])))
                 c.insertChatMessage(rolltext)
                 c.sendNetMessageToAll('r!' + rolltext)
@@ -85,7 +91,7 @@ def newEvent(st):
                         "ACTION' in italic font.")
             else:
                 action = ' '.join(words[1:])
-            c.insertChatMessage('<i>' + c.getLocalHandle() + ' ' +
+            c.insertChatMessage('<i>' + _linkedName(c.getLocalHandle()) + ' ' +
                                 unicode(action) + '</i>')
             c.sendNetMessageToAll('T!' + unicode(action))
         elif words[0].lower() == '/w' or words[0].lower() == '/t' or words[0].lower() == '/whisper' or words[0].lower() == '/tell':
@@ -109,7 +115,7 @@ def newEvent(st):
                                     unicode(mesg))
                     c.sendNetMessageToAll('W! ' + target + ' ' + unicode(mesg))
     else:
-        c.insertChatMessage(c.getLocalHandle() + ": " + st)
+        c.insertChatMessage(_linkedName(c.getLocalHandle()) + ": " + st)
         c.sendNetMessageToAll("t!" + st)
 
 def newNetEvent(st, handle):
@@ -117,13 +123,13 @@ def newNetEvent(st, handle):
     if len(st) > 1:
         if st[1] == '!':
             if st[0] == 't': #Ordinary chat message
-                c.insertChatMessage(unicode(handle) + ": " + st[2:])
+                c.insertChatMessage(_linkedName(unicode(handle)) + ": " + st[2:])
                 if c.isServer():
                     c.sendNetMessageToAllButOne('s!' + ' ' + handle +
                                                 ' ' + st[2:],
                                                 handle)
             elif st[0] == 'T': #Emote message
-                c.insertChatMessage('<i>' + unicode(handle) + " " +
+                c.insertChatMessage('<i>' + _linkedName(unicode(handle)) + " " +
                                     st[2:] + '</i>')
                 if c.isServer():
                     c.sendNetMessageToAllButOne('S!' + ' ' + handle +
@@ -131,20 +137,20 @@ def newNetEvent(st, handle):
                                                 handle)
             elif st[0] == 's': #Spoofed talk
                 words = unicode(st).split()
-                c.insertChatMessage(words[1] + ": " +
+                c.insertChatMessage(_linkedName(words[1]) + ": " +
                                     " ".join(words[2:]))
             elif st[0] == 'S': #Spoofed emote
                 words = unicode(st).split()
-                c.insertChatMessage('<i>' + words[1] + " " +
+                c.insertChatMessage('<i>' + _linkedName(words[1]) + " " +
                                     " ".join(words[2:]) + '</i>')
             elif st[0] == 'w': #Whisper/tell
                 words = unicode(st).split()
-                c.insertChatMessage('From ' + words[1] + ': ' +
+                c.insertChatMessage('From ' + _linkedName(words[1]) + ': ' +
                                     " ".join(words[2:]))
             elif st[0] == 'W': #Whisper/tell requiring relay
                 words = unicode(st).split()
                 if words[1] == c.getLocalHandle():
-                    c.insertChatMessage('From ' + handle + ': ' +
+                    c.insertChatMessage('From ' + _linkedName(handle) + ': ' +
                                         " ".join(words[2:]))
                 else:
                     c.sendNetMessageToHandle('w!' + " " + handle + " " +
