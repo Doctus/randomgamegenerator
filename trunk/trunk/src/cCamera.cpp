@@ -47,3 +47,8 @@ void cCamera::adjustCam(QPoint adjust)
 {
     cam += adjust;
 }
+
+void cCamera::setBounds(QPoint bounds)
+{
+    this->bounds = bounds;
+}

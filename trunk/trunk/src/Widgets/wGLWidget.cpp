@@ -50,6 +50,7 @@ void wGLWidget::initializeGL()
 
     glEnable(GL_TEXTURE_RECTANGLE_ARB);
     glEnable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glViewport(0, 0, 640, 480);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -60,13 +61,15 @@ void wGLWidget::initializeGL()
 
 void wGLWidget::paintGL()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     vector<bImage*> images = mGame->mTilesetManager->getImages();
+    QRect *camTest = new QRect(cam->getCam(), cam->getBounds());
 
     foreach(bImage *img, images)
     {
-        drawImage(img->getTextureId(), img->getX(), img->getY(), img->getW(), img->getH());
+        if(camTest->intersects(*(img->getRect())))
+            drawImage(img->getTextureId(), img->getX(), img->getY(), img->getW(), img->getH());
     }
 
     if(doubleBuffer()) //This check seems a bit redundant...as we force it to double buffer. But nonetheless.
@@ -181,6 +184,7 @@ void wGLWidget::resizeGL(int w, int h)
     glLoadIdentity();
     glOrtho(0, w, h, 0, -1, 1);
     glMatrixMode(GL_MODELVIEW);
+    cam->setBounds(QPoint(w, h));
 }
 
 GLuint wGLWidget::createTexture(QImage *image)
