@@ -10,7 +10,8 @@ using namespace std;
 class bImage
 {
     private:
-    int x, y, w, h, tile;
+    int tile;
+    QRect *rect;
     QString filename;
     GLuint textureId;
 
@@ -34,7 +35,7 @@ class bImage
     //librandom-game-generator only
     GLuint getTextureId();
     void setTextureId(GLuint id);
-    QRect getRect();
+    QRect* getRect();
 };
 
 #endif // BIMAGE_H
