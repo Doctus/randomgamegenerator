@@ -51,17 +51,21 @@ class bMain : public QObject
     bool isClient();
     bool isServer();
 
+    int displayUserDialogChoice(QString text, QVector<QString> buttonTexts, int defaultButton = 0);
+
     private slots:
     void chatInputTrigger(QString msg);
     void netMessageTrigger(QString msg, QString handle);
     void connectedTrigger(QString handle);
     void disconnectedTrigger(QString handle);
+    void loadMapTrigger(QString filename);
 
     signals:
     void newNetMessageSignal(QString str, QString handle);
     void newChatInputSignal(QString str);
     void connectedSignal(QString handle);
     void disconnectedSignal(QString handle);
+    void loadMapSignal(QString filename);
 };
 
 #endif // BMAIN_H

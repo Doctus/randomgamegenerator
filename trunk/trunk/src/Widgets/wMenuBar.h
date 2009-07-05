@@ -64,6 +64,9 @@ class wMenuBar : public QObject
 
     void hostServerSlot();
     void connectToServerSlot();
+
+    signals:
+    void loadMapSignal(QString filename);
 };
 
 #endif // MENUBAR_H

@@ -34,6 +34,10 @@ bMain::bMain()
     widget = new QMainWindow(); //parent widget
     widget->resize(640, 480);
 
+    QIcon *icon = new QIcon("../data/FAD-icon.png");
+
+    widget->setWindowIcon(*icon);
+
     mainGame = new cGame(widget);
 
     cout << "mainGame initialised" << endl;
@@ -42,6 +46,7 @@ bMain::bMain()
     connect(mainGame->mConnectionManager, SIGNAL(newNetMessage(QString,QString)), this, SLOT(netMessageTrigger(QString, QString)));
     connect(mainGame->mConnectionManager, SIGNAL(connectedSignal(QString)), this, SLOT(connectedTrigger(QString)));
     connect(mainGame->mConnectionManager, SIGNAL(disconnectedSignal(QString)), this, SLOT(disconnectedTrigger(QString)));
+    connect(mainGame->mMenuBar, SIGNAL(loadMapSignal(QString)), this, SLOT(loadMapTrigger(QString)));
 }
 
 void bMain::start()
@@ -78,6 +83,7 @@ void bMain::sendNetMessageToAllButOne(QString msg, QString handle)
     mainGame->mConnectionManager->sendNetMessageToAllButOne(msg, handle);
 }
 
+
 QString bMain::getLocalUserList()
 {
     return mainGame->mConnectionManager->getLocalUserList();
@@ -98,6 +104,40 @@ bool bMain::isServer()
     return mainGame->mConnectionManager->isConnectionType(Connection::SERVER);
 }
 
+
+int bMain::displayUserDialogChoice(QString text, QVector<QString> buttonTexts, int defaultButton)
+{
+    if(buttonTexts.size() == 0)
+        return -1;
+
+    QVector<QPushButton*> buttons;
+
+    QMessageBox questionDialog(widget);
+    questionDialog.setText(text);
+
+    for(int j = buttonTexts.size() - 1; j >= 0; j--)
+    {
+        QPushButton *newButton = questionDialog.addButton(buttonTexts[j], QMessageBox::AcceptRole);
+        buttons.push_front(newButton);
+        if(j == defaultButton)
+            questionDialog.setDefaultButton(newButton);
+    }
+
+    questionDialog.exec();
+
+    int i= 0;
+
+    foreach(QPushButton *button, buttons)
+    {
+        if(questionDialog.clickedButton() == button)
+            return i;
+        i++;
+    }
+
+    return -1;
+}
+
+
 void bMain::chatInputTrigger(QString msg)
 {
     emit newChatInputSignal(msg);
@@ -116,4 +156,9 @@ void bMain::connectedTrigger(QString handle)
 void bMain::disconnectedTrigger(QString handle)
 {
     emit disconnectedSignal(handle);
+}
+
+void bMain::loadMapTrigger(QString filename)
+{
+    emit loadMapSignal(filename);
 }
