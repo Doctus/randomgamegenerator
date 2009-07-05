@@ -79,6 +79,7 @@ void wMenuBar::loadMapSlot()
 
     if(!fileName.isEmpty())
     {
+        emit loadMapSignal(fileName);
     }
 }
 

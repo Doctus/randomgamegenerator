@@ -5,6 +5,7 @@ QT += opengl \
     network
 TARGET = random-game-generator
 TEMPLATE = lib
+CONFIG += debug
 SOURCES += ../src/cTilesetManager.cpp \
     ../src/cTileset.cpp \
     ../src/cGame.cpp \

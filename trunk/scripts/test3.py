@@ -188,10 +188,15 @@ def disConnection(handle):
     c.insertChatMessage("<b>" + handle + " has left the game" + "</b>")
     if c.isServer():
         c.sendNetMessageToAllButOne('u!' + ' leave ' + handle, handle)
+
+def loadMap(filename):
+    print c.displayUserDialogChoice("Test!", ["One", "Two", "Three"], 2)
+    #testMappe.LoadFromFile(filename)
     
 QtCore.QObject.connect(c, QtCore.SIGNAL("newNetMessageSignal(QString, QString)"), newNetEvent)
 QtCore.QObject.connect(c, QtCore.SIGNAL("connectedSignal(QString)"), newConnection)
 QtCore.QObject.connect(c, QtCore.SIGNAL("disconnectedSignal(QString)"), disConnection)
 QtCore.QObject.connect(c, QtCore.SIGNAL("newChatInputSignal(QString)"), newEvent)
+QtCore.QObject.connect(c, QtCore.SIGNAL("loadMapSignal(QString)"), loadMap)
 
 c.start()

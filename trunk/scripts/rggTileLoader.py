@@ -73,3 +73,9 @@ class Map:
     f.write('n! Example Map !n a! Doctus !a m! 20 20 t! ../data/town.png s! '+
             '32 32 3~4 1~15 7 5 3 4 6~5 3~30 4 5 4 7 9 2 3')
     f.close()
+
+  def LoadFromFile(self, filename):
+    f = open(filename, 'r')
+    tmp = f.read().split()
+    f.close()
+    self.loadFromString(tmp)
