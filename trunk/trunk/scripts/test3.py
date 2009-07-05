@@ -18,6 +18,8 @@ def newEvent(st):
             #testimage.setTile(testimage.getTile() + 1)
             testMappe.DEBUGSaveToFile()
             testMappe.DEBUGLoadFromFile()
+        if words[0].lower() == '/test2':
+            c.sendNetMessageToAll(testMappe.stringform)
         if words[0].lower() == '/help' or words[0].lower() == '/h':
             c.insertChatMessage("Command Help:<br> Typing ordinary text and pressing 'enter' " +
                                 "will display to all players. Other commands may be invoked " +
@@ -169,7 +171,7 @@ def newNetEvent(st, handle):
                                         " has left the game" + '</b>')
             elif st[0] == 'n': #Map file
                 #This isn't useful, just demonstrating principle
-                loadedmappe = rggTileLoader.loadFromString(st[2:])
+                testMappe.loadFromString(str(st).split())
             else:
                 print 'Malformed or unrecognised data received.'
         else:

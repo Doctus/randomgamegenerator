@@ -26,6 +26,7 @@ class Map:
     pass
 
   def loadFromString(self, s):
+    self.stringform = " ".join(s)
     self.mapname = " ".join(s[s.index('n!')+1:s.index('!n')])
     self.authorname = " ".join(s[s.index('a!')+1:s.index('!a')])
     self.mapsize = [int(s[s.index('m!')+1]), int(s[s.index('m!')+2])]
@@ -69,6 +70,6 @@ class Map:
     #inputs, format them properly, and write to a specified file.
     #It will of course be important to implement the same RLE.
     f = open('test.txt', 'w')
-    f.write('n! Example Map !n a! Doctus !a m! 10 15 t! ../data/town.png s! '+
+    f.write('n! Example Map !n a! Doctus !a m! 20 20 t! ../data/town.png s! '+
             '32 32 3~4 1~15 7 5 3 4 6~5 3~30 4 5 4 7 9 2 3')
     f.close()
