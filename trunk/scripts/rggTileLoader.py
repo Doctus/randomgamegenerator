@@ -52,6 +52,53 @@ class Map:
                                           self.tilesize[0], self.tilesize[1],
                                           self.tileindexes[x+(y*self.mapsize[0])],
                                           self.tileset))
+
+  def encodeIndexes(self, ind):
+    self.fullform = []
+    self.output = []
+    self.counthack = 1
+    for item in ind:
+      if (item+0!=item) and ('~' in item):
+        for x in range(0, int(item[item.index('~')+1:])):
+          self.fullform.append(item[0:item.index('~')])
+      else:
+        self.fullform.append(item)
+    for index in range(0, len(self.fullform)-1):
+      if self.fullform[index] == self.fullform[index+1]:
+        self.counthack += 1
+      else:
+        if self.counthack == 1: self.output.append(str(self.fullform[index]))
+        else: self.output.append(str(str(self.fullform[index]) + '~' + str(self.counthack)))
+        self.counthack = 1
+    return self.output
+
+  def deriveStringForm(self, mname, aname, msize, tset, tsize, tindexes):
+    #Best to do this "backwards" so we keep track of the indexes for insertion.
+    self.result = ['n!', '!n', 'a!', '!a', 'm!', 't!', 's!']
+    self.result.extend(self.encodeIndexes(tindexes))
+    print self.result
+    self.result.insert(7, str(tsize[1]))
+    self.result.insert(7, str(tsize[0]))
+    self.result.insert(6, str(tset))
+    self.result.insert(5, str(msize[1]))
+    self.result.insert(5, str(msize[0]))
+    #Have to take several lines here because someone decided reverse()
+    #should alter the string instead of returning the new version...
+    tmpname = aname.split()
+    tmpname.reverse()
+    for portion in tmpname:
+      self.result.insert(3, portion)
+    tmpname = mname.split()
+    tmpname.reverse()
+    for portion in tmpname:
+      self.result.insert(1, portion)
+    return " ".join(self.result)
+
+  def updateStringForm(self):
+    self.stringform = self.deriveStringForm(self.mapname, self.authorname,
+                                        self.mapsize, self.tileset,
+                                        self.tilesize, self.tileindexes)
+    print self.stringform
         
   def DEBUGLoadFromFile(self):
     f = open('test.txt', 'r')
@@ -75,6 +122,7 @@ class Map:
                                           self.tilesize[0], self.tilesize[1],
                                           self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])],
                                           self.tileset)
+    self.updateStringForm()
 
   def LoadFromFile(self, filename):
     f = open(filename, 'r')
