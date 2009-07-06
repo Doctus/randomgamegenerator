@@ -93,6 +93,18 @@ void cTilesetManager::addImage(bImage* img)
     }
 }
 
+void cTilesetManager::removeImage(bImage* img)
+{
+    for(uint i = 0; i < images.size(); i++)
+    {
+        if(images[i]->getId() == img->getId())
+        {
+            images.erase(images.begin() + i);
+            return;
+        }
+    }
+}
+
 bool cTilesetManager::changeTileOfImage(bImage *img, int tile)
 {
     cTileset *set = findTileset(img->getFilename().toStdString());

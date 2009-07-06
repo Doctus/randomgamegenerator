@@ -51,6 +51,7 @@ class cTilesetManager
     cTileset* findTileset(string filename);
 
     void addImage(bImage *img);
+    void removeImage(bImage *img);
     bool changeTileOfImage(bImage *img, int tile);
     vector<bImage*> getImages();
 

@@ -11,14 +11,17 @@ class bImage
 {
     private:
     int tile;
+    static int countId;
+    int id;
     QRect *rect;
     QString filename;
     GLuint textureId;
 
     public:
     bImage(int x, int y, int w, int h, int tile, QString filename);
-    //virtual ~bImage();
+    virtual ~bImage();
 
+    int getId();
     int getX();
     int getY();
     int getW();
