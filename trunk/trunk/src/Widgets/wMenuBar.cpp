@@ -44,10 +44,19 @@ void wMenuBar::initActions()
     hostServer->setShortcut(tr("Ctrl+H"));
     QAction::connect(hostServer, SIGNAL(triggered()), this, SLOT(hostServerSlot()));
 
-    connectToServer = new QAction(tr("&Connect to Server"), windowWidget);
-    connectToServer->setShortcut(tr("Ctrl+C"));
+    connectToServer = new QAction(tr("Co&nnect to Server"), windowWidget);
+    connectToServer->setShortcut(tr("Ctrl+N"));
     QAction::connect(connectToServer, SIGNAL(triggered()), this, SLOT(connectToServerSlot()));
 
+    selectIcon = new QAction(QIcon("../data/FAD-select-icon.png"), "Select Tool", windowWidget);
+    selectIcon->setShortcut(tr("Ctrl+S"));
+    selectIcon->setWhatsThis("Select Tool (Ctrl+S)");
+    QAction::connect(selectIcon, SIGNAL(triggered()), this, SLOT(selectIconSlot()));
+
+    moveIcon = new QAction(QIcon("../data/FAD-move-icon.png"), "Move Tool", windowWidget);
+    moveIcon->setShortcut(tr("Ctrl+M"));
+    moveIcon->setStatusTip("Move Tool (Ctrl+M)");
+    QAction::connect(moveIcon, SIGNAL(triggered()), this, SLOT(moveIconSlot()));
 }
 
 void wMenuBar::initBars()
@@ -66,6 +75,11 @@ void wMenuBar::initBars()
     bar->addMenu(fileMenu);
     bar->addMenu(internetMenu);
     bar->addMenu(viewMenu);
+
+    bar->addSeparator();
+
+    bar->addAction(selectIcon);
+    bar->addAction(moveIcon);
 }
 
 
@@ -125,3 +139,14 @@ void wMenuBar::connectToServerSlot()
 
     mConnectionManager->connectTo(host, port, handle);
 }
+
+void wMenuBar::moveIconSlot()
+{
+    mGame->mGLWidget->setSelectedIcon(IconType::move);
+}
+
+void wMenuBar::selectIconSlot()
+{
+    mGame->mGLWidget->setSelectedIcon(IconType::select);
+}
+

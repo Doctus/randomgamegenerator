@@ -34,6 +34,7 @@ std::string translateGLError(GLenum errorcode)
 wGLWidget::wGLWidget(QWidget* parent, cGame *mGame) : QGLWidget(QGLFormat(QGL::FormatOptions(QGL::DoubleBuffer | QGL::AlphaChannel)), parent)
 {
     this->mGame = mGame;
+    selectedIcon = IconType::select;
     cam = new cCamera(0, 0, 640, 480);
 
     resize(parent->width(), parent->height());
@@ -69,7 +70,7 @@ void wGLWidget::paintGL()
     foreach(bImage *img, images)
     {
         if(camTest->intersects(*(img->getRect())))
-            drawImage(img->getTextureId(), img->getX(), img->getY(), img->getW(), img->getH());
+            drawImage(img->getTextureId(), img->getX()-cam->getCam().x(), img->getY()-cam->getCam().y(), img->getW(), img->getH());
     }
 
     if(doubleBuffer()) //This check seems a bit redundant...as we force it to double buffer. But nonetheless.
@@ -227,20 +228,40 @@ void wGLWidget::deleteTexture(GLuint texture)
 }
 
 
+void wGLWidget::setSelectedIcon(IconType::IconEnum selected)
+{
+    selectedIcon = selected;
+}
+
+
 void wGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    event->accept();
-    emit mouseMoveSignal(event->pos().x(), event->pos().y());
+    if(selectedIcon == IconType::select)
+    {
+        event->accept();
+        emit mouseMoveSignal(event->pos().x(), event->pos().y());
+    }
+    else
+    {
+        cam->adjustCam(QPoint(lastx-event->pos().x(), lasty-event->pos().y()));
+        lastx = event->pos().x();
+        lasty = event->pos().y();
+    }
 }
 
 void wGLWidget::mousePressEvent(QMouseEvent *event)
 {
+    lastx = event->pos().x();
+    lasty = event->pos().y();
     event->accept();
 }
 
 void wGLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    event->accept();
-    emit mouseClickSignal(event->pos().x(), event->pos().y());
+    if(selectedIcon == IconType::select)
+    {
+        event->accept();
+        emit mouseClickSignal(event->pos().x(), event->pos().y());
+    }
 }
 

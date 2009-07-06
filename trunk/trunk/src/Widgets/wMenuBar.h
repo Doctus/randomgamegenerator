@@ -27,6 +27,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 class wMenuBar;
 
+namespace IconType
+{
+    enum IconEnum
+    {
+        move,
+        select
+    };
+}
+
 #include "../cGame.h"
 #include "../Network/nConnectionManager.h"
 
@@ -44,6 +53,9 @@ class wMenuBar : public QObject
     QAction *connectToServer;
     QAction *showAboutDialog;
     QAction *showTextDockWidget;
+
+    QAction *moveIcon;
+    QAction *selectIcon;
 
     QMenu *fileMenu;
     QMenu *internetMenu;
@@ -64,6 +76,9 @@ class wMenuBar : public QObject
 
     void hostServerSlot();
     void connectToServerSlot();
+
+    void moveIconSlot();
+    void selectIconSlot();
 
     signals:
     void loadMapSignal(QString filename);
