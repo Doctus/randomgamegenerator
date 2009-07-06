@@ -49,8 +49,14 @@ public:
 signals:
     void newNetMessageSignal(QString str, QString handle);
     void newChatInputSignal(QString str);
+
     void connectedSignal(QString handle);
     void disconnectedSignal(QString handle);
+
+    void loadMapSignal(QString filename);
+
+    void mouseMoveSignal(int x, int y);
+    void mouseClickSignal(int x, int y);
 };
 
 class bImage
