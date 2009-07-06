@@ -206,6 +206,9 @@ def mouseMove(x, y):
 
 def mouseClick(x, y):
     print "mouse clicked at " + str(x) + ", " + str(y)
+    print ("guessing click was on (" + str((x+c.getCamX())/currentMap.tilesize[0]) +
+           "," + str((y+c.getCamY())/currentMap.tilesize[1]) + ")")
+    currentMap.debugMorphTile([(x+c.getCamX())/currentMap.tilesize[0], (y+c.getCamY())/currentMap.tilesize[1]])
     
 QtCore.QObject.connect(c, QtCore.SIGNAL("newNetMessageSignal(QString, QString)"), newNetEvent)
 QtCore.QObject.connect(c, QtCore.SIGNAL("connectedSignal(QString)"), newConnection)

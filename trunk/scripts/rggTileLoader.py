@@ -68,6 +68,14 @@ class Map:
             '32 32 3~4 1~15 7 5 3 4 6~5 3~30 4 5 4 7 9 2 3')
     f.close()
 
+  def debugMorphTile(self, coord):
+    #Note: this will NOT get propagated/saved/etc at the moment.
+    self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])] += 1
+    self.tiles[coord[0]][coord[1]] = rggTile.tile(coord[0]*self.tilesize[0], coord[1]*self.tilesize[1],
+                                          self.tilesize[0], self.tilesize[1],
+                                          self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])],
+                                          self.tileset)
+
   def LoadFromFile(self, filename):
     f = open(filename, 'r')
     tmp = f.read().split()
