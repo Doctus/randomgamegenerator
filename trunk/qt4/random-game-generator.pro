@@ -14,7 +14,8 @@ SOURCES += ../src/cTilesetManager.cpp \
     ../src/Widgets/wMenuBar.cpp \
     ../src/Widgets/wDockWidgets.cpp \
     ../src/Network/nConnection.cpp \
-    ../src/Network/nConnectionManager.cpp 
+    ../src/Network/nConnectionManager.cpp \
+    ../src/Widgets/wLineEdit.cpp
 HEADERS += ../src/cTilesetManager.h \
     ../src/cTileset.h \
     ../src/cGame.h \
@@ -23,4 +24,5 @@ HEADERS += ../src/cTilesetManager.h \
     ../src/Widgets/wMenuBar.h \
     ../src/Widgets/wDockWidgets.h \
     ../src/Network/nConnection.h \
-    ../src/Network/nConnectionManager.h
+    ../src/Network/nConnectionManager.h \
+    ../src/Widgets/wLineEdit.h

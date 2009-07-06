@@ -30,6 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 class wDockWidgets;
 
+#include "wLineEdit.h"
 #include "../cGame.h"
 
 class wDockWidgets : public QObject
@@ -38,7 +39,7 @@ class wDockWidgets : public QObject
 
     private:
     QTextBrowser *dockWidgetEditor;
-    QLineEdit *dockWidgetLineInput;
+    wLineEdit *dockWidgetLineInput;
     QDockWidget *dockWidget;
     cGame *mGame;
 

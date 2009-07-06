@@ -25,7 +25,7 @@ wDockWidgets::wDockWidgets(QMainWindow *mainWindow, cGame *mGame) : QObject(main
     this->mGame = mGame;
 
     dockWidgetEditor = new QTextBrowser(mainWindow);
-    dockWidgetLineInput = new QLineEdit(mainWindow);
+    dockWidgetLineInput = new wLineEdit(mainWindow);
     dockWidget = new QDockWidget(QObject::tr("Dock Widget"), mainWindow);
 
     dockWidgetEditor->setReadOnly(true);
@@ -66,5 +66,6 @@ void wDockWidgets::processInput()
 {
     QString str = dockWidgetLineInput->text();
     dockWidgetLineInput->clear();
+    dockWidgetLineInput->addMessage(str);
     emit newChatInputSignal(str);
 }
