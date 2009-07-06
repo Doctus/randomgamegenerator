@@ -15,6 +15,8 @@ def newEvent(st):
         return
     if st[0] == '/':
         words = unicode(st).split()
+        if words[0].lower() == '/cam':
+            print 'x: ' + str(c.getCamX()) + '\ny: ' + str(c.getCamY())
         if words[0].lower() == '/sendmap':
             c.sendNetMessageToAll(currentMap.stringform)
         if words[0].lower() == '/swapmap':

@@ -140,6 +140,28 @@ int bMain::displayUserDialogChoice(QString text, QVector<QString> buttonTexts, i
 }
 
 
+int bMain::getCamX()
+{
+    return mainGame->mGLWidget->cam->getCam().x();
+}
+
+int bMain::getCamY()
+{
+    return mainGame->mGLWidget->cam->getCam().y();
+}
+
+int bMain::getCamW()
+{
+    return mainGame->mGLWidget->cam->getBounds().x();
+}
+
+int bMain::getCamH()
+{
+    return mainGame->mGLWidget->cam->getBounds().y();
+}
+
+
+
 void bMain::chatInputTrigger(QString msg)
 {
     emit newChatInputSignal(msg);

@@ -46,6 +46,11 @@ public:
 
     int displayUserDialogChoice(QString text, QVector<QString> buttonTexts, int defaultButton = 0);
 
+    int getCamX();
+    int getCamY();
+    int getCamW();
+    int getCamH();
+
 signals:
     void newNetMessageSignal(QString str, QString handle);
     void newChatInputSignal(QString str);
