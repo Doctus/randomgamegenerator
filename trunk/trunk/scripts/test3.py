@@ -198,11 +198,19 @@ def loadMap(filename):
     f.close()
     currentMap.loadFromString(tmp)
     Mappes.append(tmp)
+
+def mouseMove(x, y):
+    print "mouse moved to " + str(x) + ", " + str(y)
+
+def mouseClick(x, y):
+    print "mouse clicked at " + str(x) + ", " + str(y)
     
 QtCore.QObject.connect(c, QtCore.SIGNAL("newNetMessageSignal(QString, QString)"), newNetEvent)
 QtCore.QObject.connect(c, QtCore.SIGNAL("connectedSignal(QString)"), newConnection)
 QtCore.QObject.connect(c, QtCore.SIGNAL("disconnectedSignal(QString)"), disConnection)
 QtCore.QObject.connect(c, QtCore.SIGNAL("newChatInputSignal(QString)"), newEvent)
 QtCore.QObject.connect(c, QtCore.SIGNAL("loadMapSignal(QString)"), loadMap)
+QtCore.QObject.connect(c, QtCore.SIGNAL("mouseMoveSignal(int, int)"), mouseMove)
+QtCore.QObject.connect(c, QtCore.SIGNAL("mouseClickSignal(int, int)"), mouseClick)
 
 c.start()

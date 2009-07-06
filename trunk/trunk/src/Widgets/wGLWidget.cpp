@@ -39,7 +39,7 @@ wGLWidget::wGLWidget(QWidget* parent, cGame *mGame) : QGLWidget(QGLFormat(QGL::F
     resize(parent->width(), parent->height());
 
     this->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-    
+
     //OpenGL is initialized here, instead of somewhere inside Qt4, otherwise it Segfaults due to doing stuff prior to OpenGL being initialized. Or something.
     glInit();
 }
@@ -224,5 +224,23 @@ GLuint wGLWidget::createTexture(QImage *image)
 void wGLWidget::deleteTexture(GLuint texture)
 {
     glDeleteTextures(1, &texture);
+}
+
+
+void wGLWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    event->accept();
+    emit mouseMoveSignal(event->pos().x(), event->pos().y());
+}
+
+void wGLWidget::mousePressEvent(QMouseEvent *event)
+{
+    event->accept();
+}
+
+void wGLWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    event->accept();
+    emit mouseClickSignal(event->pos().x(), event->pos().y());
 }
 

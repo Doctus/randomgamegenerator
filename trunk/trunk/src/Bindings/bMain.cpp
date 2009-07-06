@@ -47,6 +47,8 @@ bMain::bMain()
     connect(mainGame->mConnectionManager, SIGNAL(connectedSignal(QString)), this, SLOT(connectedTrigger(QString)));
     connect(mainGame->mConnectionManager, SIGNAL(disconnectedSignal(QString)), this, SLOT(disconnectedTrigger(QString)));
     connect(mainGame->mMenuBar, SIGNAL(loadMapSignal(QString)), this, SLOT(loadMapTrigger(QString)));
+    connect(mainGame->mGLWidget, SIGNAL(mouseClickSignal(int,int)), this, SLOT(mouseClickTrigger(int,int)));
+    connect(mainGame->mGLWidget, SIGNAL(mouseMoveSignal(int,int)), this, SLOT(mouseMoveTrigger(int,int)));
 }
 
 void bMain::start()
@@ -161,4 +163,14 @@ void bMain::disconnectedTrigger(QString handle)
 void bMain::loadMapTrigger(QString filename)
 {
     emit loadMapSignal(filename);
+}
+
+void bMain::mouseMoveTrigger(int x, int y)
+{
+    emit mouseMoveSignal(x, y);
+}
+
+void bMain::mouseClickTrigger(int x, int y)
+{
+    emit mouseClickSignal(x, y);
 }

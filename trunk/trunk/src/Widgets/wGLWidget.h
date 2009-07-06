@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <QtOpenGL/QtOpenGL>
 #include <QtGui/QImage>
 #include <QtCore/QRect>
+#include <QtGui/QMouseEvent>
 
 #include <iostream>
 
@@ -37,6 +38,8 @@ using namespace std;
 
 class wGLWidget : public QGLWidget
 {
+    Q_OBJECT;
+
     private:
     cCamera *cam;
     cGame *mGame;
@@ -52,6 +55,15 @@ class wGLWidget : public QGLWidget
 
     GLuint createTexture(QImage *image);
     void deleteTexture(GLuint texture);
+
+    protected:
+    void mouseMoveEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+
+    signals:
+    void mouseMoveSignal(int x, int y);
+    void mouseClickSignal(int x, int y);
 };
 
 #endif

@@ -56,16 +56,26 @@ class bMain : public QObject
     private slots:
     void chatInputTrigger(QString msg);
     void netMessageTrigger(QString msg, QString handle);
+
     void connectedTrigger(QString handle);
     void disconnectedTrigger(QString handle);
+
     void loadMapTrigger(QString filename);
+
+    void mouseMoveTrigger(int x, int y);
+    void mouseClickTrigger(int x, int y);
 
     signals:
     void newNetMessageSignal(QString str, QString handle);
     void newChatInputSignal(QString str);
+
     void connectedSignal(QString handle);
     void disconnectedSignal(QString handle);
+
     void loadMapSignal(QString filename);
+
+    void mouseMoveSignal(int x, int y);
+    void mouseClickSignal(int x, int y);
 };
 
 #endif // BMAIN_H
