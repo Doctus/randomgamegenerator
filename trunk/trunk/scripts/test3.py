@@ -3,6 +3,7 @@ from PyQt4 import QtCore
 
 c = bmainmod.bMain()
 testMappe = rggTileLoader.Map()
+Mappes = []
 
 #testimage = rggTile.tile(0, 0, 32, 32, 0, "../data/town.png")
 
@@ -18,8 +19,15 @@ def newEvent(st):
             #testimage.setTile(testimage.getTile() + 1)
             testMappe.DEBUGSaveToFile()
             testMappe.DEBUGLoadFromFile()
+            Mappes.append(testMappe.stringform)
+            Mappes.append('n! Example Map 2 !n a! Doctus !a m! 25 25 t! ../data/town.png s! '+
+                          '32 32 3~7 1~11 7 5 3 4 6~5 3~30 4 5 4 5 10 4 3')
+            Mappes.append('n! Example Map 3 !n a! Doctus !a m! 15 15 t! ../data/town.png s! '+
+                          '32 32 4~2 9~5 7 3 5 7 6~5 3~30 4 5 9 2~4')
         if words[0].lower() == '/test2':
             c.sendNetMessageToAll(testMappe.stringform)
+        if words[0].lower() == '/test3':
+            testMappe.loadFromString(Mappes[c.displayUserDialogChoice("Load map number:", ["1", "2", "3"], 1)].split())
         if words[0].lower() == '/help' or words[0].lower() == '/h':
             c.insertChatMessage("Command Help:<br> Typing ordinary text and pressing 'enter' " +
                                 "will display to all players. Other commands may be invoked " +
@@ -170,8 +178,8 @@ def newNetEvent(st, handle):
                     c.insertChatMessage('<b>' + " ".join(words[2:]) +
                                         " has left the game" + '</b>')
             elif st[0] == 'n': #Map file
-                #This isn't useful, just demonstrating principle
-                testMappe.loadFromString(str(st).split())
+                if c.displayUserDialogChoice("Load map from " + handle + "?", ["Yes", "No"], 1) == 0:
+                    testMappe.loadFromString(str(st).split())
             else:
                 print 'Malformed or unrecognised data received.'
         else:
