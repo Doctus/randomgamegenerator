@@ -2,7 +2,7 @@ import bmainmod, rggNameGen, rggTileLoader, rggDice, rggTile
 from PyQt4 import QtCore
 
 c = bmainmod.bMain()
-testMappe = rggTileLoader.Map()
+currentMap = rggTileLoader.Map()
 Mappes = []
 
 #testimage = rggTile.tile(0, 0, 32, 32, 0, "../data/town.png")
@@ -15,19 +15,13 @@ def newEvent(st):
         return
     if st[0] == '/':
         words = unicode(st).split()
-        if words[0].lower() == '/test':
-            #testimage.setTile(testimage.getTile() + 1)
-            testMappe.DEBUGSaveToFile()
-            testMappe.DEBUGLoadFromFile()
-            Mappes.append(testMappe.stringform)
-            Mappes.append('n! Example Map 2 !n a! Doctus !a m! 25 25 t! ../data/town.png s! '+
-                          '32 32 3~7 1~11 7 5 3 4 6~5 3~30 4 5 4 5 10 4 3')
-            Mappes.append('n! Example Map 3 !n a! Doctus !a m! 15 15 t! ../data/town.png s! '+
-                          '32 32 4~2 9~5 7 3 5 7 6~5 3~30 4 5 9 2~4')
-        if words[0].lower() == '/test2':
-            c.sendNetMessageToAll(testMappe.stringform)
-        if words[0].lower() == '/test3':
-            testMappe.loadFromString(Mappes[c.displayUserDialogChoice("Load map number:", ["1", "2", "3"], 1)].split())
+        if words[0].lower() == '/sendmap':
+            c.sendNetMessageToAll(currentMap.stringform)
+        if words[0].lower() == '/swapmap':
+            namestemp = []
+            for item in Mappes:
+                namestemp.append(" ".join(item[item.index('n!')+1:item.index('!n')]))
+            currentMap.loadFromString(Mappes[c.displayUserDialogChoice("Load map:", namestemp)])
         if words[0].lower() == '/help' or words[0].lower() == '/h':
             c.insertChatMessage("Command Help:<br> Typing ordinary text and pressing 'enter' " +
                                 "will display to all players. Other commands may be invoked " +
@@ -179,7 +173,8 @@ def newNetEvent(st, handle):
                                         " has left the game" + '</b>')
             elif st[0] == 'n': #Map file
                 if c.displayUserDialogChoice("Load map from " + handle + "?", ["Yes", "No"], 1) == 0:
-                    testMappe.loadFromString(str(st).split())
+                    currentMap.loadFromString(str(st).split())
+                    Mappes.append(str(st).split())
             else:
                 print 'Malformed or unrecognised data received.'
         else:
@@ -198,8 +193,11 @@ def disConnection(handle):
         c.sendNetMessageToAllButOne('u!' + ' leave ' + handle, handle)
 
 def loadMap(filename):
-    print c.displayUserDialogChoice("Test!", ["One", "Two", "Three"], 2)
-    #testMappe.LoadFromFile(filename)
+    f = open(filename, 'r')
+    tmp = f.read().split()
+    f.close()
+    currentMap.loadFromString(tmp)
+    Mappes.append(tmp)
     
 QtCore.QObject.connect(c, QtCore.SIGNAL("newNetMessageSignal(QString, QString)"), newNetEvent)
 QtCore.QObject.connect(c, QtCore.SIGNAL("connectedSignal(QString)"), newConnection)

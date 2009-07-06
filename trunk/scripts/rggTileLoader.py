@@ -48,16 +48,10 @@ class Map:
     for x in range(0, self.mapsize[0]):
       self.tiles.append([])
       for y in range(0, self.mapsize[1]):
-        if (x == 4 or x == 3) and y == 4:
-          print (x*self.tilesize[0], y*self.tilesize[1],
-                                          self.tilesize[0], self.tilesize[1],
-                                          self.tileindexes[x+(y*self.mapsize[0])],
-                                          self.tileset)
         self.tiles[x].append(rggTile.tile(x*self.tilesize[0], y*self.tilesize[1],
                                           self.tilesize[0], self.tilesize[1],
                                           self.tileindexes[x+(y*self.mapsize[0])],
                                           self.tileset))
-    print "done"
         
   def DEBUGLoadFromFile(self):
     f = open('test.txt', 'r')
