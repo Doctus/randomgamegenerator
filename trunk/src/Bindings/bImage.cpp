@@ -4,9 +4,12 @@
 #include "../cGame.h"
 #include "bMain.h"
 
+int bImage::countId = 0;
+
 bImage::bImage(int x, int y, int w, int h, int tile, QString filename)
 {
     rect = new QRect(x, y, w, h);
+    id = countId++;
     this->tile = tile;
     this->filename = filename;
 
@@ -16,10 +19,15 @@ bImage::bImage(int x, int y, int w, int h, int tile, QString filename)
     bMain::getGameInstance()->mTilesetManager->addImage(this);
 }
 
-/*bImage::~bImage()
+bImage::~bImage()
 {
-    cout << "killing image?" << endl;
-}*/
+    bMain::getGameInstance()->mTilesetManager->removeImage(this);
+}
+
+int bImage::getId()
+{
+    return id;
+}
 
 int bImage::getX()
 {
