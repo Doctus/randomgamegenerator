@@ -33,6 +33,7 @@ class wGLWidget;
 #include "../cCamera.h"
 #include "../cGame.h"
 #include "../Bindings/bImage.h"
+#include "../Widgets/wMenuBar.h"
 
 using namespace std;
 
@@ -43,6 +44,8 @@ class wGLWidget : public QGLWidget
     private:
     cCamera *cam;
     cGame *mGame;
+    IconType::IconEnum selectedIcon;
+    int lastx, lasty;
 
     public:
     wGLWidget(QWidget* parent, cGame *mGame);
@@ -55,6 +58,8 @@ class wGLWidget : public QGLWidget
 
     GLuint createTexture(QImage *image);
     void deleteTexture(GLuint texture);
+
+    void setSelectedIcon(IconType::IconEnum selected);
 
     protected:
     void mouseMoveEvent(QMouseEvent *event);
