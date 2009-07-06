@@ -53,6 +53,11 @@ class bMain : public QObject
 
     int displayUserDialogChoice(QString text, QVector<QString> buttonTexts, int defaultButton = 0);
 
+    int getCamX();
+    int getCamY();
+    int getCamW();
+    int getCamH();
+
     private slots:
     void chatInputTrigger(QString msg);
     void netMessageTrigger(QString msg, QString handle);

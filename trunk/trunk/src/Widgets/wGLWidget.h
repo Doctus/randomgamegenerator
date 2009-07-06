@@ -33,6 +33,7 @@ class wGLWidget;
 #include "../cCamera.h"
 #include "../cGame.h"
 #include "../Bindings/bImage.h"
+#include "../Bindings/bMain.h"
 #include "../Widgets/wMenuBar.h"
 
 using namespace std;
@@ -46,6 +47,8 @@ class wGLWidget : public QGLWidget
     cGame *mGame;
     IconType::IconEnum selectedIcon;
     int lastx, lasty;
+
+    friend class bMain;
 
     public:
     wGLWidget(QWidget* parent, cGame *mGame);
