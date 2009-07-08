@@ -7,7 +7,7 @@ import cGame
 app = QtGui.QApplication(sys.argv)
 
 window = QtGui.QMainWindow()
-window.setMinimumSize(800, 600)
+window.setMinimumSize(640, 480)
 
 mGame = cGame.cGame(window)
 
