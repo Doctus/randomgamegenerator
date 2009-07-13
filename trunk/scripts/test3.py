@@ -202,8 +202,9 @@ def loadMap(filename):
     Mappes.append(tmp)
 
 def saveMap(filename):
-    print 'supposed to save the map to: ' + unicode(filename)
-    pass
+    f = open(unicode(filename), 'w')
+    f.write(currentMap.stringform)
+    f.close()
 
 def mouseMove(x, y):
     print "mouse moved to " + str(x) + ", " + str(y)
