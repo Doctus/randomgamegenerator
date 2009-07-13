@@ -13,7 +13,7 @@ class bImage
     int tile;
     static int countId;
     int id;
-    QRect *rect;
+    int x, y, w, h;
     QString filename;
     GLuint textureId;
 
