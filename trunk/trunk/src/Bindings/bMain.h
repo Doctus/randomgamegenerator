@@ -66,9 +66,11 @@ class bMain : public QObject
     void disconnectedTrigger(QString handle);
 
     void loadMapTrigger(QString filename);
+    void saveMapTrigger(QString filename);
 
     void mouseMoveTrigger(int x, int y);
-    void mouseClickTrigger(int x, int y);
+    void mousePressTrigger(int x, int y);
+    void mouseReleaseTrigger(int x, int y);
 
     signals:
     void newNetMessageSignal(QString str, QString handle);
@@ -78,9 +80,11 @@ class bMain : public QObject
     void disconnectedSignal(QString handle);
 
     void loadMapSignal(QString filename);
+    void saveMapSignal(QString filename);
 
     void mouseMoveSignal(int x, int y);
-    void mouseClickSignal(int x, int y);
+    void mousePressSignal(int x, int y);
+    void mouseReleaseSignal(int x, int y);
 };
 
 #endif // BMAIN_H

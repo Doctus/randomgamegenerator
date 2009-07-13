@@ -53,8 +53,13 @@ void wGLWidget::initializeGL()
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glViewport(0, 0, 640, 480);
+    glViewport(0, 0, width(), height());
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+    /*cout << "db: " << doubleBuffer() << endl;
+    cout << "ac: " << format().alpha() << endl;
+    cout << "rg: " << format().rgba() << endl;
+    cout << "de: " << format().depth() << endl;*/
 
     cout << "initialized GL" << endl;
 }
@@ -237,31 +242,33 @@ void wGLWidget::setSelectedIcon(IconType::IconEnum selected)
 void wGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if(selectedIcon == IconType::select)
-    {
-        event->accept();
         emit mouseMoveSignal(event->pos().x(), event->pos().y());
-    }
     else
     {
         cam->adjustCam(QPoint(lastx-event->pos().x(), lasty-event->pos().y()));
         lastx = event->pos().x();
         lasty = event->pos().y();
     }
+
+    event->accept();
 }
 
 void wGLWidget::mousePressEvent(QMouseEvent *event)
 {
     lastx = event->pos().x();
     lasty = event->pos().y();
+
+    if(selectedIcon == IconType::select)
+        emit mousePressSignal(event->pos().x(), event->pos().y());
+
     event->accept();
 }
 
 void wGLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if(selectedIcon == IconType::select)
-    {
-        event->accept();
-        emit mouseClickSignal(event->pos().x(), event->pos().y());
-    }
+        emit mouseReleaseSignal(event->pos().x(), event->pos().y());
+
+    event->accept();
 }
 

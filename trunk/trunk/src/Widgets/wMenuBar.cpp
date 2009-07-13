@@ -36,6 +36,10 @@ void wMenuBar::initActions()
     loadMap->setShortcut(tr("Ctrl+L"));
     QAction::connect(loadMap, SIGNAL(triggered()), this, SLOT(loadMapSlot()));
 
+    saveMap = new QAction(tr("&Save Map..."), windowWidget);
+    saveMap->setShortcut(tr("Ctrl+S"));
+    QAction::connect(saveMap, SIGNAL(triggered()), this, SLOT(saveMapSlot()));
+
     showTextDockWidget = new QAction(tr("&Text Widget"), windowWidget);
     showTextDockWidget->setShortcut(tr("Ctrl+T"));
     QAction::connect(showTextDockWidget, SIGNAL(triggered()), this, SLOT(showTextDockWidgetSlot()));
@@ -63,6 +67,7 @@ void wMenuBar::initBars()
 {
     fileMenu = new QMenu(tr("&File"), windowWidget);
     fileMenu->addAction(loadMap);
+    fileMenu->addAction(saveMap);
 
     internetMenu = new QMenu(tr("&Internet"), windowWidget);
     internetMenu->addAction(hostServer);
@@ -85,6 +90,12 @@ void wMenuBar::initBars()
 
 void wMenuBar::saveMapSlot()
 {
+    QString fileName = QFileDialog::getSaveFileName(windowWidget, tr("Save File"), QDir::currentPath());
+
+    if(!fileName.isEmpty())
+    {
+        emit saveMapSignal(fileName);
+    }
 }
 
 void wMenuBar::loadMapSlot()

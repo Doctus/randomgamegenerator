@@ -71,7 +71,8 @@ class wGLWidget : public QGLWidget
 
     signals:
     void mouseMoveSignal(int x, int y);
-    void mouseClickSignal(int x, int y);
+    void mousePressSignal(int x, int y);
+    void mouseReleaseSignal(int x, int y);
 };
 
 #endif
