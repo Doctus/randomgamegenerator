@@ -8,7 +8,10 @@ int bImage::countId = 0;
 
 bImage::bImage(int x, int y, int w, int h, int tile, QString filename)
 {
-    rect = new QRect(x, y, w, h);
+    this->x = x;
+    this->y = y;
+    this->w = w;
+    this->h = h;
     id = countId++;
     this->tile = tile;
     this->filename = filename;
@@ -31,22 +34,22 @@ int bImage::getId()
 
 int bImage::getX()
 {
-    return rect->x();
+    return x;
 }
 
 int bImage::getY()
 {
-    return rect->y();
+    return y;
 }
 
 int bImage::getW()
 {
-    return rect->width();
+    return w;
 }
 
 int bImage::getH()
 {
-    return rect->height();
+    return h;
 }
 
 int bImage::getTile()
@@ -62,22 +65,22 @@ QString bImage::getFilename()
 
 void bImage::setX(int x)
 {
-    rect->setX(x);
+    this->x = x;
 }
 
 void bImage::setY(int y)
 {
-    rect->setY(y);
+    this->y = y;
 }
 
 void bImage::setW(int w)
 {
-    rect->setWidth(w);
+    this->w = w;
 }
 
 void bImage::setH(int h)
 {
-    rect->setHeight(h);
+    this->h = h;
 }
 
 void bImage::setTile(int tile)
@@ -99,5 +102,5 @@ void bImage::setTextureId(GLuint textureId)
 
 QRect* bImage::getRect()
 {
-    return rect;
+    return new QRect(x, y, w, h);
 }
