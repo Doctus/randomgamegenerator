@@ -1,7 +1,4 @@
-#rggTileLoader - for the Random Game Generator project
-# v. 0.01  >> THIS IS MERELY A DEMONSTRATION INTENDED
-#             FOR FUTURE REFERENCE AND WILL NOT
-#             FUNCTION CORRECTLY AS-IS.
+#rggMap - for the Random Game Generator project            
 #
 #By Doctus (kirikayuumura.noir@gmail.com)
 '''
@@ -38,12 +35,8 @@ class Map:
         for x in range(0, int(s[itertile][s[itertile].index('~')+1:])):
           self.tileindexes.append(int(s[itertile][0:s[itertile].index('~')]))
       else: self.tileindexes.append(int(s[itertile]))
-    #print 'list generation done'
     while len(self.tileindexes) < self.mapsize[0]*self.mapsize[1]:
       self.tileindexes.append(1)
-    #print self.mapname
-    #print self.authorname
-    #print self.tiles
     self.tiles = []
     for x in range(0, self.mapsize[0]):
       self.tiles.append([])
@@ -98,25 +91,10 @@ class Map:
     self.stringform = self.deriveStringForm(self.mapname, self.authorname,
                                         self.mapsize, self.tileset,
                                         self.tilesize, self.tileindexes)
-    print self.stringform
-        
-  def DEBUGLoadFromFile(self):
-    f = open('test.txt', 'r')
-    tmp = f.read().split()
-    f.close()
-    self.loadFromString(tmp)
-
-  def DEBUGSaveToFile(self):
-    #The proper version of saving should basically take the various
-    #inputs, format them properly, and write to a specified file.
-    #It will of course be important to implement the same RLE.
-    f = open('test.txt', 'w')
-    f.write('n! Example Map !n a! Doctus !a m! 20 20 t! ../data/town.png s! '+
-            '32 32 3~4 1~15 7 5 3 4 6~5 3~30 4 5 4 7 9 2 3')
-    f.close()
 
   def debugMorphTile(self, coord):
-    #Note: this will NOT get propagated/saved/etc at the moment.
+    #Note: this will NOT necessarily get propagated/saved/etc at the moment.
+    #      it's merely a debug function.
     self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])] += 1
     self.tiles[coord[0]][coord[1]] = rggTile.tile(coord[0]*self.tilesize[0], coord[1]*self.tilesize[1],
                                           self.tilesize[0], self.tilesize[1],

@@ -1,11 +1,11 @@
-import bmainmod, rggNameGen, rggTileLoader, rggDice, rggTile
+import bmainmod, rggNameGen, rggMap, rggDice, rggTile, rggPog
 from PyQt4 import QtCore
 
 c = bmainmod.bMain()
-currentMap = rggTileLoader.Map()
+currentMap = rggMap.Map()
 Mappes = []
 
-#testimage = rggTile.tile(0, 0, 32, 32, 0, "../data/town.png")
+testpog = rggPog.Pog(5, 5, 23, 46, 'yue.png')
 
 def _linkedName(inp):
     return str('<a href="/tell ' + inp + '" title="' + inp + '">' + inp + '</a>')
@@ -211,13 +211,13 @@ def mouseMove(x, y):
 
 def mouseRelease(x, y):
     print "mouse clicked at " + str(x) + ", " + str(y)
-    print ("guessing click was on (" + str((x+c.getCamX())/currentMap.tilesize[0]) +
-           "," + str((y+c.getCamY())/currentMap.tilesize[1]) + ")")
-    currentMap.debugMorphTile([(x+c.getCamX())/currentMap.tilesize[0], (y+c.getCamY())/currentMap.tilesize[1]])
+    #print ("guessing click was on (" + str((x+c.getCamX())/currentMap.tilesize[0]) +
+    #       "," + str((y+c.getCamY())/currentMap.tilesize[1]) + ")")
+    #currentMap.debugMorphTile([(x+c.getCamX())/currentMap.tilesize[0], (y+c.getCamY())/currentMap.tilesize[1]])
 
 def mousePress(x, y):
     print 'mouse press event at (' + str(x) + ', ' + str(y) + ')'
-    pass
+    testpog.absoluteMove(x+c.getCamX(), y+c.getCamY())
     
 QtCore.QObject.connect(c, QtCore.SIGNAL("newNetMessageSignal(QString, QString)"), newNetEvent)
 QtCore.QObject.connect(c, QtCore.SIGNAL("connectedSignal(QString)"), newConnection)
