@@ -1,85 +1,47 @@
+# coding: utf-8
+
+import sys
+import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.QtOpenGL import *
+from OpenGL.GL import *
+from OpenGL.GLU import *
+from OpenGL.GLUT import *
+from PIL import Image
 
-import Image
-
-import sys
-
-try:
-    from OpenGL.GL import *
-    from OpenGL.GLU import *
-except ImportError:
-    app = QApplication(sys.argv)
-    QMessageBox.critical(None, "Random Game Generator",
-                            "PyOpenGL must be installed to run this example.",
-                            QMessageBox.Ok | QMessageBox.Default,
-                            QMessageBox.NoButton)
-    sys.exit(1)
-
-
-#import ../cCamera
+tex = 0
+mipmap = 0
 
 class wGLWidget(QGLWidget):
 
     def __init__(self, parent, mGame):
         self.parent = parent
         self.mGame = mGame
-
         self.selectedIcon = 0
 
         super(QGLWidget, self).__init__(QGLFormat(QGL.DoubleBuffer | QGL.AlphaChannel), parent)
-        #self.cam = cCamera.cCamera(0, 0, 800, 600)
 
-        #self.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Maximum)
+    def check_size(self, img):
+        for size in img.size:
+            while True:
+                if (size & 1) != 0:
+                    break
+                size >>= 1
+            if size != 1:
+                return False
+        return True
 
-        #self.glIinit()
+    def ppm2texture(self, ppm_path):
+        ppm = Image.open(ppm_path)
+        assert self.check_size(ppm)
+        w, h = ppm.size
+        data = ppm.tostring()
 
-    def initializeGL(self):
-        self.setAutoBufferSwap(False)
-
-        glEnable(GL_TEXTURE_RECTANGLE_ARB)
-        glEnable(GL_TEXTURE_2D)
-        glEnable(GL_BLEND)
-        glDisable(GL_DEPTH_TEST)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        glViewport(0, 0, 640, 480)
-        glClearColor(0.0, 0.0, 0.0, 0.0)
-
-        print 'Initialized GL'
-
-    def paintGL(self):
-        glClear(GL_COLOR_BUFFER_BIT)
-
-        self.drawTexture(self.mGame.testTexture, 0, 0, 64, 64)
-
-        if(self.doubleBuffer()):
-            self.swapBuffers()
-
-    def resizeGL(self, w, h):
-        glViewport(0, 0, w, h)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        glOrtho(0, w, h, 0, -1, 1)
-        glMatrixMode(GL_MODELVIEW)
-
-    def drawTexture(self, textureId, x, y, w, h):
-        #print "drawing id " + str(textureId) + " at (" + str(x) + ", " + str(y) + ", " + str(w) + ", " + str(h) + ")" 
-        glBindTexture(GL_TEXTURE_2D, textureId)
-
-        glBegin(GL_QUADS)
-        glTexCoord2i(0, 1)
-        glVertex3i(x, y, 0)
-
-        glTexCoord2i(1, 1)
-        glVertex3i(x+w, y, 0)
-
-        glTexCoord2i(1, 0)
-        glVertex3i(x+w, y+h, 0)
-
-        glTexCoord2i(0, 0)
-        glVertex3i(x, y+h, 0)
-        glEnd()
+        tex = glGenTextures(1)
+        glBindTexture(GL_TEXTURE_2D, tex)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h,
+                0, GL_RGBA, GL_UNSIGNED_BYTE, data)
 
         error = glGetError()
 
@@ -87,35 +49,60 @@ class wGLWidget(QGLWidget):
             print "GLError: " + gluErrorString(error)
             return False
 
-        return True
+        return tex
 
-    def createTexture(self, image):
-        #newImage = self.convertToGLFormat(image)
-        texture = -1
+    def initializeGL(self):
+        ppm_path = os.path.join(os.path.dirname(__file__), u"texture2.ppm")
+        tex = self.ppm2texture(ppm_path)
 
-        texture = glGenTextures(1)
+        self.setAutoBufferSwap(False)
 
-        print 'texture is ' + str(texture)
+    def paintGL(self):
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glColor3f(1.0, 1.0, 1.0)
 
-        glBindTexture(GL_TEXTURE_2D, texture)
+        glEnable(GL_TEXTURE_2D)
+        glBindTexture(GL_TEXTURE_2D, tex)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        glBegin(GL_QUADS)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(2.0, -1.0, -50.0)
 
-        #glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, newImage.width(), newImage.height(), 0,
-                 #GL_RGBA, GL_UNSIGNED_BYTE, newImage.bits().asstring(newImage.numBytes()))
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0,
-                 GL_RGBA, GL_UNSIGNED_BYTE, image.tostring())
+        glTexCoord2f(5.0, 1.0)
+        glVertex3f(2.0, -1.0, 0.0)
+
+        glTexCoord2f(5.0, 0.0)
+        glVertex3f(2.0, 1.0, 0.0)
+
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(2.0, 1.0, -50.0)
+        glEnd()
+
+        glColor3f(1.0, 0.0, 0.0) 
+        glRectf(-25.0, 25.0, 25.0, -25.0)
+
+        glFlush()
 
         error = glGetError()
 
         if error != GL_NO_ERROR:
-            glDeleteTextures(1, texture)
+            print "GLError: " + gluErrorString(error)
+            return False
 
-            errorDialog = QMessageBox(self.parent)
-            errorDialog.setDetailedText("OpenGL Error: " + gluErrorString(error) + "\r\n\r\n" + "Please contact the author with this message")
-            errorDialog.exec_()
+        if(self.doubleBuffer()):
+            self.swapBuffers()
 
-            return 0
+    def resizeGL(self, width, height):
+        glViewport(0, 0, width, height)
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        glFrustum(-1.0, 1.0, -1.0, 1.0, 3.0, 10000.0)
+        glMatrixMode(GL_MODELVIEW)
+        error = glGetError()
 
-        return texture
+        if error != GL_NO_ERROR:
+            print "GLError: " + gluErrorString(error)
+            return False
+

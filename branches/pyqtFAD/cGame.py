@@ -23,8 +23,8 @@ class cGame(QObject):
 
         self.parent.setCentralWidget(self.mGLWidget)
 
-        testImage = Image.open("test.png")
-        self.testTexture = self.mGLWidget.createTexture(testImage)
+        #testImage = Image.open("texture2.ppm")
+        #self.testTexture = self.mGLWidget.createTexture(testImage)
 
         self.drawTimer = QTimer()
         self.FPSTimer = QTimer()
@@ -35,8 +35,8 @@ class cGame(QObject):
 
     def draw(self):
         self.FPScounter = self.FPScounter + 1
-        self.mGLWidget.updateGL()
-        pass
+        #self.mGLWidget.updateGL()
+        #pass
 
     def displayFPS(self):
         self.parent.setWindowTitle("Random Game Generator | FPS: " + str(self.FPScounter))
