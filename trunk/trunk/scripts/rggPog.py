@@ -28,11 +28,10 @@ class Pog:
         self.tile = rggTile.tile(self.x, self.y, self.w, self.h, 0, self.src)
 
     def updateLoc(self):
-        self.tile.setX(self.x)
-        self.tile.setY(self.y)
+        self.tile = rggTile.tile(self.x, self.y, self.w, self.h, 0, self.src)
 
     def absoluteMove(self, newx, newy):
-        print "Moving Yue to " + str(newx) + ' ' + str(newy)
+        print "Moving Yue to " + str(newx) + str(newy)
         self.x = newx
         self.y = newy
         self.updateLoc()
