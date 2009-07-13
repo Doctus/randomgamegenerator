@@ -54,6 +54,7 @@ class cTileset
     int getId();
     int getTileWidth();
     int getTileHeight();
+    int getHighestTile();
     GLuint getTextureId(int tile);
     GLuint getTextureId(int x, int y);
 

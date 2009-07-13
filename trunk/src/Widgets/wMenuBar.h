@@ -82,6 +82,7 @@ class wMenuBar : public QObject
 
     signals:
     void loadMapSignal(QString filename);
+    void saveMapSignal(QString filename);
 };
 
 #endif // MENUBAR_H

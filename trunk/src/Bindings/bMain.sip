@@ -59,9 +59,11 @@ signals:
     void disconnectedSignal(QString handle);
 
     void loadMapSignal(QString filename);
+    void saveMapSignal(QString filename);
 
     void mouseMoveSignal(int x, int y);
-    void mouseClickSignal(int x, int y);
+    void mousePressSignal(int x, int y);
+    void mouseReleaseSignal(int x, int y);
 };
 
 class bImage

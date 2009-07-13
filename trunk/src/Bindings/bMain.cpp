@@ -43,11 +43,16 @@ bMain::bMain()
     cout << "mainGame initialised" << endl;
 
     connect(mainGame->mDockWidgets, SIGNAL(newChatInputSignal(QString)), this, SLOT(chatInputTrigger(QString)));
+
     connect(mainGame->mConnectionManager, SIGNAL(newNetMessage(QString,QString)), this, SLOT(netMessageTrigger(QString, QString)));
     connect(mainGame->mConnectionManager, SIGNAL(connectedSignal(QString)), this, SLOT(connectedTrigger(QString)));
     connect(mainGame->mConnectionManager, SIGNAL(disconnectedSignal(QString)), this, SLOT(disconnectedTrigger(QString)));
+
     connect(mainGame->mMenuBar, SIGNAL(loadMapSignal(QString)), this, SLOT(loadMapTrigger(QString)));
-    connect(mainGame->mGLWidget, SIGNAL(mouseClickSignal(int,int)), this, SLOT(mouseClickTrigger(int,int)));
+    connect(mainGame->mMenuBar, SIGNAL(saveMapSignal(QString)), this, SLOT(saveMapTrigger(QString)));
+
+    connect(mainGame->mGLWidget, SIGNAL(mouseReleaseSignal(int,int)), this, SLOT(mouseReleaseTrigger(int,int)));
+    connect(mainGame->mGLWidget, SIGNAL(mousePressSignal(int,int)), this, SLOT(mousePressTrigger(int,int)));
     connect(mainGame->mGLWidget, SIGNAL(mouseMoveSignal(int,int)), this, SLOT(mouseMoveTrigger(int,int)));
 }
 
@@ -187,12 +192,22 @@ void bMain::loadMapTrigger(QString filename)
     emit loadMapSignal(filename);
 }
 
+void bMain::saveMapTrigger(QString filename)
+{
+    emit saveMapSignal(filename);
+}
+
 void bMain::mouseMoveTrigger(int x, int y)
 {
     emit mouseMoveSignal(x, y);
 }
 
-void bMain::mouseClickTrigger(int x, int y)
+void bMain::mousePressTrigger(int x, int y)
 {
-    emit mouseClickSignal(x, y);
+    emit mousePressSignal(x, y);
+}
+
+void bMain::mouseReleaseTrigger(int x, int y)
+{
+    emit mouseReleaseSignal(x, y);
 }

@@ -66,6 +66,11 @@ int cTileset::getTileHeight()
     return tileHeight;
 }
 
+int cTileset::getHighestTile()
+{
+    return textureIds.size()-1;
+}
+
 
 string cTileset::getFilename()
 {

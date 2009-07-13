@@ -201,21 +201,31 @@ def loadMap(filename):
     currentMap.loadFromString(tmp)
     Mappes.append(tmp)
 
+def saveMap(filename):
+    print 'supposed to save the map to: ' + unicode(filename)
+    pass
+
 def mouseMove(x, y):
     print "mouse moved to " + str(x) + ", " + str(y)
 
-def mouseClick(x, y):
+def mouseRelease(x, y):
     print "mouse clicked at " + str(x) + ", " + str(y)
     print ("guessing click was on (" + str((x+c.getCamX())/currentMap.tilesize[0]) +
            "," + str((y+c.getCamY())/currentMap.tilesize[1]) + ")")
     currentMap.debugMorphTile([(x+c.getCamX())/currentMap.tilesize[0], (y+c.getCamY())/currentMap.tilesize[1]])
+
+def mousePress(x, y):
+    print 'mouse press event at (' + str(x) + ', ' + str(y) + ')'
+    pass
     
 QtCore.QObject.connect(c, QtCore.SIGNAL("newNetMessageSignal(QString, QString)"), newNetEvent)
 QtCore.QObject.connect(c, QtCore.SIGNAL("connectedSignal(QString)"), newConnection)
 QtCore.QObject.connect(c, QtCore.SIGNAL("disconnectedSignal(QString)"), disConnection)
 QtCore.QObject.connect(c, QtCore.SIGNAL("newChatInputSignal(QString)"), newEvent)
 QtCore.QObject.connect(c, QtCore.SIGNAL("loadMapSignal(QString)"), loadMap)
+QtCore.QObject.connect(c, QtCore.SIGNAL("saveMapSignal(QString)"), saveMap)
 QtCore.QObject.connect(c, QtCore.SIGNAL("mouseMoveSignal(int, int)"), mouseMove)
-QtCore.QObject.connect(c, QtCore.SIGNAL("mouseClickSignal(int, int)"), mouseClick)
+QtCore.QObject.connect(c, QtCore.SIGNAL("mousePressSignal(int, int)"), mousePress)
+QtCore.QObject.connect(c, QtCore.SIGNAL("mouseReleaseSignal(int, int)"), mouseRelease)
 
 c.start()
