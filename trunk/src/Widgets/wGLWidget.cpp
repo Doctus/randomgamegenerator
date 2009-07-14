@@ -36,10 +36,13 @@ wGLWidget::wGLWidget(QWidget* parent, cGame *mGame) : QGLWidget(QGLFormat(QGL::F
     this->mGame = mGame;
     selectedIcon = IconType::select;
     cam = new cCamera(0, 0, 640, 480);
+    ctrlHeld = false;
+    shiftHeld = false;
 
     resize(parent->width(), parent->height());
 
-    this->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    setFocusPolicy(Qt::StrongFocus);
 
     //OpenGL is initialized here, instead of somewhere inside Qt4, otherwise it Segfaults due to doing stuff prior to OpenGL being initialized. Or something.
     glInit();
@@ -67,13 +70,10 @@ void wGLWidget::initializeGL()
 
 void wGLWidget::paintGL()
 {
-    int layerCount = 0; //this is here so that it actually draws?! I DO NOT UNDERSTAND.
     glClear(GL_COLOR_BUFFER_BIT);
 
     vector< vector<bImage*> > images = mGame->mTilesetManager->getImages();
     QRect *camTest = new QRect(cam->getCam(), cam->getBounds());
-
-   // cout << "rect: (" << camTest->x() << ", " << camTest->y() << ", " << camTest->width() << ", " << camTest->height() << ")" << endl;
 
     foreach(vector<bImage*> layer, images)
     {
@@ -83,6 +83,8 @@ void wGLWidget::paintGL()
                 drawImage(img->getTextureId(), img->getX()-cam->getCam().x(), img->getY()-cam->getCam().y(), img->getW(), img->getH());
         }
     }
+
+    delete(camTest);
 
     if(doubleBuffer()) //This check seems a bit redundant...as we force it to double buffer. But nonetheless.
         swapBuffers();
@@ -267,16 +269,21 @@ void wGLWidget::mousePressEvent(QMouseEvent *event)
     if(selectedIcon == IconType::select)
     {
         int type = 0;
+        int offset = 0;
+        if(ctrlHeld)
+            offset += 3;
+        if(shiftHeld)
+            offset += 6;
         switch(event->button())
         {
             case Qt::LeftButton:
-            type = 0;
+            type = 0 + offset;
             break;
             case Qt::MidButton:
-            type = 1;
+            type = 1 + offset;
             break;
             case Qt::RightButton:
-            type = 2;
+            type = 2 + offset;
             break;
             default:
             type = -1;
@@ -293,16 +300,21 @@ void wGLWidget::mouseReleaseEvent(QMouseEvent *event)
     if(selectedIcon == IconType::select)
     {
         int type = 0;
+        int offset = 0;
+        if(ctrlHeld)
+            offset += 3;
+        if(shiftHeld)
+            offset += 6;
         switch(event->button())
         {
             case Qt::LeftButton:
-            type = 0;
+            type = 0 + offset;
             break;
             case Qt::MidButton:
-            type = 1;
+            type = 1 + offset;
             break;
             case Qt::RightButton:
-            type = 2;
+            type = 2 + offset;
             break;
             default:
             type = -1;
@@ -312,5 +324,23 @@ void wGLWidget::mouseReleaseEvent(QMouseEvent *event)
     }
 
     event->accept();
+}
+
+void wGLWidget::keyPressEvent(QKeyEvent *event)
+{
+    cout << "key press" << endl;
+    if(event->key() == Qt::Key_Control)
+        ctrlHeld = true;
+    else if(event->key() == Qt::Key_Shift)
+        shiftHeld = true;
+}
+
+void wGLWidget::keyReleaseEvent(QKeyEvent *event)
+{
+    cout << "key release" << endl;
+    if(event->key() == Qt::Key_Control)
+        ctrlHeld = false;
+    else if(event->key() == Qt::Key_Shift)
+        shiftHeld = false;
 }
 

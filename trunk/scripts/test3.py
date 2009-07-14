@@ -15,7 +15,7 @@ lastMouseLoc = [0, 0]
 #Pogs.append(rggPog.Pog(40, 40, 23, 46, 50, 'yue.png'))
 #Pogs.append(rggPog.Pog(25, 25, 23, 46, 2, 'yue.png'))
 
-for i in range(0, 5000):
+for i in range(0, 50):
     Pogs.append(rggPog.Pog(30+i, 30+i, 23, 46, random.randint(0, i), 'yue.png'))
     #time.sleep(0.5)
 

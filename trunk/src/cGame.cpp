@@ -35,11 +35,13 @@ cGame::cGame(QWidget *parent) : QObject(parent)
 
     mTilesetManager = new cTilesetManager(mGLWidget);
 
+    ((QMainWindow*)parent)->setWindowTitle("Random Game Generator");
+
     QTimer *timer = new QTimer(this);
     QTimer *timer2 = new QTimer(this);
     connect(timer , SIGNAL(timeout()), this, SLOT(draw()));
     connect(timer2, SIGNAL(timeout()), this, SLOT(displayFPS()));
-    timer ->start(16);
+    timer ->start(15);
     timer2->start(5000);
 }
 
