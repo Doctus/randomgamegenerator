@@ -22,33 +22,42 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 cCamera::cCamera(int x, int y, int w, int h)
 {
-    cam.setX(x);
-    cam.setY(y);
-    bounds.setX(w);
-    bounds.setY(h);
+    this->x = x;
+    this->y = y;
+    this->w = w;
+    this->h = h;
 }
 
 QPoint cCamera::getCam()
 {
-    return cam;
+    return QPoint(x, y);
 }
 
 QPoint cCamera::getBounds()
 {
-    return bounds;
+    return QPoint(x+w, y+h);
 }
 
 void cCamera::setCam(QPoint newCam)
 {
-    cam = newCam;
+    x = newCam.x();
+    y = newCam.y();
 }
 
 void cCamera::adjustCam(QPoint adjust)
 {
-    cam += adjust;
+    x += adjust.x();
+    y += adjust.y();
+}
+
+void cCamera::adjustCam(int x, int y)
+{
+    this->x += x;
+    this->y += y;
 }
 
 void cCamera::setBounds(QPoint bounds)
 {
-    this->bounds = bounds;
+    w = bounds.x();
+    h = bounds.y();
 }

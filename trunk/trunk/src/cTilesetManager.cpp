@@ -113,9 +113,12 @@ bool cTilesetManager::changeTileOfImage(bImage *img, int tile)
 {
     cTileset *set = findTileset(img->getFilename().toStdString());
 
-    if(set != NULL && tile <= set->getHighestTile())
+    if(set != NULL)
     {
-        img->setTextureId(set->getTextureId(tile));
+        if(tile <= set->getHighestTile())
+            img->setTextureId(set->getTextureId(0));
+        else
+            img->setTextureId(set->getTextureId(tile));
         return true;
     }
 

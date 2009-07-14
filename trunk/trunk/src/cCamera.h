@@ -26,8 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 class cCamera
 {
     private:
-    QPoint cam;
-    QPoint bounds;
+    int x, y, w, h;
 
     public:
     cCamera(int x, int y, int w, int h);
@@ -36,6 +35,7 @@ class cCamera
     QPoint getBounds();
     void setCam(QPoint newCam);
     void adjustCam(QPoint adjust);
+    void adjustCam(int x, int y);
     void setBounds(QPoint bounds);
 };
 

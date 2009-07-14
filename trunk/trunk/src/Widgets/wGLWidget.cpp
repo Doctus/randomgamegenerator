@@ -73,6 +73,8 @@ void wGLWidget::paintGL()
     vector< vector<bImage*> > images = mGame->mTilesetManager->getImages();
     QRect *camTest = new QRect(cam->getCam(), cam->getBounds());
 
+   // cout << "rect: (" << camTest->x() << ", " << camTest->y() << ", " << camTest->width() << ", " << camTest->height() << ")" << endl;
+
     foreach(vector<bImage*> layer, images)
     {
         foreach(bImage *img, layer)
@@ -249,7 +251,7 @@ void wGLWidget::mouseMoveEvent(QMouseEvent *event)
         emit mouseMoveSignal(event->pos().x(), event->pos().y());
     else
     {
-        cam->adjustCam(QPoint(lastx-event->pos().x(), lasty-event->pos().y()));
+        cam->adjustCam(lastx-event->pos().x(), lasty-event->pos().y());
         lastx = event->pos().x();
         lasty = event->pos().y();
     }
