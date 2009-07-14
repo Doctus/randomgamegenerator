@@ -361,3 +361,9 @@ void wGLWidget::wheelEvent(QWheelEvent *event)
     cout << "Bounds: " << cam->getBounds(zoom).x() << endl;
 }
 
+void wGLWidget::leaveEvent(QEvent *event)
+{
+    ctrlHeld = false;
+    shiftHeld = false;
+}
+

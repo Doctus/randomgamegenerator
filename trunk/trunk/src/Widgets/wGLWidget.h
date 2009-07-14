@@ -76,6 +76,8 @@ class wGLWidget : public QGLWidget
 
     void wheelEvent(QWheelEvent *event);
 
+    void leaveEvent(QEvent *event);
+
     signals:
     void mouseMoveSignal(int x, int y);
     void mousePressSignal(int x, int y, int type);
