@@ -5,10 +5,10 @@ from PyQt4 import QtCore
 random.seed()
 
 c = bmainmod.bMain()
-currentMap = rggMap.Map()
-Mappes = []
-Pogs = []
-manipulatedPogs = [None]
+Maps = [rggMap.Map()]
+Maps[0].loadFromString("n! Default Map !n a! Anonymous !a m! 20 20 t! ../data/town.png s! 32 32 1~20".split())
+currentMap = [0]
+manipulatedPogs = [None, None]
 lastMouseLoc = [0, 0]
 
 #Pogs.append(rggPog.Pog(5, 5, 23, 46, 3, 'yue.png'))
@@ -16,8 +16,7 @@ lastMouseLoc = [0, 0]
 #Pogs.append(rggPog.Pog(25, 25, 23, 46, 2, 'yue.png'))
 
 for i in range(0, 50):
-    Pogs.append(rggPog.Pog(30+i, 30+i, 23, 46, random.randint(0, i), 'yue.png'))
-    #time.sleep(0.5)
+    Maps[currentMap[0]].Pogs.append(rggPog.Pog(30+i, 30+i, 23, 46, random.randint(0, i), 'yue.png'))
 
 #Mass pog test.
 #for x in range(0, 100):
@@ -35,12 +34,16 @@ def newEvent(st):
         if words[0].lower() == '/cam':
             print 'x: ' + str(c.getCamX()) + '\ny: ' + str(c.getCamY())
         if words[0].lower() == '/sendmap':
-            c.sendNetMessageToAll(currentMap.stringform)
+            c.sendNetMessageToAll(Maps[currentMap[0]].stringform)
         if words[0].lower() == '/swapmap':
             namestemp = []
-            for item in Mappes:
-                namestemp.append(" ".join(item[item.index('n!')+1:item.index('!n')]))
-            currentMap.loadFromString(Mappes[c.displayUserDialogChoice("Load map:", namestemp)])
+            for item in Maps:
+                namestemp.append(item.mapname)
+            for pog in Maps[currentMap[0]].Pogs:
+                pog.hide()
+            currentMap[0] = c.displayUserDialogChoice("Load map:", namestemp)
+            for pog in Maps[currentMap[0]].Pogs:
+                pog.show()    
         if words[0].lower() == '/help' or words[0].lower() == '/h':
             c.insertChatMessage("Command Help:<br> Typing ordinary text and pressing 'enter' " +
                                 "will display to all players. Other commands may be invoked " +
@@ -192,7 +195,7 @@ def newNetEvent(st, handle):
                                         " has left the game" + '</b>')
             elif st[0] == 'n': #Map file
                 if c.displayUserDialogChoice("Load map from " + handle + "?", ["Yes", "No"], 1) == 0:
-                    currentMap.loadFromString(str(st).split())
+                    Maps[currentMap[0]].loadFromString(str(st).split())
                     Mappes.append(str(st).split())
             else:
                 print 'Malformed or unrecognised data received.'
@@ -215,12 +218,22 @@ def loadMap(filename):
     f = open(filename, 'r')
     tmp = f.read().split()
     f.close()
-    currentMap.loadFromString(tmp)
-    Mappes.append(tmp)
+    newMap = rggMap.Map()
+    newMap.loadFromString(tmp)
+    Maps.append(newMap)
+    for pog in Maps[currentMap[0]].Pogs:
+        pog.hide()
+    currentMap[0] = Maps.index(newMap)
+    for pog in Maps[currentMap[0]].Pogs:
+        pog.show()
 
 def saveMap(filename):
+    if c.displayUserDialogChoice("Edit map info?", ['Yes', 'No'], 1) == 0:
+        Maps[currentMap[0]].mapname = unicode(c.getUserTextInput("What is the name of this map?"))
+        Maps[currentMap[0]].authorname = unicode(c.getUserTextInput("Who is the author of this map?"))
+        Maps[currentMap[0]].updateStringForm()
     f = open(unicode(filename), 'w')
-    f.write(currentMap.stringform)
+    f.write(Maps[currentMap[0]].stringform)
     f.close()
 
 def mouseMove(x, y):
@@ -233,6 +246,7 @@ def mouseMove(x, y):
 def mouseRelease(x, y, t):
     #print "mouse released at " + str(x) + ", " + str(y)
     manipulatedPogs[0] = None
+    manipulatedPogs[1] = None
     #print ("guessing click was on (" + str((x+c.getCamX())/currentMap.tilesize[0]) +
     #       "," + str((y+c.getCamY())/currentMap.tilesize[1]) + ")")
     #currentMap.debugMorphTile([(x+c.getCamX())/currentMap.tilesize[0], (y+c.getCamY())/currentMap.tilesize[1]])
@@ -242,17 +256,23 @@ def mousePress(x, y, t):
     lastMouseLoc[0] = x
     lastMouseLoc[1] = y
     if t == 0:
-        for pog in Pogs:
+        for pog in Maps[currentMap[0]].Pogs:
             if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
                 if manipulatedPogs[0] == None:
                     manipulatedPogs[0] = pog
                 elif pog.layer > manipulatedPogs[0].layer:
                     manipulatedPogs[0] = pog
     elif t == 2:
-        selected = c.showPopupMenuAt(x, y, ["Test", "Another Test", "Yet another test!"])
-        if selected == 1: #Another Test
-            print c.getUserTextInput("What do I want to know anyway?")
-        
+        for pog in Maps[currentMap[0]].Pogs:
+            if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
+                if manipulatedPogs[1] == None:
+                    manipulatedPogs[1] = pog
+                elif pog.layer > manipulatedPogs[1].layer:
+                    manipulatedPogs[1] = pog
+        if manipulatedPogs[1] != None:
+            selected = c.showPopupMenuAt(x, y, ["Set name"])
+            if selected == 0:
+                pog.name = c.getUserTextInput("Enter a name for this pog.")
     
 QtCore.QObject.connect(c, QtCore.SIGNAL("newNetMessageSignal(QString, QString)"), newNetEvent)
 QtCore.QObject.connect(c, QtCore.SIGNAL("connectedSignal(QString)"), newConnection)

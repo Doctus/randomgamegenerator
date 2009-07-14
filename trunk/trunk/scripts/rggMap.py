@@ -20,7 +20,7 @@ import rggTile
 
 class Map:
   def __init__(self):
-    pass
+    self.Pogs = []
 
   def loadFromString(self, s):
     self.stringform = " ".join(s)
@@ -108,3 +108,17 @@ class Map:
     tmp = f.read().split()
     f.close()
     self.loadFromString(tmp)
+
+  def hide(self):
+    self.tiles = []
+
+  def show(self):
+    self.tiles = []
+    for x in range(0, self.mapsize[0]):
+      self.tiles.append([])
+      for y in range(0, self.mapsize[1]):
+        self.tiles[x].append(rggTile.tile(x*self.tilesize[0], y*self.tilesize[1],
+                                          self.tilesize[0], self.tilesize[1],
+                                          self.tileindexes[x+(y*self.mapsize[0])],
+                                          0,
+                                          self.tileset))
