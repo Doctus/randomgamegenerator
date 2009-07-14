@@ -26,9 +26,12 @@ class Pog:
         self.h = height
         self.layer = layer
         self.src = srcfile
-        self.tile = rggTile.tile(self.x, self.y, self.w, self.h, 0, layer, self.src)
+        self.tile = rggTile.tile(self.x, self.y, self.w, self.h, 0, self.layer, self.src)
+        self.name = None
+        self.hidden = False
 
     def getPointCollides(self, point):
+        if self.hidden: return False
         if (self.x > point[0] or self.x+self.w < point[0] or
             self.y > point[1] or self.y+self.h < point[1]):
             return False
@@ -48,3 +51,11 @@ class Pog:
         self.x += changex
         self.y += changey
         self.updateLoc()
+
+    def hide(self):
+        self.tile = None
+        self.hidden = True
+
+    def show(self):
+        self.tile = rggTile.tile(self.x, self.y, self.w, self.h, 0, self.layer, self.src)
+        self.hidden = False
