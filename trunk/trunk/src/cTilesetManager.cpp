@@ -92,8 +92,6 @@ void cTilesetManager::addImage(bImage* img, int layer)
 
         while(layer >= images.size())
         {
-            /*images.resize(layer+1);
-            cout << "resized images to: " << images.capacity() << endl;*/
             images.push_back(vector<bImage*>());
         }
 
