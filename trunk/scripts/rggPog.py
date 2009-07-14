@@ -28,8 +28,15 @@ class Pog:
         self.src = srcfile
         self.tile = rggTile.tile(self.x, self.y, self.w, self.h, 0, layer, self.src)
 
+    def getPointCollides(self, point):
+        if (self.x > point[0] or self.x+self.w < point[0] or
+            self.y > point[1] or self.y+self.h < point[1]):
+            return False
+        return True
+
     def updateLoc(self):
-        self.tile = rggTile.tile(self.x, self.y, self.w, self.h, 0, self.src)
+        self.tile.setX(self.x)
+        self.tile.setY(self.y)
 
     def absoluteMove(self, newx, newy):
         print "Moving Yue to " + str(newx) + str(newy)
