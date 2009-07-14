@@ -51,8 +51,8 @@ bMain::bMain()
     connect(mainGame->mMenuBar, SIGNAL(loadMapSignal(QString)), this, SLOT(loadMapTrigger(QString)));
     connect(mainGame->mMenuBar, SIGNAL(saveMapSignal(QString)), this, SLOT(saveMapTrigger(QString)));
 
-    connect(mainGame->mGLWidget, SIGNAL(mouseReleaseSignal(int,int)), this, SLOT(mouseReleaseTrigger(int,int)));
-    connect(mainGame->mGLWidget, SIGNAL(mousePressSignal(int,int)), this, SLOT(mousePressTrigger(int,int)));
+    connect(mainGame->mGLWidget, SIGNAL(mouseReleaseSignal(int,int,int)), this, SLOT(mouseReleaseTrigger(int,int,int)));
+    connect(mainGame->mGLWidget, SIGNAL(mousePressSignal(int,int,int)), this, SLOT(mousePressTrigger(int,int,int)));
     connect(mainGame->mGLWidget, SIGNAL(mouseMoveSignal(int,int)), this, SLOT(mouseMoveTrigger(int,int)));
 }
 
@@ -111,7 +111,9 @@ bool bMain::isServer()
     return mainGame->mConnectionManager->isConnectionType(Connection::SERVER);
 }
 
-
+/*
+  This function might leak some buttons. Hrm.
+ */
 int bMain::displayUserDialogChoice(QString text, QVector<QString> buttonTexts, int defaultButton)
 {
     if(buttonTexts.size() == 0)
@@ -132,7 +134,7 @@ int bMain::displayUserDialogChoice(QString text, QVector<QString> buttonTexts, i
 
     questionDialog.exec();
 
-    int i= 0;
+    int i = 0;
 
     foreach(QPushButton *button, buttons)
     {
@@ -142,6 +144,35 @@ int bMain::displayUserDialogChoice(QString text, QVector<QString> buttonTexts, i
     }
 
     return -1;
+}
+
+/*
+  This function might also leak. Some Actions this time.
+*/
+int bMain::showPopupMenuAt(int x, int y, QVector<QString> actionTexts)
+{
+    QMenu *popup = new QMenu((QWidget*)mainGame->parent());
+    int idCounter = 0;
+
+    foreach(QString str, actionTexts)
+    {
+        popup->addAction(new wAction(str, (QWidget*)mainGame->parent(), idCounter++));
+    }
+
+    int realx = x + ((QWidget*)mainGame->parent())->x() + mainGame->mGLWidget->x();
+    int realy = y + ((QWidget*)mainGame->parent())->y() + mainGame->mGLWidget->y();
+    wAction *selectedAction = (wAction*)popup->exec(QPoint(realx, realy));
+
+    if(selectedAction == 0)
+        return -1;
+
+    return selectedAction->getId();
+}
+
+QString bMain::getUserTextInput(QString question)
+{
+     QString text = QInputDialog::getText((QWidget*)mainGame->parent(), "Input", question);
+     return text;
 }
 
 
@@ -164,7 +195,6 @@ int bMain::getCamH()
 {
     return mainGame->mGLWidget->cam->getBounds().y();
 }
-
 
 
 void bMain::chatInputTrigger(QString msg)
@@ -202,12 +232,12 @@ void bMain::mouseMoveTrigger(int x, int y)
     emit mouseMoveSignal(x, y);
 }
 
-void bMain::mousePressTrigger(int x, int y)
+void bMain::mousePressTrigger(int x, int y, int type)
 {
-    emit mousePressSignal(x, y);
+    emit mousePressSignal(x, y, type);
 }
 
-void bMain::mouseReleaseTrigger(int x, int y)
+void bMain::mouseReleaseTrigger(int x, int y, int type)
 {
-    emit mouseReleaseSignal(x, y);
+    emit mouseReleaseSignal(x, y, type);
 }

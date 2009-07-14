@@ -34,7 +34,7 @@ class wGLWidget;
 #include "../cGame.h"
 #include "../Bindings/bImage.h"
 #include "../Bindings/bMain.h"
-#include "../Widgets/wMenuBar.h"
+#include "wMenuBar.h"
 
 using namespace std;
 
@@ -71,8 +71,8 @@ class wGLWidget : public QGLWidget
 
     signals:
     void mouseMoveSignal(int x, int y);
-    void mousePressSignal(int x, int y);
-    void mouseReleaseSignal(int x, int y);
+    void mousePressSignal(int x, int y, int type);
+    void mouseReleaseSignal(int x, int y, int type);
 };
 
 #endif

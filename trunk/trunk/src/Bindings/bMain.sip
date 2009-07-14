@@ -45,6 +45,8 @@ public:
     bool isServer();
 
     int displayUserDialogChoice(QString text, QVector<QString> buttonTexts, int defaultButton = 0);
+    int showPopupMenuAt(int x, int y, QVector<QString> actionTexts);
+    QString getUserTextInput(QString question);
 
     int getCamX();
     int getCamY();
@@ -62,8 +64,8 @@ signals:
     void saveMapSignal(QString filename);
 
     void mouseMoveSignal(int x, int y);
-    void mousePressSignal(int x, int y);
-    void mouseReleaseSignal(int x, int y);
+    void mousePressSignal(int x, int y, int type);
+    void mouseReleaseSignal(int x, int y, int type);
 };
 
 class bImage

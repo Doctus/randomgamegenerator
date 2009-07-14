@@ -196,7 +196,7 @@ void wGLWidget::resizeGL(int w, int h)
     glLoadIdentity();
     glOrtho(0, w, h, 0, -1, 1);
     glMatrixMode(GL_MODELVIEW);
-    cam->setBounds(QPoint(w, h));
+    cam->setBounds(w, h);
 }
 
 GLuint wGLWidget::createTexture(QImage *image)
@@ -265,7 +265,25 @@ void wGLWidget::mousePressEvent(QMouseEvent *event)
     lasty = event->pos().y();
 
     if(selectedIcon == IconType::select)
-        emit mousePressSignal(event->pos().x(), event->pos().y());
+    {
+        int type = 0;
+        switch(event->button())
+        {
+            case Qt::LeftButton:
+            type = 0;
+            break;
+            case Qt::MidButton:
+            type = 1;
+            break;
+            case Qt::RightButton:
+            type = 2;
+            break;
+            default:
+            type = -1;
+            break;
+        }
+        emit mousePressSignal(event->pos().x(), event->pos().y(), type);
+    }
 
     event->accept();
 }
@@ -273,7 +291,25 @@ void wGLWidget::mousePressEvent(QMouseEvent *event)
 void wGLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if(selectedIcon == IconType::select)
-        emit mouseReleaseSignal(event->pos().x(), event->pos().y());
+    {
+        int type = 0;
+        switch(event->button())
+        {
+            case Qt::LeftButton:
+            type = 0;
+            break;
+            case Qt::MidButton:
+            type = 1;
+            break;
+            case Qt::RightButton:
+            type = 2;
+            break;
+            default:
+            type = -1;
+            break;
+        }
+        emit mouseReleaseSignal(event->pos().x(), event->pos().y(), type);
+    }
 
     event->accept();
 }

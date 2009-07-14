@@ -18,6 +18,8 @@ class bImage
     QString filename;
     GLuint textureId;
 
+    bImage();
+
     public:
     bImage(int x, int y, int w, int h, int tile, int layer, QString filename);
     virtual ~bImage();

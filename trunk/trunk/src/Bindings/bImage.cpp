@@ -6,6 +6,18 @@
 
 int bImage::countId = 0;
 
+bImage::bImage()
+{
+    x = 0;
+    y = 0;
+    w = 0;
+    h = 0;
+    tile = 0;
+    layer = 0;
+    id = 0;
+    filename = "";
+}
+
 bImage::bImage(int x, int y, int w, int h, int tile, int layer, QString filename)
 {
     this->x = x;

@@ -37,6 +37,7 @@ class cCamera
     void adjustCam(QPoint adjust);
     void adjustCam(int x, int y);
     void setBounds(QPoint bounds);
+    void setBounds(int w, int h);
 };
 
 #endif

@@ -90,8 +90,12 @@ void cTilesetManager::addImage(bImage* img, int layer)
     {
         img->setTextureId(set->getTextureId(img->getTile()));
 
-        if(layer >= images.capacity())
-            images.resize(layer+1);
+        while(layer >= images.size())
+        {
+            /*images.resize(layer+1);
+            cout << "resized images to: " << images.capacity() << endl;*/
+            images.push_back(vector<bImage*>());
+        }
 
         images[layer].push_back(img);
     }

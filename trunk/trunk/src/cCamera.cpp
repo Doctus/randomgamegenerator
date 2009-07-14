@@ -61,3 +61,9 @@ void cCamera::setBounds(QPoint bounds)
     w = bounds.x();
     h = bounds.y();
 }
+
+void cCamera::setBounds(int w, int h)
+{
+    this->w = w;
+    this->h = h;
+}
