@@ -19,13 +19,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 import rggTile
 
 class Pog:
-    def __init__(self, initx, inity, width, height, srcfile):
+    def __init__(self, initx, inity, width, height, layer, srcfile):
         self.x = initx
         self.y = inity
         self.w = width
         self.h = height
+        self.layer = layer
         self.src = srcfile
-        self.tile = rggTile.tile(self.x, self.y, self.w, self.h, 0, self.src)
+        self.tile = rggTile.tile(self.x, self.y, self.w, self.h, 0, layer, self.src)
 
     def updateLoc(self):
         self.tile = rggTile.tile(self.x, self.y, self.w, self.h, 0, self.src)
