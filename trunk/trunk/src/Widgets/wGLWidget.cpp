@@ -38,6 +38,7 @@ wGLWidget::wGLWidget(QWidget* parent, cGame *mGame) : QGLWidget(QGLFormat(QGL::F
     cam = new cCamera(0, 0, 640, 480);
     ctrlHeld = false;
     shiftHeld = false;
+    zoom = 1;
 
     resize(parent->width(), parent->height());
 
@@ -73,14 +74,14 @@ void wGLWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT);
 
     vector< vector<bImage*> > images = mGame->mTilesetManager->getImages();
-    QRect *camTest = new QRect(cam->getCam(), cam->getBounds());
+    QRect *camTest = new QRect(cam->getCam(zoom), cam->getBounds(zoom));
 
     foreach(vector<bImage*> layer, images)
     {
         foreach(bImage *img, layer)
         {
             if(camTest->intersects(img->getRect()))
-                drawImage(img->getTextureId(), img->getX()-cam->getCam().x(), img->getY()-cam->getCam().y(), img->getW(), img->getH());
+                drawImage(img->getTextureId(), img->getX()-cam->getAbsoluteCam().x(), img->getY()-cam->getAbsoluteCam().y(), img->getW(), img->getH());
         }
     }
 
@@ -161,7 +162,7 @@ void wGLWidget::drawImage(GLuint texture, int x, int y, int w, int h)
 #else
         glTexCoord2i(0, h); //image/texture
 #endif
-        glVertex3i(x, y, 0); //screen coordinates
+        glVertex3f(x*zoom, y*zoom, 0); //screen coordinates
 
         //Bottom-left vertex (corner)
 #ifdef _WINDOWS
@@ -169,7 +170,7 @@ void wGLWidget::drawImage(GLuint texture, int x, int y, int w, int h)
 #else
         glTexCoord2i(w, h);
 #endif
-        glVertex3i(x+w, y, 0);
+        glVertex3f((x+w)*zoom, y*zoom, 0);
 
         //Bottom-right vertex (corner)
 #ifdef _WINDOWS
@@ -177,11 +178,11 @@ void wGLWidget::drawImage(GLuint texture, int x, int y, int w, int h)
 #else
         glTexCoord2i(w, 0);
 #endif
-        glVertex3i(x+w, y+h, 0);
+        glVertex3f((x+w)*zoom, (y+h)*zoom, 0);
 
         //Top-right vertex (corner)
         glTexCoord2i(0, 0);
-        glVertex3i(x, y+h, 0);
+        glVertex3f(x*zoom, (y+h)*zoom, 0);
     glEnd();
 
     if((error = glGetError()) != GL_NO_ERROR)
@@ -253,7 +254,7 @@ void wGLWidget::mouseMoveEvent(QMouseEvent *event)
         emit mouseMoveSignal(event->pos().x(), event->pos().y());
     else
     {
-        cam->adjustCam(lastx-event->pos().x(), lasty-event->pos().y());
+        cam->adjustCam((lastx - event->pos().x()) * (1/zoom), (lasty - event->pos().y()) * (1/zoom));
         lastx = event->pos().x();
         lasty = event->pos().y();
     }
@@ -342,5 +343,21 @@ void wGLWidget::keyReleaseEvent(QKeyEvent *event)
         ctrlHeld = false;
     else if(event->key() == Qt::Key_Shift)
         shiftHeld = false;
+}
+
+void wGLWidget::wheelEvent(QWheelEvent *event)
+{
+    if(event->delta() < 0)
+    {
+        if(zoom > 0.50)
+            zoom /= 2;
+    }
+    else if(event->delta() > 0)
+    {
+        if(zoom < 4.0)
+            zoom *= 2;
+    }
+    cout << "new zoom: " << zoom << endl << "1/zoom: " << 1/zoom << endl;
+    cout << "Bounds: " << cam->getBounds(zoom).x() << endl;
 }
 

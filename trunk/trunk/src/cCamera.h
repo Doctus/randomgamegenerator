@@ -31,8 +31,10 @@ class cCamera
     public:
     cCamera(int x, int y, int w, int h);
 
-    QPoint getCam();
-    QPoint getBounds();
+    QPoint getAbsoluteCam();
+    QPoint getAbsoluteBounds();
+    QPoint getCam(float zoom);
+    QPoint getBounds(float zoom);
     void setCam(QPoint newCam);
     void adjustCam(QPoint adjust);
     void adjustCam(int x, int y);
