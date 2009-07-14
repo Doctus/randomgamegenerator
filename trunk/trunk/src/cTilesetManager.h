@@ -37,7 +37,7 @@ class cTilesetManager
     private:
     vector<cTileset*> tilesets;
     int id;
-    vector<bImage*> images;
+    vector< vector<bImage*> > images;
     wGLWidget *mGLWidget;
 
     public:
@@ -50,10 +50,13 @@ class cTilesetManager
     cTileset* findTileset(int id);
     cTileset* findTileset(string filename);
 
-    void addImage(bImage *img);
-    void removeImage(bImage *img);
+    void addImage(bImage *img, int layer);
+    void removeImage(bImage *img, int layer);
+
     bool changeTileOfImage(bImage *img, int tile);
-    vector<bImage*> getImages();
+    void changeLayerOfImage(bImage *img, int oldLayer, int newLayer);
+
+    vector< vector<bImage*> > getImages();
 
     private:
     int getPosition(int id);

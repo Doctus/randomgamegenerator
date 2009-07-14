@@ -74,14 +74,15 @@ class bImage
 %End
 
     public:
-    bImage(int x, int y, int w, int h, int tile, QString filename);
-    //virtual ~bImage();
+    bImage(int x, int y, int w, int h, int tile, int layer, QString filename);
 
+    int getId();
     int getX();
     int getY();
     int getW();
     int getH();
     int getTile();
+    int getLayer();
     QString getFilename();
 
     void setX(int x);
@@ -89,4 +90,5 @@ class bImage
     void setW(int w);
     void setH(int h);
     void setTile(int tile);
+    void setLayer(int layer);
 };

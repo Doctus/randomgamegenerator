@@ -79,7 +79,7 @@ cTileset* cTilesetManager::findTileset(string filename)
 }
 
 
-void cTilesetManager::addImage(bImage* img)
+void cTilesetManager::addImage(bImage* img, int layer)
 {
     cTileset *set = findTileset(img->getFilename().toStdString());
 
@@ -89,17 +89,21 @@ void cTilesetManager::addImage(bImage* img)
     if(set != NULL)
     {
         img->setTextureId(set->getTextureId(img->getTile()));
-        images.push_back(img);
+
+        if(layer >= images.capacity())
+            images.resize(layer+1);
+
+        images[layer].push_back(img);
     }
 }
 
-void cTilesetManager::removeImage(bImage* img)
+void cTilesetManager::removeImage(bImage* img, int layer)
 {
-    for(uint i = 0; i < images.size(); i++)
+    for(uint i = 0; i < images[layer].size(); i++)
     {
-        if(images[i]->getId() == img->getId())
+        if(images[layer][i]->getId() == img->getId())
         {
-            images.erase(images.begin() + i);
+            images[layer].erase(images[layer].begin() + i);
             return;
         }
     }
@@ -118,7 +122,16 @@ bool cTilesetManager::changeTileOfImage(bImage *img, int tile)
     return false;
 }
 
-vector<bImage*> cTilesetManager::getImages()
+void cTilesetManager::changeLayerOfImage(bImage *img, int oldLayer, int newLayer)
+{
+    removeImage(img, oldLayer);
+
+    if(newLayer > images.size()-1)
+        images.resize(newLayer+1);
+    images[newLayer].push_back(img);
+}
+
+vector< vector<bImage*> > cTilesetManager::getImages()
 {
     return images;
 }

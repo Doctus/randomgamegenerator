@@ -44,6 +44,7 @@ class Map:
         self.tiles[x].append(rggTile.tile(x*self.tilesize[0], y*self.tilesize[1],
                                           self.tilesize[0], self.tilesize[1],
                                           self.tileindexes[x+(y*self.mapsize[0])],
+                                          0,
                                           self.tileset))
 
   def encodeIndexes(self, ind):

@@ -6,12 +6,13 @@
 
 int bImage::countId = 0;
 
-bImage::bImage(int x, int y, int w, int h, int tile, QString filename)
+bImage::bImage(int x, int y, int w, int h, int tile, int layer, QString filename)
 {
     this->x = x;
     this->y = y;
     this->w = w;
     this->h = h;
+    this->layer = layer;
     id = countId++;
     this->tile = tile;
     this->filename = filename;
@@ -19,12 +20,12 @@ bImage::bImage(int x, int y, int w, int h, int tile, QString filename)
     if(bMain::getGameInstance() == NULL)
         cout << "ERROR! ERROR!" << endl << "ERROR! ERROR!" << endl << "ERROR! ERROR!" << endl;
 
-    bMain::getGameInstance()->mTilesetManager->addImage(this);
+    bMain::getGameInstance()->mTilesetManager->addImage(this, layer);
 }
 
 bImage::~bImage()
 {
-    bMain::getGameInstance()->mTilesetManager->removeImage(this);
+    bMain::getGameInstance()->mTilesetManager->removeImage(this, layer);
 }
 
 int bImage::getId()
@@ -55,6 +56,11 @@ int bImage::getH()
 int bImage::getTile()
 {
     return tile;
+}
+
+int bImage::getLayer()
+{
+    return layer;
 }
 
 QString bImage::getFilename()
@@ -89,6 +95,15 @@ void bImage::setTile(int tile)
         this->tile = tile;
 }
 
+void bImage::setLayer(int layer)
+{
+    if(layer < 0)
+        return;
+
+    bMain::getGameInstance()->mTilesetManager->changeLayerOfImage(this, this->layer, layer);
+    this->layer = layer;
+}
+
 
 GLuint bImage::getTextureId()
 {
@@ -100,7 +115,7 @@ void bImage::setTextureId(GLuint textureId)
     this->textureId = textureId;
 }
 
-QRect* bImage::getRect()
+QRect bImage::getRect()
 {
-    return new QRect(x, y, w, h);
+    return QRect(x, y, w, h);
 }

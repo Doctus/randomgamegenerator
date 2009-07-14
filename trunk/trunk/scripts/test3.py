@@ -5,7 +5,7 @@ c = bmainmod.bMain()
 currentMap = rggMap.Map()
 Mappes = []
 
-testpog = rggPog.Pog(5, 5, 23, 46, 'yue.png')
+testpog = rggPog.Pog(5, 5, 23, 46, 1, 'yue.png')
 
 def _linkedName(inp):
     return str('<a href="/tell ' + inp + '" title="' + inp + '">' + inp + '</a>')

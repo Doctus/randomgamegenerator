@@ -67,15 +67,19 @@ void wGLWidget::initializeGL()
 
 void wGLWidget::paintGL()
 {
+    int layerCount = 0; //this is here so that it actually draws?! I DO NOT UNDERSTAND.
     glClear(GL_COLOR_BUFFER_BIT);
 
-    vector<bImage*> images = mGame->mTilesetManager->getImages();
+    vector< vector<bImage*> > images = mGame->mTilesetManager->getImages();
     QRect *camTest = new QRect(cam->getCam(), cam->getBounds());
 
-    foreach(bImage *img, images)
+    foreach(vector<bImage*> layer, images)
     {
-        if(camTest->intersects(*(img->getRect())))
-            drawImage(img->getTextureId(), img->getX()-cam->getCam().x(), img->getY()-cam->getCam().y(), img->getW(), img->getH());
+        foreach(bImage *img, layer)
+        {
+            if(camTest->intersects(img->getRect()))
+                drawImage(img->getTextureId(), img->getX()-cam->getCam().x(), img->getY()-cam->getCam().y(), img->getW(), img->getH());
+        }
     }
 
     if(doubleBuffer()) //This check seems a bit redundant...as we force it to double buffer. But nonetheless.
