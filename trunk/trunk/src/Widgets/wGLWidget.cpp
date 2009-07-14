@@ -251,7 +251,7 @@ void wGLWidget::setSelectedIcon(IconType::IconEnum selected)
 void wGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if(selectedIcon == IconType::select)
-        emit mouseMoveSignal(event->pos().x(), event->pos().y());
+        emit mouseMoveSignal(event->pos().x() * (1/zoom), event->pos().y() * (1/zoom));
     else
     {
         cam->adjustCam((lastx - event->pos().x()) * (1/zoom), (lasty - event->pos().y()) * (1/zoom));
@@ -290,7 +290,7 @@ void wGLWidget::mousePressEvent(QMouseEvent *event)
             type = -1;
             break;
         }
-        emit mousePressSignal(event->pos().x(), event->pos().y(), type);
+        emit mousePressSignal(event->pos().x() * (1/zoom), event->pos().y() * (1/zoom), type);
     }
 
     event->accept();
@@ -321,7 +321,7 @@ void wGLWidget::mouseReleaseEvent(QMouseEvent *event)
             type = -1;
             break;
         }
-        emit mouseReleaseSignal(event->pos().x(), event->pos().y(), type);
+        emit mouseReleaseSignal(event->pos().x() * (1/zoom), event->pos().y() * (1/zoom), type);
     }
 
     event->accept();
