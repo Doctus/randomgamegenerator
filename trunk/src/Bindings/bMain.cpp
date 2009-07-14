@@ -178,22 +178,22 @@ QString bMain::getUserTextInput(QString question)
 
 int bMain::getCamX()
 {
-    return mainGame->mGLWidget->cam->getCam().x();
+    return mainGame->mGLWidget->cam->getAbsoluteCam().x();
 }
 
 int bMain::getCamY()
 {
-    return mainGame->mGLWidget->cam->getCam().y();
+    return mainGame->mGLWidget->cam->getAbsoluteCam().y();
 }
 
 int bMain::getCamW()
 {
-    return mainGame->mGLWidget->cam->getBounds().x();
+    return mainGame->mGLWidget->cam->getAbsoluteBounds().x();
 }
 
 int bMain::getCamH()
 {
-    return mainGame->mGLWidget->cam->getBounds().y();
+    return mainGame->mGLWidget->cam->getAbsoluteBounds().y();
 }
 
 
