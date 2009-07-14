@@ -1,5 +1,8 @@
+import time, random
 import bmainmod, rggNameGen, rggMap, rggDice, rggTile, rggPog, random
 from PyQt4 import QtCore
+
+random.seed()
 
 c = bmainmod.bMain()
 currentMap = rggMap.Map()
@@ -8,9 +11,13 @@ Pogs = []
 manipulatedPogs = [None]
 lastMouseLoc = [0, 0]
 
-Pogs.append(rggPog.Pog(5, 5, 23, 46, 3, 'yue.png'))
-Pogs.append(rggPog.Pog(40, 40, 23, 46, 50, 'yue.png'))
-Pogs.append(rggPog.Pog(25, 25, 23, 46, 2, 'yue.png'))
+#Pogs.append(rggPog.Pog(5, 5, 23, 46, 3, 'yue.png'))
+#Pogs.append(rggPog.Pog(40, 40, 23, 46, 50, 'yue.png'))
+#Pogs.append(rggPog.Pog(25, 25, 23, 46, 2, 'yue.png'))
+
+for i in range(0, 5000):
+    Pogs.append(rggPog.Pog(30+i, 30+i, 23, 46, random.randint(0, i), 'yue.png'))
+    #time.sleep(0.5)
 
 #Mass pog test.
 #for x in range(0, 100):
@@ -217,29 +224,34 @@ def saveMap(filename):
     f.close()
 
 def mouseMove(x, y):
-    print "mouse moved to " + str(x) + ", " + str(y)
+    #print "mouse moved to " + str(x) + ", " + str(y)
     if manipulatedPogs[0] != None:
         manipulatedPogs[0].relativeMove(x-lastMouseLoc[0], y-lastMouseLoc[1])
     lastMouseLoc[0] = x
     lastMouseLoc[1] = y
 
-def mouseRelease(x, y):
-    print "mouse released at " + str(x) + ", " + str(y)
+def mouseRelease(x, y, t):
+    #print "mouse released at " + str(x) + ", " + str(y)
     manipulatedPogs[0] = None
     #print ("guessing click was on (" + str((x+c.getCamX())/currentMap.tilesize[0]) +
     #       "," + str((y+c.getCamY())/currentMap.tilesize[1]) + ")")
     #currentMap.debugMorphTile([(x+c.getCamX())/currentMap.tilesize[0], (y+c.getCamY())/currentMap.tilesize[1]])
 
-def mousePress(x, y):
-    print 'mouse press event at (' + str(x) + ', ' + str(y) + ')'
+def mousePress(x, y, t):
+    print 'mouse press event ' + str(t) + ' at (' + str(x) + ', ' + str(y) + ')'
     lastMouseLoc[0] = x
     lastMouseLoc[1] = y
-    for pog in Pogs:
-        if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
-            if manipulatedPogs[0] == None:
-                manipulatedPogs[0] = pog
-            elif pog.layer > manipulatedPogs[0].layer:
-                manipulatedPogs[0] = pog
+    if t == 0:
+        for pog in Pogs:
+            if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
+                if manipulatedPogs[0] == None:
+                    manipulatedPogs[0] = pog
+                elif pog.layer > manipulatedPogs[0].layer:
+                    manipulatedPogs[0] = pog
+    elif t == 2:
+        selected = c.showPopupMenuAt(x, y, ["Test", "Another Test", "Yet another test!"])
+        if selected == 1: #Another Test
+            print c.getUserTextInput("What do I want to know anyway?")
         
     
 QtCore.QObject.connect(c, QtCore.SIGNAL("newNetMessageSignal(QString, QString)"), newNetEvent)
@@ -249,7 +261,7 @@ QtCore.QObject.connect(c, QtCore.SIGNAL("newChatInputSignal(QString)"), newEvent
 QtCore.QObject.connect(c, QtCore.SIGNAL("loadMapSignal(QString)"), loadMap)
 QtCore.QObject.connect(c, QtCore.SIGNAL("saveMapSignal(QString)"), saveMap)
 QtCore.QObject.connect(c, QtCore.SIGNAL("mouseMoveSignal(int, int)"), mouseMove)
-QtCore.QObject.connect(c, QtCore.SIGNAL("mousePressSignal(int, int)"), mousePress)
-QtCore.QObject.connect(c, QtCore.SIGNAL("mouseReleaseSignal(int, int)"), mouseRelease)
+QtCore.QObject.connect(c, QtCore.SIGNAL("mousePressSignal(int, int, int)"), mousePress)
+QtCore.QObject.connect(c, QtCore.SIGNAL("mouseReleaseSignal(int, int, int)"), mouseRelease)
 
 c.start()

@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <QtCore/QObject>
 
 #include "../cGame.h"
-
+#include "../Widgets/wAction.h"
 
 
 class bMain : public QObject
@@ -52,6 +52,8 @@ class bMain : public QObject
     bool isServer();
 
     int displayUserDialogChoice(QString text, QVector<QString> buttonTexts, int defaultButton = 0);
+    int showPopupMenuAt(int x, int y, QVector<QString> actionTexts);
+    QString getUserTextInput(QString question);
 
     int getCamX();
     int getCamY();
@@ -69,8 +71,8 @@ class bMain : public QObject
     void saveMapTrigger(QString filename);
 
     void mouseMoveTrigger(int x, int y);
-    void mousePressTrigger(int x, int y);
-    void mouseReleaseTrigger(int x, int y);
+    void mousePressTrigger(int x, int y, int type);
+    void mouseReleaseTrigger(int x, int y, int type);
 
     signals:
     void newNetMessageSignal(QString str, QString handle);
@@ -83,8 +85,8 @@ class bMain : public QObject
     void saveMapSignal(QString filename);
 
     void mouseMoveSignal(int x, int y);
-    void mousePressSignal(int x, int y);
-    void mouseReleaseSignal(int x, int y);
+    void mousePressSignal(int x, int y, int type);
+    void mouseReleaseSignal(int x, int y, int type);
 };
 
 #endif // BMAIN_H
