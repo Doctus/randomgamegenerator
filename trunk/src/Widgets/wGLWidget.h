@@ -47,6 +47,7 @@ class wGLWidget : public QGLWidget
     cGame *mGame;
     IconType::IconEnum selectedIcon;
     int lastx, lasty;
+    float zoom;
     bool shiftHeld, ctrlHeld;
 
     friend class bMain;
@@ -72,6 +73,8 @@ class wGLWidget : public QGLWidget
 
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
+
+    void wheelEvent(QWheelEvent *event);
 
     signals:
     void mouseMoveSignal(int x, int y);
