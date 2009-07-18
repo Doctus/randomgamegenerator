@@ -18,9 +18,76 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
+/*
+<Doctus> Random, Procedural, Chaotic, Non-deterministic, Automated
+<Doctus> Game, Amusement, Pastime
+<Doctus> Generator, Producer, Creator, Factory
+*/
+
 #include "cGame.h"
 
 unsigned int FPScounter = 0;
+
+QString randomTitle()
+{
+    srand(time(NULL));
+
+    int rand1 = rand() % 4;
+    int rand2 = rand() % 2;
+    int rand3 = rand() % 3;
+
+    QString title;
+
+    switch(rand1)
+    {
+        case 0:
+        title += "Random ";
+        break;
+        case 1:
+        title += "Procedural ";
+        break;
+        case 2:
+        title += "Chaotic ";
+        break;
+        case 3:
+        title += "Non-deterministic ";
+        break;
+        case 4:
+        title += "Automated ";
+        break;
+    }
+
+    switch(rand2)
+    {
+        case 0:
+        title += "Game ";
+        break;
+        case 1:
+        title += "Amusement ";
+        break;
+        case 2:
+        title += "Pastime ";
+        break;
+    }
+
+    switch(rand3)
+    {
+        case 0:
+        title += "Generator";
+        break;
+        case 1:
+        title += "Producer";
+        break;
+        case 2:
+        title += "Creator";
+        break;
+        case 3:
+        title += "Factory";
+        break;
+    }
+
+    return title;
+}
 
 cGame::cGame(QWidget *parent) : QObject(parent)
 {
@@ -35,7 +102,7 @@ cGame::cGame(QWidget *parent) : QObject(parent)
 
     mTilesetManager = new cTilesetManager(mGLWidget);
 
-    ((QMainWindow*)parent)->setWindowTitle("Random Game Generator");
+    ((QMainWindow*)parent)->setWindowTitle(randomTitle());
 
     QTimer *timer = new QTimer(this);
     QTimer *timer2 = new QTimer(this);
