@@ -102,7 +102,8 @@ cGame::cGame(QWidget *parent) : QObject(parent)
 
     mTilesetManager = new cTilesetManager(mGLWidget);
 
-    ((QMainWindow*)parent)->setWindowTitle(randomTitle());
+    title = randomTitle();
+    ((QMainWindow*)parent)->setWindowTitle(title);
 
     QTimer *timer = new QTimer(this);
     QTimer *timer2 = new QTimer(this);
@@ -127,7 +128,7 @@ void cGame::draw()
 
 void cGame::displayFPS()
 {
-    QString str = QString("Random Game Generator | FPS: ") + QString::number(FPScounter);
+    QString str = title + QString(" | FPS: ") + QString::number(FPScounter);
     ((QMainWindow*)parent())->setWindowTitle(str);
     FPScounter = 0;
 }
@@ -135,5 +136,10 @@ void cGame::displayFPS()
 void cGame::showTextDockWidget()
 {
     this->mDockWidgets->showTextDockWidgets();
+}
+
+QString cGame::getTitle()
+{
+    return title;
 }
 
