@@ -6,7 +6,7 @@ random.seed()
 
 c = bmainmod.bMain()
 Maps = [rggMap.Map()]
-Maps[0].loadFromString("n! Default Map !n a! Anonymous !a m! 20 20 t! ../data/town.png s! 32 32 1~20".split())
+Maps[0].loadFromString("n! Default Map !n a! Anonymous !a m! 10 10 t! ../data/town.png s! 32 32 1~20 2~20 3~20".split())
 currentMap = [0]
 manipulatedPogs = [None, None]
 lastMouseLoc = [0, 0]
@@ -16,7 +16,8 @@ lastMouseLoc = [0, 0]
 #Pogs.append(rggPog.Pog(25, 25, 23, 46, 2, 'yue.png'))
 
 for i in range(0, 50):
-    Maps[currentMap[0]].Pogs.append(rggPog.Pog(30+i, 30+i, 23, 46, random.randint(0, i), 'yue.png'))
+    Maps[currentMap[0]].addPog(rggPog.Pog(i, 30+i, 30+i, 23, 46, random.randint(0, i), 'yue.png'))
+    #Maps[currentMap[0]].pogsByID[i] = Maps[currentMap[0]].Pogs[i]
 
 #Mass pog test.
 #for x in range(0, 100):
@@ -33,8 +34,6 @@ def newEvent(st):
         words = unicode(st).split()
         if words[0].lower() == '/cam':
             print 'x: ' + str(c.getCamX()) + '\ny: ' + str(c.getCamY())
-        if words[0].lower() == '/sendmap':
-            c.sendNetMessageToAll(Maps[currentMap[0]].stringform)
         if words[0].lower() == '/swapmap':
             namestemp = []
             for item in Maps:
@@ -181,6 +180,12 @@ def newNetEvent(st, handle):
                 else:
                     c.sendNetMessageToHandle('w!' + " " + handle + " " +
                                              " ".join(words[2:]), words[1])
+            elif st[0] == 'p': #Pog edit
+                words = unicode(st).split()
+                print words
+                if words[1] == 'm': #Pog movement
+                    if Maps[currentMap[0]].pogsByID.has_key(int(words[2])):
+                        Maps[currentMap[0]].pogsByID[int(words[2])].relativeMove(int(words[3]), int(words[4]))
             elif st[0] == 'r': #Die roll
                 c.insertChatMessage(st[2:])
                 if c.isServer():
@@ -195,8 +200,14 @@ def newNetEvent(st, handle):
                                         " has left the game" + '</b>')
             elif st[0] == 'n': #Map file
                 if c.displayUserDialogChoice("Load map from " + handle + "?", ["Yes", "No"], 1) == 0:
-                    Maps[currentMap[0]].loadFromString(str(st).split())
-                    Mappes.append(str(st).split())
+                    newMap = rggMap.Map()
+                    newMap.loadFromString(unicode(st).split())
+                    Maps.append(newMap)
+                    for pog in Maps[currentMap[0]].Pogs:
+                        pog.hide()
+                    currentMap[0] = Maps.index(newMap)
+                    for pog in Maps[currentMap[0]].Pogs:
+                        pog.show()
             else:
                 print 'Malformed or unrecognised data received.'
         else:
@@ -226,12 +237,13 @@ def loadMap(filename):
     currentMap[0] = Maps.index(newMap)
     for pog in Maps[currentMap[0]].Pogs:
         pog.show()
+    c.sendNetMessageToAll(Maps[currentMap[0]].stringform)
 
 def saveMap(filename):
     if c.displayUserDialogChoice("Edit map info?", ['Yes', 'No'], 1) == 0:
         Maps[currentMap[0]].mapname = unicode(c.getUserTextInput("What is the name of this map?"))
         Maps[currentMap[0]].authorname = unicode(c.getUserTextInput("Who is the author of this map?"))
-        Maps[currentMap[0]].updateStringForm()
+    Maps[currentMap[0]].updateStringForm() #Ensure that the saved version is exactly what the user sees at the time of saving.
     f = open(unicode(filename), 'w')
     f.write(Maps[currentMap[0]].stringform)
     f.close()
@@ -240,6 +252,8 @@ def mouseMove(x, y):
     #print "mouse moved to " + str(x) + ", " + str(y)
     if manipulatedPogs[0] != None:
         manipulatedPogs[0].relativeMove(x-lastMouseLoc[0], y-lastMouseLoc[1])
+        c.sendNetMessageToAll('p! m ' + str(manipulatedPogs[0].ID) + ' ' + str(x - lastMouseLoc[0]) + ' '
+                                      + str(y - lastMouseLoc[1]))
     lastMouseLoc[0] = x
     lastMouseLoc[1] = y
 

@@ -16,11 +16,22 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
-import rggTile
+import rggTile, rggPog, random
 
 class Map:
   def __init__(self):
     self.Pogs = []
+    self.pogsByID = {}
+
+  def addPog(self, pog):
+    self.Pogs.append(pog)
+    if self.pogsByID.has_key(pog.ID):
+      self.tmpint = 1
+      while self.pogsByID.has_key(self.tmpint):
+        self.tmpint = self.tmpint + 1
+      pog.ID = self.tmpint
+    else:
+      self.pogsByID[pog.ID] = pog
 
   def loadFromString(self, s):
     self.stringform = " ".join(s)
@@ -30,7 +41,10 @@ class Map:
     self.tileset = s[s.index('t!')+1]
     self.tilesize = [int(s[s.index('s!')+1]), int(s[s.index('s!')+2])]
     self.tileindexes = []
-    for itertile in range(s.index('s!')+3, len(s)):
+    self.itlim = len(s)
+    if 'p!' in s:
+      self.itlim = s.index('p!')
+    for itertile in range(s.index('s!')+3, self.itlim):
       if '~' in s[itertile]:
         for x in range(0, int(s[itertile][s[itertile].index('~')+1:])):
           self.tileindexes.append(int(s[itertile][0:s[itertile].index('~')]))
@@ -46,6 +60,11 @@ class Map:
                                           self.tileindexes[x+(y*self.mapsize[0])],
                                           0,
                                           self.tileset))
+    if 'p!' in s:
+      self.tmppogseg = s[s.index('p!'):]
+      while len(self.tmppogseg) > 0:
+          self.addPog(rggPog.Pog(*self.tmppogseg[1:8]))
+          self.tmppogseg = self.tmppogseg[8:]
 
   def encodeIndexes(self, ind):
     self.fullform = []
@@ -66,7 +85,7 @@ class Map:
         self.counthack = 1
     return self.output
 
-  def deriveStringForm(self, mname, aname, msize, tset, tsize, tindexes):
+  def deriveStringForm(self, mname, aname, msize, tset, tsize, tindexes, pogz):
     #Best to do this "backwards" so we keep track of the indexes for insertion.
     self.result = ['n!', '!n', 'a!', '!a', 'm!', 't!', 's!']
     self.result.extend(self.encodeIndexes(tindexes))
@@ -86,12 +105,16 @@ class Map:
     tmpname.reverse()
     for portion in tmpname:
       self.result.insert(1, portion)
+    #Now for the horror of the pogs.
+    for pog in pogz:
+      self.result.append("p! " + pog.deriveStringForm())
     return " ".join(self.result)
 
   def updateStringForm(self):
     self.stringform = self.deriveStringForm(self.mapname, self.authorname,
-                                        self.mapsize, self.tileset,
-                                        self.tilesize, self.tileindexes)
+                                            self.mapsize, self.tileset,
+                                            self.tilesize, self.tileindexes,
+                                            self.Pogs)
 
   def debugMorphTile(self, coord):
     #Note: this will NOT necessarily get propagated/saved/etc at the moment.

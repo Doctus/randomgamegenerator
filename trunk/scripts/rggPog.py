@@ -19,13 +19,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 import rggTile
 
 class Pog:
-    def __init__(self, initx, inity, width, height, layer, srcfile):
-        self.x = initx
-        self.y = inity
-        self.w = width
-        self.h = height
-        self.layer = layer
-        self.src = srcfile
+    def __init__(self, ID, initx, inity, width, height, layer, srcfile):
+        self.ID = int(ID)
+        self.x = int(initx)
+        self.y = int(inity)
+        self.w = int(width)
+        self.h = int(height)
+        self.layer = int(layer)
+        self.src = unicode(srcfile)
         self.tile = rggTile.tile(self.x, self.y, self.w, self.h, 0, self.layer, self.src)
         self.name = None
         self.hidden = False
@@ -59,3 +60,10 @@ class Pog:
     def show(self):
         self.tile = rggTile.tile(self.x, self.y, self.w, self.h, 0, self.layer, self.src)
         self.hidden = False
+
+    def deriveStringForm(self):
+        self.tmp = [str(self.ID), str(self.x), str(self.y), str(self.w), str(self.h),
+                             str(self.layer), str(self.src)]
+        if self.name is not None:
+            self.tmp.append(str(self.name))
+        return " ".join(self.tmp)
