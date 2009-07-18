@@ -47,7 +47,7 @@ class cGame : public QObject
     wDockWidgets *mDockWidgets;
     nConnectionManager *mConnectionManager;
 
-    QScrollArea *GLArea;
+    QString title;
 
     friend class wMenuBar;
     friend class wGLWidget;
@@ -64,6 +64,7 @@ class cGame : public QObject
 
     public:
     void showTextDockWidget();
+    QString getTitle();
 };
 
 #endif
