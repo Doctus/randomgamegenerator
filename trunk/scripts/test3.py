@@ -1,10 +1,10 @@
 import time, random
-import bmainmod, rggNameGen, rggMap, rggDice, rggTile, rggPog, random
+import _bmainmod, rggNameGen, rggMap, rggTile, rggPog, random
 from PyQt4 import QtCore
 
 random.seed()
 
-c = bmainmod.bMain()
+c = _bmainmod.bMain()
 Maps = [rggMap.Map()]
 Maps[0].loadFromString("n! Default Map !n a! Anonymous !a m! 10 10 t! ../data/town.png s! 32 32 1~20 2~20 3~20".split())
 currentMap = [0]
