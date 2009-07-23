@@ -30,8 +30,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <QtNetwork/QTcpSocket>
 #include <QtGui/QMessageBox>
 
-#include <confuse.h>
-
 #include <iostream>
 
 class nConnectionManager;
