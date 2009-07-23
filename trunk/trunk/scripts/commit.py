@@ -15,5 +15,6 @@ def getCommitComment():
              random.choice(verbs), random.choice(adjs), random.choice(nouns)]]
   return (" ".join(random.choice(patterns))).capitalize() + "."
 
-for r in range(0, 10):
-  print getCommitComment()
+#for r in range(0, 10):
+#  print getCommitComment()
+print "\"" + getCommitComment() + "\""
