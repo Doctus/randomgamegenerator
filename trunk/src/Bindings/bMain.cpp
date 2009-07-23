@@ -34,7 +34,7 @@ bMain::bMain()
     widget = new QMainWindow(); //parent widget
     widget->resize(640, 480);
 
-    QIcon *icon = new QIcon("../data/FAD-icon.png");
+    QIcon *icon = new QIcon("./data/FAD-icon.png");
 
     widget->setWindowIcon(*icon);
 

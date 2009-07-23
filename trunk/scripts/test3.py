@@ -6,7 +6,7 @@ random.seed()
 
 c = _bmainmod.bMain()
 Maps = [rggMap.Map()]
-Maps[0].loadFromString("n! Default Map !n a! Anonymous !a m! 10 10 t! ../data/town.png s! 32 32 1~20 2~20 3~20".split())
+Maps[0].loadFromString("n! Default Map !n a! Anonymous !a m! 10 10 t! ./data/town.png s! 32 32 1~20 2~20 3~20".split())
 currentMap = [0]
 manipulatedPogs = [None, None]
 lastMouseLoc = [0, 0]
@@ -16,7 +16,7 @@ lastMouseLoc = [0, 0]
 #Pogs.append(rggPog.Pog(25, 25, 23, 46, 2, 'yue.png'))
 
 for i in range(0, 50):
-    Maps[currentMap[0]].addPog(rggPog.Pog(i, 30+i, 30+i, 23, 46, random.randint(0, i), 'yue.png'))
+    Maps[currentMap[0]].addPog(rggPog.Pog(i, 30+i, 30+i, 23, 46, random.randint(0, i), './data/yue.png'))
     #Maps[currentMap[0]].pogsByID[i] = Maps[currentMap[0]].Pogs[i]
 
 #Mass pog test.

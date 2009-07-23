@@ -52,12 +52,12 @@ void wMenuBar::initActions()
     connectToServer->setShortcut(tr("Ctrl+N"));
     QAction::connect(connectToServer, SIGNAL(triggered()), this, SLOT(connectToServerSlot()));
 
-    selectIcon = new QAction(QIcon("../data/FAD-select-icon.png"), "Select Tool", windowWidget);
+    selectIcon = new QAction(QIcon("./data/FAD-select-icon.png"), "Select Tool", windowWidget);
     selectIcon->setShortcut(tr("Ctrl+S"));
     selectIcon->setToolTip("Select Tool (Ctrl+S)");
     QAction::connect(selectIcon, SIGNAL(triggered()), this, SLOT(selectIconSlot()));
 
-    moveIcon = new QAction(QIcon("../data/FAD-move-icon.png"), "Move Tool", windowWidget);
+    moveIcon = new QAction(QIcon("./data/FAD-move-icon.png"), "Move Tool", windowWidget);
     moveIcon->setShortcut(tr("Ctrl+M"));
     moveIcon->setToolTip("Move Tool (Ctrl+M)");
     QAction::connect(moveIcon, SIGNAL(triggered()), this, SLOT(moveIconSlot()));
