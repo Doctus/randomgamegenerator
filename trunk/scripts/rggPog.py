@@ -43,7 +43,7 @@ class Pog:
         self.tile.setY(self.y)
 
     def absoluteMove(self, newx, newy):
-        print "Moving Yue to " + str(newx) + str(newy)
+        #print "Moving Yue to " + str(newx) + str(newy)
         self.x = newx
         self.y = newy
         self.updateLoc()
