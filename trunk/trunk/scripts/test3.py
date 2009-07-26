@@ -1,5 +1,5 @@
 import time, random
-import _bmainmod, rggNameGen, rggMap, rggTile, rggPog, random
+import _bmainmod, rggNameGen, rggDice, rggMap, rggTile, rggPog, random
 from PyQt4 import QtCore
 
 random.seed()
@@ -175,7 +175,7 @@ def newNetEvent(st, handle):
                 print words
                 if words[1] == 'm': #Pog movement
                     if Maps[currentMap[0]].pogsByID.has_key(int(words[2])):
-                        Maps[currentMap[0]].pogsByID[int(words[2])].relativeMove(int(words[3]), int(words[4]))
+                        Maps[currentMap[0]].pogsByID[int(words[2])].absoluteMove(int(words[3]), int(words[4]))
                 if c.isServer():
                     c.sendNetMessageToAllButOne(st, handle)
             elif st[0] == 'r': #Die roll
@@ -248,8 +248,8 @@ def saveMap(filename):
 def mouseMove(x, y):
     if manipulatedPogs[0] != None:
         manipulatedPogs[0].relativeMove(x-lastMouseLoc[0], y-lastMouseLoc[1])
-        c.sendNetMessageToAll('p! m ' + str(manipulatedPogs[0].ID) + ' ' + str(x - lastMouseLoc[0]) + ' '
-                                      + str(y - lastMouseLoc[1]))
+        c.sendNetMessageToAll('p! m ' + str(manipulatedPogs[0].ID) + ' ' + str(manipulatedPogs[0].x) + ' '
+                                      + str(manipulatedPogs[0].y))
     lastMouseLoc[0] = x
     lastMouseLoc[1] = y
 
