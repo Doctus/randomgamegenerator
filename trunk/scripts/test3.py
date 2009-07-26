@@ -5,24 +5,14 @@ from PyQt4 import QtCore
 random.seed()
 
 c = _bmainmod.bMain()
-Maps = [rggMap.Map()]
-Maps[0].loadFromString("n! Default Map !n a! Anonymous !a m! 10 10 t! ./data/town.png s! 32 32 1~20 2~20 3~20".split())
+Maps = []
+#Maps[0].loadFromString("n! Default Map !n a! Anonymous !a m! 10 10 t! ./data/town.png s! 32 32 1~20 2~20 3~20".split())
 currentMap = [0]
 manipulatedPogs = [None, None]
 lastMouseLoc = [0, 0]
 
-#Pogs.append(rggPog.Pog(5, 5, 23, 46, 3, 'yue.png'))
-#Pogs.append(rggPog.Pog(40, 40, 23, 46, 50, 'yue.png'))
-#Pogs.append(rggPog.Pog(25, 25, 23, 46, 2, 'yue.png'))
-
-for i in range(0, 50):
-    Maps[currentMap[0]].addPog(rggPog.Pog(i, 30+i, 30+i, 23, 46, random.randint(0, i), './data/yue.png'))
-    #Maps[currentMap[0]].pogsByID[i] = Maps[currentMap[0]].Pogs[i]
-
-#Mass pog test.
-#for x in range(0, 100):
-#    for y in range(0, 100):
-#        Pogs.append(rggPog.Pog(x*5, y*5, 23, 46, random.randrange(1, 6), 'yue.png'))
+#for i in range(0, 50):
+#    Maps[currentMap[0]].addPog(rggPog.Pog(i, 30+i, 30+i, 23, 46, random.randint(0, i), './data/yue.png'))
 
 def _linkedName(inp):
     return str('<a href="/tell ' + inp + '" title="' + inp + '">' + inp + '</a>')
@@ -186,6 +176,8 @@ def newNetEvent(st, handle):
                 if words[1] == 'm': #Pog movement
                     if Maps[currentMap[0]].pogsByID.has_key(int(words[2])):
                         Maps[currentMap[0]].pogsByID[int(words[2])].relativeMove(int(words[3]), int(words[4]))
+                if c.isServer():
+                    c.sendNetMessageToAllButOne(st, handle)
             elif st[0] == 'r': #Die roll
                 c.insertChatMessage(st[2:])
                 if c.isServer():
@@ -199,15 +191,15 @@ def newNetEvent(st, handle):
                     c.insertChatMessage('<b>' + " ".join(words[2:]) +
                                         " has left the game" + '</b>')
             elif st[0] == 'n': #Map file
-                if c.displayUserDialogChoice("Load map from " + handle + "?", ["Yes", "No"], 1) == 0:
-                    newMap = rggMap.Map()
-                    newMap.loadFromString(unicode(st).split())
-                    Maps.append(newMap)
-                    for pog in Maps[currentMap[0]].Pogs:
-                        pog.hide()
-                    currentMap[0] = Maps.index(newMap)
-                    for pog in Maps[currentMap[0]].Pogs:
-                        pog.show()
+                print st
+                newMap = rggMap.Map()
+                newMap.loadFromString(unicode(st).split())
+                Maps.append(newMap)
+                for pog in Maps[currentMap[0]].Pogs:
+                    pog.hide()
+                currentMap[0] = Maps.index(newMap)
+                for pog in Maps[currentMap[0]].Pogs:
+                    pog.show()
             else:
                 print 'Malformed or unrecognised data received.'
         else:
@@ -218,6 +210,9 @@ def newNetEvent(st, handle):
 def newConnection(handle):
     c.insertChatMessage("<b>" + handle + " has joined" + "</b>")
     if c.isServer():
+        for mappe in Maps:
+            mappe.updateStringForm()
+            c.sendNetMessageToHandle(mappe.stringform, handle)
         c.sendNetMessageToAllButOne('u!' + ' join ' + handle, handle)
 
 def disConnection(handle):
@@ -251,7 +246,6 @@ def saveMap(filename):
     f.close()
 
 def mouseMove(x, y):
-    #print "mouse moved to " + str(x) + ", " + str(y)
     if manipulatedPogs[0] != None:
         manipulatedPogs[0].relativeMove(x-lastMouseLoc[0], y-lastMouseLoc[1])
         c.sendNetMessageToAll('p! m ' + str(manipulatedPogs[0].ID) + ' ' + str(x - lastMouseLoc[0]) + ' '
@@ -260,12 +254,8 @@ def mouseMove(x, y):
     lastMouseLoc[1] = y
 
 def mouseRelease(x, y, t):
-    #print "mouse released at " + str(x) + ", " + str(y)
     manipulatedPogs[0] = None
     manipulatedPogs[1] = None
-    #print ("guessing click was on (" + str((x+c.getCamX())/currentMap.tilesize[0]) +
-    #       "," + str((y+c.getCamY())/currentMap.tilesize[1]) + ")")
-    #currentMap.debugMorphTile([(x+c.getCamX())/currentMap.tilesize[0], (y+c.getCamY())/currentMap.tilesize[1]])
 
 def mousePress(x, y, t):
     print 'mouse press event ' + str(t) + ' at (' + str(x) + ', ' + str(y) + ')'
