@@ -131,34 +131,28 @@ void nConnectionManager::startServer(uint port, QString handle)
 //private
 void nConnectionManager::sendMessageToAll(QString message)
 {
-    QByteArray out(message.toUtf8());
     foreach(nConnection *conn, mConnections)
     {
-        conn->sendData(out);
+        conn->sendData(message);
     }
 }
 
 void nConnectionManager::sendNetMessageToAllButOne(QString message, QString handle)
 {
-    QByteArray out(message.toUtf8());
     foreach(nConnection *conn, mConnections)
     {
         if(conn->getHandle() != handle)
-            conn->sendData(out);
+            conn->sendData(message);
     }
 }
 
 bool nConnectionManager::sendMessageToHandle(QString message, QString handle)
 {
-    QByteArray out(message.toUtf8());
-
-    cout << "Sending \"" << message.toStdString() << "\" to \"" << handle.toStdString() << "\"" << endl;
-
     foreach(nConnection *conn, mConnections)
     {
         if(conn->getHandle() == handle)
         {
-            conn->sendData(out);
+            conn->sendData(message);
             return true;
         }
     }
@@ -219,7 +213,7 @@ void nConnectionManager::newConnection()
     connect(conn, SIGNAL(newData(QByteArray, nConnection*)), this, SLOT(newData(QByteArray, nConnection*)));
     connect(conn, SIGNAL(disconnected(nConnection*)), this, SLOT(disconnectedSlot(nConnection*)));
 
-    conn->sendData(ourHandle.toUtf8());
+    conn->sendData(ourHandle);
 
     mConnections.append(conn);
 }
@@ -231,6 +225,11 @@ void nConnectionManager::newData(QByteArray in, nConnection *mConnection)
     else
     {
         QString handle = QString::fromUtf8(in);
+        foreach(nConnection *conn, mConnections)
+        {
+            if(conn->getHandle() == handle)
+                mConnection->disconnectConnections();
+        }
         mConnection->setHandle(handle);
         mConnection->setProperlyConnected(true);
         emit connectedSignal(handle);
@@ -264,7 +263,7 @@ void nConnectionManager::succeededConnectionSlot()
 
     nConnection *conn = mConnections.at(0);
 
-    conn->sendData(ourHandle.toUtf8());
+    conn->sendData(ourHandle);
 }
 
 void nConnectionManager::disconnectedSlot(nConnection *conn)
