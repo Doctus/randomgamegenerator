@@ -32,7 +32,7 @@ class nConnection;
 
 using namespace std;
 
-class nConnection : public QObject
+class nConnection : public QThread
 {
     Q_OBJECT;
 
@@ -46,7 +46,7 @@ class nConnection : public QObject
     public:
     nConnection(QTcpSocket *tcpSocket);
 
-    void sendData(QByteArray out);
+    void sendData(QString data);
     void setHandle(QString handle);
     QString getHandle();
     bool getProperlyConnected();

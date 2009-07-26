@@ -144,7 +144,7 @@ def newEvent(st):
         c.sendNetMessageToAll("t!" + st)
 
 def newNetEvent(st, handle):
-    #c.insertChatMessage("DEBUG: " + str)
+    #c.insertChatMessage("DEBUG: " + unicode(st))
     if len(st) > 1:
         if st[1] == '!':
             if st[0] == 't': #Ordinary chat message
@@ -229,6 +229,8 @@ def loadMap(filename):
     f = open(filename, 'r')
     tmp = f.read().split()
     f.close()
+    print 'filename: ' + str(filename)
+    print 'map: ' + str(tmp)
     newMap = rggMap.Map()
     newMap.loadFromString(tmp)
     Maps.append(newMap)

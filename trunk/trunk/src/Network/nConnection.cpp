@@ -31,10 +31,18 @@ nConnection::nConnection(QTcpSocket *tcpSocket)
 }
 
 
-void nConnection::sendData(QByteArray out)
+void nConnection::sendData(QString data)
 {
-    if(tcpSocket->write(out) != out.length())
-        cout << "not all bytes were sent" << endl;
+     QByteArray block;
+     qint64 bytesSent = 0;
+     QDataStream out(&block, QIODevice::ReadWrite);
+     out.setVersion(QDataStream::Qt_4_5);
+     out << (quint16)0;
+     out << data;
+     out.device()->seek(0);
+     out << (quint16)(block.size() - sizeof(quint16));
+    if((bytesSent = tcpSocket->write(block)) != block.length())
+        cout << "not all bytes were sent, " << bytesSent << " opposed to " << data.length() + sizeof(quint16) << endl;
 }
 
 void nConnection::setHandle(QString handle)
@@ -64,8 +72,52 @@ void nConnection::disconnectConnections()
 
 void nConnection::readData()
 {
-    QByteArray data = tcpSocket->readAll();
-    emit newData(data, this);
+    /*while(tcpSocket->canReadLine())
+    {
+        QByteArray data = tcpSocket->readLine(tcpSocket->bytesAvailable());
+        emit newData(data, this);
+    }*/
+
+    QDataStream in(tcpSocket);
+    quint16 blockSize;
+    in.setVersion(QDataStream::Qt_4_5);
+
+    while(!in.atEnd())
+    {
+        if (tcpSocket->bytesAvailable() < (int)sizeof(quint16))
+        {
+            cout << "No size sent?" << endl;
+            int size = 0;
+            if(blockSize > tcpSocket->bytesAvailable())
+                size = tcpSocket->bytesAvailable();
+            else
+                size = blockSize;
+            char throwaway[size+1];
+            in.readRawData(throwaway, size);
+            return;
+        }
+
+        in >> blockSize;
+
+        if (tcpSocket->bytesAvailable() < blockSize)
+        {
+            cout << "Blocksize not met" << endl;
+            int size = 0;
+            if(blockSize > tcpSocket->bytesAvailable())
+                size = tcpSocket->bytesAvailable();
+            else
+                size = blockSize;
+            char throwaway[size+1];
+            in.readRawData(throwaway, size);
+            return;
+        }
+
+        QString message; //message length is done by QDataStream automatically. Serializing ftw?
+        in >> message;
+
+        emit newData(message.toUtf8(), this);
+    }
+
 }
 
 void nConnection::disconnectedSlot()
