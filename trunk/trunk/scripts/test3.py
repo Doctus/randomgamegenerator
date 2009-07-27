@@ -1,5 +1,5 @@
-import time, random
-import _bmainmod, rggNameGen, rggDice, rggMap, rggTile, rggPog, random
+import time, random, os, base64
+import _bmainmod, rggNameGen, rggDice, rggMap, rggTile, rggPog
 from PyQt4 import QtCore
 
 random.seed()
@@ -192,14 +192,35 @@ def newNetEvent(st, handle):
                                         " has left the game" + '</b>')
             elif st[0] == 'n': #Map file
                 print st
+                mapdat = unicode(st).split()
+                if not os.path.exists(mapdat[mapdat.index('t!')+1]):
+                    c.sendNetMessageToHandle('I! ' + mapdat[mapdat.index('t!')+1], handle)
                 newMap = rggMap.Map()
-                newMap.loadFromString(unicode(st).split())
+                newMap.loadFromString(mapdat)
                 Maps.append(newMap)
                 for pog in Maps[currentMap[0]].Pogs:
                     pog.hide()
                 currentMap[0] = Maps.index(newMap)
                 for pog in Maps[currentMap[0]].Pogs:
                     pog.show()
+                for neededImage in Maps[currentMap[0]].checkPogImages:
+                    c.sendNetMessageToHandle('I! ' + neededImage, handle)
+            elif st[0] == 'i': #Image file
+                words = unicode(st).split()
+                imgpath = words[1]
+                img = base64.b64decode(words[2])
+                f = open(imgpath, 'wb')
+                f.write(img)
+                f.close()
+                for mappe in Maps:
+                    mappe.reloadTiles()
+            elif st[0] == 'I': #Image request
+                words = unicode(st).split()
+                imgpath = words[1]
+                f = open(imgpath, 'rb')
+                imgdat = f.read()
+                f.close()
+                c.sendNetMessageToHandle("i! " + imgpath + " " + imgdat, handle)
             else:
                 print 'Malformed or unrecognised data received.'
         else:
