@@ -132,6 +132,25 @@ class Map:
     f.close()
     self.loadFromString(tmp)
 
+  def reloadTiles(self, includePogs=True):
+    for x in range(0, self.mapsize[0]):
+      self.tiles.append([])
+      for y in range(0, self.mapsize[1]):
+        self.tiles[x].append(rggTile.tile(x*self.tilesize[0], y*self.tilesize[1],
+                                          self.tilesize[0], self.tilesize[1],
+                                          self.tileindexes[x+(y*self.mapsize[0])],
+                                          0,
+                                          self.tileset))
+    if includePogs:
+      for pog in self.Pogs:
+        pog.reloadTile()
+
+  def checkPogImages(self):
+    uniqueImages = set()
+    for pog in self.Pogs:
+      uniqueImages.add(pog.src)
+    return uniqueImages
+
   def hide(self):
     self.tiles = []
 

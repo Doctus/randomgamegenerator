@@ -61,6 +61,10 @@ class Pog:
         self.tile = rggTile.tile(self.x, self.y, self.w, self.h, 0, self.layer, self.src)
         self.hidden = False
 
+    def reloadTile(self):
+        if not self.hidden:
+            self.show()
+
     def deriveStringForm(self):
         self.tmp = [str(self.ID), str(self.x), str(self.y), str(self.w), str(self.h),
                              str(self.layer), str(self.src)]
