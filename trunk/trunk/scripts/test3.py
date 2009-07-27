@@ -230,6 +230,9 @@ def newNetEvent(st, handle):
 
 def newConnection(handle):
     c.insertChatMessage("<b>" + handle + " has joined" + "</b>")
+    if not c.isServer():
+        global Maps
+        Maps = []
     if c.isServer():
         for mappe in Maps:
             mappe.updateStringForm()
