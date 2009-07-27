@@ -79,36 +79,23 @@ void nConnection::readData()
     }*/
 
     QDataStream in(tcpSocket);
-    quint16 blockSize;
+    static quint16 blockSize;
     in.setVersion(QDataStream::Qt_4_5);
 
     while(!in.atEnd())
     {
-        if (tcpSocket->bytesAvailable() < (int)sizeof(quint16))
+        if (blockSize == 0 && tcpSocket->bytesAvailable() < (int)sizeof(quint16))
         {
             cout << "No size sent?" << endl;
-            int size = 0;
-            if(blockSize > tcpSocket->bytesAvailable())
-                size = tcpSocket->bytesAvailable();
-            else
-                size = blockSize;
-            char throwaway[size+1];
-            in.readRawData(throwaway, size);
             return;
         }
 
-        in >> blockSize;
+        if(blockSize == 0)
+            in >> blockSize;
 
         if (tcpSocket->bytesAvailable() < blockSize)
         {
             cout << "Blocksize not met" << endl;
-            int size = 0;
-            if(blockSize > tcpSocket->bytesAvailable())
-                size = tcpSocket->bytesAvailable();
-            else
-                size = blockSize;
-            char throwaway[size+1];
-            in.readRawData(throwaway, size);
             return;
         }
 
@@ -116,6 +103,7 @@ void nConnection::readData()
         in >> message;
 
         emit newData(message.toUtf8(), this);
+        blockSize = 0;
     }
 
 }

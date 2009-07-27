@@ -203,7 +203,7 @@ def newNetEvent(st, handle):
                 currentMap[0] = Maps.index(newMap)
                 for pog in Maps[currentMap[0]].Pogs:
                     pog.show()
-                for neededImage in Maps[currentMap[0]].checkPogImages:
+                for neededImage in Maps[currentMap[0]].checkPogImages():
                     c.sendNetMessageToHandle('I! ' + neededImage, handle)
             elif st[0] == 'i': #Image file
                 words = unicode(st).split()
