@@ -218,7 +218,7 @@ def newNetEvent(st, handle):
                 words = unicode(st).split()
                 imgpath = words[1]
                 f = open(imgpath, 'rb')
-                imgdat = f.read()
+                imgdat = base64.b64encode(f.read())
                 f.close()
                 c.sendNetMessageToHandle("i! " + imgpath + " " + imgdat, handle)
             else:
