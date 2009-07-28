@@ -20,6 +20,9 @@ def _linkedName(inp):
 def newEvent(st):
     if (len(st) <= 0) or ('title=' in st):
         return
+    if ('<' in st and '>' not in st) or ('<' in st and '>' in st and '<' in str(st)[str(st).rfind('>'):]):
+        c.insertChatMessage("Please type &#38;#60; if you wish to include &#60; in your message.")
+        return
     if st[0] == '/':
         words = unicode(st).split()
         if words[0].lower() == '/cam':
