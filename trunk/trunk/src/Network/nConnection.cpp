@@ -86,7 +86,7 @@ void nConnection::readData()
     {
         if (blockSize == 0 && tcpSocket->bytesAvailable() < (int)sizeof(quint16))
         {
-            cout << "No size sent?" << endl;
+            //cout << "No size sent?" << endl;
             return;
         }
 
@@ -95,7 +95,7 @@ void nConnection::readData()
 
         if (tcpSocket->bytesAvailable() < blockSize)
         {
-            cout << "Blocksize not met" << endl;
+            //cout << "Blocksize not met" << endl;
             return;
         }
 

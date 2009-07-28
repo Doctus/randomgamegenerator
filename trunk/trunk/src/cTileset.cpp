@@ -72,12 +72,6 @@ int cTileset::getHighestTile()
 }
 
 
-string cTileset::getFilename()
-{
-    return filename;
-}
-
-
 GLuint cTileset::getTextureId(int tile)
 {
     return textureIds[tile];
@@ -86,6 +80,22 @@ GLuint cTileset::getTextureId(int tile)
 GLuint cTileset::getTextureId(int x, int y)
 {
     return textureIds[(image->height()/tileHeight)*(y/tileHeight)  +  (x/tileWidth)];
+}
+
+
+string cTileset::getFilename()
+{
+    return filename;
+}
+
+
+void cTileset::reload()
+{
+    if(image->isNull()) //do we even want to reload the image if it's non-null?
+    {
+        delete image;
+        loadImage();
+    }
 }
 
 

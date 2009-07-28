@@ -56,6 +56,8 @@ class cTilesetManager
     bool changeTileOfImage(bImage *img, int tile);
     void changeLayerOfImage(bImage *img, int oldLayer, int newLayer);
 
+    void changeImage(QString oldFilename, QString newFilename);
+
     vector< vector<bImage*> > getImages();
 
     private:

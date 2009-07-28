@@ -60,6 +60,8 @@ class bMain : public QObject
     int getCamW();
     int getCamH();
 
+    void changeImage(QString oldFilename, QString newFilename);
+
     private slots:
     void chatInputTrigger(QString msg);
     void netMessageTrigger(QString msg, QString handle);

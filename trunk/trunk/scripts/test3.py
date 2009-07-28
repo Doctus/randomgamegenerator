@@ -212,6 +212,7 @@ def newNetEvent(st, handle):
                 f = open(imgpath, 'wb')
                 f.write(img)
                 f.close()
+                c.changeImage(unicode(imgpath), unicode(imgpath))
                 for mappe in Maps:
                     mappe.reloadTiles()
             elif st[0] == 'I': #Image request

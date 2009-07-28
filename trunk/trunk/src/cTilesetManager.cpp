@@ -136,6 +136,19 @@ void cTilesetManager::changeLayerOfImage(bImage *img, int oldLayer, int newLayer
     images[newLayer].push_back(img);
 }
 
+void cTilesetManager::changeImage(QString oldFilename, QString newFilename)
+{
+    cTileset *set = findTileset(oldFilename.toStdString()); //This needs to be changed everywhere, to accomodate for UTF-8 T_T?
+
+    if(set != NULL)
+    {
+        if(oldFilename == newFilename)
+            set->reload();
+        //else
+            //set->changeImage(filename);
+    }
+}
+
 vector< vector<bImage*> > cTilesetManager::getImages()
 {
     return images;

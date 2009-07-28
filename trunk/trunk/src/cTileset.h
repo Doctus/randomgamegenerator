@@ -60,6 +60,9 @@ class cTileset
 
     string getFilename();
 
+    void reload();
+    //void changeImage(QString filename);
+
     private:
     void loadImage();
 };

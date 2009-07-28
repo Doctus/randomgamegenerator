@@ -53,6 +53,8 @@ public:
     int getCamW();
     int getCamH();
 
+    void changeImage(QString oldFilename, QString newFilename);
+
 signals:
     void newNetMessageSignal(QString str, QString handle);
     void newChatInputSignal(QString str);
