@@ -236,6 +236,35 @@ GLuint wGLWidget::createTexture(QImage *image)
     return texture;
 }
 
+void wGLWidget::redrawTexture(QImage *image, GLuint texture)
+{
+    GLenum error;
+
+    QImage img = QGLWidget::convertToGLFormat(*image);
+
+    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture);
+
+    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, img.width(), img.height(), 0,
+                 GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
+
+    if((error = glGetError()) != GL_NO_ERROR)
+    {
+        glDeleteTextures(1, &texture);
+
+        QMessageBox lol((QWidget*)parent());
+        lol.setDetailedText("OpenGL Error: " + QString::fromStdString(translateGLError(error)) +
+                            "\r\n\r\n" + "Please contact the author with this message.");
+        lol.exec();
+
+        throw "GL error"; //replace with an inherited exception.
+    }
+
+    return;
+}
+
 void wGLWidget::deleteTexture(GLuint texture)
 {
     glDeleteTextures(1, &texture);

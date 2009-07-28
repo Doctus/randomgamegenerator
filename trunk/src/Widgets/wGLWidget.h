@@ -62,6 +62,7 @@ class wGLWidget : public QGLWidget
     void resizeGL(int w, int h);
 
     GLuint createTexture(QImage *image);
+    void redrawTexture(QImage *image, GLuint texture);
     void deleteTexture(GLuint texture);
 
     void setSelectedIcon(IconType::IconEnum selected);

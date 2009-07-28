@@ -197,6 +197,12 @@ int bMain::getCamH()
 }
 
 
+void bMain::changeImage(QString oldFilename, QString newFilename)
+{
+    mainGame->mTilesetManager->changeImage(oldFilename, newFilename);
+}
+
+
 void bMain::chatInputTrigger(QString msg)
 {
     emit newChatInputSignal(msg);

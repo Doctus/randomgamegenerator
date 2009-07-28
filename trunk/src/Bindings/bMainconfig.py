@@ -5,7 +5,7 @@ import pyqtconfig
 # the final configuration module.
 _pkg_config = {
     'bmain_sip_dir':    '/usr/share/sip',
-    'bmain_sip_flags':  '-x VendorID -t WS_X11 -x PyQt_NoPrintRangeBug -t Qt_4_4_1 -g'
+    'bmain_sip_flags':  '-x VendorID -t WS_X11 -x PyQt_NoPrintRangeBug -t Qt_4_5_0 -x Py_v3 -g'
 }
 
 _default_macros = None
