@@ -86,6 +86,8 @@ def newEvent(st):
                     argCompilation[3] = 4
                 if parse.find("awesome") != -1 or parse.find("hotblood") != -1 or parse.find("cool") != -1:
                     argCompilation[4] = True
+                if parse.find("exalted") != -1:
+                    argCompilation[3] = random.choice([4, 7, 8, 10, 11, 12, 15])
                 c.insertChatMessage(rggNameGen.getTechniqueName(argCompilation[0], argCompilation[1], argCompilation[2],
                                                                 argCompilation[3], argCompilation[4]))
         elif words[0].lower() == '/roll':

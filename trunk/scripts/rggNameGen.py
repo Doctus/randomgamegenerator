@@ -150,11 +150,15 @@ def getTechniqueName(typ='rand', elemnt='rand', moral='rand',
   typindex = {'martial':martialnoun,
               'magic':magicnoun,
               'rand':random.choice([martialnoun, magicnoun])}
-  impressiveAdjectives = ['invulnerable', 'invincible', 'forgotten',
-                          'forbidden', 'extraordinary', 'kaleidoscopic',
-                          'vaulting', 'unrivalled', 'thousand', 'unlimited']
-  impressiveAuxNouns = ['gods', 'star', 'blade']
-  impressiveNouns = ['progression', 'barrage', 'works']
+  impressiveAdjectives = ['invulnerable', 'invincible', 'forgotten', 'ancient',
+                          'forbidden', 'extraordinary', 'kaleidoscopic', 'first',
+                          'vaulting', 'unrivalled', 'unlimited', 'endless',
+                          'cascading', 'spotless', 'secret', 'sorrowful', 'ashen',
+                          'forsaken']
+  impressiveAuxNouns = ['gods', 'star', 'blade', 'ultimatum', 'emperor', 'sorrow',
+                        'tears', 'destiny', 'silence', 'void', 'lion']
+  impressiveNouns = ['progression', 'barrage', 'works', 'cascade', 'anathema',
+                     'apocalypse']
   if complexity <= 2:
     result = " ".join([random.choice(elindex[elemnt][0][random.choice(morality)]).capitalize(),
                       random.choice([random.choice(elindex[elemnt][1][random.choice(morality)]),
@@ -182,7 +186,7 @@ def getTechniqueName(typ='rand', elemnt='rand', moral='rand',
                            random.choice(elindex[elemnt][0][random.choice(morality)]).capitalize(),
                             random.choice([random.choice(elindex[elemnt][1][random.choice(morality)]),
                                       random.choice(typindex[typ])]).capitalize()])
-  elif complexity >= 4:
+  elif complexity == 4 or (complexity >= 5 and not hotblood):
     if hotblood:
       if random.choice([True, False]):
         result = " ".join([random.choice(elindex[elemnt][0][random.choice(morality)]+impressiveAdjectives).capitalize(),
@@ -209,6 +213,9 @@ def getTechniqueName(typ='rand', elemnt='rand', moral='rand',
                            random.choice(elindex[elemnt][0][random.choice(morality)]).capitalize(),
                             random.choice(elindex[elemnt][1][random.choice(morality)]).capitalize(),
                             random.choice(typindex[typ]).capitalize()])
+  elif complexity >= 5:
+    result = random.choice([", ", " - ", " of the "]).join([getTechniqueName(typ, elemnt, moral, complexity-4, True),
+                                                            getTechniqueName(typ, elemnt, moral, 4, True)])
   if typ == 'magic' or (typ == 'rand' and typindex['rand'] == magicnoun):
     if random.choice([True, False, False]):
       result = (random.choice([_getJapaneseSurname(), _getDwarvenMaleName()]) + "'s ") + result
