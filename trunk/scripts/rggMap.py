@@ -132,7 +132,7 @@ class Map:
     f.close()
     self.loadFromString(tmp)
 
-  def reloadTiles(self, includePogs=True):
+  def reloadTiles(self, imgpath, includePogs=True):
     for x in range(0, self.mapsize[0]):
       self.tiles.append([])
       for y in range(0, self.mapsize[1]):
@@ -143,7 +143,7 @@ class Map:
                                           self.tileset))
     if includePogs:
       for pog in self.Pogs:
-        pog.reloadTile()
+        pog.reloadTile(imgpath)
 
   def checkPogImages(self):
     uniqueImages = set()
