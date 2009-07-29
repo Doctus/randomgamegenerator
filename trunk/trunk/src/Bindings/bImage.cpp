@@ -33,11 +33,14 @@ bImage::bImage(int x, int y, int w, int h, int tile, int layer, QString filename
         cout << "ERROR! ERROR!" << endl << "ERROR! ERROR!" << endl << "ERROR! ERROR!" << endl;
 
     bMain::getGameInstance()->mTilesetManager->addImage(this, layer);
+
+    //cout << "created image " << id << ":" << filename.toStdString() << endl;
 }
 
 bImage::~bImage()
 {
     bMain::getGameInstance()->mTilesetManager->removeImage(this, layer);
+    //cout << "removed image " << id << ":" << filename.toStdString() << endl;
 }
 
 int bImage::getId()

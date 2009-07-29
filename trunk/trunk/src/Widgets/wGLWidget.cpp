@@ -218,7 +218,7 @@ GLuint wGLWidget::createTexture(QImage *image)
     glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, img.width(), img.height(), 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
 
-
+    //cout << "Generated texture number: " << texture << endl;
 
     if((error = glGetError()) != GL_NO_ERROR)
     {

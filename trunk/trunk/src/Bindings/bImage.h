@@ -22,7 +22,7 @@ class bImage
 
     public:
     bImage(int x, int y, int w, int h, int tile, int layer, QString filename);
-    virtual ~bImage();
+    ~bImage();
 
     int getId();
     int getX();

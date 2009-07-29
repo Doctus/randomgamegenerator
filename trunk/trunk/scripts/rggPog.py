@@ -61,8 +61,8 @@ class Pog:
         self.tile = rggTile.tile(self.x, self.y, self.w, self.h, 0, self.layer, self.src)
         self.hidden = False
 
-    def reloadTile(self):
-        if not self.hidden:
+    def reloadTile(self, srcfile):
+        if not self.hidden and self.src == srcfile:
             self.show()
 
     def deriveStringForm(self):

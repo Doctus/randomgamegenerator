@@ -212,12 +212,12 @@ def newNetEvent(st, handle):
                 words = unicode(st).split()
                 imgpath = words[1]
                 img = base64.b64decode(words[2])
-                f = open(imgpath, 'wb')
+                f = open(unicode(imgpath), 'wb')
                 f.write(img)
                 f.close()
                 c.changeImage(unicode(imgpath), unicode(imgpath))
                 for mappe in Maps:
-                    mappe.reloadTiles()
+                    mappe.reloadTiles(unicode(imgpath))
             elif st[0] == 'I': #Image request
                 words = unicode(st).split()
                 imgpath = words[1]
