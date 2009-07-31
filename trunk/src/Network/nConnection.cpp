@@ -38,7 +38,8 @@ void nConnection::sendData(QString data)
      QDataStream out(&block, QIODevice::ReadWrite);
      out.setVersion(QDataStream::Qt_4_5);
      out << (quint16)0;
-     out << qCompress(data.toUtf8(), 9);
+     //out << qCompress(data.toUtf8(), 9);
+     out << data;
      out.device()->seek(0);
      out << (quint16)(block.size() - sizeof(quint16));
     if((bytesSent = tcpSocket->write(block)) != block.length())
@@ -99,11 +100,14 @@ void nConnection::readData()
             return;
         }
 
-        QByteArray message; //message length is done by QDataStream automatically. Serializing ftw?
+        /*QByteArray message; //message length is done by QDataStream automatically. Serializing ftw?
         in >> message;
-        message = qUncompress(message);
+        message = qUncompress(message);*/
 
-        emit newData(message, this);
+        QString message;
+        in >> message;
+
+        emit newData(message.toUtf8(), this);
         blockSize = 0;
     }
 
