@@ -1,0 +1,18 @@
+#summary A list of things that should be added and/or have been put off due to laziness.
+
+= General =
+  * ~~Something that's already been done.~~
+  * Clean up some things that don't allow spaces so that they do.
+
+= Network =
+  * Fix large image transfer somehow.
+
+= Interface =
+  * Some sort of pallete for pog placement.
+  * Multiple selection of pogs.
+  * Better tooltips.
+
+= Graphics =
+  * Some default tilesets would be nice.
+  * Some default pogs would be nice.
+  * Animated tiles.
