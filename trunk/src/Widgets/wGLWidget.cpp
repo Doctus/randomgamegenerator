@@ -38,12 +38,14 @@ wGLWidget::wGLWidget(QWidget* parent, cGame *mGame) : QGLWidget(QGLFormat(QGL::F
     cam = new cCamera(0, 0, 640, 480);
     ctrlHeld = false;
     shiftHeld = false;
+    mouseButtonHeld = false;
     zoom = 1;
 
     resize(parent->width(), parent->height());
 
     setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     setFocusPolicy(Qt::StrongFocus);
+    setMouseTracking(true);
 
     //OpenGL is initialized here, instead of somewhere inside Qt4, otherwise it Segfaults due to doing stuff prior to OpenGL being initialized. Or something.
     glInit();
@@ -279,9 +281,11 @@ void wGLWidget::setSelectedIcon(IconType::IconEnum selected)
 
 void wGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    if(selectedIcon == IconType::select)
+    if(selectedIcon == IconType::select && mouseButtonHeld)
+        emit mouseDragSignal(event->pos().x() * (1/zoom), event->pos().y() * (1/zoom));
+    else if(selectedIcon == IconType::select)
         emit mouseMoveSignal(event->pos().x() * (1/zoom), event->pos().y() * (1/zoom));
-    else
+    else if(mouseButtonHeld)
     {
         cam->adjustCam((lastx - event->pos().x()) * (1/zoom), (lasty - event->pos().y()) * (1/zoom));
         lastx = event->pos().x();
@@ -295,6 +299,7 @@ void wGLWidget::mousePressEvent(QMouseEvent *event)
 {
     lastx = event->pos().x();
     lasty = event->pos().y();
+    mouseButtonHeld = true;
 
     if(selectedIcon == IconType::select)
     {
@@ -327,6 +332,8 @@ void wGLWidget::mousePressEvent(QMouseEvent *event)
 
 void wGLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
+    mouseButtonHeld = false;
+
     if(selectedIcon == IconType::select)
     {
         int type = 0;

@@ -46,6 +46,8 @@ public:
 
     int displayUserDialogChoice(QString text, QVector<QString> buttonTexts, int defaultButton = 0);
     int showPopupMenuAt(int x, int y, QVector<QString> actionTexts);
+    void displayTooltip(QString text, int x, int y);
+    //void removeTooltip(int id);
     QString getUserTextInput(QString question);
 
     int getCamX();
