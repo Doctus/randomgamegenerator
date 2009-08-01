@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <QtGui/QImage>
 #include <QtCore/QRect>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QToolTip>
 
 #include <iostream>
 
@@ -50,7 +51,7 @@ class wGLWidget : public QGLWidget
     float zoom;
     bool shiftHeld, ctrlHeld;
     bool mouseButtonHeld;
-    QVector<QTooltip*> tooltips;
+    //QVector<QTooltip*> tooltips;
 
     friend class bMain;
 
