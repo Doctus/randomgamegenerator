@@ -16,3 +16,10 @@
   * Some default tilesets would be nice.
   * Some default pogs would be nice.
   * Animated tiles.
+
+= Generators =
+  * Add more name generators.
+  * Techniquename generator should produce much cooler content.
+  * Pog generator.
+  * Quest/Story generator.
+  * Character generator.
