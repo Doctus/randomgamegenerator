@@ -185,7 +185,9 @@ def newNetEvent(st, handle):
                     if Maps[currentMap[0]].pogsByID.has_key(int(words[2])):
                         Maps[currentMap[0]].pogsByID[int(words[2])].name = " ".join(words[3:])
                 elif words[1] == 'c': #Pog creation
-                    Maps[currentMap[0]].addPog(rggPog.Pog(1, int(words[2]), int(words[3]), int(words[4]), int(words[5]), 1, "".join(words[6:])))
+                    Maps[currentMap[0]].addPog(rggPog.Pog(1, int(words[2]), int(words[3]), int(words[4]), int(words[5]), 1, " ".join(words[6:])))
+                    if not os.path.exists(" ".join(words[6:])):
+                        c.sendNetMessageToHandle('I! ' + " ".join(words[6:]), handle)
                 if c.isServer():
                     c.sendNetMessageToAllButOne(st, handle)
             elif st[0] == 'r': #Die roll
