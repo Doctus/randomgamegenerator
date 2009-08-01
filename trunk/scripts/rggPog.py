@@ -65,6 +65,16 @@ class Pog:
         if not self.hidden and self.src == srcfile:
             self.show()
 
+    def getPrintableAttributes(self):
+        self.atttmp = []
+        if self.name is not None: self.atttmp.append(unicode(self.name))
+        if self.atttmp is not []:
+            return " ".join(self.atttmp)
+        return None
+
+    def getOverheadTooltipLoc(self):
+        return [self.x, self.y-20]
+
     def deriveStringForm(self):
         self.tmp = [str(self.ID), str(self.x), str(self.y), str(self.w), str(self.h),
                              str(self.layer), str(self.src)]

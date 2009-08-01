@@ -8,7 +8,7 @@ c = _bmainmod.bMain()
 Maps = []
 #Maps[0].loadFromString("n! Default Map !n a! Anonymous !a m! 10 10 t! ./data/town.png s! 32 32 1~20 2~20 3~20".split())
 currentMap = [0]
-manipulatedPogs = [None, None]
+manipulatedPogs = [None, None, None]
 lastMouseLoc = [0, 0]
 
 #for i in range(0, 50):
@@ -285,12 +285,24 @@ def mouseDrag(x, y):
     lastMouseLoc[1] = y
 
 def mouseMove(x, y):
-    print 'MOUSEMOVE'
+    #print 'MOUSEMOVE'
     if len(Maps) <= 0:
          return
+    tooltipPogTemp = None
     for pog in Maps[currentMap[0]].Pogs:
         if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
-            c.displayTooltip(str(pog.ID), x+c.getCamX(), y+c.getCamY())
+            if tooltipPogTemp == None:
+                tooltipPogTemp = pog
+            elif pog.layer > tooltipPogTemp.layer:
+                tooltipPogTemp = pog
+    if manipulatedPogs[2] == tooltipPogTemp:
+        #print "same"
+        return
+    manipulatedPogs[2] = tooltipPogTemp
+    if manipulatedPogs[2] is not None:
+        if manipulatedPogs[2].getPrintableAttributes() is not None:
+            displayLoc = manipulatedPogs[2].getOverheadTooltipLoc()
+            c.displayTooltip(manipulatedPogs[2].getPrintableAttributes(), displayLoc[0]-c.getCamX(), displayLoc[1]-c.getCamY())
 
 def mouseRelease(x, y, t):
     manipulatedPogs[0] = None
@@ -317,7 +329,7 @@ def mousePress(x, y, t):
         if manipulatedPogs[1] != None:
             selected = c.showPopupMenuAt(x, y, ["Set name"])
             if selected == 0:
-                pog.name = c.getUserTextInput("Enter a name for this pog.")
+                manipulatedPogs[1].name = c.getUserTextInput("Enter a name for this pog.")
     
 QtCore.QObject.connect(c, QtCore.SIGNAL("newNetMessageSignal(QString, QString)"), newNetEvent)
 QtCore.QObject.connect(c, QtCore.SIGNAL("connectedSignal(QString)"), newConnection)
