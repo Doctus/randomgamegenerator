@@ -177,13 +177,15 @@ def newNetEvent(st, handle):
                                              " ".join(words[2:]), words[1])
             elif st[0] == 'p': #Pog edit
                 words = unicode(st).split()
-                print words
+                #print words
                 if words[1] == 'm': #Pog movement
                     if Maps[currentMap[0]].pogsByID.has_key(int(words[2])):
                         Maps[currentMap[0]].pogsByID[int(words[2])].absoluteMove(int(words[3]), int(words[4]))
                 elif words[1] == 'n': #Pog naming
                     if Maps[currentMap[0]].pogsByID.has_key(int(words[2])):
                         Maps[currentMap[0]].pogsByID[int(words[2])].name = " ".join(words[3:])
+                elif words[1] == 'c': #Pog creation
+                    Maps[currentMap[0]].addPog(rggPog.Pog(1, int(words[2]), int(words[3]), int(words[4]), int(words[5]), 1, "".join(words[6:])))
                 if c.isServer():
                     c.sendNetMessageToAllButOne(st, handle)
             elif st[0] == 'r': #Die roll
@@ -199,7 +201,7 @@ def newNetEvent(st, handle):
                     c.insertChatMessage('<b>' + " ".join(words[2:]) +
                                         " has left the game" + '</b>')
             elif st[0] == 'n': #Map file
-                print st
+                #print st
                 mapdat = unicode(st).split()
                 if not os.path.exists(mapdat[mapdat.index('t!')+1]):
                     c.sendNetMessageToHandle('I! ' + mapdat[mapdat.index('t!')+1], handle)
@@ -233,11 +235,11 @@ def newNetEvent(st, handle):
                 f.close()
                 c.sendNetMessageToHandle("i! " + imgpath + " " + imgdat, handle)
             else:
-                print 'Malformed or unrecognised data received.'
+                print 'Malformed or unrecognised data received: ' + unicode(st)
         else:
-            print 'Malformed data received.'
+            print 'Malformed data received: ' + unicode(st)
     else:
-        print 'Badly malformed data received.'
+        print 'Badly malformed data received: ' + unicode(st)
 
 def newConnection(handle):
     c.insertChatMessage("<b>" + handle + " has joined" + "</b>")
@@ -259,8 +261,8 @@ def loadMap(filename):
     f = open(filename, 'r')
     tmp = f.read().split()
     f.close()
-    print 'filename: ' + str(filename)
-    print 'map: ' + str(tmp)
+    #print 'filename: ' + str(filename)
+    #print 'map: ' + str(tmp)
     newMap = rggMap.Map()
     newMap.loadFromString(tmp)
     Maps.append(newMap)
@@ -281,7 +283,7 @@ def saveMap(filename):
     f.close()
 
 def mouseDrag(x, y):
-    print 'MOUSEDRAG'
+    #print 'MOUSEDRAG'
     if manipulatedPogs[0] != None:
         manipulatedPogs[0].relativeMove(x-lastMouseLoc[0], y-lastMouseLoc[1])
         c.sendNetMessageToAll('p! m ' + str(manipulatedPogs[0].ID) + ' ' + str(manipulatedPogs[0].x) + ' '
@@ -314,7 +316,7 @@ def mouseRelease(x, y, t):
     manipulatedPogs[1] = None
 
 def mousePress(x, y, t):
-    print 'mouse press event ' + str(t) + ' at (' + str(x) + ', ' + str(y) + ')'
+    #print 'mouse press event ' + str(t) + ' at (' + str(x) + ', ' + str(y) + ')'
     lastMouseLoc[0] = x
     lastMouseLoc[1] = y
     if t == 0:
@@ -336,6 +338,15 @@ def mousePress(x, y, t):
             if selected == 0:
                 manipulatedPogs[1].name = c.getUserTextInput("Enter a name for this pog.")
                 c.sendNetMessageToAll('p! n ' + str(manipulatedPogs[1].ID) + ' ' + unicode(manipulatedPogs[1].name))
+        else:
+            selected = c.showPopupMenuAt(x, y, ["Create Pog (Temp Command)"])
+            if selected == 0:
+                pogsrc = unicode(c.getUserTextInput("What is the path to the pog image?"))
+                pogsizeraw = unicode(c.getUserTextInput("Image height/width separated by space (e.g. '16 32')"))
+                pogsizeW = int(pogsizeraw.split()[0])
+                pogsizeH = int(pogsizeraw.split()[1])
+                Maps[currentMap[0]].addPog(rggPog.Pog(1, x, y, pogsizeW, pogsizeH, 1, pogsrc))
+                c.sendNetMessageToAll('p! c ' + " ".join([str(x), str(y), str(pogsizeW), str(pogsizeH), pogsrc]))
     
 QtCore.QObject.connect(c, QtCore.SIGNAL("newNetMessageSignal(QString, QString)"), newNetEvent)
 QtCore.QObject.connect(c, QtCore.SIGNAL("connectedSignal(QString)"), newConnection)
