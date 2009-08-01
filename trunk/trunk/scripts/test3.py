@@ -275,13 +275,22 @@ def saveMap(filename):
     f.write(Maps[currentMap[0]].stringform)
     f.close()
 
-def mouseMove(x, y):
+def mouseDrag(x, y):
+    print 'MOUSEDRAG'
     if manipulatedPogs[0] != None:
         manipulatedPogs[0].relativeMove(x-lastMouseLoc[0], y-lastMouseLoc[1])
         c.sendNetMessageToAll('p! m ' + str(manipulatedPogs[0].ID) + ' ' + str(manipulatedPogs[0].x) + ' '
                                       + str(manipulatedPogs[0].y))
     lastMouseLoc[0] = x
     lastMouseLoc[1] = y
+
+def mouseMove(x, y):
+    print 'MOUSEMOVE'
+    if len(Maps) <= 0:
+         return
+    for pog in Maps[currentMap[0]].Pogs:
+        if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
+            c.displayTooltip(str(pog.ID), x+c.getCamX(), y+c.getCamY())
 
 def mouseRelease(x, y, t):
     manipulatedPogs[0] = None
@@ -317,6 +326,7 @@ QtCore.QObject.connect(c, QtCore.SIGNAL("newChatInputSignal(QString)"), newEvent
 QtCore.QObject.connect(c, QtCore.SIGNAL("loadMapSignal(QString)"), loadMap)
 QtCore.QObject.connect(c, QtCore.SIGNAL("saveMapSignal(QString)"), saveMap)
 QtCore.QObject.connect(c, QtCore.SIGNAL("mouseMoveSignal(int, int)"), mouseMove)
+QtCore.QObject.connect(c, QtCore.SIGNAL("mouseDragSignal(int, int)"), mouseDrag)
 QtCore.QObject.connect(c, QtCore.SIGNAL("mousePressSignal(int, int, int)"), mousePress)
 QtCore.QObject.connect(c, QtCore.SIGNAL("mouseReleaseSignal(int, int, int)"), mouseRelease)
 

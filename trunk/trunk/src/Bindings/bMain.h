@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <QtGui/QApplication>
 #include <QtGui/QMainWindow>
 #include <QtCore/QObject>
+#include <QtGui/QToolTip>
 
 #include "../cGame.h"
 #include "../Widgets/wAction.h"
@@ -34,6 +35,7 @@ class bMain : public QObject
 
     private:
     static cGame *mainGame;
+    QVector<QToolTip*> tooltips;
 
     public:
     bMain();
@@ -53,6 +55,8 @@ class bMain : public QObject
 
     int displayUserDialogChoice(QString text, QVector<QString> buttonTexts, int defaultButton = 0);
     int showPopupMenuAt(int x, int y, QVector<QString> actionTexts);
+    void displayTooltip(QString text, int x, int y);
+    //void removeTooltip(int id);
     QString getUserTextInput(QString question);
 
     int getCamX();
@@ -73,6 +77,7 @@ class bMain : public QObject
     void saveMapTrigger(QString filename);
 
     void mouseMoveTrigger(int x, int y);
+    void mouseDragTrigger(int x, int y);
     void mousePressTrigger(int x, int y, int type);
     void mouseReleaseTrigger(int x, int y, int type);
 
@@ -87,6 +92,7 @@ class bMain : public QObject
     void saveMapSignal(QString filename);
 
     void mouseMoveSignal(int x, int y);
+    void mouseDragSignal(int x, int y);
     void mousePressSignal(int x, int y, int type);
     void mouseReleaseSignal(int x, int y, int type);
 };

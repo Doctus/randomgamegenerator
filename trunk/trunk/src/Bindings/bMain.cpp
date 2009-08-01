@@ -54,6 +54,7 @@ bMain::bMain()
     connect(mainGame->mGLWidget, SIGNAL(mouseReleaseSignal(int,int,int)), this, SLOT(mouseReleaseTrigger(int,int,int)));
     connect(mainGame->mGLWidget, SIGNAL(mousePressSignal(int,int,int)), this, SLOT(mousePressTrigger(int,int,int)));
     connect(mainGame->mGLWidget, SIGNAL(mouseMoveSignal(int,int)), this, SLOT(mouseMoveTrigger(int,int)));
+    connect(mainGame->mGLWidget, SIGNAL(mouseDragSignal(int,int)), this, SLOT(mouseDragTrigger(int,int)));
 }
 
 void bMain::start()
@@ -169,6 +170,16 @@ int bMain::showPopupMenuAt(int x, int y, QVector<QString> actionTexts)
     return selectedAction->getId();
 }
 
+void bMain::displayTooltip(QString text, int x, int y)
+{
+    QWidget *w = (QWidget*)mainGame->parent();
+    QToolTip::showText(QPoint(x+w->x()+mainGame->mGLWidget->x(), y+w->y()+mainGame->mGLWidget->y()), text, w);
+}
+
+/*void bMain::removeTooltip(int id)
+{
+}*/
+
 QString bMain::getUserTextInput(QString question)
 {
      QString text = QInputDialog::getText((QWidget*)mainGame->parent(), "Input", question);
@@ -236,6 +247,11 @@ void bMain::saveMapTrigger(QString filename)
 void bMain::mouseMoveTrigger(int x, int y)
 {
     emit mouseMoveSignal(x, y);
+}
+
+void bMain::mouseDragTrigger(int x, int y)
+{
+    emit mouseDragSignal(x, y);
 }
 
 void bMain::mousePressTrigger(int x, int y, int type)

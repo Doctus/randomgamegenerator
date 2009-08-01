@@ -49,6 +49,8 @@ class wGLWidget : public QGLWidget
     int lastx, lasty;
     float zoom;
     bool shiftHeld, ctrlHeld;
+    bool mouseButtonHeld;
+    QVector<QTooltip*> tooltips;
 
     friend class bMain;
 
@@ -80,6 +82,7 @@ class wGLWidget : public QGLWidget
     void leaveEvent(QEvent *event);
 
     signals:
+    void mouseDragSignal(int x, int y);
     void mouseMoveSignal(int x, int y);
     void mousePressSignal(int x, int y, int type);
     void mouseReleaseSignal(int x, int y, int type);
