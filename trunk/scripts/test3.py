@@ -181,6 +181,9 @@ def newNetEvent(st, handle):
                 if words[1] == 'm': #Pog movement
                     if Maps[currentMap[0]].pogsByID.has_key(int(words[2])):
                         Maps[currentMap[0]].pogsByID[int(words[2])].absoluteMove(int(words[3]), int(words[4]))
+                elif words[1] == 'n': #Pog naming
+                    if Maps[currentMap[0]].pogsByID.has_key(int(words[2])):
+                        Maps[currentMap[0]].pogsByID[int(words[2])].name = " ".join(words[3:])
                 if c.isServer():
                     c.sendNetMessageToAllButOne(st, handle)
             elif st[0] == 'r': #Die roll
@@ -210,6 +213,8 @@ def newNetEvent(st, handle):
                     pog.show()
                 for neededImage in Maps[currentMap[0]].checkPogImages():
                     c.sendNetMessageToHandle('I! ' + neededImage, handle)
+                if c.isServer():
+                    c.sendNetMessageToAllButOne(st, handle)
             elif st[0] == 'i': #Image file
                 words = unicode(st).split()
                 imgpath = words[1]
@@ -330,6 +335,7 @@ def mousePress(x, y, t):
             selected = c.showPopupMenuAt(x, y, ["Set name"])
             if selected == 0:
                 manipulatedPogs[1].name = c.getUserTextInput("Enter a name for this pog.")
+                c.sendNetMessageToAll('p! n ' + str(manipulatedPogs[1].ID) + ' ' + unicode(manipulatedPogs[1].name))
     
 QtCore.QObject.connect(c, QtCore.SIGNAL("newNetMessageSignal(QString, QString)"), newNetEvent)
 QtCore.QObject.connect(c, QtCore.SIGNAL("connectedSignal(QString)"), newConnection)
