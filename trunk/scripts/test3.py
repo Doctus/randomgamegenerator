@@ -10,6 +10,9 @@ Maps = []
 currentMap = [0]
 manipulatedPogs = [None, None, None]
 lastMouseLoc = [0, 0]
+global tilePasting
+global tilePastingIndex
+tilePasting = False
 
 #for i in range(0, 50):
 #    Maps[currentMap[0]].addPog(rggPog.Pog(i, 30+i, 30+i, 23, 46, random.randint(0, i), './data/yue.png'))
@@ -286,10 +289,15 @@ def saveMap(filename):
 
 def mouseDrag(x, y):
     #print 'MOUSEDRAG'
+    global tilePasting
     if manipulatedPogs[0] != None:
         manipulatedPogs[0].relativeMove(x-lastMouseLoc[0], y-lastMouseLoc[1])
         c.sendNetMessageToAll('p! m ' + str(manipulatedPogs[0].ID) + ' ' + str(manipulatedPogs[0].x) + ' '
                                       + str(manipulatedPogs[0].y))
+    elif tilePasting:
+        global tilePasting
+        global tilePastingIndex
+        Maps[currentMap[0]].debugSetTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], tilePastingIndex)
     lastMouseLoc[0] = x
     lastMouseLoc[1] = y
 
@@ -322,13 +330,20 @@ def mousePress(x, y, t):
     lastMouseLoc[0] = x
     lastMouseLoc[1] = y
     if t == 0:
-        for pog in Maps[currentMap[0]].Pogs:
-            if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
-                if manipulatedPogs[0] == None:
-                    manipulatedPogs[0] = pog
-                elif pog.layer > manipulatedPogs[0].layer:
-                    manipulatedPogs[0] = pog
+        global tilePasting
+        if tilePasting:
+            global tilePasting
+            global tilePastingIndex
+            Maps[currentMap[0]].debugSetTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], tilePastingIndex)
+        else:
+            for pog in Maps[currentMap[0]].Pogs:
+                if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
+                    if manipulatedPogs[0] == None:
+                        manipulatedPogs[0] = pog
+                    elif pog.layer > manipulatedPogs[0].layer:
+                        manipulatedPogs[0] = pog
     elif t == 2:
+        global tilePasting
         for pog in Maps[currentMap[0]].Pogs:
             if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
                 if manipulatedPogs[1] == None:
@@ -341,7 +356,11 @@ def mousePress(x, y, t):
                 manipulatedPogs[1].name = c.getUserTextInput("Enter a name for this pog.")
                 c.sendNetMessageToAll('p! n ' + str(manipulatedPogs[1].ID) + ' ' + unicode(manipulatedPogs[1].name))
         else:
-            selected = c.showPopupMenuAt(x, y, ["Create Pog (Temp Command)"])
+            global tilePasting
+            if tilePasting is False:
+                selected = c.showPopupMenuAt(x, y, ["Create Pog (Temp Command)", "Begin Tile Pasting (Temp Command)"])
+            else:
+                selected = c.showPopupMenuAt(x, y, ["Create Pog (Temp Command)", "Cease Tile Pasting (Temp Command)"])
             if selected == 0:
                 pogsrc = unicode(c.getUserTextInput("What is the path to the pog image?"))
                 pogsizeraw = unicode(c.getUserTextInput("Image height/width separated by space (e.g. '16 32')"))
@@ -349,7 +368,18 @@ def mousePress(x, y, t):
                 pogsizeH = int(pogsizeraw.split()[1])
                 Maps[currentMap[0]].addPog(rggPog.Pog(1, x, y, pogsizeW, pogsizeH, 1, pogsrc))
                 c.sendNetMessageToAll('p! c ' + " ".join([str(x), str(y), str(pogsizeW), str(pogsizeH), pogsrc]))
-    
+            elif selected == 1 and tilePasting is False:
+                global tilePasting
+                global tilePastingIndex
+                tilePasting = True
+                tilePastingIndex = Maps[currentMap[0]].debugGetTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]])
+            elif selected == 1:
+                global tilePasting
+                tilePasting = False
+    elif t ==1: #DEBUG STUFF
+        Maps[currentMap[0]].debugMorphTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]])
+
+
 QtCore.QObject.connect(c, QtCore.SIGNAL("newNetMessageSignal(QString, QString)"), newNetEvent)
 QtCore.QObject.connect(c, QtCore.SIGNAL("connectedSignal(QString)"), newConnection)
 QtCore.QObject.connect(c, QtCore.SIGNAL("disconnectedSignal(QString)"), disConnection)
