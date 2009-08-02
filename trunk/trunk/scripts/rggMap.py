@@ -117,12 +117,21 @@ class Map:
                                             self.Pogs)
 
   def debugMorphTile(self, coord):
-    #Note: this will NOT necessarily get propagated/saved/etc at the moment.
-    #      it's merely a debug function.
-    self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])] += 1
+    self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])] = (self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])] + 1)%12 #ZOMG HARDCODED
     self.tiles[coord[0]][coord[1]] = rggTile.tile(coord[0]*self.tilesize[0], coord[1]*self.tilesize[1],
                                           self.tilesize[0], self.tilesize[1],
-                                          self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])],
+                                          self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])], 0,
+                                          self.tileset)
+    self.updateStringForm()
+
+  def debugGetTile(self, coord):
+    return self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])]
+
+  def debugSetTile(self, coord, ind):
+    self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])] = ind
+    self.tiles[coord[0]][coord[1]] = rggTile.tile(coord[0]*self.tilesize[0], coord[1]*self.tilesize[1],
+                                          self.tilesize[0], self.tilesize[1],
+                                          self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])], 0,
                                           self.tileset)
     self.updateStringForm()
 
