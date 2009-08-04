@@ -1,4 +1,4 @@
-import time, random, os, base64
+import time, random, os, base64, gzip, StringIO
 import _bmainmod, rggNameGen, rggDice, rggMap, rggTile, rggPog
 from PyQt4 import QtCore
 
@@ -225,10 +225,14 @@ def newNetEvent(st, handle):
             elif st[0] == 'i': #Image file
                 words = unicode(st).split()
                 imgpath = words[1]
-                img = base64.b64decode(words[2])
+                strio = StringIO.StringIO()
+                strio.write( words[2] )
+                gz = gzip.GzipFile(None, 'r', 6, strio)
+                img = base64.b64decode(gz.read())
                 f = open(unicode(imgpath), 'wb')
                 f.write(img)
                 f.close()
+                strio.close()
                 c.changeImage(unicode(imgpath), unicode(imgpath))
                 for mappe in Maps:
                     mappe.reloadTiles(unicode(imgpath))
@@ -236,9 +240,13 @@ def newNetEvent(st, handle):
                 words = unicode(st).split()
                 imgpath = words[1]
                 f = open(imgpath, 'rb')
-                imgdat = base64.b64encode(f.read())
+                imgdat = StringIO.StringIO()
+                gz = gzip.GzipFile(None, 'w', 6, imgdat)
+                gz.write(base64.b64encode(f.read()))
+                #print 'sending imgdata: "' + imgdat.getvalue() + '"'
                 f.close()
-                c.sendNetMessageToHandle("i! " + imgpath + " " + imgdat, handle)
+                c.sendNetMessageToHandle("i! " + imgpath + " " + unicode(imgdat.getvalue()), handle)
+                imgdat.close()
             else:
                 print 'Malformed or unrecognised data received: ' + unicode(st)
         else:
