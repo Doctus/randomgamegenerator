@@ -213,6 +213,16 @@ void bMain::changeImage(QString oldFilename, QString newFilename)
     mainGame->mTilesetManager->changeImage(oldFilename, newFilename);
 }
 
+int bMain::getTileCountOfImage(QString filename)
+{
+    cTileset *set = mainGame->mTilesetManager->findTileset(filename);
+
+    if(set != NULL)
+        return set->getHighestTile();
+
+    return -1;
+}
+
 
 void bMain::chatInputTrigger(QString msg)
 {

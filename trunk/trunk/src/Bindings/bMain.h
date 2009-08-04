@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "../cGame.h"
 #include "../Widgets/wAction.h"
+#include "../cTileset.h"
 
 
 class bMain : public QObject
@@ -65,6 +66,7 @@ class bMain : public QObject
     int getCamH();
 
     void changeImage(QString oldFilename, QString newFilename);
+    int getTileCountOfImage(QString filename);
 
     private slots:
     void chatInputTrigger(QString msg);

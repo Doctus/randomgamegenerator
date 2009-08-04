@@ -44,6 +44,8 @@ void nConnection::sendData(QString data)
      out << (quint16)(block.size() - sizeof(quint16));
     if((bytesSent = tcpSocket->write(block)) != block.length())
         cout << "not all bytes were sent, " << bytesSent << " opposed to " << data.length() + sizeof(quint16) << endl;
+
+    //cout << "Sending \"" << QString::fromUtf8(block).toStdString() << "\"" << endl;
 }
 
 void nConnection::setHandle(QString handle)
@@ -107,7 +109,10 @@ void nConnection::readData()
         QString message;
         in >> message;
 
-        emit newData(message.toUtf8(), this);
+        //cout << "Received \"" << message.toStdString() << "\"" << endl;
+
+        if(!message.isEmpty() && !message.isNull())
+            emit newData(message.toUtf8(), this);
         blockSize = 0;
     }
 
