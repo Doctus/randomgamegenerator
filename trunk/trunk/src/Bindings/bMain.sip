@@ -56,6 +56,7 @@ public:
     int getCamH();
 
     void changeImage(QString oldFilename, QString newFilename);
+    int getTileCountOfImage(QString filename);
 
 signals:
     void newNetMessageSignal(QString str, QString handle);
