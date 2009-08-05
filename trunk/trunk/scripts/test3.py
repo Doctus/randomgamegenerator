@@ -371,7 +371,7 @@ def mousePress(x, y, t):
                     pogappendtemp[0] = pog
                 elif pog.layer > pogappendtemp[0].layer:
                     pogappendtemp[0] = pog
-        if pogappendtemp[0] is not None:
+        if pogappendtemp[0] is not None and pogappendtemp[0] not in manipulatedPogs[3]:
             manipulatedPogs[3].append(pogappendtemp[0])
     elif t == 1: #DEBUG STUFF
         Maps[currentMap[0]].debugMorphTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], c.getTileCountOfImage(Maps[currentMap[0]].tileset))
