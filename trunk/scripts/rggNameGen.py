@@ -1,6 +1,4 @@
 #rggNameGen - for the Random Game Generator project
-# v. 0.01  >> THIS IS MERELY A DEMONSTRATION INTENDED FOR
-#             FUTURE REFERENCE AND IS NOT FULLY FUNCTIONAL.
 #
 #By Doctus (kirikayuumura.noir@gmail.com)
 '''
@@ -88,7 +86,7 @@ def _getJapaneseFullName(g=False):
   if g: return (_getJapaneseSurname() + " " + _getJapaneseMaleName())
   return (_getJapaneseSurname() + " " + _getJapaneseFemaleName())
 
-def getTechniqueName(typ='rand', elemnt='rand', moral='rand',
+def _generateTechniqueName(typ='rand', elemnt='rand', moral='rand',
                       complexity=-1, hotblood=False):
   if complexity == -1:
     complexity = random.randrange(2, 5)
@@ -214,12 +212,52 @@ def getTechniqueName(typ='rand', elemnt='rand', moral='rand',
                             random.choice(elindex[elemnt][1][random.choice(morality)]).capitalize(),
                             random.choice(typindex[typ]).capitalize()])
   elif complexity >= 5:
-    result = random.choice([", ", " - ", " of the "]).join([getTechniqueName(typ, elemnt, moral, complexity-4, True),
-                                                            getTechniqueName(typ, elemnt, moral, 4, True)])
+    result = random.choice([", ", " - ", " of the "]).join([_generateTechniqueName(typ, elemnt, moral, complexity-4, True),
+                                                            _generateTechniqueName(typ, elemnt, moral, 4, True)])
   if typ == 'magic' or (typ == 'rand' and typindex['rand'] == magicnoun):
     if random.choice([True, False, False]):
       result = (random.choice([_getJapaneseSurname(), _getDwarvenMaleName()]) + "'s ") + result
   return result
+
+def getTechniqueName(st):
+  if st is "/techniquename" or st is "/techname":
+    return _generateTechniqueName()
+  argCompilation = ['rand', 'rand', 'rand', -1, False]
+  if st.find("martial") != -1:
+      argCompilation[0] = 'martial'
+  elif st.find("magic") != -1:
+      argCompilation[0] = 'magic'
+  if st.find("fire") != -1:
+      argCompilation[1] = 'fire'
+  elif st.find("ice") != -1:
+      argCompilation[1] = 'ice'
+  elif st.find("darkness") != -1:
+      argCompilation[1] = 'darkness'
+  elif st.find("light") != -1:
+      argCompilation[1] = 'light'
+  elif st.find("psionic") != -1:
+      argCompilation[1] = 'psionic'
+  elif st.find("violent") != -1:
+      argCompilation[1] = 'violent'
+  if st.find("good") != -1:
+      argCompilation[2] = 'good'
+  elif st.find("neutral") != -1:
+      argCompilation[2] = 'neutral'
+  elif st.find("evil") != -1:
+      argCompilation[2] = 'evil'
+  if st.find("simple") != -1:
+      argCompilation[3] = 2
+  elif st.find("moderate") != -1:
+      argCompilation[3] = 3
+  elif st.find("complex") != -1:
+      argCompilation[3] = 4
+  if st.find("awesome") != -1 or st.find("hotblood") != -1 or st.find("cool") != -1:
+      argCompilation[4] = True
+  if st.find("exalted") != -1:
+      argCompilation[3] = random.choice([4, 7, 8, 10, 11, 12, 15])
+  return _generateTechniqueName(argCompilation[0], argCompilation[1], argCompilation[2],
+                                                  argCompilation[3], argCompilation[4])
+
 
 def getName(nametype):
   '''Return a random name of a type defined by the input string.
