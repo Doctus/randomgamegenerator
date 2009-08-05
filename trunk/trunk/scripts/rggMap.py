@@ -116,8 +116,8 @@ class Map:
                                             self.tilesize, self.tileindexes,
                                             self.Pogs)
 
-  def debugMorphTile(self, coord):
-    self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])] = (self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])] + 1)%12 #ZOMG HARDCODED
+  def debugMorphTile(self, coord, maxtiles):
+    self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])] = (self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])] + 1)%maxtiles
     self.tiles[coord[0]][coord[1]] = rggTile.tile(coord[0]*self.tilesize[0], coord[1]*self.tilesize[1],
                                           self.tilesize[0], self.tilesize[1],
                                           self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])], 0,

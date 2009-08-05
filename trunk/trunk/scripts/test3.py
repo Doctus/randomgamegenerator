@@ -54,45 +54,7 @@ def newEvent(st):
                 name = rggNameGen.getName(''.join(words[1:]).lower())
             c.insertChatMessage(unicode(name))
         elif words[0].lower() == '/techname' or words[0].lower() == '/techniquename':
-            if len(words) == 1:
-                c.insertChatMessage(rggNameGen.getTechniqueName())
-            else: #it's a pain but doing it this way ensures order doesn't need to be memorised...
-                argCompilation = ['rand', 'rand', 'rand', -1, False]
-                parse = str(st) #Needs to be done for find() to be invoked
-                if parse.find("martial") != -1:
-                    argCompilation[0] = 'martial'
-                elif parse.find("magic") != -1:
-                    argCompilation[0] = 'magic'
-                if parse.find("fire") != -1:
-                    argCompilation[1] = 'fire'
-                elif parse.find("ice") != -1:
-                    argCompilation[1] = 'ice'
-                elif parse.find("darkness") != -1:
-                    argCompilation[1] = 'darkness'
-                elif parse.find("light") != -1:
-                    argCompilation[1] = 'light'
-                elif parse.find("psionic") != -1:
-                    argCompilation[1] = 'psionic'
-                elif parse.find("violent") != -1:
-                    argCompilation[1] = 'violent'
-                if parse.find("good") != -1:
-                    argCompilation[2] = 'good'
-                elif parse.find("neutral") != -1:
-                    argCompilation[2] = 'neutral'
-                elif parse.find("evil") != -1:
-                    argCompilation[2] = 'evil'
-                if parse.find("simple") != -1:
-                    argCompilation[3] = 2
-                elif parse.find("moderate") != -1:
-                    argCompilation[3] = 3
-                elif parse.find("complex") != -1:
-                    argCompilation[3] = 4
-                if parse.find("awesome") != -1 or parse.find("hotblood") != -1 or parse.find("cool") != -1:
-                    argCompilation[4] = True
-                if parse.find("exalted") != -1:
-                    argCompilation[3] = random.choice([4, 7, 8, 10, 11, 12, 15])
-                c.insertChatMessage(rggNameGen.getTechniqueName(argCompilation[0], argCompilation[1], argCompilation[2],
-                                                                argCompilation[3], argCompilation[4]))
+            c.insertChatMessage(rggNameGen.getTechniqueName(str(st)))
         elif words[0].lower() == '/roll':
             if len(words) == 1:
                 c.insertChatMessage("Syntax: /roll DICE. Dice can be " +
@@ -385,7 +347,7 @@ def mousePress(x, y, t):
                 global tilePasting
                 tilePasting = False
     elif t ==1: #DEBUG STUFF
-        Maps[currentMap[0]].debugMorphTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]])
+        Maps[currentMap[0]].debugMorphTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], c.getTileCountOfImage(Maps[currentMap[0]].tileset))
 
 
 QtCore.QObject.connect(c, QtCore.SIGNAL("newNetMessageSignal(QString, QString)"), newNetEvent)
