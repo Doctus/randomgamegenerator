@@ -8,7 +8,7 @@ c = _bmainmod.bMain()
 Maps = []
 #Maps[0].loadFromString("n! Default Map !n a! Anonymous !a m! 10 10 t! ./data/town.png s! 32 32 1~20 2~20 3~20".split())
 currentMap = [0]
-manipulatedPogs = [None, None, None]
+manipulatedPogs = [None, None, None, []] #Pog being selected/leftclicked; pog being right-clicked; pog being hovered over; other pogs selected with ctrl
 lastMouseLoc = [0, 0]
 global tilePasting
 global tilePastingIndex
@@ -264,12 +264,19 @@ def mouseDrag(x, y):
         manipulatedPogs[0].relativeMove(x-lastMouseLoc[0], y-lastMouseLoc[1])
         c.sendNetMessageToAll('p! m ' + str(manipulatedPogs[0].ID) + ' ' + str(manipulatedPogs[0].x) + ' '
                                       + str(manipulatedPogs[0].y))
+        if manipulatedPogs[3] is not []:
+            for pog in manipulatedPogs[3]:
+                if pog is not manipulatedPogs[0]: #To make sure we don't get double-alteration
+                    pog.relativeMove(x-lastMouseLoc[0], y-lastMouseLoc[1])
+                    c.sendNetMessageToAll('p! m ' + str(pog.ID) + ' ' + str(pog.x) + ' '
+                                          + str(pog.y))
     elif tilePasting:
         global tilePasting
         global tilePastingIndex
         Maps[currentMap[0]].debugSetTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], tilePastingIndex)
     lastMouseLoc[0] = x
     lastMouseLoc[1] = y
+    #print manipulatedPogs
 
 def mouseMove(x, y):
     #print 'MOUSEMOVE'
@@ -312,6 +319,8 @@ def mousePress(x, y, t):
                         manipulatedPogs[0] = pog
                     elif pog.layer > manipulatedPogs[0].layer:
                         manipulatedPogs[0] = pog
+            if manipulatedPogs[0] not in manipulatedPogs[3]:
+                manipulatedPogs[3] = []
     elif t == 2:
         global tilePasting
         for pog in Maps[currentMap[0]].Pogs:
@@ -321,10 +330,18 @@ def mousePress(x, y, t):
                 elif pog.layer > manipulatedPogs[1].layer:
                     manipulatedPogs[1] = pog
         if manipulatedPogs[1] != None:
-            selected = c.showPopupMenuAt(x, y, ["Set name"])
+            selected = c.showPopupMenuAt(x, y, ["Set name", "Generate name"])
             if selected == 0:
                 manipulatedPogs[1].name = c.getUserTextInput("Enter a name for this pog.")
                 c.sendNetMessageToAll('p! n ' + str(manipulatedPogs[1].ID) + ' ' + unicode(manipulatedPogs[1].name))
+            elif selected == 1:
+                gentype = ''.join(unicode(c.getUserTextInput("Enter a generator command. See /randomname for syntax. Multi-pog compatible."))).lower()
+                manipulatedPogs[1].name = rggNameGen.getName(gentype)
+                c.sendNetMessageToAll('p! n ' + str(manipulatedPogs[1].ID) + ' ' + unicode(manipulatedPogs[1].name))
+                if manipulatedPogs[3] is not []:
+                    for pog in manipulatedPogs[3]:
+                        pog.name = rggNameGen.getName(gentype)
+                        c.sendNetMessageToAll('p! n ' + str(pog.ID) + ' ' + unicode(pog.name))
         else:
             global tilePasting
             if tilePasting is False:
@@ -346,9 +363,19 @@ def mousePress(x, y, t):
             elif selected == 1:
                 global tilePasting
                 tilePasting = False
-    elif t ==1: #DEBUG STUFF
+    elif t == 3:
+        pogappendtemp = [None]
+        for pog in Maps[currentMap[0]].Pogs:
+            if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
+                if pogappendtemp[0] == None:
+                    pogappendtemp[0] = pog
+                elif pog.layer > pogappendtemp[0].layer:
+                    pogappendtemp[0] = pog
+        if pogappendtemp[0] is not None:
+            manipulatedPogs[3].append(pogappendtemp[0])
+    elif t == 1: #DEBUG STUFF
         Maps[currentMap[0]].debugMorphTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], c.getTileCountOfImage(Maps[currentMap[0]].tileset))
-
+    #print manipulatedPogs
 
 QtCore.QObject.connect(c, QtCore.SIGNAL("newNetMessageSignal(QString, QString)"), newNetEvent)
 QtCore.QObject.connect(c, QtCore.SIGNAL("connectedSignal(QString)"), newConnection)
