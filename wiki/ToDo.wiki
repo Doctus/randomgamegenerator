@@ -9,7 +9,7 @@
 
 = Interface =
   * Some sort of pallete for pog placement.
-  * Multiple selection of pogs.
+  * ~~Multiple selection of pogs.~~
   * Better tooltips.
   * Dice macros.
   * Ability to manipulate widgets better in Python. (E.g., creating new widgets with text/images/maybe buttons)
