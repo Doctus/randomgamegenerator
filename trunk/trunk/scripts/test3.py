@@ -153,6 +153,9 @@ def newNetEvent(st, handle):
                     Maps[currentMap[0]].addPog(rggPog.Pog(1, int(words[2]), int(words[3]), int(words[4]), int(words[5]), 1, " ".join(words[6:])))
                     if not os.path.exists(" ".join(words[6:])):
                         c.sendNetMessageToHandle('I! ' + " ".join(words[6:]), handle)
+                elif words[1] == 'l': #Pog layer change
+                    if Maps[currentMap[0]].pogsByID.has_key(int(words[2])):
+                        Maps[currentMap[0]].pogsByID[int(words[2])].changeLayer(int(words[3]))
                 if c.isServer():
                     c.sendNetMessageToAllButOne(st, handle)
             elif st[0] == 'r': #Die roll
@@ -330,7 +333,7 @@ def mousePress(x, y, t):
                 elif pog.layer > manipulatedPogs[1].layer:
                     manipulatedPogs[1] = pog
         if manipulatedPogs[1] != None:
-            selected = c.showPopupMenuAt(x, y, ["Set name", "Generate name"])
+            selected = c.showPopupMenuAt(x, y, ["Set name", "Generate name", "Set Layer"])
             if selected == 0:
                 manipulatedPogs[1].name = c.getUserTextInput("Enter a name for this pog.")
                 c.sendNetMessageToAll('p! n ' + str(manipulatedPogs[1].ID) + ' ' + unicode(manipulatedPogs[1].name))
@@ -342,6 +345,14 @@ def mousePress(x, y, t):
                     for pog in manipulatedPogs[3]:
                         pog.name = rggNameGen.getName(gentype)
                         c.sendNetMessageToAll('p! n ' + str(pog.ID) + ' ' + unicode(pog.name))
+            elif selected == 2:
+                newlayer = abs(int(c.getUserTextInput("Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.")))
+                manipulatedPogs[1].changeLayer(newlayer)
+                c.sendNetMessageToAll('p! l ' + str(manipulatedPogs[1].ID) + ' ' + str(manipulatedPogs[1].layer))
+                if manipulatedPogs[3] is not []:
+                    for pog in manipulatedPogs[3]:
+                        pog.changeLayer(newlayer)
+                        c.sendNetMessageToAll('p! l ' + str(pog.ID) + ' ' + str(pog.layer))
         else:
             global tilePasting
             if tilePasting is False:

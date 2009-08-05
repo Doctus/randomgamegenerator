@@ -65,6 +65,11 @@ class Pog:
         if not self.hidden and self.src == srcfile:
             self.show()
 
+    def changeLayer(self, newlayer):
+        self.layer = newlayer
+        if not self.hidden:
+            self.show()
+
     def getPrintableAttributes(self):
         self.atttmp = []
         if self.name is not None: self.atttmp.append(unicode(self.name))
