@@ -215,7 +215,7 @@ void bMain::changeImage(QString oldFilename, QString newFilename)
 
 int bMain::getTileCountOfImage(QString filename)
 {
-    cTileset *set = mainGame->mTilesetManager->findTileset(filename);
+    cTileset *set = mainGame->mTilesetManager->findTileset(filename.toStdString());
 
     if(set != NULL)
         return set->getHighestTile();
