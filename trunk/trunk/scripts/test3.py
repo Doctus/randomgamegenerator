@@ -1,5 +1,5 @@
-import time, random, os, base64, gzip, StringIO
-import _bmainmod, rggNameGen, rggDice, rggMap, rggTile, rggPog
+import time, random, os, base64
+import _bmainmod, rggNameGen, rggDice, rggMap, rggTile, rggPog, rggDockWidget
 from PyQt4 import QtCore
 
 random.seed()
@@ -190,14 +190,10 @@ def newNetEvent(st, handle):
             elif st[0] == 'i': #Image file
                 words = unicode(st).split()
                 imgpath = words[1]
-                strio = StringIO.StringIO()
-                strio.write( words[2] )
-                gz = gzip.GzipFile(None, 'r', 6, strio)
-                img = base64.b64decode(gz.read())
+                img = base64.b64decode(words[2])
                 f = open(unicode(imgpath), 'wb')
                 f.write(img)
                 f.close()
-                strio.close()
                 c.changeImage(unicode(imgpath), unicode(imgpath))
                 for mappe in Maps:
                     mappe.reloadTiles(unicode(imgpath))
@@ -205,13 +201,9 @@ def newNetEvent(st, handle):
                 words = unicode(st).split()
                 imgpath = words[1]
                 f = open(imgpath, 'rb')
-                imgdat = StringIO.StringIO()
-                gz = gzip.GzipFile(None, 'w', 6, imgdat)
-                gz.write(base64.b64encode(f.read()))
-                #print 'sending imgdata: "' + imgdat.getvalue() + '"'
+                imgdat = base64.b64encode(f.read())
                 f.close()
-                c.sendNetMessageToHandle("i! " + imgpath + " " + unicode(imgdat.getvalue()), handle)
-                imgdat.close()
+                c.sendNetMessageToHandle("i! " + imgpath + " " + imgdat, handle)
             else:
                 print 'Malformed or unrecognised data received: ' + unicode(st)
         else:
@@ -398,5 +390,9 @@ QtCore.QObject.connect(c, QtCore.SIGNAL("mouseMoveSignal(int, int)"), mouseMove)
 QtCore.QObject.connect(c, QtCore.SIGNAL("mouseDragSignal(int, int)"), mouseDrag)
 QtCore.QObject.connect(c, QtCore.SIGNAL("mousePressSignal(int, int, int)"), mousePress)
 QtCore.QObject.connect(c, QtCore.SIGNAL("mouseReleaseSignal(int, int, int)"), mouseRelease)
+
+
+dwidget = rggDockWidget.testWidget(c.getMainWindow())
+
 
 c.start()

@@ -38,8 +38,8 @@ wDockWidgets::wDockWidgets(QMainWindow *mainWindow, cGame *mGame) : QObject(main
     layout->addWidget(dockWidgetLineInput);
 
     dockWidget->show();
-    dockWidget->setAllowedAreas(Qt::LeftDockWidgetArea |
-                                 Qt::BottomDockWidgetArea);
+    /*dockWidget->setAllowedAreas(Qt::LeftDockWidgetArea |
+                                 Qt::BottomDockWidgetArea);*/
     dockWidget->setWidget(dockWidgetContents);
     mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
 
