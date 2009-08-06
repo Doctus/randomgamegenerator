@@ -60,6 +60,8 @@ class bMain : public QObject
     //void removeTooltip(int id);
     QString getUserTextInput(QString question);
 
+    QMainWindow* getMainWindow();
+
     int getCamX();
     int getCamY();
     int getCamW();

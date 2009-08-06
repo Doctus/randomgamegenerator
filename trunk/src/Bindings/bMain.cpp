@@ -187,6 +187,12 @@ QString bMain::getUserTextInput(QString question)
 }
 
 
+QMainWindow* bMain::getMainWindow()
+{
+    return widget;
+}
+
+
 int bMain::getCamX()
 {
     return mainGame->mGLWidget->cam->getAbsoluteCam().x();

@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 %Module _bmainmod
 
 %Import QtCore/QtCoremod.sip
-//%Import QtGui/QtGuimod.sip
+%Import QtGui/QtGuimod.sip
 //%Import QtOpenGL/QtOpenGLmod.sip
 //%Import QtNetwork/QtNetworkmod.sip
 
@@ -49,6 +49,8 @@ public:
     void displayTooltip(QString text, int x, int y);
     //void removeTooltip(int id);
     QString getUserTextInput(QString question);
+
+    QMainWindow* getMainWindow();
 
     int getCamX();
     int getCamY();
