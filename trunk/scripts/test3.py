@@ -1,21 +1,22 @@
 import time, random, os, base64
-import _bmainmod, rggNameGen, rggDice, rggMap, rggTile, rggPog, rggDockWidget
-from PyQt4 import QtCore
+import _bmainmod, rggNameGen, rggDice, rggMap, rggTile, rggPog, rggDockWidget, rggDialogs
+from PyQt4 import QtCore, QtGui
 
 random.seed()
 
 c = _bmainmod.bMain()
 Maps = []
-#Maps[0].loadFromString("n! Default Map !n a! Anonymous !a m! 10 10 t! ./data/town.png s! 32 32 1~20 2~20 3~20".split())
 currentMap = [0]
 manipulatedPogs = [None, None, None, []] #Pog being selected/leftclicked; pog being right-clicked; pog being hovered over; other pogs selected with ctrl
 lastMouseLoc = [0, 0]
 global tilePasting
 global tilePastingIndex
 tilePasting = False
+placingPog = [False, "path"]
 
-#for i in range(0, 50):
-#    Maps[currentMap[0]].addPog(rggPog.Pog(i, 30+i, 30+i, 23, 46, random.randint(0, i), './data/yue.png'))
+dwidget = rggDockWidget.diceRoller(c.getMainWindow())
+pwidget = rggDockWidget.pogPalette(c.getMainWindow())
+#mwidget = rggDockWidget.mapEditor(c.getMainWindow())
 
 def _linkedName(inp):
     return str('<a href="/tell ' + inp + '" title="' + inp + '">' + inp + '</a>')
@@ -36,9 +37,11 @@ def newEvent(st):
                 namestemp.append(item.mapname)
             for pog in Maps[currentMap[0]].Pogs:
                 pog.hide()
+            Maps[currentMap[0]].hide()
             currentMap[0] = c.displayUserDialogChoice("Load map:", namestemp)
+            Maps[currentMap[0]].show()
             for pog in Maps[currentMap[0]].Pogs:
-                pog.show()    
+                pog.show()
         if words[0].lower() == '/help' or words[0].lower() == '/h':
             c.insertChatMessage("Command Help:<br> Typing ordinary text and pressing 'enter' " +
                                 "will display to all players. Other commands may be invoked " +
@@ -99,12 +102,33 @@ def newEvent(st):
                     c.insertChatMessage('To ' + unicode(target) + ': ' +
                                     unicode(mesg))
                     c.sendNetMessageToAll('W! ' + target + ' ' + unicode(mesg))
+        elif words[0].lower() == '/addmacro':
+            validation = unicode(c.getUserTextInput("What dice should be rolled?"))
+            if "error" not in rggDice.roll(validation).lower() and "not yet implemented" not in rggDice.roll(validation).lower():
+                dwidget.addMacro(validation, unicode(c.getUserTextInput("What should the macro be called?")))
+            else:
+                c.insertChatMessage('Malformed macro. Formatting help is available in "/roll" command.')
+        elif words[0].lower() == '/placepog' and placingPog[0] == False:
+            placingPog[0] = True
+            placingPog[1] = " ".join(words[1:])
+        elif words[0].lower() == '/newmap':
+            newMap = rggMap.Map()
+            newMapString = words[1:]
+            newMap.loadFromString(newMapString)
+            Maps.append(newMap)
+            if len(Maps) > 0:
+                for pog in Maps[currentMap[0]].Pogs:
+                    pog.hide()
+                Maps[currentMap[0]].hide()
+            currentMap[0] = Maps.index(newMap)
+            Maps[currentMap[0]].updateStringForm()
+            Maps[currentMap[0]].show()
+            c.sendNetMessageToAll(Maps[currentMap[0]].stringform)
     else:
         c.insertChatMessage(_linkedName(c.getLocalHandle()) + ": " + st)
         c.sendNetMessageToAll("t!" + st)
 
 def newNetEvent(st, handle):
-    #c.insertChatMessage("DEBUG: " + unicode(st))
     if len(st) > 1:
         if st[1] == '!':
             if st[0] == 't': #Ordinary chat message
@@ -225,22 +249,27 @@ def newConnection(handle):
 def disConnection(handle):
     c.insertChatMessage("<b>" + handle + " has left the game" + "</b>")
     if c.isServer():
-        c.sendNetMessageToAllButOne('u!' + ' leave ' + handle, handle)
+        c.sendNetMessageToAllButOne('u!' + ' leave ' + handle, handle)     
+
+def newMap():
+    mdia = rggDialogs.newMapDialog(c.getMainWindow())
+    QtCore.QObject.connect(mdia, QtCore.SIGNAL("newChatInputSignal(QString)"), newEvent)
 
 def loadMap(filename):
     f = open(filename, 'r')
     tmp = f.read().split()
     f.close()
-    #print 'filename: ' + str(filename)
-    #print 'map: ' + str(tmp)
     newMap = rggMap.Map()
     newMap.loadFromString(tmp)
     Maps.append(newMap)
-    for pog in Maps[currentMap[0]].Pogs:
-        pog.hide()
+    if len(Maps) > 0:
+        for pog in Maps[currentMap[0]].Pogs:
+            pog.hide()
+        Maps[currentMap[0]].hide()
     currentMap[0] = Maps.index(newMap)
     for pog in Maps[currentMap[0]].Pogs:
         pog.show()
+    Maps[currentMap[0]].show()
     c.sendNetMessageToAll(Maps[currentMap[0]].stringform)
 
 def saveMap(filename):
@@ -253,8 +282,6 @@ def saveMap(filename):
     f.close()
 
 def mouseDrag(x, y):
-    #print 'MOUSEDRAG'
-    global tilePasting
     if manipulatedPogs[0] != None:
         manipulatedPogs[0].relativeMove(x-lastMouseLoc[0], y-lastMouseLoc[1])
         c.sendNetMessageToAll('p! m ' + str(manipulatedPogs[0].ID) + ' ' + str(manipulatedPogs[0].x) + ' '
@@ -271,10 +298,8 @@ def mouseDrag(x, y):
         Maps[currentMap[0]].debugSetTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], tilePastingIndex)
     lastMouseLoc[0] = x
     lastMouseLoc[1] = y
-    #print manipulatedPogs
 
 def mouseMove(x, y):
-    #print 'MOUSEMOVE'
     if len(Maps) <= 0:
          return
     tooltipPogTemp = None
@@ -285,7 +310,6 @@ def mouseMove(x, y):
             elif pog.layer > tooltipPogTemp.layer:
                 tooltipPogTemp = pog
     if manipulatedPogs[2] == tooltipPogTemp:
-        #print "same"
         return
     manipulatedPogs[2] = tooltipPogTemp
     if manipulatedPogs[2] is not None:
@@ -301,9 +325,14 @@ def mousePress(x, y, t):
     #print 'mouse press event ' + str(t) + ' at (' + str(x) + ', ' + str(y) + ')'
     lastMouseLoc[0] = x
     lastMouseLoc[1] = y
+    if Maps == []: return
     if t == 0:
-        global tilePasting
-        if tilePasting:
+        if placingPog[0]:
+            placingPog[0] = False
+            infograb = QtGui.QPixmap(placingPog[1])
+            Maps[currentMap[0]].addPog(rggPog.Pog(1, x+c.getCamX(), y+c.getCamY(), infograb.width(), infograb.height(), 1, placingPog[1]))
+            c.sendNetMessageToAll('p! c ' + " ".join([str(x+c.getCamX()), str(y+c.getCamY()), str(infograb.width()), str(infograb.height()), placingPog[1]]))
+        elif tilePasting:
             global tilePasting
             global tilePastingIndex
             Maps[currentMap[0]].debugSetTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], tilePastingIndex)
@@ -317,7 +346,6 @@ def mousePress(x, y, t):
             if manipulatedPogs[0] not in manipulatedPogs[3]:
                 manipulatedPogs[3] = []
     elif t == 2:
-        global tilePasting
         for pog in Maps[currentMap[0]].Pogs:
             if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
                 if manipulatedPogs[1] == None:
@@ -346,7 +374,6 @@ def mousePress(x, y, t):
                         pog.changeLayer(newlayer)
                         c.sendNetMessageToAll('p! l ' + str(pog.ID) + ' ' + str(pog.layer))
         else:
-            global tilePasting
             if tilePasting is False:
                 selected = c.showPopupMenuAt(x, y, ["Create Pog (Temp Command)", "Begin Tile Pasting (Temp Command)"])
             else:
@@ -367,23 +394,30 @@ def mousePress(x, y, t):
                 global tilePasting
                 tilePasting = False
     elif t == 3:
-        pogappendtemp = [None]
-        for pog in Maps[currentMap[0]].Pogs:
-            if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
-                if pogappendtemp[0] == None:
-                    pogappendtemp[0] = pog
-                elif pog.layer > pogappendtemp[0].layer:
-                    pogappendtemp[0] = pog
-        if pogappendtemp[0] is not None and pogappendtemp[0] not in manipulatedPogs[3]:
-            manipulatedPogs[3].append(pogappendtemp[0])
+        if placingPog[0]:
+            infograb = QtGui.QPixmap(placingPog[1])
+            Maps[currentMap[0]].addPog(rggPog.Pog(1, x+c.getCamX(), y+c.getCamY(), infograb.width(), infograb.height(), 1, placingPog[1]))
+            c.sendNetMessageToAll('p! c ' + " ".join([str(x+c.getCamX()), str(y+c.getCamY()), str(infograb.width()), str(infograb.height()), placingPog[1]]))
+        else:
+            pogappendtemp = [None]
+            for pog in Maps[currentMap[0]].Pogs:
+                if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
+                    if pogappendtemp[0] == None:
+                        pogappendtemp[0] = pog
+                    elif pog.layer > pogappendtemp[0].layer:
+                        pogappendtemp[0] = pog
+            if pogappendtemp[0] is not None and pogappendtemp[0] not in manipulatedPogs[3]:
+                manipulatedPogs[3].append(pogappendtemp[0])
+            elif pogappendtemp[0] is not None and pogappendtemp[0] in manipulatedPogs[3]:
+                manipulatedPogs[3].remove(pogappendtemp[0])
     elif t == 1: #DEBUG STUFF
         Maps[currentMap[0]].debugMorphTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], c.getTileCountOfImage(Maps[currentMap[0]].tileset))
-    #print manipulatedPogs
-
+    
 QtCore.QObject.connect(c, QtCore.SIGNAL("newNetMessageSignal(QString, QString)"), newNetEvent)
 QtCore.QObject.connect(c, QtCore.SIGNAL("connectedSignal(QString)"), newConnection)
 QtCore.QObject.connect(c, QtCore.SIGNAL("disconnectedSignal(QString)"), disConnection)
 QtCore.QObject.connect(c, QtCore.SIGNAL("newChatInputSignal(QString)"), newEvent)
+QtCore.QObject.connect(c, QtCore.SIGNAL("newMapSignal( )"), newMap)
 QtCore.QObject.connect(c, QtCore.SIGNAL("loadMapSignal(QString)"), loadMap)
 QtCore.QObject.connect(c, QtCore.SIGNAL("saveMapSignal(QString)"), saveMap)
 QtCore.QObject.connect(c, QtCore.SIGNAL("mouseMoveSignal(int, int)"), mouseMove)
@@ -391,8 +425,7 @@ QtCore.QObject.connect(c, QtCore.SIGNAL("mouseDragSignal(int, int)"), mouseDrag)
 QtCore.QObject.connect(c, QtCore.SIGNAL("mousePressSignal(int, int, int)"), mousePress)
 QtCore.QObject.connect(c, QtCore.SIGNAL("mouseReleaseSignal(int, int, int)"), mouseRelease)
 
-
-dwidget = rggDockWidget.testWidget(c.getMainWindow())
-
+QtCore.QObject.connect(dwidget, QtCore.SIGNAL("newChatInputSignal(QString)"), newEvent)
+QtCore.QObject.connect(pwidget, QtCore.SIGNAL("newChatInputSignal(QString)"), newEvent)
 
 c.start()

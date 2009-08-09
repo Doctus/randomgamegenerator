@@ -32,6 +32,10 @@ wMenuBar::wMenuBar(QWidget *windowWidget, cGame *game, nConnectionManager *mConn
 
 void wMenuBar::initActions()
 {
+    newMap = new QAction(tr("&New Map..."), windowWidget);
+    newMap->setShortcut(tr("Ctrl+N"));
+    QAction::connect(newMap, SIGNAL(triggered()), this, SLOT(newMapSlot()));
+
     loadMap = new QAction(tr("&Load Map..."), windowWidget);
     loadMap->setShortcut(tr("Ctrl+L"));
     QAction::connect(loadMap, SIGNAL(triggered()), this, SLOT(loadMapSlot()));
@@ -49,7 +53,7 @@ void wMenuBar::initActions()
     QAction::connect(hostServer, SIGNAL(triggered()), this, SLOT(hostServerSlot()));
 
     connectToServer = new QAction(tr("Co&nnect to Server"), windowWidget);
-    connectToServer->setShortcut(tr("Ctrl+N"));
+    connectToServer->setShortcut(tr("Ctrl+J"));
     QAction::connect(connectToServer, SIGNAL(triggered()), this, SLOT(connectToServerSlot()));
 
     selectIcon = new QAction(QIcon("./data/FAD-select-icon.png"), "Select Tool", windowWidget);
@@ -66,6 +70,7 @@ void wMenuBar::initActions()
 void wMenuBar::initBars()
 {
     fileMenu = new QMenu(tr("&File"), windowWidget);
+    fileMenu->addAction(newMap);
     fileMenu->addAction(loadMap);
     fileMenu->addAction(saveMap);
 
@@ -87,6 +92,10 @@ void wMenuBar::initBars()
     bar->addAction(moveIcon);
 }
 
+void wMenuBar::newMapSlot()
+{
+    emit newMapSignal();
+}
 
 void wMenuBar::saveMapSlot()
 {

@@ -67,6 +67,7 @@ signals:
     void connectedSignal(QString handle);
     void disconnectedSignal(QString handle);
 
+    void newMapSignal();
     void loadMapSignal(QString filename);
     void saveMapSignal(QString filename);
 

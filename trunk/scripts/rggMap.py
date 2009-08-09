@@ -30,11 +30,15 @@ class Map:
       while self.pogsByID.has_key(self.tmpint):
         self.tmpint = self.tmpint + 1
       pog.ID = self.tmpint
+      self.pogsByID[pog.ID] = pog
     else:
       self.pogsByID[pog.ID] = pog
 
   def loadFromString(self, s):
-    self.stringform = " ".join(s)
+    if len(s) != len("".join(s)): #An amusing way to do it since it must
+      self.stringform = " ".join(s) #contain at least one two-character value
+    else:
+      self.stringform = s
     self.mapname = " ".join(s[s.index('n!')+1:s.index('!n')])
     self.authorname = " ".join(s[s.index('a!')+1:s.index('!a')])
     self.mapsize = [int(s[s.index('m!')+1]), int(s[s.index('m!')+2])]
@@ -89,7 +93,6 @@ class Map:
     #Best to do this "backwards" so we keep track of the indexes for insertion.
     self.result = ['n!', '!n', 'a!', '!a', 'm!', 't!', 's!']
     self.result.extend(self.encodeIndexes(tindexes))
-    print self.result
     self.result.insert(7, str(tsize[1]))
     self.result.insert(7, str(tsize[0]))
     self.result.insert(6, str(tset))
