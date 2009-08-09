@@ -77,6 +77,7 @@ class bMain : public QObject
     void connectedTrigger(QString handle);
     void disconnectedTrigger(QString handle);
 
+    void newMapTrigger();
     void loadMapTrigger(QString filename);
     void saveMapTrigger(QString filename);
 
@@ -92,6 +93,7 @@ class bMain : public QObject
     void connectedSignal(QString handle);
     void disconnectedSignal(QString handle);
 
+    void newMapSignal();
     void loadMapSignal(QString filename);
     void saveMapSignal(QString filename);
 

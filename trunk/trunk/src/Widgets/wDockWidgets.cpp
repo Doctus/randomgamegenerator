@@ -26,7 +26,7 @@ wDockWidgets::wDockWidgets(QMainWindow *mainWindow, cGame *mGame) : QObject(main
 
     dockWidgetEditor = new QTextBrowser(mainWindow);
     dockWidgetLineInput = new wLineEdit(mainWindow);
-    dockWidget = new QDockWidget(QObject::tr("Dock Widget"), mainWindow);
+    dockWidget = new QDockWidget(QObject::tr("Chat"), mainWindow);
 
     dockWidgetEditor->setReadOnly(true);
     dockWidgetEditor->setOpenLinks(false);
@@ -41,7 +41,7 @@ wDockWidgets::wDockWidgets(QMainWindow *mainWindow, cGame *mGame) : QObject(main
     /*dockWidget->setAllowedAreas(Qt::LeftDockWidgetArea |
                                  Qt::BottomDockWidgetArea);*/
     dockWidget->setWidget(dockWidgetContents);
-    mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
+    mainWindow->addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
 
     QObject::connect((QObject*)dockWidgetLineInput, SIGNAL(returnPressed()), (QObject*)this, SLOT(processInput()));
 }
@@ -56,7 +56,7 @@ void wDockWidgets::insertMessage(QString message)
     bool scroll = (dockWidgetEditor->verticalScrollBar()->value() == dockWidgetEditor->verticalScrollBar()->maximum()) ?
                     true : false;
 
-    dockWidgetEditor->insertHtml(message + "<br />");
+    dockWidgetEditor->append(message); //Using insertHtml here made the text appear at the user's cursor loc.
 
     if(scroll)
         dockWidgetEditor->verticalScrollBar()->setValue(dockWidgetEditor->verticalScrollBar()->maximum());

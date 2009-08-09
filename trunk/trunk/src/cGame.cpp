@@ -32,9 +32,9 @@ QString randomTitle()
 {
     srand(time(NULL));
 
-    int rand1 = rand() % 4;
-    int rand2 = rand() % 2;
-    int rand3 = rand() % 3;
+    int rand1 = rand() % 7;
+    int rand2 = rand() % 5;
+    int rand3 = rand() % 5;
 
     QString title;
 
@@ -55,6 +55,12 @@ QString randomTitle()
         case 4:
         title += "Automated ";
         break;
+        case 5:
+        title += "Mechanized ";
+        break;
+        case 6:
+        title += "Unpredictable ";
+        break;
     }
 
     switch(rand2)
@@ -67,6 +73,12 @@ QString randomTitle()
         break;
         case 2:
         title += "Pastime ";
+        break;
+        case 3:
+        title += "Recreation ";
+        break;
+        case 4:
+        title += "Fun ";
         break;
     }
 
@@ -83,6 +95,9 @@ QString randomTitle()
         break;
         case 3:
         title += "Factory";
+        break;
+        case 4:
+        title += "Constructor";
         break;
     }
 

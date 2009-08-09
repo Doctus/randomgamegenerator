@@ -47,6 +47,7 @@ class wMenuBar : public QObject
     cGame *mGame;
     nConnectionManager *mConnectionManager;
 
+    QAction *newMap;
     QAction *loadMap;
     QAction *saveMap;
     QAction *hostServer;
@@ -71,6 +72,7 @@ class wMenuBar : public QObject
     private slots:
     void saveMapSlot();
     void loadMapSlot();
+    void newMapSlot();
 
     void showTextDockWidgetSlot();
 
@@ -81,6 +83,7 @@ class wMenuBar : public QObject
     void selectIconSlot();
 
     signals:
+    void newMapSignal();
     void loadMapSignal(QString filename);
     void saveMapSignal(QString filename);
 };

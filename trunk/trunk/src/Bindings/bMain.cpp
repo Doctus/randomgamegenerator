@@ -48,6 +48,7 @@ bMain::bMain()
     connect(mainGame->mConnectionManager, SIGNAL(connectedSignal(QString)), this, SLOT(connectedTrigger(QString)));
     connect(mainGame->mConnectionManager, SIGNAL(disconnectedSignal(QString)), this, SLOT(disconnectedTrigger(QString)));
 
+    connect(mainGame->mMenuBar, SIGNAL(newMapSignal()), this, SLOT(newMapTrigger()));
     connect(mainGame->mMenuBar, SIGNAL(loadMapSignal(QString)), this, SLOT(loadMapTrigger(QString)));
     connect(mainGame->mMenuBar, SIGNAL(saveMapSignal(QString)), this, SLOT(saveMapTrigger(QString)));
 
@@ -248,6 +249,11 @@ void bMain::connectedTrigger(QString handle)
 void bMain::disconnectedTrigger(QString handle)
 {
     emit disconnectedSignal(handle);
+}
+
+void bMain::newMapTrigger()
+{
+    emit newMapSignal();
 }
 
 void bMain::loadMapTrigger(QString filename)
