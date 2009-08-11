@@ -6,6 +6,10 @@ QT += opengl \
 TARGET = random-game-generator
 TEMPLATE = lib
 CONFIG += release
+TRANSLATIONS = rgg_nl.ts \
+               rgg_ja.ts
+CODECFORTR = UTF-8
+CODECFORSRC = UTF-8
 SOURCES += ../src/cTilesetManager.cpp \
     ../src/cTileset.cpp \
     ../src/cGame.cpp \

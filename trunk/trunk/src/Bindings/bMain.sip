@@ -60,6 +60,9 @@ public:
     void changeImage(QString oldFilename, QString newFilename);
     int getTileCountOfImage(QString filename);
 
+    /*void addTranslationFile(QString filename);
+    void removeTranslationFile(QString filename);*/
+
 signals:
     void newNetMessageSignal(QString str, QString handle);
     void newChatInputSignal(QString str);
