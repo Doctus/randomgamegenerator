@@ -70,6 +70,9 @@ class bMain : public QObject
     void changeImage(QString oldFilename, QString newFilename);
     int getTileCountOfImage(QString filename);
 
+    /*void addTranslationFile(QString filename);
+    void removeTranslationFile(QString filename);*/
+
     private slots:
     void chatInputTrigger(QString msg);
     void netMessageTrigger(QString msg, QString handle);

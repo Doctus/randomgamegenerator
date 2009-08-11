@@ -126,12 +126,12 @@ void wMenuBar::showTextDockWidgetSlot()
 void wMenuBar::hostServerSlot()
 {
     bool okStuff = false;
-    QString handle = QInputDialog::getText(windowWidget, "Name", "Which handle are you going to use?", QLineEdit::Normal, "Host", &okStuff);
+    QString handle = QInputDialog::getText(windowWidget, tr("Name"), tr("Which handle are you going to use?"), QLineEdit::Normal, tr("Host"), &okStuff);
 
     if(!okStuff) //if user pressed cancel
         return;
 
-    int port = QInputDialog::getInt(windowWidget, "Port", "Which port to host on?", 6812, 1025, 65535, 1, &okStuff);
+    int port = QInputDialog::getInt(windowWidget, tr("Port"), tr("Which port to host on?"), 6812, 1025, 65535, 1, &okStuff);
 
     if(!okStuff)
         return;
@@ -142,17 +142,17 @@ void wMenuBar::hostServerSlot()
 void wMenuBar::connectToServerSlot()
 {
     bool okStuff = false;
-    QString handle = QInputDialog::getText(windowWidget, "Name", "Which handle are you going to use?", QLineEdit::Normal, "Guest", &okStuff);
+    QString handle = QInputDialog::getText(windowWidget, tr("Name"), tr("Which handle are you going to use?"), QLineEdit::Normal, tr("Guest"), &okStuff);
 
     if(!okStuff) //if user pressed cancel
         return;
 
-    QString host = QInputDialog::getText(windowWidget, "Host", "Which host to connect to?", QLineEdit::Normal, "localhost", &okStuff);
+    QString host = QInputDialog::getText(windowWidget, tr("Host"), tr("Which host to connect to?"), QLineEdit::Normal, "localhost", &okStuff);
 
     if(!okStuff)
         return;
 
-    int port = QInputDialog::getInt(windowWidget, "Port", "Which port to use?", 6812, 1025, 65535, 1, &okStuff);
+    int port = QInputDialog::getInt(windowWidget, tr("Port"), tr("Which port to use?"), 6812, 1025, 65535, 1, &okStuff);
 
     if(!okStuff)
         return;

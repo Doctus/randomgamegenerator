@@ -25,7 +25,7 @@ def newEvent(st):
     if (len(st) <= 0) or ('title=' in st):
         return
     if ('<' in st and '>' not in st) or ('<' in st and '>' in st and '<' in str(st)[str(st).rfind('>'):]):
-        c.insertChatMessage("Please type &#38;#60; if you wish to include &#60; in your message.")
+        c.insertChatMessage(c.tr("Please type &#38;#60; if you wish to include &#60; in your message."))
         return
     if st[0] == '/':
         words = unicode(st).split()
@@ -65,12 +65,12 @@ def newEvent(st):
                                     " other variants depending on " +
                                     "development. See also /troll")
             else:
-                rolltext = (_linkedName(c.getLocalHandle()) + " rolls " +
+                rolltext = (_linkedName(c.getLocalHandle()) + c.tr(" rolls ") +
                             rggDice.roll(" ".join(words[1:])))
                 c.insertChatMessage(rolltext)
                 c.sendNetMessageToAll('r!' + rolltext)
         elif words[0].lower() == '/troll':
-            rolltext = (c.getLocalHandle() + " rolls " + rggDice.roll('2d6'))
+            rolltext = (c.getLocalHandle() + c.tr(" rolls ") + rggDice.roll('2d6'))
             c.insertChatMessage(rolltext)
             c.sendNetMessageToAll('r!' + rolltext)
         elif words[0].lower() == '/me' or words[0].lower() == '/emote':

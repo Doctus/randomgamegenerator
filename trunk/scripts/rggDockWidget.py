@@ -4,7 +4,8 @@ import os
 class diceRoller(QtGui.QDockWidget):
 
   def __init__(self, mainWindow):
-    super(QtGui.QDockWidget, self).__init__("Dice", mainWindow)
+    super(QtGui.QDockWidget, self).__init__(mainWindow)
+    self.setWindowTitle(self.tr("Dice"))
     self.realwidget = QtGui.QWidget(mainWindow) #I messed up on the initial setup and was too lazy to rename everything.
     self.widget = QtGui.QBoxLayout(2)
     self.diceArea = QtGui.QListWidget(mainWindow)
@@ -16,8 +17,8 @@ class diceRoller(QtGui.QDockWidget):
     self.controlArea = QtGui.QWidget(mainWindow)
     self.controlLayout = QtGui.QBoxLayout(2)
     self.rollbutton = QtGui.QPushButton("Roll", mainWindow)
-    self.addmacrobutton = QtGui.QPushButton("Add Macro", mainWindow)
-    self.removemacrobutton = QtGui.QPushButton("Delete Macro", mainWindow)
+    self.addmacrobutton = QtGui.QPushButton(self.tr("Add Macro"), mainWindow)
+    self.removemacrobutton = QtGui.QPushButton(self.tr("Delete Macro"), mainWindow)
     self.connect(self.rollbutton, QtCore.SIGNAL('pressed()'), self.rollDice)
     self.connect(self.addmacrobutton, QtCore.SIGNAL('pressed()'), self.summonMacro)
     self.connect(self.removemacrobutton, QtCore.SIGNAL('pressed()'), self.removeCurrentMacro)

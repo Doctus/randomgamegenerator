@@ -23,16 +23,41 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../Widgets/wDockWidgets.h"
 #include "../Network/nConnectionManager.h"
 
-QApplication app(NULL, NULL);
+int i = 1;
+char *argv[] = {"random game generator"};
+
+QApplication app(i, argv, 0);
 QMainWindow *widget;
 cGame* bMain::mainGame;
 
 bMain::bMain()
 {
-
-
     widget = new QMainWindow(); //parent widget
     widget->resize(640, 480);
+
+
+
+    QTextCodec::setCodecForTr(QTextCodec::codecForName("utf8"));
+    QString locale = QLocale::system().name();
+    //QString locale = "nl";
+    locale.truncate(2);
+
+    cout << "locale: " << locale.toStdString() << endl;
+
+    QTranslator *t = new QTranslator(widget);
+    QTranslator *t2 = new QTranslator(widget);
+
+    if(!t->load(QString("rgg_") + locale))
+        cout << "rgg_" << locale.toStdString() << " failed to load" << endl;
+    else
+        cout << "rgg_" << locale.toStdString() << " loaded" << endl;
+    if(!t2->load(QString("rgg_py_") + locale))
+        cout << "rgg_py_" << locale.toStdString() << " failed to load" << endl;
+    else
+        cout << "rgg_py_" << locale.toStdString() << " loaded" << endl;
+
+    app.installTranslator(t);
+    app.installTranslator(t2);
 
     QIcon *icon = new QIcon("./data/FAD-icon.png");
 
@@ -229,6 +254,27 @@ int bMain::getTileCountOfImage(QString filename)
 
     return -1;
 }
+
+/* This is a wonderful idea, but it requires all widgets using tr() to re-implement changeEvent
+ * and check if a LanguageChange event comes by. If so, re-translate every tr() by
+ * calling widget->setText() on everything that requires re-translation. *sigh*
+ */
+
+/*void bMain::addTranslationFile(QString filename)
+{
+    QTranslator *t = new QTranslator(widget);
+    bool val = t->load(filename);
+    cout << "addTranslationFile: " << val << endl;
+    app.installTranslator(t);
+}
+
+void bMain::removeTranslationFile(QString filename)
+{
+    QTranslator *t = new QTranslator(widget);
+    bool val = t->load(filename);
+    cout << "removeTranslationFile: " << val << endl;
+    app.removeTranslator(t);
+}*/
 
 
 void bMain::chatInputTrigger(QString msg)
