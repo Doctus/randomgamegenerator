@@ -7,7 +7,7 @@
     <message>
         <location filename="../src/Widgets/wDockWidgets.cpp" line="29"/>
         <source>Chat</source>
-        <translation type="unfinished"></translation>
+        <translation>チャット</translation>
     </message>
 </context>
 <context>
@@ -15,7 +15,7 @@
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="35"/>
         <source>&amp;New Map...</source>
-        <translation type="unfinished"></translation>
+        <translation>マップを作る...</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="36"/>
@@ -25,7 +25,7 @@
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="39"/>
         <source>&amp;Load Map...</source>
-        <translation type="unfinished"></translation>
+        <translation>マップファイルをロード...</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="40"/>
@@ -35,7 +35,7 @@
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="43"/>
         <source>&amp;Save Map...</source>
-        <translation type="unfinished"></translation>
+        <translation>マップファイルをセーブ...</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="44"/>
@@ -46,7 +46,7 @@
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="47"/>
         <source>&amp;Text Widget</source>
-        <translation type="unfinished"></translation>
+        <translation>チャット</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="48"/>
@@ -56,7 +56,7 @@
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="51"/>
         <source>&amp;Host Server</source>
-        <translation type="unfinished"></translation>
+        <translation>ホストする</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="52"/>
@@ -66,7 +66,7 @@
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="55"/>
         <source>Co&amp;nnect to Server</source>
-        <translation type="unfinished"></translation>
+        <translation>ホストで接続する</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="56"/>
@@ -81,71 +81,71 @@
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="72"/>
         <source>&amp;File</source>
-        <translation>&amp;JAPANESE</translation>
+        <translation>ファイル</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="77"/>
         <source>&amp;Internet</source>
-        <translation type="unfinished"></translation>
+        <translation>ネットワーク</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="81"/>
         <source>&amp;View</source>
-        <translation type="unfinished"></translation>
+        <translation>ウィンドウ</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="102"/>
         <source>Save File</source>
-        <translation type="unfinished"></translation>
+        <translation>マップファイルのセーブ</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="112"/>
         <source>Open File</source>
-        <translation type="unfinished"></translation>
+        <translation>マップファイルのロード</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="129"/>
         <location filename="../src/Widgets/wMenuBar.cpp" line="145"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>名前</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="129"/>
         <location filename="../src/Widgets/wMenuBar.cpp" line="145"/>
         <source>Which handle are you going to use?</source>
-        <translation type="unfinished"></translation>
+        <translation>ハンドルネームを入力しなさい</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="129"/>
         <location filename="../src/Widgets/wMenuBar.cpp" line="150"/>
         <source>Host</source>
-        <translation type="unfinished"></translation>
+        <translation>ホスト</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="134"/>
         <location filename="../src/Widgets/wMenuBar.cpp" line="155"/>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>ポート</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="134"/>
         <source>Which port to host on?</source>
-        <translation type="unfinished"></translation>
+        <translation>どのポートでホストしますか</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="145"/>
         <source>Guest</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアント</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="150"/>
         <source>Which host to connect to?</source>
-        <translation type="unfinished"></translation>
+        <translation>ホストのアドレス（ＩＰ）を入力しなさい</translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="155"/>
         <source>Which port to use?</source>
-        <translation type="unfinished"></translation>
+        <translation>どのポートで接続しますか</translation>
     </message>
 </context>
 </TS>
