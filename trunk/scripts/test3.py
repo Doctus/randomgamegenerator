@@ -58,6 +58,8 @@ def newEvent(st):
             c.insertChatMessage(unicode(name))
         elif words[0].lower() == '/techname' or words[0].lower() == '/techniquename':
             c.insertChatMessage(rggNameGen.getTechniqueName(str(st)))
+        elif words[0].lower() == '/advice':
+            c.insertChatMessage(rggNameGen.getAdvice())
         elif words[0].lower() == '/roll':
             if len(words) == 1:
                 c.insertChatMessage("Syntax: /roll DICE. Dice can be " +

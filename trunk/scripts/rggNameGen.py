@@ -86,6 +86,24 @@ def _getJapaneseFullName(g=False):
   if g: return (_getJapaneseSurname() + " " + _getJapaneseMaleName())
   return (_getJapaneseSurname() + " " + _getJapaneseFemaleName())
 
+def _generateAdvice():
+  anto = [['+cold', '+heat'], ['wisdom', '+fool'], ['+light', '+darkness'],
+        ['victory', 'defeat'], ['evil', 'good'], ['sound', 'silence']]
+  phrases = ["To find +~#, you must look within +@%.",
+           "The greatest ~# is in the middle of +@%.",
+           "The path of ~# leads to @%.",
+           "Be wary of the ~# that cloaks itself as @%.",
+           "When you see ~#, @% lies just above."]
+  advice = random.choice(phrases)
+  subject = random.choice(anto)
+  if random.choice([True, False]): subject.reverse()
+  advice = advice.replace("~#", subject[0])
+  advice = advice.replace("@%", subject[1])
+  advice = advice.replace('++', 'the ')
+  advice = advice.replace('+', '')
+  advice = advice.capitalize()
+  return advice
+
 def _generateTechniqueName(typ='rand', elemnt='rand', moral='rand',
                       complexity=-1, hotblood=False):
   if complexity == -1:
@@ -258,6 +276,9 @@ def getTechniqueName(st):
   return _generateTechniqueName(argCompilation[0], argCompilation[1], argCompilation[2],
                                                   argCompilation[3], argCompilation[4])
 
+def getAdvice():
+  #We might want to do more here at some point, hence breaking it up.
+  return _generateAdvice()
 
 def getName(nametype):
   '''Return a random name of a type defined by the input string.
