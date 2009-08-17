@@ -1,22 +1,27 @@
 import time, random, os, base64
-import _bmainmod, rggNameGen, rggDice, rggMap, rggTile, rggPog, rggDockWidget, rggDialogs
+import _bmainmod, rggNameGen, rggDice, rggMap, rggTile, rggPog, rggDockWidget, rggDialogs, rggMenuBar
 from PyQt4 import QtCore, QtGui
 
 random.seed()
 
 c = _bmainmod.bMain()
+global tilePasting
+global tilePastingIndex
+global mouseButtonHeld
+global lastMouseLoc
 Maps = []
 currentMap = [0]
 manipulatedPogs = [None, None, None, []] #Pog being selected/leftclicked; pog being right-clicked; pog being hovered over; other pogs selected with ctrl
 lastMouseLoc = [0, 0]
-global tilePasting
-global tilePastingIndex
+mouseButtonHeld = None
 tilePasting = False
 placingPog = [False, "path"]
 
 dwidget = rggDockWidget.diceRoller(c.getMainWindow())
 pwidget = rggDockWidget.pogPalette(c.getMainWindow())
 #mwidget = rggDockWidget.mapEditor(c.getMainWindow())
+
+rggMenuBar.setupMenuBar(c)
 
 def _linkedName(inp):
     return str('<a href="/tell ' + inp + '" title="' + inp + '">' + inp + '</a>')
@@ -284,6 +289,9 @@ def saveMap(filename):
     f.close()
 
 def mouseDrag(x, y):
+    global tilePasting
+    global tilePastingIndex
+
     if manipulatedPogs[0] != None:
         manipulatedPogs[0].relativeMove(x-lastMouseLoc[0], y-lastMouseLoc[1])
         c.sendNetMessageToAll('p! m ' + str(manipulatedPogs[0].ID) + ' ' + str(manipulatedPogs[0].x) + ' '
@@ -295,125 +303,142 @@ def mouseDrag(x, y):
                     c.sendNetMessageToAll('p! m ' + str(pog.ID) + ' ' + str(pog.x) + ' '
                                           + str(pog.y))
     elif tilePasting:
-        global tilePasting
-        global tilePastingIndex
         Maps[currentMap[0]].debugSetTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], tilePastingIndex)
+
+def mouseMove(x, y):
+    global lastMouseLoc
+    global mouseButtonHeld
+
+    if rggMenuBar.getSelectedIcon() == 0: #selectIcon
+        if mouseButtonHeld == None:
+            if len(Maps) <= 0:
+                 return
+            tooltipPogTemp = None
+            for pog in Maps[currentMap[0]].Pogs:
+                if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
+                    if tooltipPogTemp == None:
+                        tooltipPogTemp = pog
+                    elif pog.layer > tooltipPogTemp.layer:
+                        tooltipPogTemp = pog
+            if manipulatedPogs[2] == tooltipPogTemp:
+                return
+            manipulatedPogs[2] = tooltipPogTemp
+            if manipulatedPogs[2] is not None:
+                if manipulatedPogs[2].getPrintableAttributes() is not None:
+                    displayLoc = manipulatedPogs[2].getOverheadTooltipLoc()
+                    c.displayTooltip(manipulatedPogs[2].getPrintableAttributes(), displayLoc[0]-c.getCamX(), displayLoc[1]-c.getCamY())
+        elif mouseButtonHeld == 0:
+            mouseDrag(x, y)
+    elif rggMenuBar.getSelectedIcon() == 1 and mouseButtonHeld == 0: #moveIcon
+        c.adjustCam(lastMouseLoc[0]-x, lastMouseLoc[1]-y)
+
     lastMouseLoc[0] = x
     lastMouseLoc[1] = y
 
-def mouseMove(x, y):
-    if len(Maps) <= 0:
-         return
-    tooltipPogTemp = None
-    for pog in Maps[currentMap[0]].Pogs:
-        if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
-            if tooltipPogTemp == None:
-                tooltipPogTemp = pog
-            elif pog.layer > tooltipPogTemp.layer:
-                tooltipPogTemp = pog
-    if manipulatedPogs[2] == tooltipPogTemp:
-        return
-    manipulatedPogs[2] = tooltipPogTemp
-    if manipulatedPogs[2] is not None:
-        if manipulatedPogs[2].getPrintableAttributes() is not None:
-            displayLoc = manipulatedPogs[2].getOverheadTooltipLoc()
-            c.displayTooltip(manipulatedPogs[2].getPrintableAttributes(), displayLoc[0]-c.getCamX(), displayLoc[1]-c.getCamY())
-
 def mouseRelease(x, y, t):
+    global mouseButtonHeld
+
     manipulatedPogs[0] = None
     manipulatedPogs[1] = None
+    mouseButtonHeld = None
 
 def mousePress(x, y, t):
     #print 'mouse press event ' + str(t) + ' at (' + str(x) + ', ' + str(y) + ')'
+    global tilePasting
+    global tilePastingIndex
+    global mouseButtonHeld
+    global lastMouseLoc
+
     lastMouseLoc[0] = x
     lastMouseLoc[1] = y
+    mouseButtonHeld = t
     if Maps == []: return
-    if t == 0:
-        if placingPog[0]:
-            placingPog[0] = False
-            infograb = QtGui.QPixmap(placingPog[1])
-            Maps[currentMap[0]].addPog(rggPog.Pog(1, x+c.getCamX(), y+c.getCamY(), infograb.width(), infograb.height(), 1, placingPog[1]))
-            c.sendNetMessageToAll('p! c ' + " ".join([str(x+c.getCamX()), str(y+c.getCamY()), str(infograb.width()), str(infograb.height()), placingPog[1]]))
-        elif tilePasting:
-            global tilePasting
-            global tilePastingIndex
-            Maps[currentMap[0]].debugSetTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], tilePastingIndex)
-        else:
-            for pog in Maps[currentMap[0]].Pogs:
-                if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
-                    if manipulatedPogs[0] == None:
-                        manipulatedPogs[0] = pog
-                    elif pog.layer > manipulatedPogs[0].layer:
-                        manipulatedPogs[0] = pog
-            if manipulatedPogs[0] not in manipulatedPogs[3]:
-                manipulatedPogs[3] = []
-    elif t == 2:
-        for pog in Maps[currentMap[0]].Pogs:
-            if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
-                if manipulatedPogs[1] == None:
-                    manipulatedPogs[1] = pog
-                elif pog.layer > manipulatedPogs[1].layer:
-                    manipulatedPogs[1] = pog
-        if manipulatedPogs[1] != None:
-            selected = c.showPopupMenuAt(x, y, ["Set name", "Generate name", "Set Layer"])
-            if selected == 0:
-                manipulatedPogs[1].name = c.getUserTextInput("Enter a name for this pog.")
-                c.sendNetMessageToAll('p! n ' + str(manipulatedPogs[1].ID) + ' ' + unicode(manipulatedPogs[1].name))
-            elif selected == 1:
-                gentype = ''.join(unicode(c.getUserTextInput("Enter a generator command. See /randomname for syntax. Multi-pog compatible."))).lower()
-                manipulatedPogs[1].name = rggNameGen.getName(gentype)
-                c.sendNetMessageToAll('p! n ' + str(manipulatedPogs[1].ID) + ' ' + unicode(manipulatedPogs[1].name))
-                if manipulatedPogs[3] is not []:
-                    for pog in manipulatedPogs[3]:
-                        pog.name = rggNameGen.getName(gentype)
-                        c.sendNetMessageToAll('p! n ' + str(pog.ID) + ' ' + unicode(pog.name))
-            elif selected == 2:
-                newlayer = abs(int(c.getUserTextInput("Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.")))
-                manipulatedPogs[1].changeLayer(newlayer)
-                c.sendNetMessageToAll('p! l ' + str(manipulatedPogs[1].ID) + ' ' + str(manipulatedPogs[1].layer))
-                if manipulatedPogs[3] is not []:
-                    for pog in manipulatedPogs[3]:
-                        pog.changeLayer(newlayer)
-                        c.sendNetMessageToAll('p! l ' + str(pog.ID) + ' ' + str(pog.layer))
-        else:
-            if tilePasting is False:
-                selected = c.showPopupMenuAt(x, y, ["Create Pog (Temp Command)", "Begin Tile Pasting (Temp Command)"])
+
+    if rggMenuBar.getSelectedIcon() == 0: #selectIcon
+        if t == 0:
+            if placingPog[0]:
+                placingPog[0] = False
+                infograb = QtGui.QPixmap(placingPog[1])
+                Maps[currentMap[0]].addPog(rggPog.Pog(1, x+c.getCamX(), y+c.getCamY(), infograb.width(), infograb.height(), 1, placingPog[1]))
+                c.sendNetMessageToAll('p! c ' + " ".join([str(x+c.getCamX()), str(y+c.getCamY()), str(infograb.width()), str(infograb.height()), placingPog[1]]))
+            elif tilePasting:
+                Maps[currentMap[0]].debugSetTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], tilePastingIndex)
             else:
-                selected = c.showPopupMenuAt(x, y, ["Create Pog (Temp Command)", "Cease Tile Pasting (Temp Command)"])
-            if selected == 0:
-                pogsrc = unicode(c.getUserTextInput("What is the path to the pog image?"))
-                pogsizeraw = unicode(c.getUserTextInput("Image height/width separated by space (e.g. '16 32')"))
-                pogsizeW = int(pogsizeraw.split()[0])
-                pogsizeH = int(pogsizeraw.split()[1])
-                Maps[currentMap[0]].addPog(rggPog.Pog(1, x, y, pogsizeW, pogsizeH, 1, pogsrc))
-                c.sendNetMessageToAll('p! c ' + " ".join([str(x), str(y), str(pogsizeW), str(pogsizeH), pogsrc]))
-            elif selected == 1 and tilePasting is False:
-                global tilePasting
-                global tilePastingIndex
-                tilePasting = True
-                tilePastingIndex = Maps[currentMap[0]].debugGetTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]])
-            elif selected == 1:
-                global tilePasting
-                tilePasting = False
-    elif t == 3:
-        if placingPog[0]:
-            infograb = QtGui.QPixmap(placingPog[1])
-            Maps[currentMap[0]].addPog(rggPog.Pog(1, x+c.getCamX(), y+c.getCamY(), infograb.width(), infograb.height(), 1, placingPog[1]))
-            c.sendNetMessageToAll('p! c ' + " ".join([str(x+c.getCamX()), str(y+c.getCamY()), str(infograb.width()), str(infograb.height()), placingPog[1]]))
-        else:
-            pogappendtemp = [None]
+                for pog in Maps[currentMap[0]].Pogs:
+                    if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
+                        if manipulatedPogs[0] == None:
+                            manipulatedPogs[0] = pog
+                        elif pog.layer > manipulatedPogs[0].layer:
+                            manipulatedPogs[0] = pog
+                if manipulatedPogs[0] not in manipulatedPogs[3]:
+                    manipulatedPogs[3] = []
+        elif t == 2:
             for pog in Maps[currentMap[0]].Pogs:
                 if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
-                    if pogappendtemp[0] == None:
-                        pogappendtemp[0] = pog
-                    elif pog.layer > pogappendtemp[0].layer:
-                        pogappendtemp[0] = pog
-            if pogappendtemp[0] is not None and pogappendtemp[0] not in manipulatedPogs[3]:
-                manipulatedPogs[3].append(pogappendtemp[0])
-            elif pogappendtemp[0] is not None and pogappendtemp[0] in manipulatedPogs[3]:
-                manipulatedPogs[3].remove(pogappendtemp[0])
-    elif t == 1: #DEBUG STUFF
-        Maps[currentMap[0]].debugMorphTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], c.getTileCountOfImage(Maps[currentMap[0]].tileset))
+                    if manipulatedPogs[1] == None:
+                        manipulatedPogs[1] = pog
+                    elif pog.layer > manipulatedPogs[1].layer:
+                        manipulatedPogs[1] = pog
+            if manipulatedPogs[1] != None:
+                selected = c.showPopupMenuAt(x, y, ["Set name", "Generate name", "Set Layer"])
+                if selected == 0:
+                    manipulatedPogs[1].name = c.getUserTextInput("Enter a name for this pog.")
+                    c.sendNetMessageToAll('p! n ' + str(manipulatedPogs[1].ID) + ' ' + unicode(manipulatedPogs[1].name))
+                elif selected == 1:
+                    gentype = ''.join(unicode(c.getUserTextInput("Enter a generator command. See /randomname for syntax. Multi-pog compatible."))).lower()
+                    manipulatedPogs[1].name = rggNameGen.getName(gentype)
+                    c.sendNetMessageToAll('p! n ' + str(manipulatedPogs[1].ID) + ' ' + unicode(manipulatedPogs[1].name))
+                    if manipulatedPogs[3] is not []:
+                        for pog in manipulatedPogs[3]:
+                            pog.name = rggNameGen.getName(gentype)
+                            c.sendNetMessageToAll('p! n ' + str(pog.ID) + ' ' + unicode(pog.name))
+                elif selected == 2:
+                    newlayer = abs(int(c.getUserTextInput("Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.")))
+                    manipulatedPogs[1].changeLayer(newlayer)
+                    c.sendNetMessageToAll('p! l ' + str(manipulatedPogs[1].ID) + ' ' + str(manipulatedPogs[1].layer))
+                    if manipulatedPogs[3] is not []:
+                        for pog in manipulatedPogs[3]:
+                            pog.changeLayer(newlayer)
+                            c.sendNetMessageToAll('p! l ' + str(pog.ID) + ' ' + str(pog.layer))
+            else:
+                if tilePasting is False:
+                    selected = c.showPopupMenuAt(x, y, ["Create Pog (Temp Command)", "Begin Tile Pasting (Temp Command)"])
+                else:
+                    selected = c.showPopupMenuAt(x, y, ["Create Pog (Temp Command)", "Cease Tile Pasting (Temp Command)"])
+                if selected == 0:
+                    pogsrc = unicode(c.getUserTextInput("What is the path to the pog image?"))
+                    pogsizeraw = unicode(c.getUserTextInput("Image height/width separated by space (e.g. '16 32')"))
+                    pogsizeW = int(pogsizeraw.split()[0])
+                    pogsizeH = int(pogsizeraw.split()[1])
+                    Maps[currentMap[0]].addPog(rggPog.Pog(1, x, y, pogsizeW, pogsizeH, 1, pogsrc))
+                    c.sendNetMessageToAll('p! c ' + " ".join([str(x), str(y), str(pogsizeW), str(pogsizeH), pogsrc]))
+                elif selected == 1 and tilePasting is False:
+                    tilePasting = True
+                    tilePastingIndex = Maps[currentMap[0]].debugGetTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]])
+                elif selected == 1:
+                    tilePasting = False
+        elif t == 3:
+            if placingPog[0]:
+                infograb = QtGui.QPixmap(placingPog[1])
+                Maps[currentMap[0]].addPog(rggPog.Pog(1, x+c.getCamX(), y+c.getCamY(), infograb.width(), infograb.height(), 1, placingPog[1]))
+                c.sendNetMessageToAll('p! c ' + " ".join([str(x+c.getCamX()), str(y+c.getCamY()), str(infograb.width()), str(infograb.height()), placingPog[1]]))
+            else:
+                pogappendtemp = [None]
+                for pog in Maps[currentMap[0]].Pogs:
+                    if pog.getPointCollides([x+c.getCamX(), y+c.getCamY()]):
+                        if pogappendtemp[0] == None:
+                            pogappendtemp[0] = pog
+                        elif pog.layer > pogappendtemp[0].layer:
+                            pogappendtemp[0] = pog
+                if pogappendtemp[0] is not None and pogappendtemp[0] not in manipulatedPogs[3]:
+                    manipulatedPogs[3].append(pogappendtemp[0])
+                elif pogappendtemp[0] is not None and pogappendtemp[0] in manipulatedPogs[3]:
+                    manipulatedPogs[3].remove(pogappendtemp[0])
+        elif t == 1: #DEBUG STUFF
+            Maps[currentMap[0]].debugMorphTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], c.getTileCountOfImage(Maps[currentMap[0]].tileset))
+    #elif rggMenuBar.getSelectedIcon() == 1: #moveIcon
+
+        
     
 QtCore.QObject.connect(c, QtCore.SIGNAL("newNetMessageSignal(QString, QString)"), newNetEvent)
 QtCore.QObject.connect(c, QtCore.SIGNAL("connectedSignal(QString)"), newConnection)
@@ -423,7 +448,6 @@ QtCore.QObject.connect(c, QtCore.SIGNAL("newMapSignal( )"), newMap)
 QtCore.QObject.connect(c, QtCore.SIGNAL("loadMapSignal(QString)"), loadMap)
 QtCore.QObject.connect(c, QtCore.SIGNAL("saveMapSignal(QString)"), saveMap)
 QtCore.QObject.connect(c, QtCore.SIGNAL("mouseMoveSignal(int, int)"), mouseMove)
-QtCore.QObject.connect(c, QtCore.SIGNAL("mouseDragSignal(int, int)"), mouseDrag)
 QtCore.QObject.connect(c, QtCore.SIGNAL("mousePressSignal(int, int, int)"), mousePress)
 QtCore.QObject.connect(c, QtCore.SIGNAL("mouseReleaseSignal(int, int, int)"), mouseRelease)
 

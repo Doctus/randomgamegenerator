@@ -57,6 +57,9 @@ public:
     int getCamW();
     int getCamH();
 
+    void setCam(int x, int y);
+    void adjustCam(int x, int y);
+
     void changeImage(QString oldFilename, QString newFilename);
     int getTileCountOfImage(QString filename);
 
@@ -77,6 +80,9 @@ signals:
     void mouseMoveSignal(int x, int y);
     void mousePressSignal(int x, int y, int type);
     void mouseReleaseSignal(int x, int y, int type);
+
+    void leaveEventSignal();
+    void enterEventSignal();
 };
 
 class bImage

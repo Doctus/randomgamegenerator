@@ -80,7 +80,6 @@ bMain::bMain()
     connect(mainGame->mGLWidget, SIGNAL(mouseReleaseSignal(int,int,int)), this, SLOT(mouseReleaseTrigger(int,int,int)));
     connect(mainGame->mGLWidget, SIGNAL(mousePressSignal(int,int,int)), this, SLOT(mousePressTrigger(int,int,int)));
     connect(mainGame->mGLWidget, SIGNAL(mouseMoveSignal(int,int)), this, SLOT(mouseMoveTrigger(int,int)));
-    connect(mainGame->mGLWidget, SIGNAL(mouseDragSignal(int,int)), this, SLOT(mouseDragTrigger(int,int)));
 }
 
 void bMain::start()
@@ -240,6 +239,17 @@ int bMain::getCamH()
 }
 
 
+void bMain::setCam(int x, int y)
+{
+    mainGame->mGLWidget->cam->setCam(QPoint(x, y));
+}
+
+void bMain::adjustCam(int x, int y)
+{
+    mainGame->mGLWidget->cam->adjustCam(x, y);
+}
+
+
 void bMain::changeImage(QString oldFilename, QString newFilename)
 {
     mainGame->mTilesetManager->changeImage(oldFilename, newFilename);
@@ -317,11 +327,6 @@ void bMain::mouseMoveTrigger(int x, int y)
     emit mouseMoveSignal(x, y);
 }
 
-void bMain::mouseDragTrigger(int x, int y)
-{
-    emit mouseDragSignal(x, y);
-}
-
 void bMain::mousePressTrigger(int x, int y, int type)
 {
     emit mousePressSignal(x, y, type);
@@ -330,4 +335,14 @@ void bMain::mousePressTrigger(int x, int y, int type)
 void bMain::mouseReleaseTrigger(int x, int y, int type)
 {
     emit mouseReleaseSignal(x, y, type);
+}
+
+void bMain::leaveEventTrigger()
+{
+    emit leaveEventSignal();
+}
+
+void bMain::enterEventTrigger()
+{
+    emit enterEventSignal();
 }

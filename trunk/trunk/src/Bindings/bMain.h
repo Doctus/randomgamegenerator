@@ -67,6 +67,9 @@ class bMain : public QObject
     int getCamW();
     int getCamH();
 
+    void setCam(int x, int y);
+    void adjustCam(int x, int y);
+
     void changeImage(QString oldFilename, QString newFilename);
     int getTileCountOfImage(QString filename);
 
@@ -85,9 +88,11 @@ class bMain : public QObject
     void saveMapTrigger(QString filename);
 
     void mouseMoveTrigger(int x, int y);
-    void mouseDragTrigger(int x, int y);
     void mousePressTrigger(int x, int y, int type);
     void mouseReleaseTrigger(int x, int y, int type);
+
+    void leaveEventTrigger();
+    void enterEventTrigger();
 
     signals:
     void newNetMessageSignal(QString str, QString handle);
@@ -101,9 +106,11 @@ class bMain : public QObject
     void saveMapSignal(QString filename);
 
     void mouseMoveSignal(int x, int y);
-    void mouseDragSignal(int x, int y);
     void mousePressSignal(int x, int y, int type);
     void mouseReleaseSignal(int x, int y, int type);
+
+    void leaveEventSignal();
+    void enterEventSignal();
 };
 
 #endif // BMAIN_H

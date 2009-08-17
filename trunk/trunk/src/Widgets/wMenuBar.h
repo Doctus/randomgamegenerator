@@ -55,9 +55,6 @@ class wMenuBar : public QObject
     QAction *showAboutDialog;
     QAction *showTextDockWidget;
 
-    QAction *moveIcon;
-    QAction *selectIcon;
-
     QMenu *fileMenu;
     QMenu *internetMenu;
     QMenu *viewMenu;
@@ -78,9 +75,6 @@ class wMenuBar : public QObject
 
     void hostServerSlot();
     void connectToServerSlot();
-
-    void moveIconSlot();
-    void selectIconSlot();
 
     signals:
     void newMapSignal();

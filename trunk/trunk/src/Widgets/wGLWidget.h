@@ -46,7 +46,6 @@ class wGLWidget : public QGLWidget
     private:
     cCamera *cam;
     cGame *mGame;
-    IconType::IconEnum selectedIcon;
     int lastx, lasty;
     float zoom;
     bool shiftHeld, ctrlHeld;
@@ -68,8 +67,6 @@ class wGLWidget : public QGLWidget
     void redrawTexture(QImage *image, GLuint texture);
     void deleteTexture(GLuint texture);
 
-    void setSelectedIcon(IconType::IconEnum selected);
-
     protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -81,12 +78,15 @@ class wGLWidget : public QGLWidget
     void wheelEvent(QWheelEvent *event);
 
     void leaveEvent(QEvent *event);
+    void enterEvent(QEvent *event);
 
     signals:
-    void mouseDragSignal(int x, int y);
     void mouseMoveSignal(int x, int y);
     void mousePressSignal(int x, int y, int type);
     void mouseReleaseSignal(int x, int y, int type);
+
+    void leaveSignal();
+    void enterSignal();
 };
 
 #endif
