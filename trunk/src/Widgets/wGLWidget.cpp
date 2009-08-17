@@ -34,7 +34,6 @@ std::string translateGLError(GLenum errorcode)
 wGLWidget::wGLWidget(QWidget* parent, cGame *mGame) : QGLWidget(QGLFormat(QGL::FormatOptions(QGL::DoubleBuffer | QGL::AlphaChannel)), parent)
 {
     this->mGame = mGame;
-    selectedIcon = IconType::select;
     cam = new cCamera(0, 0, 640, 480);
     ctrlHeld = false;
     shiftHeld = false;
@@ -273,15 +272,9 @@ void wGLWidget::deleteTexture(GLuint texture)
 }
 
 
-void wGLWidget::setSelectedIcon(IconType::IconEnum selected)
-{
-    selectedIcon = selected;
-}
-
-
 void wGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    if(selectedIcon == IconType::select && mouseButtonHeld)
+    /*if(selectedIcon == IconType::select && mouseButtonHeld)
         emit mouseDragSignal(event->pos().x() * (1/zoom), event->pos().y() * (1/zoom));
     else if(selectedIcon == IconType::select)
         emit mouseMoveSignal(event->pos().x() * (1/zoom), event->pos().y() * (1/zoom));
@@ -290,7 +283,9 @@ void wGLWidget::mouseMoveEvent(QMouseEvent *event)
         cam->adjustCam((lastx - event->pos().x()) * (1/zoom), (lasty - event->pos().y()) * (1/zoom));
         lastx = event->pos().x();
         lasty = event->pos().y();
-    }
+    }*/
+
+    emit mouseMoveSignal(event->pos().x() * (1/zoom), event->pos().y() * (1/zoom));
 
     event->accept();
 }
@@ -301,31 +296,28 @@ void wGLWidget::mousePressEvent(QMouseEvent *event)
     lasty = event->pos().y();
     mouseButtonHeld = true;
 
-    if(selectedIcon == IconType::select)
+    int type = 0;
+    int offset = 0;
+    if(ctrlHeld)
+        offset += 3;
+    if(shiftHeld)
+        offset += 6;
+    switch(event->button())
     {
-        int type = 0;
-        int offset = 0;
-        if(ctrlHeld)
-            offset += 3;
-        if(shiftHeld)
-            offset += 6;
-        switch(event->button())
-        {
-            case Qt::LeftButton:
-            type = 0 + offset;
-            break;
-            case Qt::MidButton:
-            type = 1 + offset;
-            break;
-            case Qt::RightButton:
-            type = 2 + offset;
-            break;
-            default:
-            type = -1;
-            break;
-        }
-        emit mousePressSignal(event->pos().x() * (1/zoom), event->pos().y() * (1/zoom), type);
+        case Qt::LeftButton:
+        type = 0 + offset;
+        break;
+        case Qt::MidButton:
+        type = 1 + offset;
+        break;
+        case Qt::RightButton:
+        type = 2 + offset;
+        break;
+        default:
+        type = -1;
+        break;
     }
+    emit mousePressSignal(event->pos().x() * (1/zoom), event->pos().y() * (1/zoom), type);
 
     event->accept();
 }
@@ -334,38 +326,36 @@ void wGLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     mouseButtonHeld = false;
 
-    if(selectedIcon == IconType::select)
+    int type = 0;
+    int offset = 0;
+
+    if(ctrlHeld)
+        offset += 3;
+    if(shiftHeld)
+        offset += 6;
+    switch(event->button())
     {
-        int type = 0;
-        int offset = 0;
-        if(ctrlHeld)
-            offset += 3;
-        if(shiftHeld)
-            offset += 6;
-        switch(event->button())
-        {
-            case Qt::LeftButton:
-            type = 0 + offset;
-            break;
-            case Qt::MidButton:
-            type = 1 + offset;
-            break;
-            case Qt::RightButton:
-            type = 2 + offset;
-            break;
-            default:
-            type = -1;
-            break;
-        }
-        emit mouseReleaseSignal(event->pos().x() * (1/zoom), event->pos().y() * (1/zoom), type);
+        case Qt::LeftButton:
+        type = 0 + offset;
+        break;
+        case Qt::MidButton:
+        type = 1 + offset;
+        break;
+        case Qt::RightButton:
+        type = 2 + offset;
+        break;
+        default:
+        type = -1;
+        break;
     }
+    emit mouseReleaseSignal(event->pos().x() * (1/zoom), event->pos().y() * (1/zoom), type);
 
     event->accept();
 }
 
 void wGLWidget::keyPressEvent(QKeyEvent *event)
 {
-    cout << "key press" << endl;
+    //cout << "key press" << endl;
     if(event->key() == Qt::Key_Control)
         ctrlHeld = true;
     else if(event->key() == Qt::Key_Shift)
@@ -374,7 +364,7 @@ void wGLWidget::keyPressEvent(QKeyEvent *event)
 
 void wGLWidget::keyReleaseEvent(QKeyEvent *event)
 {
-    cout << "key release" << endl;
+    //cout << "key release" << endl;
     if(event->key() == Qt::Key_Control)
         ctrlHeld = false;
     else if(event->key() == Qt::Key_Shift)
@@ -401,5 +391,11 @@ void wGLWidget::leaveEvent(QEvent *event)
 {
     ctrlHeld = false;
     shiftHeld = false;
+    emit leaveSignal();
+}
+
+void wGLWidget::enterEvent(QEvent *event)
+{
+    emit enterSignal();
 }
 
