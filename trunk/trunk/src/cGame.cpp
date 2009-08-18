@@ -113,7 +113,7 @@ cGame::cGame(QWidget *parent) : QObject(parent)
 
     mMenuBar = new wMenuBar(parent, this, mConnectionManager);
 
-    mDockWidgets = new wDockWidgets((QMainWindow*)parent, this);
+    //mDockWidgets = new wDockWidgets((QMainWindow*)parent, this);
 
     mTilesetManager = new cTilesetManager(mGLWidget);
 
