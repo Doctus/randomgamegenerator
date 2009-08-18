@@ -20,6 +20,7 @@ placingPog = [False, "path"]
 dwidget = rggDockWidget.diceRoller(c.getMainWindow())
 pwidget = rggDockWidget.pogPalette(c.getMainWindow())
 #mwidget = rggDockWidget.mapEditor(c.getMainWindow())
+cwidget = rggDockWidget.chatWidget(c.getMainWindow())
 
 rggMenuBar.setupMenuBar(c)
 
@@ -30,7 +31,7 @@ def newEvent(st):
     if (len(st) <= 0) or ('title=' in st):
         return
     if ('<' in st and '>' not in st) or ('<' in st and '>' in st and '<' in str(st)[str(st).rfind('>'):]):
-        c.insertChatMessage(c.tr("Please type &#38;#60; if you wish to include &#60; in your message."))
+        cwidget.insertMessage(c.tr("Please type &#38;#60; if you wish to include &#60; in your message."))
         return
     if st[0] == '/':
         words = unicode(st).split()
@@ -48,7 +49,7 @@ def newEvent(st):
             for pog in Maps[currentMap[0]].Pogs:
                 pog.show()
         if words[0].lower() == '/help' or words[0].lower() == '/h':
-            c.insertChatMessage("Command Help:<br> Typing ordinary text and pressing 'enter' " +
+            cwidget.insertMessage("Command Help:<br> Typing ordinary text and pressing 'enter' " +
                                 "will display to all players. Other commands may be invoked " +
                                 "with '/' plus the name of the command plus any arguments." +
                                 "<br>Commands<br>/randomname<br>/techname<br>/roll<br>/troll"+
@@ -60,25 +61,25 @@ def newEvent(st):
                         "JAPANESEFEMALEFULL and DwArF M aLe")
             else:
                 name = rggNameGen.getName(''.join(words[1:]).lower())
-            c.insertChatMessage(unicode(name))
+            cwidget.insertMessage(unicode(name))
         elif words[0].lower() == '/techname' or words[0].lower() == '/techniquename':
-            c.insertChatMessage(rggNameGen.getTechniqueName(str(st)))
+            cwidget.insertMessage(rggNameGen.getTechniqueName(str(st)))
         elif words[0].lower() == '/advice':
-            c.insertChatMessage(rggNameGen.getAdvice())
+            cwidget.insertMessage(rggNameGen.getAdvice())
         elif words[0].lower() == '/roll':
             if len(words) == 1:
-                c.insertChatMessage("Syntax: /roll DICE. Dice can be " +
+                cwidget.insertMessage("Syntax: /roll DICE. Dice can be " +
                                     "like '3d4 - 2 + 1d20' or '5k3' or" +
                                     " other variants depending on " +
                                     "development. See also /troll")
             else:
                 rolltext = (_linkedName(c.getLocalHandle()) + c.tr(" rolls ") +
                             rggDice.roll(" ".join(words[1:])))
-                c.insertChatMessage(rolltext)
+                cwidget.insertMessage(rolltext)
                 c.sendNetMessageToAll('r!' + rolltext)
         elif words[0].lower() == '/troll':
             rolltext = (c.getLocalHandle() + c.tr(" rolls ") + rggDice.roll('2d6'))
-            c.insertChatMessage(rolltext)
+            cwidget.insertMessage(rolltext)
             c.sendNetMessageToAll('r!' + rolltext)
         elif words[0].lower() == '/me' or words[0].lower() == '/emote':
             if len(words) == 1:
@@ -86,7 +87,7 @@ def newEvent(st):
                         "ACTION' in italic font.")
             else:
                 action = ' '.join(words[1:])
-            c.insertChatMessage('<i>' + _linkedName(c.getLocalHandle()) + ' ' +
+            cwidget.insertMessage('<i>' + _linkedName(c.getLocalHandle()) + ' ' +
                                 unicode(action) + '</i>')
             c.sendNetMessageToAll('T!' + unicode(action))
         elif words[0].lower() == '/w' or words[0].lower() == '/t' or words[0].lower() == '/whisper' or words[0].lower() == '/tell':
@@ -94,19 +95,19 @@ def newEvent(st):
                 mesg = ("Syntax: /whisper HANDLE MESSAGE. Sends a message " +
                         "only to the specified user. Spaces MUST be correct." +
                         " Handle may be caps-sensitive.")
-                c.insertChatMessage(unicode(mesg))
+                cwidget.insertMessage(unicode(mesg))
             else:
                 target = words[1]
                 mesg = " ".join(words[2:])
                 if c.isServer():
                     if not c.sendNetMessageToHandle('w! ' + c.getLocalHandle() +
                                              ' ' + unicode(mesg), target):
-                        c.insertChatMessage("Error: could not find that handle.")
+                        cwidget.insertMessage("Error: could not find that handle.")
                     else:
-                        c.insertChatMessage('To ' + unicode(target) + ': ' +
+                        cwidget.insertMessage('To ' + unicode(target) + ': ' +
                                     unicode(mesg))
                 else:
-                    c.insertChatMessage('To ' + unicode(target) + ': ' +
+                    cwidget.insertMessage('To ' + unicode(target) + ': ' +
                                     unicode(mesg))
                     c.sendNetMessageToAll('W! ' + target + ' ' + unicode(mesg))
         elif words[0].lower() == '/addmacro':
@@ -114,7 +115,7 @@ def newEvent(st):
             if "error" not in rggDice.roll(validation).lower() and "not yet implemented" not in rggDice.roll(validation).lower():
                 dwidget.addMacro(validation, unicode(c.getUserTextInput("What should the macro be called?")))
             else:
-                c.insertChatMessage('Malformed macro. Formatting help is available in "/roll" command.')
+                cwidget.insertMessage('Malformed macro. Formatting help is available in "/roll" command.')
         elif words[0].lower() == '/placepog' and placingPog[0] == False:
             placingPog[0] = True
             placingPog[1] = " ".join(words[1:])
@@ -132,20 +133,20 @@ def newEvent(st):
             Maps[currentMap[0]].show()
             c.sendNetMessageToAll(Maps[currentMap[0]].stringform)
     else:
-        c.insertChatMessage(_linkedName(c.getLocalHandle()) + ": " + st)
+        cwidget.insertMessage(_linkedName(c.getLocalHandle()) + ": " + st)
         c.sendNetMessageToAll("t!" + st)
 
 def newNetEvent(st, handle):
     if len(st) > 1:
         if st[1] == '!':
             if st[0] == 't': #Ordinary chat message
-                c.insertChatMessage(_linkedName(unicode(handle)) + ": " + st[2:])
+                cwidget.insertMessage(_linkedName(unicode(handle)) + ": " + st[2:])
                 if c.isServer():
                     c.sendNetMessageToAllButOne('s!' + ' ' + handle +
                                                 ' ' + st[2:],
                                                 handle)
             elif st[0] == 'T': #Emote message
-                c.insertChatMessage('<i>' + _linkedName(unicode(handle)) + " " +
+                cwidget.insertMessage('<i>' + _linkedName(unicode(handle)) + " " +
                                     st[2:] + '</i>')
                 if c.isServer():
                     c.sendNetMessageToAllButOne('S!' + ' ' + handle +
@@ -153,20 +154,20 @@ def newNetEvent(st, handle):
                                                 handle)
             elif st[0] == 's': #Spoofed talk
                 words = unicode(st).split()
-                c.insertChatMessage(_linkedName(words[1]) + ": " +
+                cwidget.insertMessage(_linkedName(words[1]) + ": " +
                                     " ".join(words[2:]))
             elif st[0] == 'S': #Spoofed emote
                 words = unicode(st).split()
-                c.insertChatMessage('<i>' + _linkedName(words[1]) + " " +
+                cwidget.insertMessage('<i>' + _linkedName(words[1]) + " " +
                                     " ".join(words[2:]) + '</i>')
             elif st[0] == 'w': #Whisper/tell
                 words = unicode(st).split()
-                c.insertChatMessage('From ' + _linkedName(words[1]) + ': ' +
+                cwidget.insertMessage('From ' + _linkedName(words[1]) + ': ' +
                                     " ".join(words[2:]))
             elif st[0] == 'W': #Whisper/tell requiring relay
                 words = unicode(st).split()
                 if words[1] == c.getLocalHandle():
-                    c.insertChatMessage('From ' + _linkedName(handle) + ': ' +
+                    cwidget.insertMessage('From ' + _linkedName(handle) + ': ' +
                                         " ".join(words[2:]))
                 else:
                     c.sendNetMessageToHandle('w!' + " " + handle + " " +
@@ -190,16 +191,16 @@ def newNetEvent(st, handle):
                 if c.isServer():
                     c.sendNetMessageToAllButOne(st, handle)
             elif st[0] == 'r': #Die roll
-                c.insertChatMessage(st[2:])
+                cwidget.insertMessage(st[2:])
                 if c.isServer():
                     c.sendNetMessageToAllButOne(st, handle)
             elif st[0] == 'u': #User message
                 words = unicode(st).split()
                 if words[1] == 'join':
-                    c.insertChatMessage('<b>' + " ".join(words[2:]) +
+                    cwidget.insertMessage('<b>' + " ".join(words[2:]) +
                                         " has joined the game" + '</b>')
                 elif words[1] == 'leave':
-                    c.insertChatMessage('<b>' + " ".join(words[2:]) +
+                    cwidget.insertMessage('<b>' + " ".join(words[2:]) +
                                         " has left the game" + '</b>')
             elif st[0] == 'n': #Map file
                 #print st
@@ -243,7 +244,7 @@ def newNetEvent(st, handle):
         print 'Badly malformed data received: ' + unicode(st)
 
 def newConnection(handle):
-    c.insertChatMessage("<b>" + handle + " has joined" + "</b>")
+    cwidget.insertMessage("<b>" + handle + " has joined" + "</b>")
     if not c.isServer():
         global Maps
         Maps = []
@@ -254,7 +255,7 @@ def newConnection(handle):
         c.sendNetMessageToAllButOne('u!' + ' join ' + handle, handle)
 
 def disConnection(handle):
-    c.insertChatMessage("<b>" + handle + " has left the game" + "</b>")
+    cwidget.insertMessage("<b>" + handle + " has left the game" + "</b>")
     if c.isServer():
         c.sendNetMessageToAllButOne('u!' + ' leave ' + handle, handle)     
 
@@ -453,5 +454,6 @@ QtCore.QObject.connect(c, QtCore.SIGNAL("mouseReleaseSignal(int, int, int)"), mo
 
 QtCore.QObject.connect(dwidget, QtCore.SIGNAL("newChatInputSignal(QString)"), newEvent)
 QtCore.QObject.connect(pwidget, QtCore.SIGNAL("newChatInputSignal(QString)"), newEvent)
+QtCore.QObject.connect(cwidget, QtCore.SIGNAL("newChatInputSignal(QString)"), newEvent)
 
 c.start()

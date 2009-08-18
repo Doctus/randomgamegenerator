@@ -41,7 +41,7 @@ wDockWidgets::wDockWidgets(QMainWindow *mainWindow, cGame *mGame) : QObject(main
     /*dockWidget->setAllowedAreas(Qt::LeftDockWidgetArea |
                                  Qt::BottomDockWidgetArea);*/
     dockWidget->setWidget(dockWidgetContents);
-    mainWindow->addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
+    mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
 
     QObject::connect((QObject*)dockWidgetLineInput, SIGNAL(returnPressed()), (QObject*)this, SLOT(processInput()));
 }
