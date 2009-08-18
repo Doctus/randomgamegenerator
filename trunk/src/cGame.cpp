@@ -148,10 +148,6 @@ void cGame::displayFPS()
     FPScounter = 0;
 }
 
-void cGame::showTextDockWidget()
-{
-    this->mDockWidgets->showTextDockWidgets();
-}
 
 QString cGame::getTitle()
 {

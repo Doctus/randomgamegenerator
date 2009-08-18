@@ -53,11 +53,9 @@ class wMenuBar : public QObject
     QAction *hostServer;
     QAction *connectToServer;
     QAction *showAboutDialog;
-    QAction *showTextDockWidget;
 
     QMenu *fileMenu;
     QMenu *internetMenu;
-    QMenu *viewMenu;
     QMenu *helpMenu;
 
     public:
@@ -70,8 +68,6 @@ class wMenuBar : public QObject
     void saveMapSlot();
     void loadMapSlot();
     void newMapSlot();
-
-    void showTextDockWidgetSlot();
 
     void hostServerSlot();
     void connectToServerSlot();
