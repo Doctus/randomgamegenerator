@@ -152,7 +152,7 @@ class pogPalette(QtGui.QDockWidget):
     self.controlLayout = QtGui.QBoxLayout(2)
     self.addpogbutton = QtGui.QPushButton(self.tr("Update (UNTESTED)"), mainWindow)
     self.connect(self.addpogbutton, QtCore.SIGNAL('pressed()'), self.addPog)
-    self.connect(self.pogArea, QtCore.SIGNAL('itemDoubleClicked(QListWidgetItem *)'), self.placePog)
+    self.connect(self.pogArea, QtCore.SIGNAL('itemActivated(QListWidgetItem *)'), self.placePog)
     self.controlLayout.addWidget(self.addpogbutton)
     self.controlArea.setLayout(self.controlLayout)
     self.mainLayout.addWidget(self.pogArea)

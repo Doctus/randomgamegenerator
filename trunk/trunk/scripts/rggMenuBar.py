@@ -28,5 +28,8 @@ def setupMenuBar(c):
     moveIcon.setToolTip("Move Tool (Ctrl+M)");
     menubar.addAction(moveIcon)
 
+    global selectedIcon
+    selectedIcon = 0
+
     QtCore.QObject.connect(selectIcon, QtCore.SIGNAL("triggered()"), selectIconClicked)
     QtCore.QObject.connect(moveIcon, QtCore.SIGNAL("triggered()"), moveIconClicked)
