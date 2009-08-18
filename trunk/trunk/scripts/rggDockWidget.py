@@ -14,14 +14,18 @@ class chatLineEdit(QtGui.QLineEdit):
     self.position = len(self.messageHistory)
 
   def keyPressEvent(self, event):
-    if event.key == QtCore.Qt.Key_Up and position > 0:
+    print "test"
+    print event.key
+    if event.key() == QtCore.Qt.Key_Up and self.position > 0:
+      print "up!"
       if self.position == len(self.messageHistory):
         self.lastInput = self.text()
       self.position -= 1
       self.setText(self.messageHistory[self.position])
-    elif event.key == QtCore.Qt.Key_Down:
+    elif event.key() == QtCore.Qt.Key_Down:
+      print "down!"
       if self.position < len(self.messageHistory) - 1:
-        self.positon += 1
+        self.position += 1
         self.setText(self.messageHistory[self.position])
       elif self.position == len(self.messageHistory) - 1:
         self.setText(self.lastInput)
