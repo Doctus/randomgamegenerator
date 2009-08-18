@@ -12,15 +12,16 @@
   * Some sort of pallete for pog placement.
   * ~~Multiple selection of pogs.~~
   * Better tooltips.
-  * Dice macros.
-  * Ability to manipulate widgets better in Python. (E.g., creating new widgets with text/images/maybe buttons)
-  * "New Map" item in file menu.
+  * ~~Dice macros.~~
+  * ~~Ability to manipulate widgets better in Python. (E.g., creating new widgets with text/images/maybe buttons)~~
+  * ~~"New Map" item in file menu.~~
   * Warning in the join-game dialog that you'll lose current maps and get those the group has loaded.
   * Some sort of dialog designed for displaying information (text and/or images; maybe the same HTML subset as chat would be preferable). For stuff like, say, character sheets. Doesn't need to be editable; probably shouldn't be in fact. Might get rolled into the "widgets" thing.
   * More pog editing commands:
     * Edit layer
     * More associated data
     * Maybe other stuff
+  * Option for separate IC/OOC chat.
 
 = Graphics =
   * Some default tilesets would be nice.
