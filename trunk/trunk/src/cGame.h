@@ -28,7 +28,6 @@ class cGame;
 #include "cTilesetManager.h"
 #include "Widgets/wMenuBar.h"
 #include "Widgets/wGLWidget.h"
-#include "Widgets/wDockWidgets.h"
 #include "Network/nConnectionManager.h"
 #include "Bindings/bMain.h"
 #include "Bindings/bImage.h"
@@ -43,7 +42,6 @@ class cGame : public QObject
     cTilesetManager *mTilesetManager;
     wMenuBar *mMenuBar;
     wGLWidget *mGLWidget;
-    wDockWidgets *mDockWidgets;
     nConnectionManager *mConnectionManager;
 
     QString title;
@@ -62,7 +60,6 @@ class cGame : public QObject
     void displayFPS();
 
     public:
-    void showTextDockWidget();
     QString getTitle();
 };
 

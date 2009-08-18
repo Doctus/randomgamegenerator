@@ -7,7 +7,7 @@ TARGET = random-game-generator
 TEMPLATE = lib
 CONFIG += release
 TRANSLATIONS = rgg_nl.ts \
-               rgg_ja.ts
+    rgg_ja.ts
 CODECFORTR = UTF-8
 CODECFORSRC = UTF-8
 SOURCES += ../src/cTilesetManager.cpp \
@@ -16,10 +16,8 @@ SOURCES += ../src/cTilesetManager.cpp \
     ../src/cCamera.cpp \
     ../src/Widgets/wGLWidget.cpp \
     ../src/Widgets/wMenuBar.cpp \
-    ../src/Widgets/wDockWidgets.cpp \
     ../src/Network/nConnection.cpp \
     ../src/Network/nConnectionManager.cpp \
-    ../src/Widgets/wLineEdit.cpp \
     ../src/Widgets/wAction.cpp
 HEADERS += ../src/cTilesetManager.h \
     ../src/cTileset.h \
@@ -27,8 +25,6 @@ HEADERS += ../src/cTilesetManager.h \
     ../src/cCamera.h \
     ../src/Widgets/wGLWidget.h \
     ../src/Widgets/wMenuBar.h \
-    ../src/Widgets/wDockWidgets.h \
     ../src/Network/nConnection.h \
     ../src/Network/nConnectionManager.h \
-    ../src/Widgets/wLineEdit.h \
     ../src/Widgets/wAction.h

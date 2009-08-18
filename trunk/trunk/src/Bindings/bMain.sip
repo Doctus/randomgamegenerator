@@ -34,7 +34,6 @@ class bMain : QObject {
 public:
     bMain();
     void start();
-    void insertChatMessage(QString str);
     void sendNetMessageToAll(QString msg);
     bool sendNetMessageToHandle(QString msg, QString handle);
     void sendNetMessageToAllButOne(QString msg, QString handle);
@@ -68,7 +67,6 @@ public:
 
 signals:
     void newNetMessageSignal(QString str, QString handle);
-    void newChatInputSignal(QString str);
 
     void connectedSignal(QString handle);
     void disconnectedSignal(QString handle);

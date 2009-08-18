@@ -14,8 +14,6 @@ class chatLineEdit(QtGui.QLineEdit):
     self.position = len(self.messageHistory)
 
   def keyPressEvent(self, event):
-    print "test"
-    print event.key
     if event.key() == QtCore.Qt.Key_Up and self.position > 0:
       print "up!"
       if self.position == len(self.messageHistory):

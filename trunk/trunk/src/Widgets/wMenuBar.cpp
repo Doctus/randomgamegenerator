@@ -44,10 +44,6 @@ void wMenuBar::initActions()
     saveMap->setShortcut(tr("Ctrl+S"));
     QAction::connect(saveMap, SIGNAL(triggered()), this, SLOT(saveMapSlot()));
 
-    showTextDockWidget = new QAction(tr("&Text Widget"), windowWidget);
-    showTextDockWidget->setShortcut(tr("Ctrl+T"));
-    QAction::connect(showTextDockWidget, SIGNAL(triggered()), this, SLOT(showTextDockWidgetSlot()));
-
     hostServer = new QAction(tr("&Host Server"), windowWidget);
     hostServer->setShortcut(tr("Ctrl+H"));
     QAction::connect(hostServer, SIGNAL(triggered()), this, SLOT(hostServerSlot()));
@@ -68,13 +64,9 @@ void wMenuBar::initBars()
     internetMenu->addAction(hostServer);
     internetMenu->addAction(connectToServer);
 
-    viewMenu = new QMenu(tr("&View"), windowWidget);
-    viewMenu->addAction(showTextDockWidget);
-
     QMenuBar *bar = ((QMainWindow*)windowWidget)->menuBar();
     bar->addMenu(fileMenu);
     bar->addMenu(internetMenu);
-    bar->addMenu(viewMenu);
 
     bar->addSeparator();
 }
@@ -102,11 +94,6 @@ void wMenuBar::loadMapSlot()
     {
         emit loadMapSignal(fileName);
     }
-}
-
-void wMenuBar::showTextDockWidgetSlot()
-{
-    mGame->showTextDockWidget();
 }
 
 

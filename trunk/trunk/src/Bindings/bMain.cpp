@@ -20,7 +20,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "bMain.h"
 
 #include "../cGame.h"
-#include "../Widgets/wDockWidgets.h"
 #include "../Network/nConnectionManager.h"
 
 int i = 1;
@@ -67,8 +66,6 @@ bMain::bMain()
 
     cout << "mainGame initialised" << endl;
 
-    connect(mainGame->mDockWidgets, SIGNAL(newChatInputSignal(QString)), this, SLOT(chatInputTrigger(QString)));
-
     connect(mainGame->mConnectionManager, SIGNAL(newNetMessage(QString,QString)), this, SLOT(netMessageTrigger(QString, QString)));
     connect(mainGame->mConnectionManager, SIGNAL(connectedSignal(QString)), this, SLOT(connectedTrigger(QString)));
     connect(mainGame->mConnectionManager, SIGNAL(disconnectedSignal(QString)), this, SLOT(disconnectedTrigger(QString)));
@@ -94,11 +91,6 @@ void bMain::start()
 cGame* bMain::getGameInstance()
 {
     return mainGame;
-}
-
-void bMain::insertChatMessage(QString str)
-{
-    mainGame->mDockWidgets->insertMessage(str);
 }
 
 void bMain::sendNetMessageToAll(QString msg)
@@ -286,11 +278,6 @@ void bMain::removeTranslationFile(QString filename)
     app.removeTranslator(t);
 }*/
 
-
-void bMain::chatInputTrigger(QString msg)
-{
-    emit newChatInputSignal(msg);
-}
 
 void bMain::netMessageTrigger(QString msg, QString handle)
 {
