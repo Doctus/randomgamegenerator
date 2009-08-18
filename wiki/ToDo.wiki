@@ -30,6 +30,7 @@
   * Some default tilesets would be nice.
   * Some default pogs would be nice.
   * Animated tiles.
+  * Be able to draw points, lines, squares, etc.
 
 = Generators =
   * Add more name generators.
