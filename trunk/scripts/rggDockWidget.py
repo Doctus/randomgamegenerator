@@ -164,16 +164,15 @@ class pogPalette(QtGui.QDockWidget):
     mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
 
   def addPog(self):
-    self.pogstemp = []
+    self.pogArea.clear()
+    self.pogs = []
     for x in os.walk('data/pogs'):
       if ".svn" not in x[0]:
         for y in x[2]:
           if ".png" in y or ".jpg" in y or ".jpeg" in y or ".tiff" in y or ".bmp" in y or ".ppm" in y or ".xbm" in y or ".xpm" in y:
-            if (x[0] + "/" + y) not in self.pogs:
-              self.pogstemp.append(x[0] + "/" + y)
-    if self.pogstemp is not []:
-      for greatjustice in self.pogstemp:
-        self.pogArea.addItem(QtGui.QListWidgetItem(QtGui.QIcon(QtGui.QIcon(p).pixmap(QtCore.QSize(32, 32))), greatjustice[10:]))
+            self.pogs.append(x[0] + "/" + y)
+    for greatjustice in self.pogs:
+      self.pogArea.addItem(QtGui.QListWidgetItem(QtGui.QIcon(QtGui.QIcon(greatjustice).pixmap(QtCore.QSize(32, 32))), greatjustice[10:]))
 
   def placePog(self, pog):
     self.emit(QtCore.SIGNAL("newChatInputSignal(QString)"), "/placepog data/pogs/" + pog.text())
