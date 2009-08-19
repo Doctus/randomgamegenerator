@@ -5,31 +5,30 @@ QT += opengl \
     network
 TARGET = random-game-generator
 TEMPLATE = lib
-DEFINES = _WINDOWS
 CONFIG += release
+TRANSLATIONS = rgg_nl.ts \
+    rgg_ja.ts
+CODECFORTR = UTF-8
+CODECFORSRC = UTF-8
 SOURCES += ../src/cTilesetManager.cpp \
     ../src/cTileset.cpp \
     ../src/cGame.cpp \
     ../src/cCamera.cpp \
     ../src/Widgets/wGLWidget.cpp \
     ../src/Widgets/wMenuBar.cpp \
-    ../src/Widgets/wDockWidgets.cpp \
     ../src/Network/nConnection.cpp \
     ../src/Network/nConnectionManager.cpp \
-    ../src/Bindings/bMain.cpp \
+    ../src/Widgets/wAction.cpp \
     ../src/Bindings/bImage.cpp \
-    ../src/Widgets/wLineEdit.cpp \
-    ../src/Widgets/wAction.cpp
+    ../src/Bindings/bMain.cpp
 HEADERS += ../src/cTilesetManager.h \
     ../src/cTileset.h \
     ../src/cGame.h \
     ../src/cCamera.h \
     ../src/Widgets/wGLWidget.h \
     ../src/Widgets/wMenuBar.h \
-    ../src/Widgets/wDockWidgets.h \
     ../src/Network/nConnection.h \
     ../src/Network/nConnectionManager.h \
-    ../src/Bindings/bImage.h \
+    ../src/Widgets/wAction.h \
     ../src/Bindings/bMain.h \
-    ../src/Widgets/wLineEdit.h \
-    ../src/Widgets/wAction.h
+    ../src/Bindings/bImage.h
