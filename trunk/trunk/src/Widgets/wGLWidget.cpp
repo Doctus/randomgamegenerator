@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "wGLWidget.h"
 
-#ifdef _WINDOWS
+#ifdef WIN32
   #define GL_TEXTURE_RECTANGLE_ARB GL_TEXTURE_2D //This abolishes POT textures, but at least it works! (god damn microsoft and its shitty products)
 #endif
 
