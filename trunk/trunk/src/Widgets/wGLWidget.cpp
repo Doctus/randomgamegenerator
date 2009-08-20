@@ -111,7 +111,7 @@ void wGLWidget::drawImage(QImage *originalImage, int x, int y)
     //note, Somehow, qt4 reverses bottom and top. Somehow.
     glBegin(GL_QUADS);
         //Top-left vertex (corner)
-#ifdef _WINDOWS
+#ifdef WIN32
         glTexCoord2i(0, 1);
 #else
         glTexCoord2i(0, image.height()); //image/texture
@@ -119,7 +119,7 @@ void wGLWidget::drawImage(QImage *originalImage, int x, int y)
         glVertex3i(x, y, 0); //screen coordinates
 
         //Bottom-left vertex (corner)
-#ifdef _WINDOWS
+#ifdef WIN32
         glTexCoord2i(1, 1);
 #else
         glTexCoord2i(image.width(), image.height());
@@ -127,7 +127,7 @@ void wGLWidget::drawImage(QImage *originalImage, int x, int y)
         glVertex3i(x+image.width(), y, 0);
 
         //Bottom-right vertex (corner)
-#ifdef _WINDOWS
+#ifdef WIN32
         glTexCoord2i(1, 0);
 #else
         glTexCoord2i(image.width(), 0);
@@ -158,7 +158,7 @@ void wGLWidget::drawImage(GLuint texture, int x, int y, int w, int h)
     //note, Somehow, qt4 reverses bottom and top. Somehow.
     glBegin(GL_QUADS);
         //Top-left vertex (corner)
-#ifdef _WINDOWS
+#ifdef WIN32
         glTexCoord2i(0, 1);
 #else
         glTexCoord2i(0, h); //image/texture
@@ -166,7 +166,7 @@ void wGLWidget::drawImage(GLuint texture, int x, int y, int w, int h)
         glVertex3f(x*zoom, y*zoom, 0); //screen coordinates
 
         //Bottom-left vertex (corner)
-#ifdef _WINDOWS
+#ifdef WIN32
         glTexCoord2i(1, 1);
 #else
         glTexCoord2i(w, h);
@@ -174,7 +174,7 @@ void wGLWidget::drawImage(GLuint texture, int x, int y, int w, int h)
         glVertex3f((x+w)*zoom, y*zoom, 0);
 
         //Bottom-right vertex (corner)
-#ifdef _WINDOWS
+#ifdef WIN32
         glTexCoord2i(1, 0);
 #else
         glTexCoord2i(w, 0);
@@ -285,7 +285,7 @@ void wGLWidget::mouseMoveEvent(QMouseEvent *event)
         lasty = event->pos().y();
     }*/
 
-    emit mouseMoveSignal(event->pos().x() * (1/zoom), event->pos().y() * (1/zoom));
+    emit mouseMoveSignal(int(event->pos().x() * (1/zoom)), int(event->pos().y() * (1/zoom)));
 
     event->accept();
 }
@@ -317,7 +317,7 @@ void wGLWidget::mousePressEvent(QMouseEvent *event)
         type = -1;
         break;
     }
-    emit mousePressSignal(event->pos().x() * (1/zoom), event->pos().y() * (1/zoom), type);
+    emit mousePressSignal(int(event->pos().x() * (1/zoom)), int(event->pos().y() * (1/zoom)), type);
 
     event->accept();
 }
@@ -348,7 +348,7 @@ void wGLWidget::mouseReleaseEvent(QMouseEvent *event)
         type = -1;
         break;
     }
-    emit mouseReleaseSignal(event->pos().x() * (1/zoom), event->pos().y() * (1/zoom), type);
+    emit mouseReleaseSignal(int(event->pos().x() * (1/zoom)), int(event->pos().y() * (1/zoom)), type);
 
     event->accept();
 }

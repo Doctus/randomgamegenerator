@@ -35,7 +35,6 @@ class wGLWidget;
 #include "../cGame.h"
 #include "../Bindings/bImage.h"
 #include "../Bindings/bMain.h"
-#include "wMenuBar.h"
 
 using namespace std;
 
