@@ -46,7 +46,7 @@ QPoint cCamera::getCam(float zoom)
 
 QPoint cCamera::getBounds(float zoom)
 {
-    return QPoint(x + w * (1/zoom), y + h * (1/zoom));
+    return QPoint(int(x + w * (1/zoom)), int(y + h * (1/zoom)));
 }
 
 void cCamera::setCam(QPoint newCam)

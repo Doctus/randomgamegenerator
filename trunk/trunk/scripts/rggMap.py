@@ -1,7 +1,8 @@
-#rggMap - for the Random Game Generator project            
-#
-#By Doctus (kirikayuumura.noir@gmail.com)
 '''
+rggMap - for the Random Game Generator project            
+
+By Doctus (kirikayuumura.noir@gmail.com)
+
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
 License as published by the Free Software Foundation; either
@@ -16,163 +17,144 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
+import sys
 import rggTile, rggPog, random
+from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
-class Map:
-  def __init__(self):
-    self.Pogs = []
-    self.pogsByID = {}
-
-  def addPog(self, pog):
-    self.Pogs.append(pog)
-    if self.pogsByID.has_key(pog.ID):
-      self.tmpint = 1
-      while self.pogsByID.has_key(self.tmpint):
-        self.tmpint = self.tmpint + 1
-      pog.ID = self.tmpint
-      self.pogsByID[pog.ID] = pog
-    else:
-      self.pogsByID[pog.ID] = pog
-
-  def loadFromString(self, s):
-    if len(s) != len("".join(s)): #An amusing way to do it since it must
-      self.stringform = " ".join(s) #contain at least one two-character value
-    else:
-      self.stringform = s
-    self.mapname = " ".join(s[s.index('n!')+1:s.index('!n')])
-    self.authorname = " ".join(s[s.index('a!')+1:s.index('!a')])
-    self.mapsize = [int(s[s.index('m!')+1]), int(s[s.index('m!')+2])]
-    self.tileset = s[s.index('t!')+1]
-    self.tilesize = [int(s[s.index('s!')+1]), int(s[s.index('s!')+2])]
-    self.tileindexes = []
-    self.itlim = len(s)
-    if 'p!' in s:
-      self.itlim = s.index('p!')
-    for itertile in range(s.index('s!')+3, self.itlim):
-      if '~' in s[itertile]:
-        for x in range(0, int(s[itertile][s[itertile].index('~')+1:])):
-          self.tileindexes.append(int(s[itertile][0:s[itertile].index('~')]))
-      else: self.tileindexes.append(int(s[itertile]))
-    while len(self.tileindexes) < self.mapsize[0]*self.mapsize[1]:
-      self.tileindexes.append(1)
-    self.tiles = []
-    for x in range(0, self.mapsize[0]):
-      self.tiles.append([])
-      for y in range(0, self.mapsize[1]):
-        self.tiles[x].append(rggTile.tile(x*self.tilesize[0], y*self.tilesize[1],
-                                          self.tilesize[0], self.tilesize[1],
-                                          self.tileindexes[x+(y*self.mapsize[0])],
-                                          0,
-                                          self.tileset))
-    if 'p!' in s:
-      self.tmppogseg = s[s.index('p!'):]
-      while len(self.tmppogseg) > 0:
-          self.addPog(rggPog.Pog(*self.tmppogseg[1:8]))
-          self.tmppogseg = self.tmppogseg[8:]
-
-  def encodeIndexes(self, ind):
-    self.fullform = []
-    self.output = []
-    self.counthack = 1
-    for item in ind:
-      if (item+0!=item) and ('~' in item):
-        for x in range(0, int(item[item.index('~')+1:])):
-          self.fullform.append(item[0:item.index('~')])
-      else:
-        self.fullform.append(item)
-    for index in range(0, len(self.fullform)-1):
-      if self.fullform[index] == self.fullform[index+1]:
-        self.counthack += 1
-      else:
-        if self.counthack == 1: self.output.append(str(self.fullform[index]))
-        else: self.output.append(str(str(self.fullform[index]) + '~' + str(self.counthack)))
-        self.counthack = 1
-    return self.output
-
-  def deriveStringForm(self, mname, aname, msize, tset, tsize, tindexes, pogz):
-    #Best to do this "backwards" so we keep track of the indexes for insertion.
-    self.result = ['n!', '!n', 'a!', '!a', 'm!', 't!', 's!']
-    self.result.extend(self.encodeIndexes(tindexes))
-    self.result.insert(7, str(tsize[1]))
-    self.result.insert(7, str(tsize[0]))
-    self.result.insert(6, str(tset))
-    self.result.insert(5, str(msize[1]))
-    self.result.insert(5, str(msize[0]))
-    #Have to take several lines here because someone decided reverse()
-    #should alter the string instead of returning the new version...
-    tmpname = aname.split()
-    tmpname.reverse()
-    for portion in tmpname:
-      self.result.insert(3, portion)
-    tmpname = mname.split()
-    tmpname.reverse()
-    for portion in tmpname:
-      self.result.insert(1, portion)
-    #Now for the horror of the pogs.
-    for pog in pogz:
-      self.result.append("p! " + pog.deriveStringForm())
-    return " ".join(self.result)
-
-  def updateStringForm(self):
-    self.stringform = self.deriveStringForm(self.mapname, self.authorname,
-                                            self.mapsize, self.tileset,
-                                            self.tilesize, self.tileindexes,
-                                            self.Pogs)
-
-  def debugMorphTile(self, coord, maxtiles):
-    self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])] = (self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])] + 1)%maxtiles
-    self.tiles[coord[0]][coord[1]] = rggTile.tile(coord[0]*self.tilesize[0], coord[1]*self.tilesize[1],
-                                          self.tilesize[0], self.tilesize[1],
-                                          self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])], 0,
-                                          self.tileset)
-    self.updateStringForm()
-
-  def debugGetTile(self, coord):
-    return self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])]
-
-  def debugSetTile(self, coord, ind):
-    self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])] = ind
-    self.tiles[coord[0]][coord[1]] = rggTile.tile(coord[0]*self.tilesize[0], coord[1]*self.tilesize[1],
-                                          self.tilesize[0], self.tilesize[1],
-                                          self.tileindexes[coord[0]+(coord[1]*self.mapsize[0])], 0,
-                                          self.tileset)
-    self.updateStringForm()
-
-  def LoadFromFile(self, filename):
-    f = open(filename, 'r')
-    tmp = f.read().split()
-    f.close()
-    self.loadFromString(tmp)
-
-  def reloadTiles(self, imgpath, includePogs=True):
-    for x in range(0, self.mapsize[0]):
-      self.tiles.append([])
-      for y in range(0, self.mapsize[1]):
-        self.tiles[x].append(rggTile.tile(x*self.tilesize[0], y*self.tilesize[1],
-                                          self.tilesize[0], self.tilesize[1],
-                                          self.tileindexes[x+(y*self.mapsize[0])],
-                                          0,
-                                          self.tileset))
-    if includePogs:
-      for pog in self.Pogs:
-        pog.reloadTile(imgpath)
-
-  def checkPogImages(self):
-    uniqueImages = set()
-    for pog in self.Pogs:
-      uniqueImages.add(pog.src)
-    return uniqueImages
-
-  def hide(self):
-    self.tiles = []
-
-  def show(self):
-    self.tiles = []
-    for x in range(0, self.mapsize[0]):
-      self.tiles.append([])
-      for y in range(0, self.mapsize[1]):
-        self.tiles[x].append(rggTile.tile(x*self.tilesize[0], y*self.tilesize[1],
-                                          self.tilesize[0], self.tilesize[1],
-                                          self.tileindexes[x+(y*self.mapsize[0])],
-                                          0,
-                                          self.tileset))
+class Map(object):
+    
+    def __init__(self, mapname, authorname, mapsize, tileset, tilesize):
+        """Initializes a new map."""
+        
+        self.mapname = mapname
+        self.authorname = authorname
+        self.mapsize = mapsize
+        self.tileset = tileset
+        self.tilesize = tilesize
+        
+        self.Pogs = {}
+        self.tileindexes = [0 for i in xrange(mapsize[0] * mapsize[1])]
+        self.hidden = False
+        self.tiles = None
+        self._showTiles()
+        
+    def addPog(self, pog):
+        """Adds a pog to the map, assigning it a unique id."""
+        if pog.ID is None:
+            pog.ID = self._findUniqueID()
+        self.Pogs[pog.ID] = pog
+    
+    def _findRandomAppend(self):
+        # Can't spell swear words without vowels
+        # Left out l and v because they look enough like i and u
+        letters = '256789bcdfghjkmnpqrstwxz'
+        return letters[random.randint(0, len(letters) - 1)];
+    
+    def _findUniqueID(self):
+        """Get a unique id for a pog."""
+        id = self._findRandomAppend()
+        while id in self.Pogs:
+            id += self._findRandomAppend()
+        return id
+    
+    def hide(self, hidden=True, includeTiles=True, includePogs=True):
+        """Hide or show all pogs and tiles."""
+        if hidden == self.hidden:
+            return
+        self.hidden = hidden
+        if includePogs:
+            if hidden:
+                for pog in self.Pogs.values():
+                    pog.hide()
+            else:
+                for pog in self.Pogs.values():
+                    pog.show()
+        if includeTiles:
+            if hidden:
+                self.tiles = None
+            else:
+                self.reloadTiles()
+    
+    def show(self):
+        return self.hide(False)
+    
+    def _showTiles(self):
+        """Show all the tiles of this map."""
+        self.tiles = []
+        for y in xrange(0, self.mapsize[1]):
+            for x in xrange(0, self.mapsize[0]):
+                self.tiles.append(rggTile.tile(
+                    (x * self.tilesize[0], y * self.tilesize[1]),
+                    self.tilesize,
+                    self.tileindexes[len(self.tiles)],
+                    0,
+                    self.tileset))
+    
+    def getTile(self, tile):
+        """Change the specified tile."""
+        x, y = tile
+        assert(0 <= x <= self.mapsize[0])
+        assert(0 <= y <= self.mapsize[1])
+        t = x + self.mapsize[0] * y
+        return self.tileindexes[t]
+    
+    def setTile(self, tile, index):
+        """Change the specified tile."""
+        x, y = tile
+        assert(0 <= x <= self.mapsize[0])
+        assert(0 <= y <= self.mapsize[1])
+        t = x + self.mapsize[0] * y
+        self.tileindexes[t] = index
+        if not self.hidden:
+            self.tiles[t].setTile(self.tileindexes[t])
+    
+    def _setIndexes(self, indexes):
+        if len(indexes) != len(self.tileindexes):
+            return
+        self.tileindexes[:] = indexes[:]
+        if not self.hidden:
+            for i in xrange(len(indexes)):
+                self.tiles[i].setTile(self.tileindexes[i])
+                print self.tileindexes[i], self.tiles[i].getTile()
+    
+    def findTopPog(self, position):
+        """Returns the top pog at a given position, or None."""
+        layer = -sys.maxint
+        top = None
+        for pog in self.Pogs.values():
+            if layer >= pog.layer:
+                continue
+            if pog.pointCollides(position):
+                top = pog
+                layer = top.layer
+        return top
+    
+    def dump(self):
+        """Serialize to an object valid for JSON dumping."""
+        return dict(
+            mapname=self.mapname,
+            authorname=self.authorname,
+            mapsize=self.mapsize,
+            tileset=self.tileset,
+            tilesize=self.tilesize,
+            pogs=[pog.dump() for pog in self.Pogs.values()],
+            tiles=self.tileindexes)
+    
+    @staticmethod
+    def load(obj):
+        """Deserialize a new map from a dictionary."""
+        map = Map(
+            loadString('Map.mapname', obj.get('mapname')),
+            loadString('Map.authorname', obj.get('authorname')),
+            loadCoordinates('Map.mapsize', obj.get('mapsize'), min=1, max=65535),
+            loadString('Map.tileset', obj.get('tileset')),
+            loadCoordinates('Map.tilesize', obj.get('tilesize'), min=1, max=65535))
+        
+        pogs = loadArray('Map.pogs', obj.get('pogs'))
+        for pog in pogs:
+            map.addPog(Pog.load(pog))
+        
+        # HACK: Looks like coordinates; saves work.
+        tiles = loadCoordinates('Map.tiles', obj.get('tiles'), min=0, max=65535)
+        map._setIndexes(tiles)
+        return map

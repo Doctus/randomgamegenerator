@@ -26,9 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 class cGame;
 
 #include "cTilesetManager.h"
-#include "Widgets/wMenuBar.h"
 #include "Widgets/wGLWidget.h"
-#include "Network/nConnectionManager.h"
 #include "Bindings/bMain.h"
 #include "Bindings/bImage.h"
 
@@ -40,13 +38,10 @@ class cGame : public QObject
 
     private:
     cTilesetManager *mTilesetManager;
-    wMenuBar *mMenuBar;
     wGLWidget *mGLWidget;
-    nConnectionManager *mConnectionManager;
 
     QString title;
 
-    friend class wMenuBar;
     friend class wGLWidget;
     friend class bMain;
     friend class bImage;

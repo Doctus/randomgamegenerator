@@ -106,12 +106,8 @@ QString randomTitle()
 
 cGame::cGame(QWidget *parent) : QObject(parent)
 {
-    mConnectionManager = new nConnectionManager(parent, this);
-
     mGLWidget = new wGLWidget(parent, this);
     ((QMainWindow*)parent)->setCentralWidget(mGLWidget);
-
-    mMenuBar = new wMenuBar(parent, this, mConnectionManager);
 
     //mDockWidgets = new wDockWidgets((QMainWindow*)parent, this);
 

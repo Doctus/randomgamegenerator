@@ -20,7 +20,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "bMain.h"
 
 #include "../cGame.h"
-#include "../Network/nConnectionManager.h"
 
 int i = 1;
 char *argv[] = {"random game generator"};
@@ -66,14 +65,6 @@ bMain::bMain()
 
     cout << "mainGame initialised" << endl;
 
-    connect(mainGame->mConnectionManager, SIGNAL(newNetMessage(QString,QString)), this, SLOT(netMessageTrigger(QString, QString)));
-    connect(mainGame->mConnectionManager, SIGNAL(connectedSignal(QString)), this, SLOT(connectedTrigger(QString)));
-    connect(mainGame->mConnectionManager, SIGNAL(disconnectedSignal(QString)), this, SLOT(disconnectedTrigger(QString)));
-
-    connect(mainGame->mMenuBar, SIGNAL(newMapSignal()), this, SLOT(newMapTrigger()));
-    connect(mainGame->mMenuBar, SIGNAL(loadMapSignal(QString)), this, SLOT(loadMapTrigger(QString)));
-    connect(mainGame->mMenuBar, SIGNAL(saveMapSignal(QString)), this, SLOT(saveMapTrigger(QString)));
-
     connect(mainGame->mGLWidget, SIGNAL(mouseReleaseSignal(int,int,int)), this, SLOT(mouseReleaseTrigger(int,int,int)));
     connect(mainGame->mGLWidget, SIGNAL(mousePressSignal(int,int,int)), this, SLOT(mousePressTrigger(int,int,int)));
     connect(mainGame->mGLWidget, SIGNAL(mouseMoveSignal(int,int)), this, SLOT(mouseMoveTrigger(int,int)));
@@ -91,42 +82,6 @@ void bMain::start()
 cGame* bMain::getGameInstance()
 {
     return mainGame;
-}
-
-void bMain::sendNetMessageToAll(QString msg)
-{
-    mainGame->mConnectionManager->sendMessageToAll(msg);
-}
-
-bool bMain::sendNetMessageToHandle(QString msg, QString handle)
-{
-    return mainGame->mConnectionManager->sendMessageToHandle(msg, handle);
-}
-
-void bMain::sendNetMessageToAllButOne(QString msg, QString handle)
-{
-    mainGame->mConnectionManager->sendNetMessageToAllButOne(msg, handle);
-}
-
-
-QString bMain::getLocalUserList()
-{
-    return mainGame->mConnectionManager->getLocalUserList();
-}
-
-QString bMain::getLocalHandle()
-{
-    return mainGame->mConnectionManager->getLocalHandle();
-}
-
-bool bMain::isClient()
-{
-    return mainGame->mConnectionManager->isConnectionType(Connection::CLIENT);
-}
-
-bool bMain::isServer()
-{
-    return mainGame->mConnectionManager->isConnectionType(Connection::SERVER);
 }
 
 /*
@@ -278,36 +233,6 @@ void bMain::removeTranslationFile(QString filename)
     app.removeTranslator(t);
 }*/
 
-
-void bMain::netMessageTrigger(QString msg, QString handle)
-{
-    emit newNetMessageSignal(msg, handle);
-}
-
-void bMain::connectedTrigger(QString handle)
-{
-    emit connectedSignal(handle);
-}
-
-void bMain::disconnectedTrigger(QString handle)
-{
-    emit disconnectedSignal(handle);
-}
-
-void bMain::newMapTrigger()
-{
-    emit newMapSignal();
-}
-
-void bMain::loadMapTrigger(QString filename)
-{
-    emit loadMapSignal(filename);
-}
-
-void bMain::saveMapTrigger(QString filename)
-{
-    emit saveMapSignal(filename);
-}
 
 void bMain::mouseMoveTrigger(int x, int y)
 {
