@@ -90,7 +90,7 @@ void cTilesetManager::addImage(bImage* img, int layer)
     {
         img->setTextureId(set->getTextureId(img->getTile()));
 
-        while(layer >= images.size())
+        while(layer >= int(images.size()))
         {
             images.push_back(vector<bImage*>());
         }
@@ -131,7 +131,7 @@ void cTilesetManager::changeLayerOfImage(bImage *img, int oldLayer, int newLayer
 {
     removeImage(img, oldLayer);
 
-    if(newLayer > images.size()-1)
+    if(newLayer > int(images.size())-1)
         images.resize(newLayer+1);
     images[newLayer].push_back(img);
 }

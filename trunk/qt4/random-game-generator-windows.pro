@@ -15,9 +15,6 @@ SOURCES += ../src/cTilesetManager.cpp \
     ../src/cGame.cpp \
     ../src/cCamera.cpp \
     ../src/Widgets/wGLWidget.cpp \
-    ../src/Widgets/wMenuBar.cpp \
-    ../src/Network/nConnection.cpp \
-    ../src/Network/nConnectionManager.cpp \
     ../src/Widgets/wAction.cpp \
     ../src/Bindings/bImage.cpp \
     ../src/Bindings/bMain.cpp
@@ -26,9 +23,6 @@ HEADERS += ../src/cTilesetManager.h \
     ../src/cGame.h \
     ../src/cCamera.h \
     ../src/Widgets/wGLWidget.h \
-    ../src/Widgets/wMenuBar.h \
-    ../src/Network/nConnection.h \
-    ../src/Network/nConnectionManager.h \
     ../src/Widgets/wAction.h \
     ../src/Bindings/bMain.h \
     ../src/Bindings/bImage.h

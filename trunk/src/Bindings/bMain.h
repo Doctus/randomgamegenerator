@@ -44,15 +44,7 @@ class bMain : public QObject
 
     void start();
     static cGame* getGameInstance();
-    void sendNetMessageToAll(QString msg);
-    bool sendNetMessageToHandle(QString msg, QString handle);
-    void sendNetMessageToAllButOne(QString msg, QString handle);
-
-    QString getLocalUserList();
-    QString getLocalHandle();
-    bool isClient();
-    bool isServer();
-
+	
     int displayUserDialogChoice(QString text, QVector<QString> buttonTexts, int defaultButton = 0);
     int showPopupMenuAt(int x, int y, QVector<QString> actionTexts);
     void displayTooltip(QString text, int x, int y);
@@ -76,15 +68,6 @@ class bMain : public QObject
     void removeTranslationFile(QString filename);*/
 
     private slots:
-    void netMessageTrigger(QString msg, QString handle);
-
-    void connectedTrigger(QString handle);
-    void disconnectedTrigger(QString handle);
-
-    void newMapTrigger();
-    void loadMapTrigger(QString filename);
-    void saveMapTrigger(QString filename);
-
     void mouseMoveTrigger(int x, int y);
     void mousePressTrigger(int x, int y, int type);
     void mouseReleaseTrigger(int x, int y, int type);
@@ -93,15 +76,6 @@ class bMain : public QObject
     void enterEventTrigger();
 
     signals:
-    void newNetMessageSignal(QString str, QString handle);
-
-    void connectedSignal(QString handle);
-    void disconnectedSignal(QString handle);
-
-    void newMapSignal();
-    void loadMapSignal(QString filename);
-    void saveMapSignal(QString filename);
-
     void mouseMoveSignal(int x, int y);
     void mousePressSignal(int x, int y, int type);
     void mouseReleaseSignal(int x, int y, int type);

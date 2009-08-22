@@ -27,22 +27,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 class bMain : QObject {
 
 %TypeHeaderCode
-#include <bMain.h>
+#include "bMain.h"
 %End
 
 
 public:
     bMain();
     void start();
-    void sendNetMessageToAll(QString msg);
-    bool sendNetMessageToHandle(QString msg, QString handle);
-    void sendNetMessageToAllButOne(QString msg, QString handle);
-
-    QString getLocalUserList();
-    QString getLocalHandle();
-    bool isClient();
-    bool isServer();
-
+   
     int displayUserDialogChoice(QString text, QVector<QString> buttonTexts, int defaultButton = 0);
     int showPopupMenuAt(int x, int y, QVector<QString> actionTexts);
     void displayTooltip(QString text, int x, int y);
@@ -66,15 +58,6 @@ public:
     void removeTranslationFile(QString filename);*/
 
 signals:
-    void newNetMessageSignal(QString str, QString handle);
-
-    void connectedSignal(QString handle);
-    void disconnectedSignal(QString handle);
-
-    void newMapSignal();
-    void loadMapSignal(QString filename);
-    void saveMapSignal(QString filename);
-
     void mouseMoveSignal(int x, int y);
     void mousePressSignal(int x, int y, int type);
     void mouseReleaseSignal(int x, int y, int type);
@@ -87,7 +70,7 @@ class bImage
 {
 
 %TypeHeaderCode
-#include <bImage.h>
+#include "bImage.h"
 %End
 
     public:

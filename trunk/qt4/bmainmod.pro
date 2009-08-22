@@ -5,7 +5,6 @@ QT += core
 #QT =
 TARGET = bmainmod
 TEMPLATE = lib
-DEFINES = _WINDOWS
 CONFIG += release dll
 
 INCLUDEPATH += C:\Python26\lib\site-packages\PyQt4\include \

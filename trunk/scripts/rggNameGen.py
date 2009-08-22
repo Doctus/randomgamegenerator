@@ -275,7 +275,7 @@ def _generateTechniqueName(typ='rand', elemnt='rand', moral='rand',
   return result
 
 def getTechniqueName(st):
-  if st is "/techniquename" or st is "/techname":
+  if len(st) <= 0:
     return _generateTechniqueName()
   argCompilation = ['rand', 'rand', 'rand', -1, False]
   if st.find("martial") != -1:
