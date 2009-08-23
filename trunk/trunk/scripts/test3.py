@@ -1,4 +1,4 @@
-import time, random, os, base64
+import time, random, os, base64, bz2
 import _bmainmod, rggNameGen, rggDice, rggMap, rggTile, rggPog, rggDockWidget, rggDialogs, rggMenuBar
 from PyQt4 import QtCore, QtGui
 
@@ -233,7 +233,9 @@ def newNetEvent(st, handle):
                 words = unicode(st).split()
                 imgpath = words[1]
                 f = open(imgpath, 'rb')
-                imgdat = base64.b64encode(f.read())
+                imgdat = QtCore.QString()
+                imgdat.append( base64.b64encode(f.read()) )
+                print 'python length: ' + str(imgdat.length())
                 f.close()
                 c.sendNetMessageToHandle("i! " + imgpath + " " + imgdat, handle)
             else:
