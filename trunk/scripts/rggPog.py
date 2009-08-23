@@ -109,8 +109,8 @@ class Pog(object):
     def load(obj):
         """Deserialize a new map from a dictionary."""
         pog = Pog(
-            loadCoordinates('Pog.position', obj.get('position')),
-            loadCoordinates('Pog.dimensions', obj.get('dimensions')),
+            loadCoordinates('Pog.position', obj.get('position'), length=2),
+            loadCoordinates('Pog.dimensions', obj.get('dimensions'), length=2, min=1, max=65535),
             loadInteger('Pog.layer', obj.get('layer'), min=0, max=65535),
             loadString('Pog.src', obj.get('src')))
         pog.name = loadString('Pog.name', obj.get('name'), allowEmpty=True)

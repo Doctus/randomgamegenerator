@@ -63,17 +63,19 @@ def loadObject(name, value):
         'Validation expected {0} to be an object, found {1}.'.
             format(name, value))
     
-def loadArray(name, value):
+def loadArray(name, value, length=None):
     if isinstance(value, list):
-        return value
+        if length is None or len(value) == length:
+            return value
     raise validationError(
         'Validation expected {0} to be an array, found {1}.'.
             format(name, value))
     
-def loadCoordinates(name, value, min=None, max=None):
+def loadCoordinates(name, value, length=None, min=None, max=None):
     if isinstance(value, list):
-        return tuple(loadInteger('{name}[{coord}]'.format(name=name, coord=i),
-            value[i], min=min, max=max) for i in xrange(len(value)))
+        if length is None or len(value) == length:
+            return tuple(loadInteger('{name}[{coord}]'.format(name=name, coord=i),
+                value[i], min=min, max=max) for i in xrange(len(value)))
     raise validationError(
         'Validation expected {0} to be an array of coordinates, found {1}.'.
             format(name, value))

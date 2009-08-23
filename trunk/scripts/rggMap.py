@@ -146,15 +146,15 @@ class Map(object):
         map = Map(
             loadString('Map.mapname', obj.get('mapname')),
             loadString('Map.authorname', obj.get('authorname')),
-            loadCoordinates('Map.mapsize', obj.get('mapsize'), min=1, max=65535),
+            loadCoordinates('Map.mapsize', obj.get('mapsize'), length=2, min=1, max=65535),
             loadString('Map.tileset', obj.get('tileset')),
-            loadCoordinates('Map.tilesize', obj.get('tilesize'), min=1, max=65535))
+            loadCoordinates('Map.tilesize', obj.get('tilesize'), length=2, min=1, max=65535))
         
         pogs = loadArray('Map.pogs', obj.get('pogs'))
         for pog in pogs:
-            map.addPog(Pog.load(pog))
+            map.addPog(rggPog.Pog.load(pog))
         
         # HACK: Looks like coordinates; saves work.
-        tiles = loadCoordinates('Map.tiles', obj.get('tiles'), min=0, max=65535)
+        tiles = loadCoordinates('Map.tiles', obj.get('tiles'), length=len(map.tileindexes), min=0, max=65535)
         map._setIndexes(tiles)
         return map
