@@ -5,7 +5,36 @@
         25, 
         25
     ], 
-    "pogs": [], 
+    "pogs": [
+        {
+            "dimensions": [
+                32, 
+                64
+            ], 
+            "id": "9", 
+            "layer": 1, 
+            "name": null, 
+            "position": [
+                212, 
+                227
+            ], 
+            "src": "data/pogs\\randomlygenerated01.png"
+        }, 
+        {
+            "dimensions": [
+                32, 
+                64
+            ], 
+            "id": "r", 
+            "layer": 1, 
+            "name": null, 
+            "position": [
+                604, 
+                548
+            ], 
+            "src": "data/pogs\\randomlygenerated03.png"
+        }
+    ], 
     "tiles": [
         0, 
         0, 

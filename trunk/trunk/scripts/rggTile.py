@@ -7,6 +7,11 @@ class tile(_bmainmod.bImage):
     def __init__(self, position, dimensions, tile, layer, filename):
         x, y = position
         w, h = dimensions
+        #for i in xrange(len(filename)):
+        #    if filename[i] == '\\':
+        #        filename = filename[:i] + '/' + filename[i+1:]
+        #print (int(x), int(y), int(w),
+        #                                      int(h), int(tile), int(layer), str(filename))
         super(_bmainmod.bImage, self).__init__(int(x), int(y), int(w),
                                               int(h), int(tile), int(layer), str(filename))
         #print 'pyimage created'
