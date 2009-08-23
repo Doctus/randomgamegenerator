@@ -247,7 +247,7 @@ def mouseMove(screenPosition, mapPosition, displacement):
     icon = rggMenuBar.getSelectedIcon()
     if icon == ICON_MOVE: # moveIcon
         if state.mouseButton == BUTTON_LEFT:
-            setCameraPosition(map(lambda c, d: c + d, cameraPosition(), displacement))
+            setCameraPosition(map(lambda c, d: c - d, cameraPosition(), displacement))
         return
     elif icon != ICON_SELECT: #selectIcon
         return
