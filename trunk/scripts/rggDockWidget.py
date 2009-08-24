@@ -1,5 +1,5 @@
 from PyQt4 import QtGui, QtCore
-from rggSystem import findFiles, POG_DIR, IMAGE_EXTENSIONS
+from rggSystem import signal, findFiles, POG_DIR, IMAGE_EXTENSIONS
 import os, os.path
 
 class chatLineEdit(QtGui.QLineEdit):
@@ -47,21 +47,30 @@ class chatWidget(QtGui.QDockWidget):
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
         mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self)
-        QtCore.QObject.connect(self.widgetLineInput, QtCore.SIGNAL("returnPressed()"), self.processInput)
-
+        
+        self.widgetLineInput.returnPressed.connect(self.processInput)
+    
     def insertMessage(self, mes):
         self.scroll = (self.widgetEditor.verticalScrollBar().value() ==
                    self.widgetEditor.verticalScrollBar().maximum())
         self.widgetEditor.append(mes)
         if self.scroll:
             self.widgetEditor.verticalScrollBar().setValue(self.widgetEditor.verticalScrollBar().maximum())
-
+    
     def processInput(self):
-        self.newmes = self.widgetLineInput.text()
+        self.newmes = unicode(self.widgetLineInput.text())
         self.widgetLineInput.clear()
         self.widgetLineInput.addMessage(self.newmes)
-        self.emit(QtCore.SIGNAL("newChatInputSignal(QString)"), self.newmes)
-
+        self.chatInput.emit(self.newmes)
+    
+    chatInput = signal(basestring, doc=
+        """Called when chat input is received.
+        
+        text -- the message entered
+        
+        """
+    )
+    
 class diceRoller(QtGui.QDockWidget):
 
     def __init__(self, mainWindow):
@@ -74,7 +83,8 @@ class diceRoller(QtGui.QDockWidget):
                        QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), "Sample: 4k2")]
         for m in self.macros:
             self.diceArea.addItem(m)
-        self.connect(self.diceArea, QtCore.SIGNAL('currentRowChanged(int)'), self.changeCurrentMacro)    
+        self.diceArea.currentRowChanged.connect(self.changeCurrentMacro)
+        
         self.controlArea = QtGui.QWidget(mainWindow)
         self.controlLayout = QtGui.QBoxLayout(2)
         self.rollbutton = QtGui.QPushButton(self.tr("Roll"), mainWindow)
@@ -96,13 +106,12 @@ class diceRoller(QtGui.QDockWidget):
 
     def changeCurrentMacro(self, n):
         self.currentMacro = n
-
+    
     def rollDice(self):
         current = self.diceArea.item(self.currentMacro)
         if current is not None:
-            import rggViews
             text = unicode(current.text())
-            rggViews.rollDice(text[text.rfind(':')+1:])
+            self.rollRequested.emit(text[text.rfind(':')+1:])
 
     def addMacro(self, mac, macname):
         self.macros.append(QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), macname + ': ' + mac))
@@ -115,8 +124,21 @@ class diceRoller(QtGui.QDockWidget):
         self.diceArea.takeItem(self.currentMacro)
 
     def summonMacro(self):
-        import rggViews
-        rggViews.addMacro()
+        macroRequested.emit()
+    
+    rollRequested = signal(basestring, doc=
+        """Called when the roll button is hit.
+        
+        roll -- the dice to be rolled
+        
+        """
+    )
+    
+    macroRequested = signal(doc=
+        """Called when the add macro button is pressed."""
+    )
+    
+
 
 #It turns out to be hard to do the map editor as I intended because HTML can't get individual tiles,
 # and nothing that can display individual tiles seems to have appropriate "word wrap". -Doctus
@@ -149,12 +171,9 @@ class pogPalette(QtGui.QDockWidget):
         self.widget = QtGui.QWidget(mainWindow)
         self.mainLayout = QtGui.QBoxLayout(2)
         self.pogArea = QtGui.QListWidget(mainWindow)
-        self.addPog()
         self.controlArea = QtGui.QWidget(mainWindow)
         self.controlLayout = QtGui.QBoxLayout(2)
         self.addpogbutton = QtGui.QPushButton(self.tr("Update"), mainWindow)
-        self.connect(self.addpogbutton, QtCore.SIGNAL('pressed()'), self.addPog)
-        self.connect(self.pogArea, QtCore.SIGNAL('itemActivated(QListWidgetItem *)'), self.placePog)
         self.controlLayout.addWidget(self.addpogbutton)
         self.controlArea.setLayout(self.controlLayout)
         self.mainLayout.addWidget(self.pogArea)
@@ -162,20 +181,28 @@ class pogPalette(QtGui.QDockWidget):
         self.widget.setLayout(self.mainLayout)
         self.setWidget(self.widget)
         mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
+        
+        self.addpogbutton.pressed.connect(self.addPog)
+        self.pogArea.itemActivated.connect(self.place)
+        self.addPog()
     
     def addPog(self):
         """Add all pogs from the pog directory."""
+        #TODO: Refactor into a view.
         self.pogArea.clear()
         self.pogs = findFiles(POG_DIR, IMAGE_EXTENSIONS)
         for greatJustice in self.pogs:
             icon = QtGui.QIcon(QtGui.QIcon(greatJustice).pixmap(QtCore.QSize(32, 32)))
             self.pogArea.addItem(QtGui.QListWidgetItem(icon, greatJustice))
     
-    def placePog(self, pog):
+    def place(self, pog):
         """Place a pog on the map."""
-        import rggViews
-        rggViews.placePog(os.path.join(POG_DIR, unicode(pog.text())))
+        self.pogPlaced.emit(os.path.join(POG_DIR, unicode(pog.text())))
 
+    pogPlaced = signal(basestring, doc=
+        """Called to request pog placement on the map."""
+    )
+    
 class characterSheet(QtGui.QDockWidget):
 
     def __init__(self, mainWindow, charName):

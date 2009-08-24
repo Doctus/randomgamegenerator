@@ -22,18 +22,37 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 from rggFields import validationError
 import json
 
-def dumpjson(obj, filename):
+def jsondumps(obj):
+    """Dumps the object into a string. Contains no newlines."""
+    # compact version
+    #serial = json.dumps(obj, separators=(',',':'))
+    # pretty print
+    serial = json.dumps(obj, sort_keys=True)
+    assert(isinstance(serial, basestring))
+    assert('\n' not in serial and u'\n' not in serial)
+    return serial
+
+def jsondump(obj, filename):
+    """Dump object to file."""
     file = open(filename, 'wb')
+    # compact version
+    #json.dump(obj, file, separators=(',',':'))
     # pretty print
     json.dump(obj, file, sort_keys=True, indent=4)
-    # compact version
-    #json.dump(self.dump(), file, separators=(',',':'))
     file.close()
 
-def loadjson(filename):
+def jsonloads(str):
+    """Loads the object from a string. May throw."""
+    obj = json.loads(str)
+    assert(isinstance(obj, list) or isinstance(obj, dict))
+    return obj
+
+def jsonload(filename):
+    """Loads the object from a file. May throw."""
     file = open(filename, 'rb')
     obj = json.load(file)
     file.close()
+    assert(isinstance(obj, list) or isinstance(obj, dict))
     return obj
 
 def loadString(name, value, allowEmpty=False):

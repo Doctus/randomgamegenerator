@@ -2,7 +2,7 @@
 initialization - for the Random Game Generator project            
 By Doctus (kirikayuumura.noir@gmail.com)
 
-Interface among main singleton widgets.
+Qt and C++ servces.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -19,30 +19,9 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
-import _bmainmod, sys
+import sys
 import os, os.path
 from PyQt4 import QtCore, QtGui
-
-_c = _bmainmod.bMain()
-
-mainWindow = _c.getMainWindow()
-
-
-def connectSignal(signal, func):
-    QtCore.QObject.connect(_c, QtCore.SIGNAL(signal), func)
-
-def connectChat(func):
-    global _dwidget, _pwidget, _cwidget
-    
-    from rggDockWidget import diceRoller, pogPalette, chatWidget
-    _dwidget = diceRoller(mainWindow)
-    _pwidget = pogPalette(mainWindow)
-    #_mwidget = mapEditor(mainWindow)
-    _cwidget = chatWidget(mainWindow)
-    
-    QtCore.QObject.connect(_dwidget, QtCore.SIGNAL("newChatInputSignal(QString)"), func)
-    QtCore.QObject.connect(_pwidget, QtCore.SIGNAL("newChatInputSignal(QString)"), func)
-    QtCore.QObject.connect(_cwidget, QtCore.SIGNAL("newChatInputSignal(QString)"), func)
 
 class fake(object):
     """Fake translation tools."""
@@ -56,29 +35,100 @@ class fake(object):
 def translate(*args):
     return unicode(QtCore.QCoreApplication.translate(*args))
 
-def start():
-    return _c.start()
+IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".ppm", ".xbm", ".xpm")
+IMAGE_FILTER = fake.translate('system', 'Images ({imageList})').format(
+    imageList=','.join('*{ext}'.format(ext=ext) for ext in IMAGE_EXTENSIONS))
+TILESET_DIR = 'data/tilesets'
+POG_DIR = 'data/pogs'
 
-def addDiceMacro(dice, name):
-    _dwidget.addMacro(dice, name)
+_main = None
+mainWindow = None
+
+def signal(*args, **kwargs):
+    """Creates a signal."""
+    
+    # Figure out parameters
+    parameters = args
+    for parm in parameters:
+        if not isinstance(parm, type):
+            raise TypeError("Parameters to the signal constructor must be types.")
+    doc = kwargs.get('doc')
+    
+    # A unique key
+    key = object()
+    
+    def get(self):
+        if not hasattr(self, '_signals'):
+            self._signals = {}
+        if key not in self._signals:
+            self._signals[key] = signalStorage(parameters)
+        return self._signals[key]
+    
+    return property(get, doc=doc)
+
+class signalStorage(object):
+    """A signal mechanism similar to Qt's signals.
+    
+    Would have used Qt's if they supported python better.
+    
+    """
+    
+    def __init__(self, parameters):
+        """Initializes the signal.
+        
+        args -- the parameters used to trigger the signal
+        
+        """
+        self.callbacks = set()
+        self.parameters = parameters
+    
+    def emit(self, *args):
+        """Emit this signal to all connected slots."""
+        if len(args) != len(self.parameters):
+            raise TypeError("Too few parameters to signal.")
+        for parm, arg in zip(self.parameters, args):
+            if not isinstance(arg, parm):
+                raise TypeError("Invalid parameter to signal: expected {0} to be {1}.".format(repr(arg), parm))
+        for callback in self.callbacks:
+            callback(*args)
+    
+    def connect(self, callable):
+        """Connect this signal to a slot. (Python callable.)"""
+        self.callbacks.add(callable)
+        
+    def disconnect(self, callable=None):
+        """Disconnect this signal from a specified slot,
+        or all slots if no parameter is specified.
+        
+        """
+        if callable is None:
+            self.callbacks = set()
+        else:
+            self.callbacks.remove(callable)
+
+def injectMain():
+    """Injects and returns the main C++ interface object."""
+    import _bmainmod
+    
+    global _main
+    global mainWindow
+    
+    assert(not _main)
+    assert(not mainWindow)
+    
+    _main = _bmainmod.bMain()
+    mainWindow = _main.getMainWindow()
+    return _main
 
 def showErrorMessage(message, title=translate('system', "Error", 'default error prompt title')):
     """Pops up an error message to the user."""
     QtGui.QMessageBox.critical(mainWindow, title, message)
 
-def say(message):
-    """Say an IC message."""
-    _cwidget.insertMessage(message)
-
-def announce(message):
-    """Say an OOC message."""
-    _cwidget.insertMessage(message)
-
 def displayTooltip(text, position):
-    return _c.displayTooltip(text, position[0], position[1])
+    return _main.displayTooltip(text, position[0], position[1])
 
 def showPopupMenuAt(position, choices):
-    return _c.showPopupMenuAt(position[0], position[1], choices)
+    return _main.showPopupMenuAt(position[0], position[1], choices)
 
 def promptString(prompt, title=translate('system', "Input", 'default string prompt title')):
     text, ok = QtGui.QInputDialog.getText(mainWindow, title, prompt)
@@ -121,14 +171,8 @@ def promptSaveFile(title, filter):
         return None
     return unicode(filename)
 
-IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".ppm", ".xbm", ".xpm")
-IMAGE_FILTER = translate('system', 'Images ({imageList})').format(
-    imageList=','.join('*{ext}'.format(ext=ext) for ext in IMAGE_EXTENSIONS))
-TILESET_DIR = 'data/tilesets'
-POG_DIR = 'data/pogs'
-
 def findFiles(dir, extensions):
-    """Get the list of tileset files."""
+    """Get the list of files with one of the given extensions."""
     files = []
     for dirpath, dirnames, filenames in os.walk(dir):
         if ".svn" in dirpath:
@@ -140,19 +184,10 @@ def findFiles(dir, extensions):
     #files.sort()
     return files
     
-def localHandle():
-    return 'you'
-
-def linkedName(name):
-    return translate('system', '<a href="/tell {name}" title="{name}">{name}</a>').format(name=name)
-
-def linkedHandle():
-    return linkedName(localHandle())
-
 def cameraPosition():
-    return (_c.getCamX(), _c.getCamY())
+    return (_main.getCamX(), _main.getCamY())
 
 def setCameraPosition(position):
-    _c.setCam(position[0], position[1])
+    _main.setCam(position[0], position[1])
 
 

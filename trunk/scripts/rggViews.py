@@ -21,44 +21,153 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 import time, random, os, base64
 import rggNameGen, rggDice, rggMap, rggTile, rggPog, rggDockWidget, rggDialogs, rggMenuBar
-from PyQt4 import QtCore, QtGui
-from rggJson import dumpjson, loadjson
-from rggSystem import cameraPosition, setCameraPosition, mainWindow, addDiceMacro
-from rggSystem import translate, say, announce, linkedHandle, showErrorMessage, displayTooltip
+from rggRPC import server, client
+from rggJson import jsondump, jsonload
+from rggMenuBar import ICON_SELECT, ICON_MOVE
+from rggSystem import cameraPosition, setCameraPosition, mainWindow
+from rggSystem import translate, showErrorMessage, displayTooltip
 from rggSystem import showPopupMenuAt, IMAGE_FILTER
 from rggSystem import promptString, promptInteger, promptCoordinates, promptSaveFile, promptLoadFile
 from rggDialogs import newMapDialog, hostDialog, joinDialog
+from PyQt4 import QtCore, QtGui
 
-ICON_SELECT = 0
-ICON_MOVE = 1
-
-class GameState(object):
-    """A state class build to avoid all these global statements."""
-    
-    def __init__(self):
-        self.Maps = []
-        self.currentMap = None
-        
-        self.pogSelection = set()
-        self.pogHover = None
-        
-        self.mouseButton = None
-        self.mousePosition = (0, 0)
-        
-        self.tilePasting = False
-        self.tilePastingIndex = 0
-        
-        self.pogPlacement = False
-        self.pogPath = "path"
-        
-state = GameState()
-
+# Button enum
 BUTTON_LEFT = 0
 BUTTON_MIDDLE = 1
 BUTTON_RIGHT = 2
 BUTTON_CONTROL = 3
 BUTTON_SHIFT = 6
 
+# Table of active users on the server
+class User(object):
+    """User representation on the server."""
+    
+    def __init__(self, id):
+        self.id = id
+        self.username = '[unnamed #{0}]'.format(id)
+        self.unnamed = True
+
+class state(object):
+    """A state class build to avoid all these global statements."""
+    
+    Maps = []
+    currentMap = None
+    
+    pogSelection = set()
+    pogHover = None
+    
+    mouseButton = None
+    mousePosition = (0, 0)
+    
+    tilePasting = False
+    tilePastingIndex = 0
+    
+    pogPlacement = False
+    pogPath = "path"
+    
+    @staticmethod
+    def initialize():
+        state.menu = rggMenuBar.menuBar()
+        
+        state.dwidget = rggDockWidget.diceRoller(mainWindow)
+        state.pwidget = rggDockWidget.pogPalette(mainWindow)
+        state.cwidget = rggDockWidget.chatWidget(mainWindow)
+        
+        state.localuser = User(0)
+        state.users = { state.localuser.id: state.localuser }
+        state.usernames = {}
+
+# MESSAGES
+
+def addDiceMacro(dice, name):
+    state.dwidget.addMacro(dice, name)
+
+def say(message):
+    """Say an IC message."""
+    state.cwidget.insertMessage(message)
+
+def announce(message):
+    """Say an OOC message."""
+    state.cwidget.insertMessage(message)
+
+def linkedName(name):
+    return translate('views', '<a href="/tell {name}" title="{name}">{name}</a>').format(name=name)
+
+# NETWORK
+
+def allusers():
+    """Get a list of all users."""
+    return state.users.values()
+
+def getuser(idOrName):
+    """Returns a user given an id or name, or None if not valid."""
+    if isinstance(idOrName, basestring):
+        idOrName = idOrName.lower()
+        if idOrName in self.usernames:
+            return self.usernames[idOrName]
+    try:
+        return state.users[int(idOrName)]
+    except:
+        pass
+    return None
+
+def localuser():
+    """The user for the local player."""
+    return state.localuser
+
+def localhandle():
+    return localuser().username
+
+def hostGame():
+    """Allows the user to host a game."""
+    if client.isConnected:
+        say(translate('views', "You are already in a game."))
+        return
+    
+    dialog = hostDialog()
+    
+    def accept():
+        valid = dialog.is_valid()
+        if not valid:
+            showErrorMessage(dialog.error)
+        return valid
+    
+    if dialog.exec_(mainWindow, accept):
+        connection = dialog.save()
+        if client.host(connection):
+            say(translate('views', 'Now listening on port {port}.').format(port=connection.port))
+        else:
+            #TODO: better error message here
+            say(translate('views', 'Unable to access network; perhaps the port is in use?'))
+        
+
+def joinGame():
+    """Allows the user to join a game."""
+    if client.isConnected:
+        say(translate('views', "You are already in a game."))
+        return
+    
+    dialog = joinDialog()
+    
+    def accept():
+        valid = dialog.is_valid()
+        if not valid:
+            showErrorMessage(dialog.error)
+        return valid
+    
+    if dialog.exec_(mainWindow, accept):
+        connection = dialog.save()
+        client.join(connection)
+        say(translate('views', 'Connecting to {host}:{port}...').format(host=connection.host, port=connection.port))
+
+def disconnectGame():
+    """Allows the user to disconnect from the internet."""
+    if not client.isConnected:
+        say(translate('views', "You are not connected."))
+        return
+    
+    client.close()
+    say(translate('views', "Disconnected."))
 
 # MAPS
 
@@ -94,10 +203,16 @@ def newMap():
 
 def loadMap():
     """Allows the user to load a new map."""
-    filename = promptLoadFile('Open Map', 'Random Game Map files (*.rgm)')
+    filename = promptLoadFile(translate('views', 'Open Map'),
+        translate('views', 'Random Game Map files (*.rgm)'))
     if not filename:
         return
-    map = rggMap.Map.load(loadjson(filename))
+    try:
+        obj = jsonload(filename)
+    except Exception as e:
+        showErrorMessage(translate('views', "Unable to read {0}."))
+        return
+    map = rggMap.Map.load(obj)
     addMap(map)
 
 def saveMap():
@@ -111,69 +226,12 @@ def saveMap():
     #    map.mapname = unicode(promptString("What is the name of this map?")) or map.mapname
     #    map.authorname = unicode(promptString("Who is the author of this map?")) or map.authorname
     
-    filename = promptSaveFile('Save Map', 'Random Game Map files (*.rgm)')
+    filename = promptSaveFile(translate('views', 'Save Map'),
+        translate('views', 'Random Game Map files (*.rgm)'))
     if not filename:
         return
     
     dumpjson(map.dump(), filename)
-
-def hostGame():
-    """Allows the user to host a game."""
-    dialog = hostDialog()
-    
-    def accept():
-        valid = dialog.is_valid()
-        if not valid:
-            showErrorMessage(dialog.error)
-        return valid
-    
-    if dialog.exec_(mainWindow, accept):
-        connection = dialog.save()
-        #connection.start()
-
-def joinGame():
-    """Allows the user to join a game."""
-    dialog = joinDialog()
-    
-    def accept():
-        valid = dialog.is_valid()
-        if not valid:
-            showErrorMessage(dialog.error)
-        return valid
-    
-    if dialog.exec_(mainWindow, accept):
-        connection = dialog.save()
-        #connection.start()
-
-# CHAT
-
-def sendSay(message):
-    say(translate('views', '{name}: {sayText}').format(
-        name=linkedHandle(),
-        sayText=message))
-    #c.sendNetMessageToAll("t!" + st)
-
-def sendEmote(message):
-    action = translate('views', '<i>{name} {emote}</i>').format(
-        name=linkedHandle(),
-        emote=message)
-    say(action)
-    #c.sendNetMessageToAll('T!' + unicode(action))
-
-def sendWhisper(name, message):
-    pass
-    #if c.isServer():
-        #if not c.sendNetMessageToHandle('w! ' + c.getLocalHandle() +
-        #                         ' ' + unicode(mesg), target):
-        #    cwidget.insertMessage("Error: could not find that handle.")
-        #else:
-        #    cwidget.insertMessage('To ' + unicode(target) + ': ' +
-        #                unicode(mesg))
-    #else:
-    #    cwidget.insertMessage('To ' + unicode(target) + ': ' +
-    #                    unicode(mesg))
-        #c.sendNetMessageToAll('W! ' + target + ' ' + unicode(mesg))
-
 
 # DICE
 
@@ -197,7 +255,7 @@ def addMacro():
         name = promptString(translate('views', "What should the macro be called?"))
         if name is None:
             return
-        addDiceMacro(dice, name)
+        state.dwidget.addMacro(dice, name)
     else:
         say(translate('views', 'Malformed dice macro. Formatting help is available in "/roll" command.'))
 
@@ -244,7 +302,7 @@ def mouseDrag(screenPosition, mapPosition, displacement):
         state.currentMap.setTile(tile, state.tilePastingIndex)
 
 def mouseMove(screenPosition, mapPosition, displacement):
-    icon = rggMenuBar.getSelectedIcon()
+    icon = state.menu.selectedIcon
     if icon == ICON_MOVE: # moveIcon
         if state.mouseButton == BUTTON_LEFT:
             setCameraPosition(map(lambda c, d: c - d, cameraPosition(), displacement))
@@ -271,7 +329,7 @@ def mousePress(screenPosition, mapPosition, button):
     if state.currentMap is None:
         return
     
-    icon = rggMenuBar.getSelectedIcon()
+    icon = state.menu.selectedIcon
     if icon == ICON_MOVE:
         return
     elif icon != ICON_SELECT:
