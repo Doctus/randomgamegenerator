@@ -19,9 +19,9 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
-import rggViews
-from rggSystem import fake, translate, say
-#from rggViews import chooseMap
+import rggViews, rggRemote
+from rggSystem import fake, translate
+from rggViews import say, announce
 
 chatCommands = {}
 chatCommandNames = []
@@ -54,7 +54,7 @@ def squish(message):
 
 @chat('say', hidden=True)
 def sayChat(message):
-    rggViews.sendSay(message)
+    rggRemote.sendSay(message)
     
 sayChat.documentation = fake.translate('chatdoc', 
     """/say: Say a chat message. You do not need to write this as a command.<dl>
@@ -149,7 +149,7 @@ def emote(message):
         say(translate('chat', "Syntax: /me DOES ACTION. Displays '[HANDLE] DOES "
                 "ACTION' in italic font."))
     else:
-        rggViews.sendEmote(message)
+        rggRemote.sendEmote(message)
 
 emote.documentation = fake.translate('chatdoc',
     """Display an emote in italics.<dl>
@@ -170,7 +170,7 @@ def whisper(message):
             " Handle may be caps-sensitive."))
     else:
         target, rest = splitword(message)
-        rggViews.sendWhisper(target, rest)
+        rggRemote.sendWhisper(target, rest)
 
 whisper.documentation = fake.translate('chatdoc',
     """/whisper: Whisper a message to another user.<dl>

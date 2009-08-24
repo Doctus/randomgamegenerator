@@ -23,6 +23,7 @@ import os, os.path
 import rggMap
 from rggSystem import fake, translate, showErrorMessage, findFiles, IMAGE_EXTENSIONS, TILESET_DIR
 from rggFields import integerField, stringField, dropDownField, validationError
+from rggNet import ConnectionData, localHost
 from PyQt4 import QtGui, QtCore
 
 class dialog(object):
@@ -76,7 +77,7 @@ class newMapDialog(dialog):
         
         tilesets = findFiles(TILESET_DIR, IMAGE_EXTENSIONS)
         if len(tilesets) <= 0:
-            raise InvalidOperationError(translate('newMapDialog',
+            raise RuntimeError(translate('newMapDialog',
                 'Cannot create a map when no tilesets are available.'))
         
         return dict(
@@ -249,7 +250,7 @@ class hostDialog(dialog):
     def save(self):
         """Make a new map and return it."""
         assert(self.cleanData)
-        return Connection(self.cleanData['port'],
+        return ConnectionData(localHost(), self.cleanData['port'],
             self.cleanData['username'])
     
 class joinDialog(dialog):
@@ -267,7 +268,7 @@ class joinDialog(dialog):
             username=stringField(translate('joinDialog', 'Username'),
                 value=data.get('username', translate('joinDialog', 'Anonymous'))),
             host=stringField(translate('joinDialog', 'Host Name'),
-                value=data.get('host', 'localhost')),
+                value=data.get('host', localHost())),
             port=integerField(translate('joinDialog', 'Port'),
                 min=1, max=65535, value=data.get('port', 6812)))
     
@@ -336,6 +337,6 @@ class joinDialog(dialog):
     def save(self):
         """Make a new map and return it."""
         assert(self.cleanData)
-        return Connection(self.cleanData['host'], self.cleanData['port'],
+        return ConnectionData(self.cleanData['host'], self.cleanData['port'],
             self.cleanData['username'])
     

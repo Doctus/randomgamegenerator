@@ -20,84 +20,78 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
 from PyQt4 import QtGui, QtCore
+from rggSystem import translate, mainWindow
 
-selectedIcon = None
+ICON_SELECT = 0
+ICON_MOVE = 1
 
-def selectIconClicked():
-    import rggViews
-    global selectedIcon
-    selectedIcon = rggViews.ICON_SELECT
+class menuBar(object):
+    """An object representing the menu bar."""
+    
+    def __init__(self):
+        
+        main = mainWindow
+        
+        menubar = main.menuBar()
+        
+        # ACTIONS
+        
+        self.newMapAct = QtGui.QAction("&New Map...", main)
+        self.newMapAct.setShortcut("Ctrl+N")
+        
+        self.loadMapAct = QtGui.QAction("&Load Map...", main)
+        self.loadMapAct.setShortcut("Ctrl+L")
+        
+        self.saveMapAct = QtGui.QAction("&Save Map As...", main)
+        self.saveMapAct.setShortcut("Ctrl+S")
+        
+        self.hostGameAct = QtGui.QAction("&Host Game", main)
+        self.hostGameAct.setShortcut("Ctrl+H")
 
-def moveIconClicked():
-    import rggViews
-    global selectedIcon
-    selectedIcon = rggViews.ICON_MOVE
+        self.joinGameAct = QtGui.QAction("&Join Game", main)
+        self.joinGameAct.setShortcut("Ctrl+J")
+        
+        self.disconnectAct = QtGui.QAction("&Disconnect", main)
+        self.disconnectAct.setShortcut("Ctrl+D")
+        
+        selectIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-select-icon.png"), "Select Tool", main)
+        selectIcon.setShortcut("Ctrl+T");
+        selectIcon.setToolTip("Select Tool (Ctrl+T)");
+        
+        moveIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-move-icon.png"), "Move Tool", main)
+        moveIcon.setShortcut("Ctrl+M");
+        moveIcon.setToolTip("Move Tool (Ctrl+M)");
+        
+        # MENUS
+        
+        fileMenu = QtGui.QMenu("&File", main)
+        fileMenu.addAction(self.newMapAct)
+        fileMenu.addAction(self.loadMapAct)
+        fileMenu.addAction(self.saveMapAct)
+        
+        internetMenu = QtGui.QMenu("&Internet", main)
+        internetMenu.addAction(self.hostGameAct)
+        internetMenu.addAction(self.joinGameAct)
+        internetMenu.addAction(self.disconnectAct)
+        
+        # MENUBAR
 
-def getSelectedIcon():
-    global selectedIcon
-    return selectedIcon
+        menubar.addMenu(fileMenu)
+        menubar.addMenu(internetMenu)
+        menubar.addSeparator()
+        menubar.addAction(selectIcon)
+        menubar.addAction(moveIcon)
 
-def setupMenuBar(main):
-    from rggViews import newMap, saveMap, loadMap, hostGame, joinGame
+        # EVENTS
+        
+        self.selectedIcon = 0
+        selectIcon.triggered.connect(self.selectIconClicked)
+        moveIcon.triggered.connect(self.moveIconClicked)
     
-    menubar = main.menuBar()
+    def selectIconClicked(self):
+        self.selectedIcon = ICON_SELECT
     
-    # ACTIONS
-    
-    newMapAct = QtGui.QAction("&New Map...", main)
-    newMapAct.setShortcut("Ctrl+N")
-    
-    loadMapAct = QtGui.QAction("&Load Map...", main)
-    loadMapAct.setShortcut("Ctrl+L")
-    
-    saveMapAct = QtGui.QAction("&Save Map...", main)
-    saveMapAct.setShortcut("Ctrl+S")
-    
-    hostGameAct = QtGui.QAction("&Host Game", main)
-    hostGameAct.setShortcut("Ctrl+H")
-
-    joinGameAct = QtGui.QAction("&Join Game", main)
-    joinGameAct.setShortcut("Ctrl+J")
-    
-    selectIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-select-icon.png"), "Select Tool", main)
-    selectIcon.setShortcut("Ctrl+S");
-    selectIcon.setToolTip("Select Tool (Ctrl+S)");
-    
-    moveIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-move-icon.png"), "Move Tool", main)
-    moveIcon.setShortcut("Ctrl+M");
-    moveIcon.setToolTip("Move Tool (Ctrl+M)");
-    
-    # MENUS
-    
-    fileMenu = QtGui.QMenu("&File", main)
-    fileMenu.addAction(newMapAct)
-    fileMenu.addAction(loadMapAct)
-    fileMenu.addAction(saveMapAct)
-    
-    internetMenu = QtGui.QMenu("&Internet", main)
-    internetMenu.addAction(hostGameAct)
-    internetMenu.addAction(joinGameAct)
-    
-    # MENUBAR
-
-    menubar.addMenu(fileMenu)
-    menubar.addMenu(internetMenu)
-    menubar.addSeparator()
-    menubar.addAction(selectIcon)
-    menubar.addAction(moveIcon)
-
-    # EVENTS
-    
-    QtCore.QObject.connect(newMapAct, QtCore.SIGNAL("triggered()"), newMap)
-    QtCore.QObject.connect(loadMapAct, QtCore.SIGNAL("triggered()"), loadMap)
-    QtCore.QObject.connect(saveMapAct, QtCore.SIGNAL("triggered()"), saveMap)
-    
-    QtCore.QObject.connect(hostGameAct, QtCore.SIGNAL("triggered()"), hostGame)
-    QtCore.QObject.connect(joinGameAct, QtCore.SIGNAL("triggered()"), joinGame)
+    def moveIconClicked(self):
+        self.selectedIcon = ICON_MOVE
     
     
-    global selectedIcon
-    selectedIcon = 0
-
-    QtCore.QObject.connect(selectIcon, QtCore.SIGNAL("triggered()"), selectIconClicked)
-    QtCore.QObject.connect(moveIcon, QtCore.SIGNAL("triggered()"), moveIconClicked)

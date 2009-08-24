@@ -115,7 +115,7 @@ class Map(object):
         if not self.hidden:
             for i in xrange(len(indexes)):
                 self.tiles[i].setTile(self.tileindexes[i])
-                print self.tileindexes[i], self.tiles[i].getTile()
+                #print self.tileindexes[i], self.tiles[i].getTile()
     
     def findTopPog(self, position):
         """Returns the top pog at a given position, or None."""
