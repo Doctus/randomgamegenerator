@@ -56,8 +56,13 @@ class JsonClient(object):
         return bool(self.isClient or self.server)
     
     @property
-    def isClient(self):
+    def isClientReady(self):
+        """Whether the client is ready to accept data transfers."""
         return self.state == QtNetwork.QAbstractSocket.ConnectedState
+    
+    @property
+    def isClient(self):
+        return self.state != QtNetwork.QAbstractSocket.UnconnectedState
     
     def host(self, connectionData):
         """Starts the network as a server."""
@@ -106,7 +111,7 @@ class JsonClient(object):
         
     def send(self, data):
         """Call to send an object over the wire."""
-        if self.isClient:
+        if self.isClientReady:
             dumpMessage(self.debugname, self.socket, data)
         else:
             self._server._receive(self.id, data)
@@ -229,6 +234,8 @@ class JsonClient(object):
             # Something random happened
             else:
                 message = translate('net', 'You have been disconnected.')
+        
+        self.close()
         self.disconnected.emit(self, message)
     
     def _hostFound(self, context, socket):
@@ -371,7 +378,7 @@ class JsonServer(object):
         if self.isConnected:
             server = self.server
             self.server = None
-            for client in self.clients:
+            for client in self.clients.values():
                 client.close()
             self.clients = {0: self._client}
             self.id = 1
@@ -402,9 +409,11 @@ class JsonServer(object):
     
     def _disconnect(self, id, errorMessage):
         """Receive the specified data."""
+        if not self.isConnected:
+            return
         assert(id != 0)
         del self.clients[id]
-        return self.disconnected.emit(self, id, errorMessage)
+        self.disconnected.emit(self, id, errorMessage)
     
     def _receive(self, id, data):
         """Receive the specified data."""
