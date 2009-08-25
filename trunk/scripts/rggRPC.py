@@ -167,7 +167,7 @@ def validateRPC(command, args, kwargs, minargs, argnames, hasArgs, hasKwargs):
     elif len(args) < minargs:
         for name in argnames[len(args):minargs]:
             if name not in names:
-                raise invalidRPCError("RPC call to '{0}' is missing '{1}' keyword argument".format(command, name))
+                raise invalidRPCError("RPC call to '{0}' is missing '{1}' argument".format(command, name))
 
 def packRPCData(command, args, kwargs):
     """Create a dictionary that can be sent over the wire."""
@@ -193,6 +193,11 @@ def unpackRPCData(data):
         del kwargs[PARM_ARGS]
     else:
         args = []
+    
+    #print command, repr(args), repr(kwargs)
+    # bugfix: need kwargs to be strings
+    kwargs=dict((str(key), item) for key, item in kwargs.items())
+    #print repr(kwargs)
     
     return command, args, kwargs
 

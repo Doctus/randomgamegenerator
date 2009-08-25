@@ -305,7 +305,7 @@ class RemoteClient(object):
         # Closing connection, unconnected, or some weird state hit; assume a disconnect
         # Discover disconnection reason
         print "[C{0}] Disconnected: {1} {2} {reason}".format(
-            self.id, oldState, newState, reason=socket.errorString())
+            self.id, oldState, newState, reason=self.socket.errorString())
         
         err = self.socket.error()
         
@@ -356,7 +356,7 @@ class JsonServer(object):
         server = QtNetwork.QTcpServer(mainWindow)
         server.newConnection.connect(self._newConnection)
         
-        result = server.listen(QtNetwork.QHostAddress(), connectionData.port)
+        result = server.listen(QtNetwork.QHostAddress("0.0.0.0"), connectionData.port)
         if result:
             print "[Server] Listening on {0}:{1}".format(server.serverAddress().toString(), server.serverPort())
             self.server = server

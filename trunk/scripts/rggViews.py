@@ -74,13 +74,13 @@ class state(object):
         state.cwidget = rggDockWidget.chatWidget(mainWindow)
         
         state.localuser = User(0)
+        # remain unnamed, but give a default
+        state.localuser.username = 'localplayer'
+        
         state.users = { state.localuser.id: state.localuser }
         state.usernames = {}
 
 # MESSAGES
-
-def addDiceMacro(dice, name):
-    state.dwidget.addMacro(dice, name)
 
 def say(message):
     """Say an IC message."""
@@ -99,17 +99,50 @@ def allusers():
     """Get a list of all users."""
     return state.users.values()
 
+def allusersbut(idOrNameOrUser):
+    user = getuser(idOrNameOrUser)
+    if not user:
+        raise RuntimeError("No user named {user}.".format(user=idOrNameOrUser))
+    all = allusers()
+    assert(user in all)
+    all.remove(user)
+    return all
+
 def getuser(idOrName):
     """Returns a user given an id or name, or None if not valid."""
+    if isinstance(idOrName, User):
+        assert(idOrName in allusers())
+        return idOrName
     if isinstance(idOrName, basestring):
         idOrName = idOrName.lower()
-        if idOrName in self.usernames:
-            return self.usernames[idOrName]
+        if idOrName in state.usernames:
+            return state.usernames[idOrName]
     try:
         return state.users[int(idOrName)]
     except:
         pass
     return None
+
+def usernames():
+    """Returns all the usernames."""
+    return state.usernames.keys()
+
+def changeName(user, name):
+    assert(name not in state.usernames)
+    if user.unnamed:
+        user.unnamed = False
+    if user.username in state.usernames:
+        del state.usernames[user.username]
+    state.usernames[name] = user
+    user.username = name
+
+def createUsername(basename=None):
+    if not basename:
+        basename = 'guest'
+    while basename in state.usernames:
+        # HACK: should move static out to system
+        basename += rggMap.Map._findRandomAppend()
+    return basename
 
 def localuser():
     """The user for the local player."""
@@ -136,6 +169,8 @@ def hostGame():
         connection = dialog.save()
         if client.host(connection):
             say(translate('views', 'Now listening on port {port}.').format(port=connection.port))
+            import rggRemote
+            rggRemote.changeUsername(client.username)
         else:
             #TODO: better error message here
             say(translate('views', 'Unable to access network; perhaps the port is in use?'))
@@ -167,6 +202,9 @@ def disconnectGame():
         return
     
     client.close()
+    state.users = {0: localuser()}
+    state.usernames = {}
+    localuser().unnamed = True
     say(translate('views', "Disconnected."))
 
 # MAPS
