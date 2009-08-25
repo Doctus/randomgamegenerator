@@ -124,7 +124,7 @@ class diceRoller(QtGui.QDockWidget):
         self.diceArea.takeItem(self.currentMacro)
 
     def summonMacro(self):
-        macroRequested.emit()
+        self.macroRequested.emit()
     
     rollRequested = signal(basestring, doc=
         """Called when the roll button is hit.
