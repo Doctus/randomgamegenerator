@@ -68,11 +68,11 @@ def changeUsername(user, username):
         if not user.unnamed:
             return
         username = rggViews.createUsername()
-    if user.username == username:
+    if user.username == username and not user.unnamed:
         respondError(user, fake.translate('remote', 'You are already known as {username}.'), username=username)
         return
     #print username, usernames(), username in usernames()
-    if username in usernames():
+    if username in usernames() and not user.username == username:
         respondError(user, fake.translate('remote', '{username} is already taken.'), username=username)
         if not user.unnamed:
             return
@@ -168,7 +168,6 @@ def serverConnect(server, id):
         print "Server: duplicate id ({0}) connected.".format(id)
         return
     rggViews.state.users[id] = User(id)
-    # TODO: Something here?
 
 def serverDisconnect(server, id, errorMessage):
     """Occurs when a client disconnects without being kicked.
@@ -180,8 +179,12 @@ def serverDisconnect(server, id, errorMessage):
     if id not in rggViews.state.users:
         print "Server: unknown id ({0}) disconnected: {1}".format(id, errorMessage)
         return
-    # TODO: Something here?
+    user = rggViews.state.users[id]
     del rggViews.state.users[id]
+    if not user.unnamed:
+        respondError(allusers(),
+            translate('remote', '{username} has left the game. ({error})').format(
+                username=user.username, error=errorMessage))
 
 def serverReceive(server, id, data):
     """Occurs when the server receives data.
