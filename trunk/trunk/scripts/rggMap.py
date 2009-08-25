@@ -44,7 +44,8 @@ class Map(object):
             pog.ID = self._findUniqueID()
         self.Pogs[pog.ID] = pog
     
-    def _findRandomAppend(self):
+    @staticmethod
+    def _findRandomAppend():
         # Can't spell swear words without vowels
         # Left out l and v because they look enough like i and u
         letters = '256789bcdfghjkmnpqrstwxz'

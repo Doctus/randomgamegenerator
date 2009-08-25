@@ -19,47 +19,126 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
+import re
 import rggViews, rggRPC
-from rggSystem import translate
-from rggViews import say, announce, linkedName, getuser, allusers, User
+from rggSystem import translate, fake
+from rggViews import say, announce, linkedName
+from rggViews import localuser, getuser, allusers, allusersbut, usernames, User
 from rggRPC import clientRPC, serverRPC
 
+VALID_USERNAME = re.compile('^\w+$')
+
 @serverRPC
-def receiveSay(username, message):
+def respondError(message, *args, **kwargs):
+    """Responds as an error message.
+    
+    message -- the error message to send
+        should be fake translated so it is
+        done on the client instead of the server.
+    
+    Extra arguments are passed to format the translated string.
+    
+    """
+    say(translate('remote', message).format(*args, **kwargs))
+
+@serverRPC
+def respondNewUser(username):
+    say(translate('remote', '{name} has joined.').format(name=username))
+
+@serverRPC
+def respondArrival(username):
+    localuser().username = username
+    say(translate('remote', 'Welcome, {name}.').format(name=username))
+
+@serverRPC
+def respondUsernameChange(oldname, newname):
+    say(translate('remote', '{oldname} is now known as {newname}.').format(oldname=oldname, newname=newname))
+
+@serverRPC
+def respondSenderUsernameChange(oldname, newname):
+    say(translate('remote', 'You are now known as {newname}.').format(oldname=oldname, newname=newname))
+
+@clientRPC
+def changeUsername(user, username):
+    username = username.lower()
+    
+    # Make sure there are at least no spaces
+    if not VALID_USERNAME.match(username):
+        respondError(user, fake.translate('remote', '{username} contains invalid characters.'), username=username)
+        if not user.unnamed:
+            return
+        username = rggViews.createUsername()
+    if user.username == username:
+        respondError(user, fake.translate('remote', 'You are already known as {username}.'), username=username)
+        return
+    #print username, usernames(), username in usernames()
+    if username in usernames():
+        respondError(user, fake.translate('remote', '{username} is already taken.'), username=username)
+        if not user.unnamed:
+            return
+        username = rggViews.createUsername(username)
+    
+    oldName = user.username
+    unnamed = user.unnamed
+    rggViews.changeName(user, username)
+    if unnamed:
+        respondNewUser(allusersbut(user), username)
+        if user != localuser():
+            respondArrival(user, username)
+    else:
+        del state.usernames[oldName]
+        respondUsernameChange(allusersbut(user), oldName, username)
+        if user != localuser():
+            respondSenderUsernameChange(user, oldName, username)
+
+@serverRPC
+def respondSay(username, message):
     say(translate('remote', '{name}: {sayText}').format(
         name=linkedName(username),
         sayText=message))
 
 @clientRPC
 def sendSay(user, message):
-    receiveSay(allusers(), user.username, message)
+    respondSay(allusers(), user.username, message)
 
-def sendEmote(message):
-    action = translate('views', '<i>{name} {emote}</i>').format(
-        name=linkedHandle(),
-        emote=message)
-    say(action)
-    #c.sendNetMessageToAll('T!' + unicode(action))
+@serverRPC
+def respondEmote(username, message):
+    say(translate('remote', '<i>{name} {emote}</i>').format(
+        name=linkedName(username),
+        emote=message))
 
-def sendWhisper(name, message):
-    pass
-    #if c.isServer():
-        #if not c.sendNetMessageToHandle('w! ' + c.getLocalHandle() +
-        #                         ' ' + unicode(mesg), target):
-        #    cwidget.insertMessage("Error: could not find that handle.")
-        #else:
-        #    cwidget.insertMessage('To ' + unicode(target) + ': ' +
-        #                unicode(mesg))
-    #else:
-    #    cwidget.insertMessage('To ' + unicode(target) + ': ' +
-    #                    unicode(mesg))
-        #c.sendNetMessageToAll('W! ' + target + ' ' + unicode(mesg))
+@clientRPC
+def sendEmote(user, message):
+    respondEmote(allusers(), user.username, message)
 
+@serverRPC
+def respondWhisperSender(target, message):
+    say(translate('remote', 'To {username}: {message}').format(
+        username=linkedName(target),
+        message=message))
+
+@serverRPC
+def respondWhisperTarget(sender, message):
+    say(translate('remote', '{username} whispers: {message}').format(
+        username=linkedName(sender),
+        message=message))
+
+@clientRPC
+def sendWhisper(user, target, message):
+    target = target.lower()
+    targetuser = getuser(target)
+    if not targetuser:
+        respondError(user, fake.translate('remote', '{target} does not exist.'), target=target)
+    else:
+        respondWhisperSender(user, targetuser.username, message)
+        respondWhisperTarget(targetuser, user.username, message)
+    
 # LOW-LEVEL NETWORKING
 
 def clientConnect(client):
     """Occurs when the client is ready to start sending data."""
     say(translate('remote', "Connected!"))
+    changeUsername(client.username)
     #TODO change username to client.username
 
 def clientDisconnect(client, errorMessage):

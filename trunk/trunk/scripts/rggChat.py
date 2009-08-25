@@ -170,7 +170,12 @@ def whisper(message):
             " Handle may be caps-sensitive."))
     else:
         target, rest = splitword(message)
-        rggRemote.sendWhisper(target, rest)
+        if target.lower() == rggViews.localuser().username:
+            emote(translate('chat', "mutters something."))
+        elif not rest:
+            say(translate('chat', "What do you want to tell {target}?").format(target=target))
+        else:
+            rggRemote.sendWhisper(target, rest)
 
 whisper.documentation = fake.translate('chatdoc',
     """/whisper: Whisper a message to another user.<dl>
