@@ -279,7 +279,7 @@ def rollDice(dice):
         say(translate('views', "Invalid dice roll. See /roll documentation for help."))
     else:
         text = translate('views', "{name} rolls {roll}").format(
-            name=linkedHandle(),
+            name=linkedName(localuser().username),
             roll=rggDice.roll(dice))
         say(text)
         #c.sendNetMessageToAll(text)
