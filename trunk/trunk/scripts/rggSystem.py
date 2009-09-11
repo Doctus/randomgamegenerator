@@ -19,7 +19,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
-import sys
+import sys, random
 import os, os.path
 from PyQt4 import QtCore, QtGui
 
@@ -29,6 +29,10 @@ class fake(object):
     @staticmethod
     def translate(context, key, *args):
         """Fake translate to mark strings before they are used."""
+        if args:
+            raise RuntimeError("Fake translation of {context} failed. "
+                "Comment arguments will not be preserved.".format(context=context))
+        assert(not args)
         return key
 
 # Real translation
@@ -90,7 +94,12 @@ class signalStorage(object):
             if not isinstance(arg, parm):
                 raise TypeError("Invalid parameter to signal: expected {0} to be {1}.".format(repr(arg), parm))
         for callback in self.callbacks:
-            callback(*args)
+            try:
+                callback(*args)
+            except Exception as e:
+                import traceback
+                print "ERROR encountered in signal handler {handler}:".format(handler=repr(callback))
+                traceback.print_exc()
     
     def connect(self, callable):
         """Connect this signal to a slot. (Python callable.)"""
@@ -190,4 +199,20 @@ def cameraPosition():
 def setCameraPosition(position):
     _main.setCam(position[0], position[1])
 
+def findRandomAppend():
+    """Gives a random character to append to string to make it random."""
+    # Can't spell swear words without vowels
+    # Left out l and v because they look enough like i and u
+    letters = '256789bcdfghjkmnpqrstwxz'
+    return letters[random.randint(0, len(letters) - 1)];
 
+
+def makeLocalFilename(filename):
+    """Converts a portable path to a complete path."""
+    # TODO: Implement filename conversion
+    return filename
+
+def makePortableFilename(filename):
+    """Attempts to convert a local path to a portable, relative, unique path."""
+    # TODO: Implement filename conversion
+    return filename

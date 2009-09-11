@@ -1,0 +1,255 @@
+This is the base protocol used within rggSocket and rggNet, as of 9/9/9.
+
+rggRPC uses a similar, but separate, protocol built on top of this one.
+
+
+Client always connects to server. Any bad or unexpected data should lead to disconnection,
+but may be ignored if the implementer is lazy.
+Disconnects are usually abrupt (no reason given), so they require
+local verification.
+
+The TRANSFER protocol socket is free to connect and disconnect at will, but whenever
+the OBJECT protocol socket is disconnected, the TRANSFER protocol socket is invalid.
+
+
+PROTOCOLS:
+
+This is a listing of protocols for each type of connection.
+
+
+Clientside OBJECT protocol:
+
+    At any time, the connection may close -> Disconnected
+    
+    Disconnected:
+        Client can connect to server -> Connecting
+    
+    Connecting:
+        When TCP connection made, send IDENTIFY with protocol OBJECT -> Awaiting Activation
+    
+    Awaiting Activation:
+        ACTIVATE packet received -> Connected
+    
+    Connected:
+        Can send/receive GET or IGNORE
+        Can send/receive objects
+
+
+Clientside TRANSFER protocol:
+
+    At any time, the connection may close -> Disconnected
+    
+    Disconnected:
+        Client can connect to server -> Connecting
+    
+    Connecting:
+        When TCP connection made, send IDENTIFY with protocol TRANSFER -> Awaiting Activation
+    
+    Awaiting Activation:
+        ACTIVATE packet received -> Connected
+    
+    Connected:
+        Can send PUT -> Waiting for Response
+        Can receive PUT -> immediately send ACCEPT/REJECT
+            ACCEPT -> Busy Receiving -> Connected
+            REJECT -> Connected
+    
+    Waiting for Response:
+        Can receive ACCEPT -> Busy Sending -> Connected
+        Can receive REJECT -> Connected
+        Can receive PUT -> Waiting for Response with Pending Put
+    
+    Waiting for Response with Pending Put:
+        Can receive ACCEPT -> Busy Sending -> immediately send ACCEPT/REJECT
+            ACCEPT -> Busy Receiving
+            REJECT -> Connected
+    
+    Busy Sending:
+        Continuously send data
+        Data finished sending -> Connected
+
+    Busy Receiving:
+        Continuously receive data
+        Data finished receiving -> Connected or Busy Sending
+
+
+Server protocol:
+
+    At any time, the connection may close -> Disconnected
+    
+    Disconnected:
+        Start the server -> Listening
+    
+    Listening:
+        Client connects, spawn new unknown remote socket at Awaiting Identification
+
+
+Serverside Protocol:
+    
+    At any time, the connection may close, and the socket is thrown out.
+    
+    Awaiting Identification:
+        IDENTIFY with protocol OBJECT, send ACTIVATE -> OBJECT Connected
+        IDENTIFY with protocol TRANSFFER, send ACTIVATE -> TRANSFER Connected
+
+    OBJECT Connected:
+        Can send/receive GET or IGNORE
+        Can send/receive objects
+    
+    TRANSFER Connected:
+        Can send PUT -> TRANSFER Waiting for Response
+        Can receive PUT; immediately send ACCEPT/REJECT
+            ACCEPT -> TRANSFER Busy Receiving -> TRANSFER Connected
+            REJECT -> TRANSFER Connected
+    
+    TRANSFER Waiting for Response:
+        Can receive ACCEPT -> TRANSFER Busy Sending
+        Can receive REJECT -> TRANSFER Connected
+        Can receive PUT; immediately send ACCEPT/REJECT
+            ACCEPT -> TRANSFER Busy Receiving -> TRANSFER Waiting for Response
+            REJECT -> TRANSFER Waiting for Response
+    
+    TRANSFER Busy Sending:
+        Continuously send data
+        Data finished sending -> TRANSFER Connected
+
+    TRANSFER Busy Receiving:
+        Continuously receive data
+        Data finished receiving -> TRANSFER Connected or TRANSFER Waiting for Response
+
+
+OBJECTS:
+
+Objects are read as one serialized JSON object per line.
+Any valid JSON object that fits in one line is allowed.
+
+
+COMMANDS:
+
+Commands are a subset of objects. They take the form:
+
+{"-command": "COMMANDNAME", "-internal": true, "ARGNAME1": ARGVALUE1}
+
+ie: {"-command": "IDENTIFY", "-internal": true, "protocol": "object", "username": "Anonymous"}
+
+
+IDENFITY(protocol, username):
+Client -> Server EITHER PROTOCOL
+
+protocol -- "OBJECT" or "TRANSFER"
+username -- any string
+
+Identifies the protocol and requests a particular username.
+
+    OBJECT:
+        If the username is duplicate or the server doesn't like it
+        for any reason, the server can ignore the requested name.
+    
+    TRANSFER:
+        The username must match another connection, and the connection
+        must come from the same computer.
+
+In reply, the server sends an ACTIVATE command.
+
+
+ACTIVATE(username):
+Server -> Client EITHER PROTOCOL
+
+username -- any string; assigned user name
+
+This notifies the client that the server has accepted the connection,
+and has given the client the specified username.
+
+It will be given in response to an IDENTIFY command.
+
+
+GET(filename, size, checksum):
+Client <-> Server OBJECT PROTOCOL
+
+filename -- string; portable path to file to get
+size -- integer; size of local copy
+checksum -- string; md5 sum on file in hex
+
+Requests that a file be transferred at a later date.
+The request may be later voided by IGNORE or attempted with PUT.
+If the OBJECT protocol connection fails, all files are voided.
+
+A size and checksum are provided to be compared with the receiving side's file.
+If size and checksum are the same on both files, the proper response
+is IGNORE.
+
+If the receiving side does not wish to send the file, it may send IGNORE
+to indicate so.
+
+If the receiving side wishes to send the file, it should attempt to
+send asynchronously on the TRANSFER protocol socket, when available.
+There is no need to send the file immediately.
+
+
+IGNORE(filename):
+Client <-> Server OBJECT PROTOCOL
+
+filename -- string; portable path to file ignored
+
+This message indicates that a previous GET was ignored. This message
+should not appear more than once for a given GET.
+
+
+PUT(filename, size, checksum):
+Client <-> Server TRANSFER PROTOCOL
+
+filename -- string; portable path to file to transfer
+size -- integer; size of local copy
+checksum -- string; md5 sum on file in hex
+
+Requests that a file be transferred. The request may be responded to with
+ACCEPT or REJECT. Only one PUT may be active at one time, without receving
+ACCEPT or REJECT.
+
+The size and checksum are provided for to check against a local copy, or
+the data actually received.
+
+The size is also provided to determine how much data will be sent.
+
+If the receiving side would like the file, it may respond with ACCEPT and
+then read the given number of bytes.
+
+If the receiving side does not want the file, it may respond with REJECT.
+
+There is potential for a deadlock involving two simultaneous PUTs. For this
+reason, when the client receives a PUT from the server:
+    if it has an active PUT, it must wait for ACCEPT or REJECT
+    if it has no active PUT, it must send ACCEPT or REJECT before any other TRANSFER data
+When the server receives a PUT from the client, it must send ACCEPT or REJECT
+before any other TRANSFER data.
+
+Thus, the server prioritizes downloading, and the client prioritizes uploading,
+since the server will need to share more data, and the client is likely to
+have unique new data.
+
+
+ACCEPT(filename):
+Client <-> Server TRANSFER PROTOCOL
+
+filename -- string; portable path to file being accepted
+
+Accepts an active PUT request. See PUT for more information.
+
+After sending this command, the sender should then expect SIZE bytes
+as the contents of the file. SIZE is the size parameter given by the
+corresponding PUT command.
+
+Upon receiving this command, the receiver should then send SIZE bytes,
+the contents of the file.
+
+After the send/receive is complete, commands are again processed normally.
+
+
+REJECT(filename):
+Client <-> Server TRANSFER PROTOCOL
+
+filename -- string; portable path to file being rejected
+
+Declines transfer of a PUT request. See PUT for more information.
+
+Once this is received, the receiver is free to send another PUT request.

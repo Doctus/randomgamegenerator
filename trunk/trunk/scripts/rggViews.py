@@ -38,16 +38,23 @@ BUTTON_RIGHT = 2
 BUTTON_CONTROL = 3
 BUTTON_SHIFT = 6
 
-# Table of active users on the server
+# Feel free to add fields to the user object
 class User(object):
     """User representation on the server."""
     
-    def __init__(self, id):
-        self.id = id
-        self.username = '[unnamed #{0}]'.format(id)
-        self.unnamed = True
+    def __init__(self, username):
+        self.username = username
+    
+    def __repr__(self):
+        return u"User(u'{name}')".format(name=self.username)
+    
+    def __unicode__(self):
+        return self.username
+    
+    def __str__(self):
+        return self.__unicode__()
 
-class state(object):
+class _state(object):
     """A state class build to avoid all these global statements."""
     
     Maps = []
@@ -67,40 +74,37 @@ class state(object):
     
     @staticmethod
     def initialize():
-        state.menu = rggMenuBar.menuBar()
+        _state.menu = rggMenuBar.menuBar()
         
-        state.dwidget = rggDockWidget.diceRoller(mainWindow)
-        state.pwidget = rggDockWidget.pogPalette(mainWindow)
-        state.cwidget = rggDockWidget.chatWidget(mainWindow)
+        _state.dwidget = rggDockWidget.diceRoller(mainWindow)
+        _state.pwidget = rggDockWidget.pogPalette(mainWindow)
+        _state.cwidget = rggDockWidget.chatWidget(mainWindow)
+        _state.users = {}
+        _state.localuser = User(client.username)
+        _state.users[client.username] = _state.localuser
         
-        state.localuser = User(0)
-        # remain unnamed, but give a default
-        state.localuser.username = 'localplayer'
-        
-        state.users = { state.localuser.id: state.localuser }
-        state.usernames = {}
 
 # MESSAGES
 
 def say(message):
     """Say an IC message."""
-    state.cwidget.insertMessage(message)
+    _state.cwidget.insertMessage(message)
 
 def announce(message):
     """Say an OOC message."""
-    state.cwidget.insertMessage(message)
+    _state.cwidget.insertMessage(message)
 
 def linkedName(name):
     return translate('views', '<a href="/tell {name}" title="{name}">{name}</a>').format(name=name)
 
-# NETWORK
+# NETWORK (Server only)
 
 def allusers():
     """Get a list of all users."""
-    return state.users.values()
+    return _state.users.values()
 
-def allusersbut(idOrNameOrUser):
-    user = getuser(idOrNameOrUser)
+def allusersbut(usernameOrUser):
+    user = getuser(usernameOrUser)
     if not user:
         raise RuntimeError("No user named {user}.".format(user=idOrNameOrUser))
     all = allusers()
@@ -108,48 +112,65 @@ def allusersbut(idOrNameOrUser):
     all.remove(user)
     return all
 
-def getuser(idOrName):
-    """Returns a user given an id or name, or None if not valid."""
-    if isinstance(idOrName, User):
-        assert(idOrName in allusers())
-        return idOrName
-    if isinstance(idOrName, basestring):
-        idOrName = idOrName.lower()
-        if idOrName in state.usernames:
-            return state.usernames[idOrName]
-    try:
-        return state.users[int(idOrName)]
-    except:
-        pass
+def getuser(username):
+    """Returns a user given a username, or None if not valid."""
+    if isinstance(username, User):
+        assert(username in allusers())
+        return username
+    username = unicode(username)
+    #print server.userExists(username), server.users
+    if server.userExists(username):
+        username = server.fullname(username)
+        assert(username in _state.users)
+        return _state.users[username]
     return None
 
 def usernames():
     """Returns all the usernames."""
-    return state.usernames.keys()
+    return _state.users.keys()
 
-def changeName(user, name):
-    assert(name not in state.usernames)
-    if user.unnamed:
-        user.unnamed = False
-    if user.username in state.usernames:
-        del state.usernames[user.username]
-    state.usernames[name] = user
-    user.username = name
-
-def createUsername(basename=None):
-    if not basename:
-        basename = 'guest'
-    while basename in state.usernames:
-        # HACK: should move static out to system
-        basename += rggMap.Map._findRandomAppend()
-    return basename
+# TODO: Name changing needs to be synched across the wire
+# The workaround is to log out and back in.
+#def changeName(user, name):
+#    assert(name not in _state.usernames)
+#    if user.unnamed:
+#        user.unnamed = False
+#    if user.username in _state.usernames:
+#        del _state.usernames[user.username]
+#    _state.usernames[name] = user
+#    user.username = name
 
 def localuser():
     """The user for the local player."""
-    return state.localuser
+    return _state.localuser
 
 def localhandle():
     return localuser().username
+
+def adduser(user):
+    """Add a user to the list locally."""
+    #print "ADD", user.username
+    assert(user.username not in _state.users)
+    _state.users[user.username] = user
+    return user
+
+def renameuser(oldname, newname):
+    """Rename a user locally."""
+    #print "RENAME", oldname, newname
+    if oldname == newname:
+        return
+    user = removeuser(oldname)
+    server.rename(oldname, newname)
+    user.username = newname
+    adduser(user)
+
+def removeuser(username):
+    """Remove a user from the list locally."""
+    #print "REMOVE", username
+    assert(username in _state.users)
+    user = _state.users[username]
+    del _state.users[username]
+    return user
 
 def hostGame():
     """Allows the user to host a game."""
@@ -167,10 +188,9 @@ def hostGame():
     
     if dialog.exec_(mainWindow, accept):
         connection = dialog.save()
-        if client.host(connection):
+        renameuser(localhandle(), connection.username)
+        if client.host(connection.port):
             say(translate('views', 'Now listening on port {port}.').format(port=connection.port))
-            import rggRemote
-            rggRemote.changeUsername(client.username)
         else:
             #TODO: better error message here
             say(translate('views', 'Unable to access network; perhaps the port is in use?'))
@@ -192,8 +212,17 @@ def joinGame():
     
     if dialog.exec_(mainWindow, accept):
         connection = dialog.save()
-        client.join(connection)
+        renameuser(localhandle(), connection.username)
+        client.join(connection.host, connection.port)
         say(translate('views', 'Connecting to {host}:{port}...').format(host=connection.host, port=connection.port))
+
+def killConnection():
+    """Kills the connection without reporting anything."""
+    client.close()
+    assert(localhandle() in usernames())
+    assert(localuser() == getuser(localhandle()))
+    users = {localhandle(): localuser()}
+    #print "KILL"
 
 def disconnectGame():
     """Allows the user to disconnect from the internet."""
@@ -201,26 +230,23 @@ def disconnectGame():
         say(translate('views', "You are not connected."))
         return
     
-    client.close()
-    state.users = {0: localuser()}
-    state.usernames = {}
-    localuser().unnamed = True
+    killConnection()
     say(translate('views', "Disconnected."))
 
 # MAPS
 
 def switchMap(map):
     """Switches to the specified map."""
-    if state.currentMap:
-        state.currentMap.hide()
-    state.currentMap = map
-    if state.currentMap:
-        state.currentMap.show()
+    if _state.currentMap:
+        _state.currentMap.hide()
+    _state.currentMap = map
+    if _state.currentMap:
+        _state.currentMap.show()
 
 def addMap(map):
     """Adds a map to the list and marks it current."""
-    assert(not map in state.Maps)
-    state.Maps.append(map)
+    assert(not map in _state.Maps)
+    _state.Maps.append(map)
     switchMap(map)
     # broadcast map
     #c.sendNetMessageToAll(Maps[currentMap[0]].stringform)
@@ -256,8 +282,8 @@ def loadMap():
 def saveMap():
     """Allows the user to save the current map."""
     
-    map = state.currentMap
-    if state.currentMap is None:
+    map = _state.currentMap
+    if _state.currentMap is None:
         return
     # TODO: Probably better handled in a Map Properties dialog.
     #if promptChoice("Edit map info?", ['Yes', 'No'], 1) == 0:
@@ -293,7 +319,7 @@ def addMacro():
         name = promptString(translate('views', "What should the macro be called?"))
         if name is None:
             return
-        state.dwidget.addMacro(dice, name)
+        _state.dwidget.addMacro(dice, name)
     else:
         say(translate('views', 'Malformed dice macro. Formatting help is available in "/roll" command.'))
 
@@ -321,91 +347,91 @@ def reportCamera():
 
 def placePog(pogpath):
     """Places a pog on the map."""
-    if state.currentMap is None:
+    if _state.currentMap is None:
         return
-    state.pogPlacement = True
-    state.pogPath = pogpath
+    _state.pogPlacement = True
+    _state.pogPath = pogpath
 
 # MOUSE ACTIONS
 
 def mouseDrag(screenPosition, mapPosition, displacement):
-    if state.pogSelection:
-        for pog in state.pogSelection:
+    if _state.pogSelection:
+        for pog in _state.pogSelection:
             pog.displace(displacement)
         # Send net message
         #c.sendNetMessageToAll('p! m ' + str(manipulatedPogs[0].ID) + ' ' + str(manipulatedPogs[0].x) + ' '
         #                              + str(manipulatedPogs[0].y))
-    elif state.tilePasting:
-        tile = map(lambda p, d: p // d, mapPosition, state.currentMap.tilesize)
-        state.currentMap.setTile(tile, state.tilePastingIndex)
+    elif _state.tilePasting:
+        tile = map(lambda p, d: p // d, mapPosition, _state.currentMap.tilesize)
+        _state.currentMap.setTile(tile, _state.tilePastingIndex)
 
 def mouseMove(screenPosition, mapPosition, displacement):
-    icon = state.menu.selectedIcon
+    icon = _state.menu.selectedIcon
     if icon == ICON_MOVE: # moveIcon
-        if state.mouseButton == BUTTON_LEFT:
+        if _state.mouseButton == BUTTON_LEFT:
             setCameraPosition(map(lambda c, d: c - d, cameraPosition(), displacement))
         return
     elif icon != ICON_SELECT: #selectIcon
         return
     
-    if state.mouseButton is None:
-        if state.currentMap is None:
+    if _state.mouseButton is None:
+        if _state.currentMap is None:
             return
-        tooltipPog = state.currentMap.findTopPog(mapPosition)
-        if state.pogHover == tooltipPog:
+        tooltipPog = _state.currentMap.findTopPog(mapPosition)
+        if _state.pogHover == tooltipPog:
             return
-        state.pogHover = tooltipPog
+        _state.pogHover = tooltipPog
         if tooltipPog is None:
             return
         displayPosition = map(lambda t, c: t - c, tooltipPog.tooltipPosition(), cameraPosition())
         displayTooltip(tooltipPog.tooltipText(), displayPosition)
-    elif state.mouseButton == BUTTON_LEFT:
+    elif _state.mouseButton == BUTTON_LEFT:
         return mouseDrag(screenPosition, mapPosition, displacement)
 
 def mousePress(screenPosition, mapPosition, button):
     
-    if state.currentMap is None:
+    if _state.currentMap is None:
         return
     
-    icon = state.menu.selectedIcon
+    icon = _state.menu.selectedIcon
     if icon == ICON_MOVE:
         return
     elif icon != ICON_SELECT:
         return
     
     if button == BUTTON_LEFT or button == BUTTON_LEFT + BUTTON_CONTROL:
-        if state.pogPlacement:
-            state.pogPlacement = False
-            infograb = QtGui.QPixmap(state.pogPath)
-            state.currentMap.addPog(rggPog.Pog(
+        if _state.pogPlacement:
+            _state.pogPlacement = False
+            infograb = QtGui.QPixmap(_state.pogPath)
+            _state.currentMap.addPog(rggPog.Pog(
                 mapPosition,
                 (infograb.width(), infograb.height()),
                 1,
-                state.pogPath))
+                _state.pogPath))
             #c.sendNetMessageToAll('p! c ' + " ".join([str(x+c.getCamX()), str(y+c.getCamY()), str(infograb.width()), str(infograb.height()), placingPog[1]]))
             return
-        elif state.tilePasting:
-            tile = map(lambda p, s: p // s, mapPosition, state.currentMap.tilesize)
-            state.currentMap.setTile(tile, state.tilePastingIndex)
+        elif _state.tilePasting:
+            tile = map(lambda p, s: p // s, mapPosition, _state.currentMap.tilesize)
+            _state.currentMap.setTile(tile, _state.tilePastingIndex)
             return
     
     if button == BUTTON_LEFT:
-        pog = state.currentMap.findTopPog(mapPosition)
-        if pog not in state.pogSelection:
-            state.pogSelection = set()
+        pog = _state.currentMap.findTopPog(mapPosition)
+        if pog not in _state.pogSelection:
+            _state.pogSelection = set()
         if not pog:
             return
-        state.pogSelection.add(pog)
+        _state.pogSelection.add(pog)
     elif button == BUTTON_LEFT + BUTTON_CONTROL:
-        pog = state.currentMap.findTopPog(mapPosition)
+        pog = _state.currentMap.findTopPog(mapPosition)
         if not pog:
             return
-        if pog in state.pogSelection:
-            state.pogSelection.remove(pog)
+        if pog in _state.pogSelection:
+            _state.pogSelection.remove(pog)
         else:
-            state.pogSelection.add(pog)
+            _state.pogSelection.add(pog)
     elif button == BUTTON_RIGHT:
-        pog = state.currentMap.findTopPog(mapPosition)
+        pog = _state.currentMap.findTopPog(mapPosition)
         if pog is not None:
             selected = showPopupMenuAt(
                 screenPosition,
@@ -424,7 +450,7 @@ def mousePress(screenPosition, mapPosition, button):
                 if gentype is None:
                     return
                 gentype = ''.join(gentype.split()).lower()
-                for selectedPog in set([pog] + list(state.pogSelection)):
+                for selectedPog in set([pog] + list(_state.pogSelection)):
                     selectedPog.name = rggNameGen.getName(gentype)
                     #c.sendNetMessageToAll('p! n ' + str(manipulatedPogs[1].ID) + ' ' + unicode(manipulatedPogs[1].name))
             elif selected == 2:
@@ -432,11 +458,11 @@ def mousePress(screenPosition, mapPosition, button):
                 newlayer = promptInteger(prompt, min=0, max=65535)
                 if newlayer is None:
                     return
-                for selectedPog in set([pog] + list(state.pogSelection)):
+                for selectedPog in set([pog] + list(_state.pogSelection)):
                     selectedPog.layer = newlayer
                     #c.sendNetMessageToAll('p! l ' + str(manipulatedPogs[1].ID) + ' ' + str(manipulatedPogs[1].layer))
         else:
-            if not state.tilePasting:
+            if not _state.tilePasting:
                 selected = showPopupMenuAt(
                     screenPosition,
                     [translate('views', "Create Pog (Temp Command)"),
@@ -455,32 +481,32 @@ def mousePress(screenPosition, mapPosition, button):
                 if size is None:
                     return
                 pog = rgg.Pog(mapPosition, size, 1, src)
-                state.currentMap.addPog(pog)
+                _state.currentMap.addPog(pog)
                 #c.sendNetMessageToAll('p! c ' + " ".join([str(x), str(y), str(pogsizeW), str(pogsizeH), pogsrc]))
             elif selected == 1:
-                if not state.tilePasting:
-                    state.tilePasting = True
-                    tile = map(lambda p, c: p // c, mapPosition, state.currentMap.tilesize)
-                    state.tilePastingIndex = state.currentMap.getTile(tile)
+                if not _state.tilePasting:
+                    _state.tilePasting = True
+                    tile = map(lambda p, c: p // c, mapPosition, _state.currentMap.tilesize)
+                    _state.tilePastingIndex = _state.currentMap.getTile(tile)
                 else:
-                    state.tilePasting = False
+                    _state.tilePasting = False
     #elif button == BUTTON_MIDDLE: #DEBUG STUFF
     #    Maps[currentMap[0]].debugMorphTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], c.getTileCountOfImage(Maps[currentMap[0]].tileset))
 
 
 def mouseRelease(screenPosition, mapPosition, button):
-    state.mouseButton = None
+    _state.mouseButton = None
 
 def mouseMoveResponse(x, y):
     #print 'move', x, y
     
     screenPosition = (x, y)
     mapPosition = map(lambda p,c: p + c, screenPosition, cameraPosition())
-    displacement = map(lambda p,m: p - m, screenPosition, state.mousePosition)
+    displacement = map(lambda p,m: p - m, screenPosition, _state.mousePosition)
     
     mouseMove(screenPosition, mapPosition, displacement)
     
-    state.mousePosition = screenPosition
+    _state.mousePosition = screenPosition
 
 def mousePressResponse(x, y, t):
     #print 'press', x, y, t
@@ -489,8 +515,8 @@ def mousePressResponse(x, y, t):
     screenPosition = (x, y)
     mapPosition = map(lambda p,c: p + c, screenPosition, cameraPosition())
     
-    state.mousePosition = screenPosition
-    state.mouseButton = t
+    _state.mousePosition = screenPosition
+    _state.mouseButton = t
     
     mousePress(screenPosition, mapPosition, t)
     
@@ -500,8 +526,8 @@ def mouseReleaseResponse(x, y, t):
     screenPosition = (x, y)
     mapPosition = map(lambda p,c: p + c, screenPosition, cameraPosition())
     
-    state.mousePosition = screenPosition
-    state.mouseButton = t
+    _state.mousePosition = screenPosition
+    _state.mouseButton = t
     
     mouseRelease(screenPosition, mapPosition, t)
 

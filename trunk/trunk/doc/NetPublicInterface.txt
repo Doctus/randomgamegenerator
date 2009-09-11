@@ -1,0 +1,433 @@
+This file explains the public interface of rggNet, as of 9/9/9.
+
+Two main types:
+
+JsonClient
+JsonServer
+
+Instantiated with a bit of a hack:
+
+client = JsonClient()
+server = JsonServer(client)
+client.server = server
+
+
+class JsonClient:
+
+
+PROPERTIES:
+
+ready: bool
+
+Without being connected, the client emulates the server locally. IE, it
+pretends to be a running server.
+
+When ready is True, it stops emulating and starts sending data over the wire.
+
+ready starts being True when the connected signal is emitted and stops being
+True when the disconnected signal is emitted. Note that the disconnected signal
+can occur before the connection is successful.
+
+ready stays False when hosting.
+
+
+isConnected: bool
+
+Whether there is an active connection, which could mean
+the client is connected (ready), in the process of connecting, or
+that the server is hosting.
+
+
+isHosting: bool
+
+True if the server is currently hosting.
+
+
+CONNECTION METHODS:
+
+host(connectionData): bool
+
+connectionData.port -- port to listen on
+connectionData.username -- the username to use
+
+returns -- True if hosting succeeded, False if hosting failed
+
+pre: not isConnected
+
+Start hosting a game. Connections will start to come in automatically.
+The server will not disconnect until it is closed.
+
+If the networking interface cannot be accessed, the game will not start
+hosting and False will be returned.
+
+
+join(connectionData):
+
+connectionData.hostname -- server hostname or IP address
+connectionData.port -- server port
+connectionData.username -- a username you would like to use; the server may change or ignore it
+
+pre: not isConnected
+
+Start connecting to the indicated server. The client will still emulate locally until
+connected signal is emitted (when ready becomes True).
+
+
+close():
+
+Immediately close all active connections. Will close both server and client.
+
+Always safe to call, even if already disconnected.
+Does not raise the disconnected() signal.
+
+
+DATA TRANSFER METHODS:
+
+send(data):
+
+data -- a dictionary object that is serializable to Json
+
+Will send the data to the server. If not connected or hosting, it will go
+directly to the local server.
+
+
+requestFile(filename):
+
+filename -- a portable, relative, unique filename for the resource requested
+
+Requests the transfer of the given filename. Sometime later you may get a
+fileReceived signal, but there's no guarantee it will ever be received.
+
+If the connection is closed, the list of files to send/receive is reset.
+
+
+USER MANAGEMENT METHODS:
+
+rename(username):
+
+username -- the name to change to
+
+Sets the username property of the client. Does absolutely no
+synchronization with the server, even if hosting.
+
+
+HOOKS:
+
+allowSend(client, filename, size, checksum): bool
+
+client -- this client
+filename -- the portable, relative, unique filename requested
+size -- the size of that file, in bytes
+checksum -- the md5 checksum of the file
+returns -- True to allow, False to reject
+
+This is a hook that can be replaced with an equivalent function that
+only returns True on files that should be sent.
+
+The server will have requested the file, and the size and md5 will
+be checked to make sure that the file did not previously exist or was different.
+
+The default implementation returns True.
+
+
+allowReceipt(client, filename, size, checksum): bool
+
+client -- this client
+filename -- the portable, relative, unique filename requested
+size -- the size of that file, in bytes
+checksum -- the md5 checksum of the file
+returns -- True to allow, False to reject
+
+This is a hook that can be replaced with an equivalent function that
+only returns True on files that should be allowed to be received.
+
+This client will have previously requested the file, and the size and
+md5 will have been checked to make sure that the file was not previously
+present or that it was different.
+
+The default implementation returns True.
+
+
+SIGNALS:
+
+connected(client):
+
+client -- this client
+
+This signal is raised when the client is ready to send data to the server.
+It is never raised when the server is active. 
+
+
+disconnected(client, errorMessage):
+
+client -- this client
+errorMessage -- a human-readable (localized) string indicating
+    why the connection failed
+
+This signal is raised when the client either fails to connect
+(before connected() is raised) or if the connection is lost
+(after connected() is raised).
+
+The signal is never raised when the server is active, and will
+not be raised if close() is called to manually disconnect.
+
+
+objectReceived(client, data):
+
+client -- this client
+data -- a dict representing data received from the server
+
+This signal is called to notify about incoming data from the server.
+It will only occur when ready is True.
+
+
+fileReceived(client, filename):
+
+client -- this client
+filename -- the portable, relative, unique filename of the file received
+
+This signal occurs when a file has finished downloading. It will have
+passed all the requsite checks and be ready for use.
+
+
+class JsonServer:
+
+
+PROPERTIES:
+
+isConnected: bool
+
+True if the server is currently actively listening for connections.
+
+
+users: list of unicode strings
+
+The list of usernames currently connected. The local user will always
+be in this list.
+
+
+banlist: set
+
+This is a set of IP addresses in unicode. You may alter bans by
+adding to/removing from this list. Any IP in this list will not
+be allowed to connect.
+
+You may also want to kick the user with the kick() function, and
+can obtain the IP through the userIP function.
+
+The banlist does not affect the local user.
+
+
+CONNECTION METHODS:
+
+close():
+
+Closes all connections immediately.
+
+Always safe to call, even if already disconnected.
+Does not raise the disconnected() signal.
+
+
+DATA TRANSFER METHODS:
+
+send(username, data):
+
+username -- the user to send to
+data -- a dictionary serializable to JSON
+
+pre: userExists(username)
+
+Sends the JSON data to the specified user.
+
+If no connection is active (not client.ready), the data will
+be passed directly to the local client.
+
+
+broadcast(data, users=None]):
+
+data -- a dictionary of data serializable to JSON
+users -- an optional list of users to send to, defaults to self.users
+
+pre: userExists(user) for each user in users, if provided
+
+Sends the JSON data to all specified users.
+
+If no connection is active (not client.ready), the data will
+be passed directly to the local client.
+
+
+requestFile(username, filename):
+
+username -- the user to request the file of
+filename -- a portable, relative, unique filename for the resource requested
+
+pre: userExists(username)
+
+Requests the transfer of the given filename. Sometime later you may get a
+fileReceived signal, but there's no guarantee it will ever be received.
+
+If the connection is closed, the list of files to send/receive is reset.
+
+
+USER MANAGEMENT METHODS:
+
+userExists(username): bool
+
+username -- the name of the user to check
+
+Determines if a user with the given username is participating.
+
+The comparison is case-insensitive, so not equivalent to (username in server.users).
+
+
+fullname(username): unicode
+
+username -- the name of the user to access
+returns -- the full username
+
+pre: userExists(username)
+
+Returns the correctly-capitalized username for the specified user.
+
+
+userIP(username): unicode
+
+username -- the name of the user to access
+
+pre: userExists(username)
+
+Gets the IP address of the specified user. The local user's IP will be
+127.0.0.1.
+
+
+rename(oldname, newname):
+
+oldname -- the curent name of the user
+newname -- the name to change to
+
+pre: userExists(oldname)
+pre: oldname != newname
+pre: allowUsername(newname)
+pre: not userExists(newname) or oldname == newname (case insensitive)
+
+Changes the username for the given user on the server.
+Does no synchronization with the client; you must ensure consistency manually.
+
+
+kick(username):
+
+username -- the user to kick
+
+pre: userExists(username)
+
+Disconnects the specified client. Does not raise the disconnected() signal.
+
+
+
+HOOKS:
+
+allowSend(server, username, filename, size, checksum): bool
+
+server -- this server
+username -- the username of the client to send to
+filename -- the portable, relative, unique filename requested
+size -- the size of that file, in bytes
+checksum -- the md5 checksum of the file
+returns -- True to allow, False to reject
+
+This is a hook that can be replaced with an equivalent function that
+only returns True on files that should be sent.
+
+The client will have requested the file, and the size and md5 will
+be checked to make sure that the file did not previously exist or was different.
+
+The default implementation returns True.
+
+allowReceipt(server, username, filename, size, checksum): bool
+
+server -- this server
+username -- the username of the client to receive from
+filename -- the portable, relative, unique filename requested
+size -- the size of that file, in bytes
+checksum -- the md5 checksum of the file
+returns -- True to allow, False to reject
+
+This is a hook that can be replaced with an equivalent function that
+only returns True on files that should be allowed to be received.
+
+This server will have previously requested the file, and the size and
+md5 will have been checked to make sure that the file was not previously
+present or that it was different.
+
+The default implementation returns True.
+
+
+baseUsername(server): unicode string
+
+server -- this server
+returns -- a valid username
+
+Returns a generic string that can be used to form a username.
+It may later have text matching /-[A-Za-z0-9]+/ appended to it.
+Notice the leading dash.
+
+The default implementation returns u"guest".
+
+
+allowUsername(server, username): bool
+
+server -- this server
+username -- the username to check
+returns True to accept, False to reject
+
+Accepts or rejects a given username.
+It may have text matching /-[A-Za-z0-9]+/ appended to it.
+Notice the leading dash.
+
+The default implementation uses a regex that passes /[A-Za-z0-9_\-]+/.
+
+
+SIGNALS:
+
+connected(server, username):
+
+server -- this server
+username -- the username of the connecting client
+
+This signal is raised when a new client has connected to the server.
+The client will be ready to send and receive data.
+
+
+disconnected(server, username, errorMessage):
+
+server -- this server
+username -- the username of the disconnected client
+errorMessage -- a human-readable (localized) string indicating
+    why the connection failed
+
+This signal is raised when a connection to a client is lost.
+The client will previously have been connected().
+
+The signal will not be raised when close() is called.
+
+
+objectReceived(server, username, data):
+
+server -- this server
+username -- the username of the client that sent the data
+data -- a dict representing data received from the server
+
+This signal is called to notify about incoming data from a client.
+It will only occur when ready is True.
+
+
+fileReceived(server, username, filename):
+
+server -- this server
+username -- the username of the client who sent the file
+filename -- the portable, relative, unique filename of the file received
+
+This signal occurs when a file has finished downloading. It will have
+passed all the requsite checks and be ready for use.
+
+

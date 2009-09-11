@@ -18,7 +18,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 import sys
-import rggTile, rggPog, random
+import rggTile, rggPog, rggSystem, random
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
 class Map(object):
@@ -44,18 +44,11 @@ class Map(object):
             pog.ID = self._findUniqueID()
         self.Pogs[pog.ID] = pog
     
-    @staticmethod
-    def _findRandomAppend():
-        # Can't spell swear words without vowels
-        # Left out l and v because they look enough like i and u
-        letters = '256789bcdfghjkmnpqrstwxz'
-        return letters[random.randint(0, len(letters) - 1)];
-    
     def _findUniqueID(self):
         """Get a unique id for a pog."""
-        id = self._findRandomAppend()
+        id = rggSystem.findRandomAppend()
         while id in self.Pogs:
-            id += self._findRandomAppend()
+            id += rggSystem.findRandomAppend()
         return id
     
     def hide(self, hidden=True, includeTiles=True, includePogs=True):
