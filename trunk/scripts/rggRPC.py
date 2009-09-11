@@ -55,11 +55,10 @@ def serverRPC(callable):
         
         data = packRPCData(command, args, kwargs)
         
-        if hasattr(users, 'id'):
+        if hasattr(users, 'username'):
             users = (users,)
         
-        for user in users:
-            server.send(user.id, data)
+        server.broadcast(data, users=[user.username for user in users])
     
     def receive(args, kwargs):
         # Might be redundant with python's checking, but gives more contextual error messages.
@@ -180,7 +179,7 @@ def packRPCData(command, args, kwargs):
     return data
 
 def unpackRPCData(data):
-    """Create a dictionary that can be sent over the wire."""
+    """Create a dictionary from data sent over the wire."""
     kwargs = data.copy()
 
     command = data.get(PARM_COMMAND)
@@ -203,7 +202,7 @@ def unpackRPCData(data):
 
 # Receipt of data
 
-def receiveClientRPC(client, data):
+def receiveClientRPC(data):
     """Occurs when the client receives data.
     
     data -- a dictionary or list of serialized data
@@ -213,6 +212,10 @@ def receiveClientRPC(client, data):
     excepting = True
     try:
         command, args, kwargs = unpackRPCData(data)
+        if not command in clientResponses:
+            print "Client: attempt to run unknown command {command}".format(command=command)
+            excepting = False
+            return
         clientResponses[command](args, kwargs)
         excepting = False
     finally:
@@ -230,6 +233,10 @@ def receiveServerRPC(user, data):
     excepting = True
     try:
         command, args, kwargs = unpackRPCData(data)
+        if not command in serverResponses:
+            print "Server: attempt to run unknown command from {user} {command}".format(user=user.username, command=command)
+            excepting = False
+            return
         serverResponses[command](user, args, kwargs)
         excepting = False
     finally:

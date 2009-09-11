@@ -20,109 +20,448 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
 import re
-from rggJson import jsondumps, jsonloads
-from rggSystem import translate, mainWindow, signal
+import rggSystem
+from rggSocket import statefulSocket
+from rggSystem import translate, mainWindow, signal, makeLocalFilename
 from PyQt4 import QtCore, QtNetwork
 
-WHITESPACE = re.compile('^\s*$')
+MESSAGE_IDENTIFY = "IDENTIFY" # Identify this client
+MESSAGE_ACTIVATE = "ACTIVATE" # Assign username
+MESSAGE_GET = "GET" # Request file transfer
+MESSAGE_PUT = "PUT" # Transfer file data
+MESSAGE_IGNORE = "IGNORE" # Requested file was ignored
+MESSAGE_ACCEPT = "ACCEPT" # Accept the specified file
+MESSAGE_REJECT = "REJECT" # Reject the specified file
+
+PROTOCOL_OBJECT = "OBJECT" # Object-based protocol
+PROTOCOL_TRANSFER = "TRANSFER" # Transfer-based protocol
+
+VALID_USERNAME = re.compile('^[\w\-]+$')
 
 class ConnectionData(object):
     """Data used to create a network connection."""
     
-    def __init__(self, host=None, port=6812, username=translate('net', 'Anonymous', 'default connection name')):
+    def __init__(self, host=None, port=6812, username=translate('net', 'Anonymous', 'default connection username')):
         self.host = host or localHost()
         self.port = port
         self.username = username
 
-class JsonClient(object):
-    """A client that communicates with a server."""
+class BaseClient(object):
+    """Base class for local and remote clients."""
     
     def __init__(self):
-        self.debugcounter = 0
-        self.debugname = 'CD'
-        self.socket = None
+        """Initializes the client."""
+        # Sockets/server
+        self.obj = None
+        self.xfer = None
         self.server = None
-        self.username = None
-        self.state = QtNetwork.QAbstractSocket.UnconnectedState
-        self.id = 0
-    
-    def _setDebugName(self):
-        """Sets the debug name."""
-        self.debugname = 'C{0}:{1}'.format(self.id, self.debugcounter)
-        self.debugcounter += 1
-    
-    @property
-    def isConnected(self):
-        return bool(self.isClient or self.server)
-    
-    @property
-    def isClientReady(self):
-        """Whether the client is ready to accept data transfers."""
-        return self.state == QtNetwork.QAbstractSocket.ConnectedState
-    
-    @property
-    def isClient(self):
-        return self.state != QtNetwork.QAbstractSocket.UnconnectedState
-    
-    def host(self, connectionData):
-        """Starts the network as a server."""
-        if self.isConnected:
-            raise RuntimeError("Already connected.")
-        self._setDebugName()
-        self.username = connectionData.username
-        self.server = self._server
-        result = self.server.listen(connectionData)
-        if not result:
-            self.close()
-        return result
+        self.hostname = None
+        self.port = None
         
-    def join(self, connectionData):
-        """Starts the network as a client."""
-        if self.isConnected:
-            raise RuntimeError("Already connected.")
-        self.id = 0
-        self._setDebugName()
-        self.username = connectionData.username
-        socket = QtNetwork.QTcpSocket(mainWindow)
-        context = self.debugname
-        socket.error.connect(lambda err: self._error(context, socket, err))
-        socket.hostFound.connect(lambda: self._hostFound(context, socket))
-        socket.connected.connect(lambda: self._connected(context, socket))
-        socket.disconnected.connect(lambda: self._disconnected(context, socket))
-        socket.stateChanged.connect(lambda state: self._stateChanged(context, socket, state))
-        socket.readyRead.connect(lambda: self._readyRead(context, socket))
-        
-        self.socket = socket
-        socket.connectToHost(connectionData.host, connectionData.port)
+        # File transfer lists
+        self.sendList = set()
+        self.getList = set()
+        self.sentfile = None
+        self.receivedfile = None
+        # Doesn't need translation
+        self.username = unicode(localHost()) or u'localhost'
+        assert(self.username)
+    
+    @property
+    def ready(self):
+        return bool(self.obj) and self.obj.ready
     
     def close(self):
         """Disconnect all network activity."""
-        self.state = QtNetwork.QAbstractSocket.UnconnectedState
-        self.debugname = 'CD'
-        if self.socket:
-            socket = self.socket
-            self.socket = None
-            socket.disconnectFromHost()
-            print "[{0}] Closed connection.".format(self.debugname)
-        elif self.server:
-            server = self.server
-            self.server = None
-            server.close()
-        
+        self.sendList = set()
+        self.getList = set()
+        self.hostname = None
+        self.port = None
+        if self.obj:
+            x = self.obj
+            self.obj = None
+            x.connected.disconnect()
+            x.disconnected.disconnect()
+            x.objectReceived.disconnect()
+            x.commandReceived.disconnect()
+            x.close()
+        self._closeXfer()
+    
+    def _openXfer(self, socket):
+        """Open the transfer socket."""
+        assert(self.ready)
+        assert(socket.ready)
+        self._closeXfer()
+        self.xfer = socket
+        socket.connected.connect(self._socketConnected)
+        socket.disconnected.connect(self._socketDisconnected)
+        socket.objectReceived.connect(self._socketObject)
+        socket.commandReceived.connect(self._socketCommand)
+        socket.fileSent.connect(self._fileSent)
+        socket.fileReceived.connect(self._fileReceived)
+    
+    def _closeXfer(self):
+        """Disconnect the transfer socket."""
+        if self.xfer:
+            if self.sentfile:
+                x = self.sentfile
+                self.sentfile = None
+                x.file.close()
+            self.receivedfile = None
+            
+            x = self.xfer
+            self.xfer = None
+            x.connected.disconnect()
+            x.disconnected.disconnect()
+            x.objectReceived.disconnect()
+            x.commandReceived.disconnect()
+            x.fileSent.disconnect()
+            x.fileReceived.disconnect()
+            x.close()
+
     def send(self, data):
         """Call to send an object over the wire."""
-        if self.isClientReady:
-            dumpMessage(self.debugname, self.socket, data)
-        else:
-            self._server._receive(self.id, data)
+        self.server.receive(self.username, data)
     
-    connected = signal(object, doc=
+    def receive(self, obj):
+        """Make the client receive some data."""
+        pass
+    
+    def requestFile(self, filename):
+        if filename in self.getList:
+            # NOTE: could update checksum here (for refreshing the file when updated locally)
+            return
+        try:
+            file = QtCore.QFile(makeLocalFilename(filename))
+            if not file.open(QtCore.QFile.ReadWrite):
+                return
+            try:
+                size = file.size()
+                digest = generateChecksum(file)
+                filedata = fileData(file, filename, size, digest)
+            finally:
+                file.close()
+        except IOError:
+            return
+        self.getList.add(filename)
+        self.obj.sendMessage(MESSAGE_GET,
+            filename=filedata.filename,
+            size=filedata.size,
+            checksum=filedata.checksum)
+        self._updatetransfer()
+
+    def _updateSendReceive(self):
+        """Determines the order of updates to prioritize server GETs."""
+        raise NotImplementedError("Must override.")
+        
+    def _updateSend(self):
+        """Updates the transfers to send."""
+        
+        while self.sendList and not self.sentfile:
+            filedata = self.sendList.itervalues().next()
+            if self._shouldSendFile(filedata):
+                self.sentfile = filedata
+                self.xfer.sendMessage(MESSAGE_PUT,
+                    filename=filedata.filename,
+                    size=filedata.size,
+                    digest=filedata.digest)
+                message = "[{0}] Offering transfer of {filename}"
+            else:
+                self.obj.sendMessage(MESSAGE_IGNORE, filename=filedata.filename)
+                message = "[{0}] Ignored transfer of {filename}"
+            print message.format(socket.context, filename=filedata.filename)
+        
+    
+    def _updateReceive(self):
+        """Updates the transfers to receive."""
+        
+        # Did the server want to send us something?
+        if self.receivedfile:
+            filename = self.receivedfile.filename
+            if self._shouldReceiveFile(self.receivedfile):
+                socket.sendMessage(MESSAGE_ACCEPT, filename)
+                socket.receiveFile(self.receivedfile)
+                message = "[{0}] Accepted transfer of {filename}"
+            else:
+                socket.sendMessage(MESSAGE_REJECT, filename)
+                message = "[{0}] Rejected transfer of {filename}"
+            self.getList.discard(filename)
+            self.receivedfile = None
+            print message.format(socket.context, filename=filename)
+    
+    def _updatetransfer(self):
+        """Opens or updates the transfer socket."""
+        if not self.ready:
+            return
+        if not self.getList or not self.sendList:
+            return
+        if not self.xfer:
+            self.openXfer()
+            return
+        
+        self._updateSendReceive()
+        
+    
+    def allowSend(client, filename, size, checksum):
+        """Replacable hook for determining which files should be sent."""
+        return True
+    
+    def allowReceipt(client, filename, size, checksum):
+        """Replacable hook for determining which files should be accepted."""
+        return True
+    
+    def _shouldSendFile(self, fileData):
+        """Check if we should send a file. Does extra mutating work."""
+        file, filename = fileData.file, fileData.filename
+        try:
+            # Can we open the file?
+            if not file.open(QtCore.QFile.Read):
+                return False
+            try:
+                # Do we already have an identical copy?
+                size = file.size()
+                digest = generateChecksum(file)
+                if fileData.size is not None and fileData.digest is not None:
+                    if size == fileData.size and digest == fileData.digest:
+                        return False
+                
+                fileData.size = file.size()
+                fileData.digest = digest
+                
+                # User hook
+                if not self.allowSend(filedata.filename,
+                        filedata.size, filedata.digest):
+                    return False
+                
+                file = None
+                return True
+            finally:
+                if file:
+                    file.close()
+        except IOError:
+            pass
+        return False
+    
+    def _shouldReceiveFile(self, fileData):
+        """Check if we should receive a file. Does extra mutating work."""
+        file, filename = fileData.file, fileData.filename
+        
+        # Did we ask for the file?
+        if not filename in self.getList:
+            return False
+        try:
+            # Can we open the file?
+            if not file.open(QtCore.QFile.ReadWrite):
+                return False
+            try:
+                # Do we already have an identical copy?
+                if file.size() != fileData.size:
+                    if generateChecksum(file) != fileData.digest:
+                        return False
+                        
+                # User hook
+                if not self.allowReceipt(filedata.filename,
+                        filedata.size, filedata.digest):
+                    return False
+                
+                return True
+            finally:
+                file.close()
+        except IOError:
+            pass
+        return False
+    
+    # SIGNAL RESPONSES
+    
+    def _socketConnected(self, socket):
+        """Called when a socket is connected."""
+        pass
+    
+    def _socketDisconnected(self, socket, errorMessage):
+        """Called when a socket disconnects."""
+        if socket == self.obj:
+            self.close()
+        elif socket == self.xfer:
+            self._closeXfer()
+            self._updatetransfer()
+    
+    def _socketObject(self, socket, data):
+        """Called when an object is received on a socket."""
+        if socket == self.obj:
+            self.receive(data)
+    
+    def _socketCommand(self, socket, command, kwargs):
+        """Responds to socket commands."""
+        if socket == self.obj:
+            if command not in (MESSAGE_ACTIVATE, MESSAGE_GET, MESSAGE_IGNORE):
+                message = "[{0}] Unexpected object command {command}"
+                print message.format(socket.context, command=command)
+                return
+        elif socket == self.xfer:
+            if command not in (MESSAGE_ACTIVATE, MESSAGE_PUT, MESSAGE_ACCEPT, MESSAGE_REJECT):
+                message = "[{0}] Unexpected transfer command {command}"
+                print message.format(socket.context, command=command)
+                return
+        else:
+            return
+        if ((command == MESSAGE_ACTIVATE) == self.ready):
+            message = "[{0}] Unexpected command {command}"
+            print message.format(socket.context, command=command)
+            return
+        try:
+            kwargs = dict((str(key), val) for key, val in kwargs.items())
+            if command == MESSAGE_ACTIVATE:
+                self._activateSocket(socket, **kwargs)
+            elif command == MESSAGE_GET:
+                self._getFile(socket, **kwargs)
+            elif command == MESSAGE_PUT:
+                self._putFile(socket, **kwargs)
+            elif command == MESSAGE_IGNORE:
+                self._ignoreFile(socket, **kwargs)
+            elif command == MESSAGE_ACCEPT:
+                self._acceptFile(socket, **kwargs)
+            elif command == MESSAGE_REJECT:
+                self._rejectFile(socket, **kwargs)
+        except TypeError as e:
+            message = "[{0}] Invalid parameters to remote command {command}: {parms}; {err}"
+            print message.format(socket.context, command=command, parms=repr(kwargs), err=e)
+    
+    def _activateSocket(self, socket, username):
+        """Activates the socket."""
+        pass
+    
+    def _getFile(self, socket, filename, size, checksum):
+        """Responds to a file request."""
+        self.sendList[filename] = fileData(QtCore.QFile(filename), filename, size, checksum)
+        self._updatetransfer()
+    
+    def _putFile(self, socket, filename, size, checksum):
+        """Checks whether to accept a sent file."""
+        
+        if self.receivedfile is not None:
+            message = "[{0}] Remote duplicate PUT; ignoring {filename}"
+            print message.format(socket.context, filename=self.receivedfile.filename)
+        
+        # TODO: Filename conversions...
+        self.receivedfile = fileData(QtCore.QFile(filename), filename, size, checksum)
+        self._updatetransfer()
+    
+    def _ignoreFile(self, socket, filename):
+        """Responds to a file request."""
+        message = "[{0}] Remote refused to send {filename}"
+        print message.format(socket.context, filename=filename)
+        if filename in self.getList:
+            del self.getList[filename]
+        self._updatetransfer()
+    
+    def _acceptFile(self, socket, filename):
+        """Starts sending the specified file."""
+        if not self.sentfile or self.sentfile.filename != filename:
+            message = "[{0}] Attempt to accept unexpected file {filename}"
+            print message.format(socket.context, filename=filename)
+            socket._disconnectWithPrejudice()
+            return
+        self.sendList.remove(filename)
+        socket.sendFile(self.sentfile)
+        self.sentfile = None
+    
+    def _rejectFile(self, socket, filename):
+        """Cancels sending the specified file."""
+        if not self.sentfile or self.sentfile.filename != filename:
+            message = "[{0}] Attempt to reject unexpected file {filename}"
+            print message.format(socket.context, filename=filename)
+            return
+        self.sendList.remove(filename)
+        self.sentfile.file.close()
+        self.sentfile = None
+    
+    def _fileSent(self, socket, filename):
+        """Look for more stuff to send."""
+        self._updatetransfer()
+    
+    def _fileReceived(self, socket, filename):
+        """Look more stuff to send."""
+        self._updatetransfer()
+    
+    
+class JsonClient(BaseClient):
+    """A client that communicates with a server."""
+    
+    # CONNECTION
+    
+    @property
+    def isHosting(self):
+        return self.server.isConnected
+    
+    @property
+    def isConnected(self):
+        return self.obj or self.server.isConnected
+    
+    def host(self, port):
+        """Starts the network as a server."""
+        if self.isConnected:
+            raise RuntimeError("Already connected.")
+        assert(self.username)
+        result = self.server._listen(port)
+        if result:
+            self.port = port
+        return result
+        
+    def join(self, hostname, port):
+        """Starts the network as a client."""
+        if self.isConnected:
+            raise RuntimeError("Already connected.")
+        self.obj = statefulSocket(name="C-OBJ", hostname=hostname, port=port)
+        self.hostname = hostname
+        self.port = port
+        self.obj.connected.connect(self._socketConnected)
+        self.obj.disconnected.connect(self._socketDisconnected)
+        self.obj.objectReceived.connect(self._socketObject)
+        self.obj.commandReceived.connect(self._socketCommand)
+        assert(self.username)
+    
+    def close(self):
+        """Closes the server as well as this client."""
+        super(JsonClient, self).close()
+        if self.server.isConnected:
+            self.server.close()
+    
+    def _openXfer(self):
+        """Open the transfer socket."""
+        BaseClient._openXfer(self, statefulSocket(name="C-XFR", connectionData=self.connectionData))
+    
+    def send(self, data):
+        """Call to send an object over the wire."""
+        if self.ready:
+            self.obj.sendObject(data)
+        else:
+            self.server.receive(self.username, data)
+    
+    def receive(self, obj):
+        """Make the client receive some data."""
+        self.objectReceived.emit(self, obj)
+    
+    def _updateSendReceive(self):
+        """Determines the order of updates to avoid deadlock."""
+        
+        # Even if there's a transfer waiting, prioritize sending stuff first
+        self._updateSend()
+        
+        # This check ensures the client priortizes sending over receiving
+        if self.sentfile:
+            return
+        self._updateReceive()
+        
+    # SIGNALS
+    
+    connected = signal(object, basestring, doc=
         """Called when the client is ready to start sending;
         when isConnected becomes True.
         
         Never called when hosting; can send immediately in that case.
         
         client -- this client
+        username -- the username the server is using
         
         """
     )
@@ -135,12 +474,12 @@ class JsonClient(object):
         Never called when hosting; you will never be disconnected automatically.
         
         client -- this client
-        errorMessage -- the reason the connection failed
+        errorMessage -- the untranslated reason the connection failed
         
         """
     )
     
-    received = signal(object, dict, doc=
+    objectReceived = signal(object, dict, doc=
         """Called when an object is received over the wire.
         
         client -- this client
@@ -149,286 +488,322 @@ class JsonClient(object):
         """
     )
     
-    def _receive(self, data):
-        """Call to make the client receive data."""
-        self.received.emit(self, data)
+    fileReceived = signal(object, basestring, doc=
+        """Called when a file is received over the wire.
+        
+        client -- this client
+        filename -- the filename of the file received
+        
+        """
+    )
     
-    def _readyRead(self, context, socket):
-        """Called when data is ready."""
-        if socket is not self.socket:
-            return
-        while True:
-            data = loadMessage(self.debugname, socket)
-            if data is None:
-                return
-            self._receive(data)
+    # SIGNAL RESPONSES
     
-    def _connected(self, context, socket):
-        """Called when connected to the server."""
-        if socket is not self.socket:
-            return
+    def _socketConnected(self, socket):
+        """Called when a socket is connected."""
+        if socket == self.obj:
+            self.obj.sendMessage(MESSAGE_IDENTIFY, protocol=PROTOCOL_OBJECT, username=self.username)
+        elif socket == self.xfer:
+            self.xfer.sendMessage(MESSAGE_IDENTIFY, protocol=PROTOCOL_TRANSFER, username=self.username)
     
-    def _disconnected(self, context, socket):
-        """Called when disconnected from the server."""
-        print "[{0}] Disconnected.".format(context)
-        # TODO: Should we delete the socket here?
-        #socket.deleteLater()
-        
-    def _stateChanged(self, context, socket, newState):
-        """Detects connection changes."""
-        if socket is not self.socket:
-            return
-        
-        oldState = self.state
-        self.state = newState
-        if oldState == newState:
-            return
-        
-        s = QtNetwork.QAbstractSocket
-        
-        if newState == s.HostLookupState:
-            print "[{0}] Looking up host...".format(context)
-            return
-        elif newState == s.ConnectingState:
-            print "[{0}] Connecting...".format(context)
-            return
-        elif newState == s.ConnectedState:
-            print "[{0}] Connected.".format(context)
-            self.connected.emit(self)
-            return
-        elif oldState not in (s.HostLookupState, s.ConnectingState, s.ConnectedState):
-            return
-        
-        # Closing connection, unconnected, or some weird state hit; assume a disconnect
-        # Discover disconnection reason
-        print "[{0}] Disconnected: {1} {2} {reason}".format(
-            context, oldState, newState, reason=socket.errorString())
-        
-        err = socket.error()
-        
-        # Messages for what happens when we weren't yet connected
-        if oldState != s.ConnectedState:
-            # ConnectionRefusedError could mean either refused or timed out
-            # SocketTimeoutError is probably not relevant here
-            if err == s.ConnectionRefusedError or err == s.SocketTimeoutError:
-                message = translate('net', 'The connection was refused or timed out.')
-            # Couldn't look up the IP or url that the user specified (didn't reach DNS)
-            elif err == s.HostNotFoundError:
-                message = translate('net', 'The system could not find the specified host address.')
-            # Local firewall or privileges denied access to sockets
-            elif err == s.SocketAccessError:
-                message = translate('net', 'The program was denied access to network hardware.')
-            # Lot of stuff that probably won't apply; SSL, Proxies, etc
-            # Mostly they mean there's a cable unplugged or something
-            else:
-                message = translate('net', 'The program could not find the specified host.')
-        
-        # Messages for when we were connected
-        else:
-            # Server quit gracefully or kicked you out
-            if err == s.RemoteHostClosedError:
-                message = translate('net', 'The server closed the connection.')
-            # Server died without saying anything
-            elif err == s.SocketTimeoutError:
-                message = translate('net', 'The connection timed out.')
-            # Something random happened
-            else:
-                message = translate('net', 'You have been disconnected.')
-        
-        self.close()
-        self.disconnected.emit(self, message)
+    def _socketDisconnected(self, socket, errorMessage):
+        """Called when a socket disconnects."""
+        if socket == self.obj:
+            self.disconnected.emit(self, errorMessage)
+        super(JsonClient, self)._socketDisconnected(socket, errorMessage)
     
-    def _hostFound(self, context, socket):
-        """Responds to host name being resolved. (DNS)"""
-        if socket is not self.socket:
-            return
-        # Apparently it's still not available
-        #print "[{0}] Host found: {1} resolved to {2}:{3}".format(
-        #    context, socket.peerName(), socket.peerAddress().toString(), socket.peerPort())
+    def _activateSocket(self, socket, username):
+        """Activates the socket."""
+        if socket == self.xfer:
+            assert(username == self.username)
+            socket.activate()
+            self._updatetransfer()
+        elif socket == self.obj:
+            socket.activate()
+            self._updatetransfer()
+            self.connected.emit(self, username)
+            super(JsonClient, self)._activateSocket(socket, username)
     
-    def _error(self, context, socket, err):
-        """Writes errors to the console."""
-        print "[{context}] ERROR {message}".format(
-            context=context, message=socket.errorString()) 
-
-class RemoteClient(object):
+    def _fileReceived(self, socket, filename):
+        """Emit and look for more stuff to send."""
+        if socket == self.xfer:
+            self.fileReceived.emit(self, filename)
+        super(JsonClient, self)._fileReceived(socket, filename)
+    
+class RemoteClient(BaseClient):
     """A client on a different computer."""
     
-    def __init__(self, server, socket):
-        """Initializes the client."""
-        self.socket = socket
-        self.server = server
-        self.id = -1
-        self.state = self.socket.state()
-        socket.readyRead.connect(self._readyRead)
-        socket.stateChanged.connect(self._stateChanged)
-        socket.disconnected.connect(self._disconnected)
-        socket.error.connect(self._error)
+    # CONNECTION
     
+    def __init__(self, username, server, obj):
+        super(RemoteClient, self).__init__()
+        assert(obj.ready)
+        self.obj = obj
+        self.server = server
+    
+        self.obj.disconnected.connect(self._socketDisconnected)
+        self.obj.objectReceived.connect(self._socketObject)
+        self.obj.commandReceived.connect(self._socketCommand)
+        self.username = username
+        
     @property
     def isConnected(self):
-        return self.state == QtNetwork.QAbstractSocket.ConnectedState
+        return bool(self.obj)
     
-    # NOTE: These are reversed for ducking.
-    def send(self, data):
-        """Called when data is sent from the client."""
-        self.server._receive(self.id, data)
+    # send/receive are reversed for ducking
+    def receive(self, data):
+        """Call to send an object over the wire."""
+        assert(self.ready)
+        self.obj.sendObject(data)
     
-    def _receive(self, data):
-        """Called to make the client receive data."""
-        if not self.isConnected:
-            raise RuntimeError("Not connected.")
-        dumpMessage("C{0}".format(self.id), self.socket, data)
+    def _updateSendReceive(self):
+        """Determines the order of updates to avoid deadlock."""
+        
+        # Even if there's a send pending, prioritize receiving stuff first
+        self._updateReceive()
+        if self.xfer.busy:
+            return
+        self._updateSend()
     
-    def close(self):
-        """Close the connection."""
-        if self.isConnected:
-            self.socket.close()
+    def allowSend(self, filename, size, checksum):
+        """Overridden to defer to server."""
+        return self.server.allowSend(self.username, filename, size, checksum)
     
-    def _readyRead(self):
-        """Called when data is ready."""
-        while True:
-            data = loadMessage('C{0}'.format(self.id), self.socket)
-            if data is None:
-                return
+    def allowReceipt(self, filename, size, checksum):
+        """Overridden to defer to server."""
+        return self.server.allowReceipt(self.username, filename, size, checksum)
+    
+    # SIGNAL RESPONSES
+    
+    def _socketDisconnected(self, socket, errorMessage):
+        """Called when a socket disconnects."""
+        if socket == self.obj:
+            self.server._dropClient(self.username, errorMessage)
+        super(RemoteClient, self)._socketDisconnected(socket, errorMessage)
+    
+    def _socketObject(self, socket, data):
+        """Called when an object is received on a socket."""
+        if socket == self.obj:
             self.send(data)
     
-    def _disconnected(self, context, socket):
-        """Called when disconnected from the server."""
-        print "[C{0}] Disconnected.".format(self.id)
-        # TODO: Should we delete the socket here?
-        #socket.deleteLater()
-        
-    def _stateChanged(self, newState):
-        """Detects connection changes."""
-        
-        oldState = self.state
-        self.state = newState
-        if oldState == newState:
-            return
-        
-        s = QtNetwork.QAbstractSocket
-        
-        # Closing connection, unconnected, or some weird state hit; assume a disconnect
-        # Discover disconnection reason
-        print "[C{0}] Disconnected: {1} {2} {reason}".format(
-            self.id, oldState, newState, reason=self.socket.errorString())
-        
-        err = self.socket.error()
-        
-        # Client gracefully quit
-        if err == s.RemoteHostClosedError:
-            message = translate('net', 'The client closed the connection.')
-        # Client died without saying anything
-        elif err == s.SocketTimeoutError:
-            message = translate('net', 'The connection timed out.')
-        # Something random happened
-        else:
-            message = translate('net', 'The client was disconnected.')
-        
-        self.server._disconnect(self.id, message)
-    
-    def _error(self, err):
-        """Writes errors to the console."""
-        print "[C{context}] ERROR {message}".format(
-            context=self.id, message=self.socket.errorString()) 
-    
+    def _fileReceived(self, socket, filename):
+        """Emit and look for more stuff to send."""
+        if socket == self.xfer:
+            self.server.receiveFile(self.username, filename)
+        super(RemoteClient, self)._fileReceived(socket, filename)
 
 class JsonServer(object):
     """A server that processes JSON messages."""
     
     def __init__(self, client):
-        self.server = None
-        self.clients = {0: client}
-        self.id = 1
-        self._client = client
-        client._server = self
+        self.clients = {}
+        self._addClient(client)
+        self.unknown = set()
+        self.client = client
+        client.server = self
+        self.tcp = None
+        # Banlist can be manipulated manually;
+        # just add ips
+        self.banlist = set()
     
     @property
     def isConnected(self):
-        return bool(self.server)
+        return bool(self.tcp)
     
-    def addClient(self, client):
-        """Adds a client to the list."""
-        assert(not client in self.clients.values())
-        client.id = self.id
-        self.id += 1
-        self.clients[client.id] = client
-    
-    def listen(self, connectionData):
+    def _listen(self, port):
         """Starts the server. Returns True on success, else False."""
         if self.isConnected:
             raise RuntimeError("Already connected.")
         
-        server = QtNetwork.QTcpServer(mainWindow)
-        server.newConnection.connect(self._newConnection)
+        self.clients = {}
+        self._addClient(self.client)
         
-        result = server.listen(QtNetwork.QHostAddress("0.0.0.0"), connectionData.port)
+        tcp = QtNetwork.QTcpServer(mainWindow)
+        tcp.newConnection.connect(self._newConnection)
+        
+        result = tcp.listen(QtNetwork.QHostAddress("0.0.0.0"), port)
         if result:
-            print "[Server] Listening on {0}:{1}".format(server.serverAddress().toString(), server.serverPort())
-            self.server = server
+            print "[SERVER] Listening on {0}:{1}".format(tcp.serverAddress().toString(), tcp.serverPort())
+            self.tcp = tcp
         else:
-            print "[Server] Error on listen attempt; {0}".format(server.errorString())
+            print "[SERVER] Error on listen attempt; {0}".format(tcp.errorString())
             # TODO: Should we delete the server here?
-            #server.deleteLater()
-            
+            tcp.deleteLater()
+        
+        #TODO: Better error reporting?
         return result
     
     def close(self):
+        self.clients = {}
+        self._addClient(self.client)
         if self.isConnected:
-            server = self.server
-            self.server = None
+            tcp = self.tcp
+            self.tcp = None
             for client in self.clients.values():
                 client.close()
-            self.clients = {0: self._client}
-            self.id = 1
-            server.close()
+            for socket in self.unknown:
+                socket.close()
+            self.unknown = set()
+            tcp.close()
             # TODO: Should we delete the server here?
-            #server.deleteLater()
+            tcp.deleteLater()
+            print "[SERVER] No longer listening."
     
-    def idExists(self, id):
-        """Check whether the id exists."""
-        return id in self.clients
-    
-    def send(self, id, data):
+    def send(self, username, data):
         """Call to send an object over the wire."""
-        if not self.idExists(id):
-            raise RuntimeError("Invalid id {0}".format(id))
-        client = self.clients[id]
-        client._receive(data)
+        if not self.userExists(username):
+            raise RuntimeError("Invalid username {0}".format(username))
+        client = self.clients[self._processUsername(username)]
+        client.receive(data)
     
-    def broadcast(self, data, exclude=None):
+    def broadcast(self, data, users=None):
         """Call to send an object over the wire.
         
-        exclude -- exclude a list of ids
+        users -- users to send to; default is all
         """
-        for client in self.clients:
-            if exclude and client.id in exclude:
-                continue
-            client._receive(data)
+        if users:
+            users = set(self._processUsername(username) for username in users)
+        else:
+            users = self.clients.keys()
+        for shortname in users:
+            assert(shortname in self.clients)
+            self.clients[shortname].receive(data)
     
-    def _disconnect(self, id, errorMessage):
+    def requestFile(self, username, filename):
+        """Requests a file from the specified user."""
+        if not self.userExists(username):
+            raise RuntimeError("Invalid username {0}".format(username))
+        client = self.clients[self._processUsername(username)]
+        client.requestFile(filename)
+    
+    def receive(self, username, data):
         """Receive the specified data."""
+        return self.objectReceived.emit(self, username, data)
+    
+    def allowSend(server, username, filename, size, checksum):
+        """Replacable hook for determining which files should be sent."""
+        return True
+    
+    def allowReceipt(server, username, filename, size, checksum):
+        """Replacable hook for determining which files should be accepted."""
+        return True
+    
+    def _processUsername(self, username):
+        """Processes a username to lowercase."""
+        return unicode(username).lower()
+    
+    def _addClient(self, client):
+        """Adds a client to the list."""
+        assert(not self.userExists(client.username))
+        self.clients[self._processUsername(client.username)] = client
+    
+    def userExists(self, username):
+        """Checks whether the given username is taken."""
+        return (self._processUsername(username) in self.clients)
+    
+    def fullname(self, username):
+        """Returns the correctly capitalized version of the username."""
+        assert(self.userExists(username))
+        return self.clients[self._processUsername(username)].username
+    
+    @property
+    def users(self):
+        """Returns the list of usernames."""
+        return self.clients.keys()
+    
+    def userIP(self, username):
+        """Gets the IP of an existing client."""
+        if not self.userExists(username):
+            raise RuntimeError("Invalid username {0}".format(username))
+        if self.clients[self._processUsername(username)] == self.client:
+            return u"127.0.0.1"
+        return unicode(self.clients[self._processUsername(username)].obj.socket.peerAddress())
+    
+    def baseUsername(server):
+        """Replaceable hook for the base 'guest' username."""
+        # NOTE: should not localize
+        return u'guest'
+    
+    def allowUsername(server, username):
+        """Replacable hook for determining whether a username is OK.
+        
+        Does not need to determine uniqueness, but the name may
+        be altered to something in the form of '{original}-[A-Za-z0-9]+'
+        
+        """
+        return bool(VALID_USERNAME.match(username))
+    
+    def _fixUsername(self, username=None):
+        """Fixes a username so that it's unique."""
+        if not username:
+            username = self.baseUsername()
+        if self.userExists(username):
+            username = username + ('-' + rggSystem.findRandomAppend())
+            while self.userExists(username):
+                username += rggSystem.findRandomAppend()
+        return unicode(username)
+
+    def rename(self, oldname, newname):
+        """Renames a user to the specified name.
+        
+        Does some quick validity checking.
+        Raises if not accepted;
+        pre: not userExists(newname) and allowUsername(newname) and oldname != newname
+        
+        NOTE: Might cause file transfer to be declined, but
+            will just reconnect.
+        
+        Only renames on this side; you must coordinate it manually.
+        
+        """
+        oldname = self._processUsername(oldname)
+        newproc = self._processUsername(newname)
+        
+        assert(self.userExists(oldname))
+        client = self.clients[oldname]
+        assert(self.allowUsername(newname))
+        assert(client.username != newname)
+        assert(not self.userExists(newname) or newproc == oldname)
+        
+        del self.clients[oldname]
+        client.username = newname
+        self._addClient(client)
+    
+    def kick(self, username):
+        """Kicks a user."""
         if not self.isConnected:
             return
-        assert(id != 0)
-        del self.clients[id]
-        self.disconnected.emit(self, id, errorMessage)
+        username = self._processUsername(username)
+        assert(username in self.clients)
+        client = self.clients[username]
+        assert(client != self.client)
+        client.close()
+        del self.clients[username]
     
-    def _receive(self, id, data):
-        """Receive the specified data."""
-        return self.received.emit(self, id, data)
+    def _dropClient(self, username, errorMessage):
+        """Disconnect a remote client."""
+        if not self.isConnected:
+            return
+        username = self._processUsername(username)
+        assert(self.userExists(username))
+        assert(username in self.clients)
+        client = self.clients[username]
+        assert(client != self.client)
+        client.close()
+        assert(username in self.clients)
+        del self.clients[username]
+        self.disconnected.emit(self, client.username, errorMessage)
     
-    connected = signal(object, int, doc=
+    connected = signal(object, basestring, doc=
         """Called when a client connects to the server.
         
         server -- this server
-        id -- the id of the client
+        username -- the username of the client
         
         """
     )
     
-    disconnected = signal(object, int, basestring, doc=
+    disconnected = signal(object, basestring, basestring, doc=
         """Called when a client disconnects from the server.
         
         Not called when disconnected manually (through close()).
@@ -436,96 +811,139 @@ class JsonServer(object):
         Never called when hosting; you will never be disconnected automatically.
         
         server -- this server
-        id -- the id of the client
-        errorMessage -- the reason the connection failed
+        username -- the username of the client
+        errorMessage -- the untranslated reason the connection failed
         
         """
     )
     
-    received = signal(object, int, dict, doc=
-        """Called when an object is received from a client over the wire.
+    objectReceived = signal(object, basestring, dict, doc=
+        """Called when an object is received from the client over the wire.
         
         server -- this server
-        id -- the id of the client
+        username -- the username of the client
         data -- the data received
+        
+        """
+    )
+    
+    fileReceived = signal(object, basestring, basestring, doc=
+        """Called when a file is received over the wire.
+        
+        server -- this server
+        username -- the username of the client
+        filename -- the filename of the file received
         
         """
     )
     
     def _newConnection(self):
         """Responds to a new connection occurring."""
-        if not self.server:
+        if not self.tcp:
             return
-        while self.server.hasPendingConnections():
-            socket = self.server.nextPendingConnection()
+        while self.tcp.hasPendingConnections():
+            socket = self.tcp.nextPendingConnection()
+            if unicode(socket.peerAddress().toString()) in self.banlist:
+                socket.close()
+                print "[SERVER] Banned client attempted to connect: {1}:{2}".format(
+                    socket.peerName(), socket.peerAddress().toString(), socket.peerPort())
+                return
             assert(socket)
-            client = RemoteClient(self, socket)
-            self.addClient(client)
-            print "[Server] Client connected: {1}:{2}".format(
-                socket.peerName(), socket.peerAddress().toString(), socket.peerPort())
-            self.connected.emit(self, client.id)
+            print "[SERVER] New client connected: {1}:{2}".format(
+                    socket.peerName(), socket.peerAddress().toString(), socket.peerPort())
+            socket = statefulSocket(socket=socket)
+            self.unknown.add(socket)
+            socket.disconnected.connect(self._socketDisconnected)
+            socket.commandReceived.connect(self._socketCommand)
+            socket.objectReceived.connect(self._socketObject)
+    
+    def _detachUnknown(self, socket):
+        self.unknown.discard(socket)
+        socket.disconnected.disconnect()
+        socket.commandReceived.disconnect()
+        socket.objectReceived.disconnect()
+    
+    def _socketDisconnected(self, socket, reason):
+        message = "Socket closed before identification: {reason}"
+        message = message.format(reason=reason)
+        self._forbidSocket(socket, message)
+    
+    def _forbidSocket(self, socket, text):
+        message = "[{0}] {1}"
+        print message.format(socket.context, text)
+        self._detachUnknown(socket)
+        socket.close()
+    
+    def _socketObject(self, socket, obj):
+        message = "Disallowed object data received"
+        self._forbidSocket(socket, message)
+        return
+    
+    def _socketCommand(self, socket, command, kwargs):
+        if command != MESSAGE_IDENTIFY:
+            message = "Disallowed initial remote command {command}"
+            message = message.format(command=command)
+            self._forbidSocket(socket, message)
+            return
+        try:
+            kwargs = dict((str(key), val) for key, val in kwargs.items())
+            self._socketIdentified(socket, **kwargs)
+        except TypeError as e:
+            message = "Invalid parameters to initial remote command {command}: {parms}; {err}"
+            message = message.format(command=command, parms=repr(kwargs), err=e)
+            self._forbidSocket(socket, message)
+    
+    def _socketIdentified(self, socket, protocol, username):
+        """Socket identifies itself with protocol and username."""
+        if protocol not in (PROTOCOL_OBJECT, PROTOCOL_TRANSFER):
+            message = "Disallowed protocol identified {protocol} ({username})"
+            message = message.format(protocol=protocol, username=username)
+            self._forbidSocket(socket, message)
+            return
+        self._detachUnknown(socket)
+        if protocol == PROTOCOL_OBJECT:
+            # Make it unique and valid
+            
+            if not self.allowUsername(username):
+                username = None
+            username = self._fixUsername(username)
+            
+            assert(not self.userExists(username))
+            
+            socket.imbueName("S-OBJ")
+            socket.activate()
+            client = RemoteClient(username, self, socket)
+            self._addClient(client)
+            self.connected.emit(self, username)
+            socket.sendMessage(MESSAGE_ACTIVATE, username=username)
+        else:
+            # Make sure identities match
+            if username not in self.clients:
+                message = "Transfer protocol username does not match {username}"
+                message = message.format(username=username)
+                self._forbidSocket(socket, message)
+                return
+            client = self.clients[self._processUsername(username)]
+            if client == self.client:
+                message = "Transfer protocol attempt to match server user."
+                message = message.format(username=username)
+                self._forbidSocket(socket, message)
+                return
+            assert(client.ready)
+            if client.obj.peerAddress() != socket.peerAddress():
+                message = "Transfer protocol attempt to match user from different IP."
+                message = message.format(username=username)
+                self._forbidSocket(socket, message)
+                return
+            socket.activate()
+            socket.imbueName("S-XFR")
+            client._openXfer(socket)
+            socket.sendMessage(MESSAGE_ACTIVATE, username=username)
+            message = "[{0}:{1}] Transfer socket connected to {username}"
+            print message.format(socket.context, client.obj.context)
+
 
 def localHost():
     """Gets the name of the local machine."""
     return unicode(QtNetwork.QHostInfo.localHostName())
-
-ERROR_LENGTH = 12
-def sampleError(text):
-    if len(text) < ERROR_LENGTH:
-        return text
-    return text[:ERROR_LENGTH]
-
-# Simple one-item identity-based cache to avoid generating JSON on identical requests
-# Will not work if contents are altered
-memoizeKey = None
-memoizeData = None
-
-def dumpMessage(context, socket, data):
-    """Attempts to dump the specified data into the socket."""
-    global memoizeKey
-    global memoizeData
-    if memoizeKey is data:
-        # NOTE: Could be expensive; can remove for speed
-        #assert(hash(data) == hash(memoizeKey))
-        serial = memoizeData
-    else:
-        serial = jsondumps(data)
-        serial = QtCore.QByteArray('\n' + serial + '\n')
-        memoizeKey = data
-        memoizeData = serial
-    result = socket.write(serial)
-    if result == len(serial):
-        #print "Socket write: [{context}] {0}".format(sampleError(serial), context=context)
-        socket.flush()
-        return
-    sample = sampleError(serial)
-    if result == -1:
-        print "Socket write error: {context} could not send data '{1}' length {0}.".format(len(serial), sample, context=context)
-    else:
-        print "Socket write error: {context} sent partial message '{1}' length {0}.".format(len(serial), sample, context=context)
-    
-def loadMessage(context, socket):
-    """Attempts to load a JSON object or array from the socket.
-    
-    returns None if not ready
-    """
-    serial = ""
-    while WHITESPACE.match(serial):
-        if not socket.canReadLine():
-            return None
-        serial = socket.readLine(0)
-        #print "Socket read: [{context}] {0}".format(sampleError(serial), context=context)
-        if not serial:
-            print "Socket read error: {context} unexpectedly could not read line".format(context=context)
-            return None
-        assert(len(serial) > 0 and serial[-1] == '\n')
-    try:
-        #print unicode(serial)
-        obj = jsonloads(unicode(serial))
-        #print repr(obj)
-    except:
-        sample = sampleError(serial)
-        print "Socket read error: {context} read invalid JSON '{1}' length {0}".format(len(serial), sample, context=context)
-        return loadMessage(socket) # Don't want to report None if there's more to read
-    return obj
 

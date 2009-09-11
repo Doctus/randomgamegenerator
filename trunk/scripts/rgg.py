@@ -6,7 +6,7 @@ if __name__ == '__main__':
     import rggSystem, rggRPC, rggChat, rggViews, rggRemote
     
     # Initialize view state.
-    s = rggViews.state
+    s = rggViews._state
     s.initialize()
     
     # EVENT WIRING
@@ -40,10 +40,15 @@ if __name__ == '__main__':
     
     client.connected.connect(rggRemote.clientConnect)
     client.disconnected.connect(rggRemote.clientDisconnect)
-    client.received.connect(rggRemote.clientReceive)
+    client.objectReceived.connect(rggRemote.clientReceive)
+    client.fileReceived.connect(rggRemote.clientFileReceive)
     server.connected.connect(rggRemote.serverConnect)
     server.disconnected.connect(rggRemote.serverDisconnect)
-    server.received.connect(rggRemote.serverReceive)
+    server.objectReceived.connect(rggRemote.serverReceive)
+    server.fileReceived.connect(rggRemote.serverFileReceive)
     
     # Start execution
-    main.start()
+    try:
+        main.start()
+    finally:
+        client.close()

@@ -23,10 +23,8 @@ import re
 import rggViews, rggRPC
 from rggSystem import translate, fake
 from rggViews import say, announce, linkedName
-from rggViews import localuser, getuser, allusers, allusersbut, usernames, User
+from rggViews import localhandle,localuser, getuser, allusers, allusersbut, usernames, User
 from rggRPC import clientRPC, serverRPC
-
-VALID_USERNAME = re.compile('^\w+$')
 
 @serverRPC
 def respondError(message, *args, **kwargs):
@@ -39,57 +37,7 @@ def respondError(message, *args, **kwargs):
     Extra arguments are passed to format the translated string.
     
     """
-    say(translate('remote', message).format(*args, **kwargs))
-
-@serverRPC
-def respondNewUser(username):
-    say(translate('remote', '{name} has joined.').format(name=username))
-
-@serverRPC
-def respondArrival(username):
-    localuser().username = username
-    say(translate('remote', 'Welcome, {name}.').format(name=username))
-
-@serverRPC
-def respondUsernameChange(oldname, newname):
-    say(translate('remote', '{oldname} is now known as {newname}.').format(oldname=oldname, newname=newname))
-
-@serverRPC
-def respondSenderUsernameChange(oldname, newname):
-    say(translate('remote', 'You are now known as {newname}.').format(oldname=oldname, newname=newname))
-
-@clientRPC
-def changeUsername(user, username):
-    username = username.lower()
-    
-    # Make sure there are at least no spaces
-    if not VALID_USERNAME.match(username):
-        respondError(user, fake.translate('remote', '{username} contains invalid characters.'), username=username)
-        if not user.unnamed:
-            return
-        username = rggViews.createUsername()
-    if user.username == username and not user.unnamed:
-        respondError(user, fake.translate('remote', 'You are already known as {username}.'), username=username)
-        return
-    #print username, usernames(), username in usernames()
-    if username in usernames() and not user.username == username:
-        respondError(user, fake.translate('remote', '{username} is already taken.'), username=username)
-        if not user.unnamed:
-            return
-        username = rggViews.createUsername(username)
-    
-    oldName = user.username
-    unnamed = user.unnamed
-    rggViews.changeName(user, username)
-    if unnamed:
-        respondNewUser(allusersbut(user), username)
-        if user != localuser():
-            respondArrival(user, username)
-    else:
-        del state.usernames[oldName]
-        respondUsernameChange(allusersbut(user), oldName, username)
-        if user != localuser():
-            respondSenderUsernameChange(user, oldName, username)
+    say(translate('error', message).format(*args, **kwargs))
 
 @serverRPC
 def respondSay(username, message):
@@ -135,11 +83,10 @@ def sendWhisper(user, target, message):
     
 # LOW-LEVEL NETWORKING
 
-def clientConnect(client):
+def clientConnect(client, username):
     """Occurs when the client is ready to start sending data."""
-    say(translate('remote', "Connected!"))
-    changeUsername(client.username)
-    #TODO change username to client.username
+    rggViews.renameuser(localhandle(), username)
+    say(translate('remote', "Welcome, {name}!".format(name=username)))
 
 def clientDisconnect(client, errorMessage):
     """Occurs when the client connection disconnects without being told to.
@@ -148,7 +95,7 @@ def clientDisconnect(client, errorMessage):
     
     """
     say(translate('remote', "Disconnected. {0}").format(errorMessage))
-
+    
 def clientReceive(client, data):
     """Occurs when the client receives data.
     
@@ -156,47 +103,62 @@ def clientReceive(client, data):
     
     """
     #print "client received"
-    rggRPC.receiveClientRPC(client, data)
+    rggRPC.receiveClientRPC(data)
 
-def serverConnect(server, id):
-    """Occurs when a new client joins.
+def clientFileReceive(client, filename):
+    """Occurs when the client receives data.
     
-    id -- a numeric id for the client
+    filename -- the name of the file received
     
     """
-    if id in rggViews.state.users:
-        print "Server: duplicate id ({0}) connected.".format(id)
-        return
-    rggViews.state.users[id] = User(id)
+    pass
 
-def serverDisconnect(server, id, errorMessage):
+def serverConnect(server, username):
+    """Occurs when a new client joins.
+    
+    username -- a username for the client
+    
+    """
+    rggViews.adduser(User(username))
+    say(translate('remote', '{name} has joined.').format(name=username))
+
+@serverRPC
+def disconnectionMessage(message, error, *args, **kwargs):
+    """Special translation for a disconnection message."""
+    error = translate('socket', error)
+    say(translate('error', message).format(*args, error=disconnect, **kwargs))
+
+def serverDisconnect(server, username, errorMessage):
     """Occurs when a client disconnects without being kicked.
     
-    id -- a numeric id for the client
+    username -- a username for the client
     errorMessage -- a human-readable error message for why the connection failed
     
     """
-    if id not in rggViews.state.users:
-        print "Server: unknown id ({0}) disconnected: {1}".format(id, errorMessage)
-        return
-    user = rggViews.state.users[id]
-    del rggViews.state.users[id]
-    if not user.unnamed:
-        respondError(allusers(),
-            translate('remote', '{username} has left the game. ({error})').format(
-                username=user.username, error=errorMessage))
+    user = rggViews.removeuser(username)
+    respondError(allusers(),
+        fake.translate('remote', '{username} has left the game. {error}'),
+            username=user.username, error=errorMessage)
 
-def serverReceive(server, id, data):
+def serverReceive(server, username, data):
     """Occurs when the server receives data.
     
-    id -- a numeric id for the client
+    username -- a username for the client
     data - a dictionary or list of serialized data
     
     """
-    if id not in rggViews.state.users:
-        print "Server: Data for unknown id ({0}) received: {1}".format(id, repr(data))
-        return
+    #print username, getuser(username), usernames(), allusers()
+    assert(getuser(username))
     #print "server received"
-    rggRPC.receiveServerRPC(rggViews.state.users[id], data)
+    rggRPC.receiveServerRPC(getuser(username), data)
 
+
+def serverFileReceive(server, username, filename):
+    """Occurs when the client receives data.
+    
+    username -- the name of the sending user
+    filename -- the name of the file received
+    
+    """
+    pass
 
