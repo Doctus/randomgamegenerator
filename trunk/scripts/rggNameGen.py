@@ -25,6 +25,16 @@ def _assembleName(ph, pa):
     name.append(random.choice(ph[r]))
   return (''.join(name)).capitalize()
 
+def _getEvilTitle():
+  eps = ['Baron', 'Bringer', 'Champion', 'Demon', 'Duke', 'Emperor',
+         'Empress', 'Harbinger', 'Heart', 'Herald', 'Lady', 'Lord',
+         'Master', 'Mother', 'Overlord', 'Queen', 'Servant', 'Spawn']
+  evilstuff = ['Annihilation', 'Conquest', 'Darkness', 'Decay', 'Despair',
+               'Destruction', 'Doom', 'Dread', 'Famine', 'Fear', 'Fury',
+               'Greed', 'Hate', 'Horror', 'Madness', 'Malice', 'Pestilence',
+               'Ruin', 'Sorrow', 'Terror']
+  return random.choice(eps) + " of " + random.choice(evilstuff)
+
 def _getDwarvenMaleName():
   '''Data drawn from: Durin, Nithi, Northri, Suthri, Austri, Vestri,
       Dvalin, Nar, Nain, Niping, Dain, Bifur, Bofur, Bombur, Nori,
@@ -68,6 +78,11 @@ def _getJapaneseFemaleName():
            'Aoi', 'Nanase', 'Natsumi']
   return random.choice(names)
 
+def _getJapaneseRandomName():
+  if random.choice([True, False]):
+    return _getJapaneseMaleName()
+  return _getJapaneseFemaleName()
+
 def _getJapaneseSurname():
   '''Data drawn from personal knowledge (special case)'''
   names = ['Yagi', 'Tanaka', 'Ueda', 'Yamagawa', 'Yamamoto',
@@ -82,8 +97,15 @@ def _getJapaneseSurname():
            'Nakagawa', 'Nakano', 'Tokunaga']
   return random.choice(names)
 
-def _getJapaneseFullName(g=False):
-  if g: return (_getJapaneseSurname() + " " + _getJapaneseMaleName())
+def _getJapaneseMaleFullName():
+  return (_getJapaneseSurname() + " " + _getJapaneseMaleName())
+
+def _getJapaneseFemaleFullName():
+  return (_getJapaneseSurname() + " " + _getJapaneseFemaleName())
+
+def _getJapaneseRandomFullName():
+  if random.choice([True, False]):
+    return (_getJapaneseSurname() + " " + _getJapaneseMaleName())
   return (_getJapaneseSurname() + " " + _getJapaneseFemaleName())
 
 def _getArtifactWeaponName():
@@ -207,11 +229,14 @@ def _generateTechniqueName(typ='rand', elemnt='rand', moral='rand',
                           'forbidden', 'extraordinary', 'kaleidoscopic', 'first',
                           'vaulting', 'unrivalled', 'unlimited', 'endless',
                           'cascading', 'spotless', 'secret', 'sorrowful', 'ashen',
-                          'forsaken']
+                          'forsaken', 'flawless', 'cacophonic', 'overwhelming',
+                          'ferocious', 'unstoppable', 'lunar', 'solar']
   impressiveAuxNouns = ['gods', 'star', 'blade', 'ultimatum', 'emperor', 'sorrow',
-                        'tears', 'destiny', 'silence', 'void', 'lion']
+                        'tears', 'destiny', 'silence', 'void', 'lion', 'master',
+                        'brilliance', 'wheel', 'oblivion']
   impressiveNouns = ['progression', 'barrage', 'works', 'cascade', 'anathema',
-                     'apocalypse']
+                     'apocalypse', 'prana', 'kata', 'technology', 'method',
+                     'perfection', 'excellency']
   if complexity <= 2:
     result = " ".join([random.choice(elindex[elemnt][0][random.choice(morality)]).capitalize(),
                       random.choice([random.choice(elindex[elemnt][1][random.choice(morality)]),
@@ -317,6 +342,25 @@ def getAdvice():
   #We might want to do more here at some point, hence breaking it up.
   return _generateAdvice()
 
+def _getKaleidoscope():
+  blegh = random.choice([getName(random.choice(getName('kaikeys'))),
+                         getName(random.choice(getName('kaikeys'))),
+                         getName(random.choice(getName('kaikeys'))),
+                         getTechniqueName('cool exalted')])
+  blegh = blegh.split()
+  if len(blegh) > 1:
+    blegh[1] = random.choice([getName(random.choice(getName('kaikeys'))),
+                              getName(random.choice(getName('kaikeys'))),
+                              getName(random.choice(getName('kaikeys'))),
+                              getTechniqueName('cool exalted')])
+  else:
+    blegh = blegh + random.choice([getName(random.choice(getName('kaikeys'))),
+                                   getName(random.choice(getName('kaikeys'))),
+                                   getName(random.choice(getName('kaikeys'))),
+                                   getTechniqueName('cool exalted')]).split()
+  blegh = " ".join(blegh)
+  return blegh
+
 def getName(nametype):
   '''Return a random name of a type defined by the input string.
       The input can be the name of a valid style (dwarf, Japanese, or elf)
@@ -324,25 +368,20 @@ def getName(nametype):
       with equal probability, or it can take a form like 'dwarfmale'
       if a specific gender is desired.
   '''
-  try:
-    if nametype == "dwarfmale" or (nametype == "dwarf" and
-                                   random.choice([True, False])):
-      return (_getDwarvenMaleName())
-    elif nametype == "dwarffemale" or nametype == "dwarf":
-      return (_getDwarvenFemaleName())
-    elif nametype == "japanesemale" or (nametype == "japanese" and
-                                        random.choice([True, False])):
-      return (_getJapaneseMaleName())
-    elif nametype == "japanesefemale" or nametype == "japanese":
-      return (_getJapaneseFemaleName())
-    elif nametype == "japanesemalefull" or (nametype == "japanesefull" and
-                                        random.choice([True, False])):
-      return (_getJapaneseFullName(True))
-    elif nametype == "japanesefemalefull" or nametype == "japanesefull":
-      return (_getJapaneseFullName())
-    elif nametype == "weapon":
-      return (_getArtifactWeaponName())
-    else:
-      return "Error McInvalidArgument"
-  except:
-    return "Error McProblem"
+  typedic = {"dwarfmale":_getDwarvenMaleName,
+             "dwarf":_getDwarvenMaleName,
+             "dwarffemale":_getDwarvenFemaleName,
+             "japanesemale":_getJapaneseMaleName,
+             "japanese":_getJapaneseRandomName,
+             "japanesefemale":_getJapaneseFemaleName,
+             "japanesemalefull":_getJapaneseMaleFullName,
+             "japanesefemalefull":_getJapaneseFemaleFullName,
+             "japanesefull":_getJapaneseRandomFullName,
+             "weapon":_getArtifactWeaponName,
+             "eviltitle":_getEvilTitle,
+             "kaijyuu":_getKaleidoscope}
+  if nametype == "keys":
+    return typedic.keys()
+  if nametype == 'kaikeys':
+    return ['dwarfmale', 'japanesefull', 'weapon', 'eviltitle']
+  return typedic[nametype]()
