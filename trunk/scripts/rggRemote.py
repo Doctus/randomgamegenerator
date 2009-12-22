@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 import re
 import rggViews, rggRPC
 from rggSystem import translate, fake
-from rggViews import say, announce, linkedName
+from rggViews import say, announce, linkedName, currentmap, getmap, allmaps
 from rggViews import localhandle,localuser, getuser, allusers, allusersbut, usernames, User
 from rggRPC import clientRPC, serverRPC
 
@@ -80,12 +80,13 @@ def sendWhisper(user, target, message):
     else:
         respondWhisperSender(user, targetuser.username, message)
         respondWhisperTarget(targetuser, user.username, message)
-    
+
 # LOW-LEVEL NETWORKING
 
 def clientConnect(client, username):
     """Occurs when the client is ready to start sending data."""
     rggViews.renameuser(localhandle(), username)
+    rggViews.closeAllMaps()
     say(translate('remote', "Welcome, {name}!".format(name=username)))
 
 def clientDisconnect(client, errorMessage):
@@ -119,8 +120,11 @@ def serverConnect(server, username):
     username -- a username for the client
     
     """
-    rggViews.adduser(User(username))
+    user = User(username)
+    rggViews.adduser(user)
     say(translate('remote', '{name} has joined.').format(name=username))
+    for ID, map in allmaps():
+        rggViews.respondMapUpdate(user, ID, map.dump())
 
 @serverRPC
 def disconnectionMessage(message, error, *args, **kwargs):

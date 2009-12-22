@@ -26,6 +26,7 @@ class Map(object):
     def __init__(self, mapname, authorname, mapsize, tileset, tilesize):
         """Initializes a new map."""
         
+        self.ID = None
         self.mapname = mapname
         self.authorname = authorname
         self.mapsize = mapsize
@@ -40,13 +41,14 @@ class Map(object):
         
     def addPog(self, pog):
         """Adds a pog to the map, assigning it a unique id."""
-        if pog.ID is None:
-            pog.ID = self._findUniqueID()
+        assert(pog.ID is not None)
+        #if pog.ID is None:
+        #    pog.ID = self._findUniqueID()
         self.Pogs[pog.ID] = pog
     
-    def _findUniqueID(self):
+    def _findUniqueID(self, src):
         """Get a unique id for a pog."""
-        id = rggSystem.findRandomAppend()
+        id = src or rggSystem.findRandomAppend()
         while id in self.Pogs:
             id += rggSystem.findRandomAppend()
         return id
@@ -131,7 +133,7 @@ class Map(object):
             mapsize=self.mapsize,
             tileset=self.tileset,
             tilesize=self.tilesize,
-            pogs=[pog.dump() for pog in self.Pogs.values()],
+            pogs=dict([(pog.ID, pog.dump()) for pog in self.Pogs.values()]),
             tiles=self.tileindexes)
     
     @staticmethod
@@ -144,11 +146,18 @@ class Map(object):
             loadString('Map.tileset', obj.get('tileset')),
             loadCoordinates('Map.tilesize', obj.get('tilesize'), length=2, min=1, max=65535))
         
-        pogs = loadArray('Map.pogs', obj.get('pogs'))
-        for pog in pogs:
+        pogs = loadObject('Map.pogs', obj.get('pogs'))
+        for ID, pog in pogs.items():
+            pog.ID = ID
             map.addPog(rggPog.Pog.load(pog))
         
         # HACK: Looks like coordinates; saves work.
         tiles = loadCoordinates('Map.tiles', obj.get('tiles'), length=len(map.tileindexes), min=0, max=65535)
         map._setIndexes(tiles)
         return map
+        
+    def __unicode__(self):
+        return "{0} {1}".format(self.mapname, self.ID)
+    
+    def __str__(self):
+        return self.__unicode__()

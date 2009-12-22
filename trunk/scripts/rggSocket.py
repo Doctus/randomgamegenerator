@@ -26,6 +26,8 @@ def generateChecksum(file):
     
     hash = hashlib.md5()
     MD5_CHUNK_SIZE = 4096
+    totalsize = 0
+    size = file.size()
     while True:
         chunk = file.read(MD5_CHUNK_SIZE)
         totalsize += len(chunk)

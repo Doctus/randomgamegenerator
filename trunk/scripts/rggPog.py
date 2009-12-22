@@ -16,7 +16,7 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
-import rggTile
+import rggTile, rggResource
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
 class Pog(object):
@@ -25,10 +25,11 @@ class Pog(object):
         self._position = position
         self.dimensions = dimensions
         self._layer = layer
-        self.src = srcfile
+        self._src = srcfile
         self.name = None
         self.tile = None
         self.show()
+        rggResource.crm.listen(srcfile, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
     
     @property
     def hidden(self):
@@ -55,7 +56,7 @@ class Pog(object):
 
     def show(self):
         if self.hidden:
-            self.tile = rggTile.tile(self.position, self.dimensions, 0, self.layer, self.src)
+            self.tile = self._makeTile()
     
     @property
     def layer(self):
@@ -66,6 +67,10 @@ class Pog(object):
         self._layer = layer
         if not self.hidden:
             self.tile.setLayer(int(layer))
+    
+    @property
+    def src(self):
+        return self._src
     
     def pointCollides(self, point):
         if self.hidden: return False
@@ -89,20 +94,26 @@ class Pog(object):
 
     def deriveStringForm(self):
         self.tmp = [str(self.ID), str(self.x), str(self.y), str(self.w), str(self.h),
-                             str(self.layer), str(self.src)]
+                             str(self.layer), str(self._src)]
         if self.name is not None:
             self.tmp.append(str(self.name))
         return " ".join(self.tmp)
     
+    def _makeTile(self):
+        src = rggResource.crm.translateFile(self._src, rggResource.RESOURCE_IMAGE)
+        return rggTile.tile(self.position, self.dimensions, 0, self.layer, src)
+    
+    def _updateSrc(self, crm, filename, translation):
+        if filename == self._src and self.tile:
+            self.tile = self._makeTile()
+    
     def dump(self):
         """Serialize to an object valid for JSON dumping."""
-        assert(self.ID is not None)
         return dict(
-            id=self.ID,
             position=self.position,
             dimensions=self.dimensions,
             layer=self.layer,
-            src=self.src,
+            src=self._src,
             name=self.name)
     
     @staticmethod
@@ -114,5 +125,4 @@ class Pog(object):
             loadInteger('Pog.layer', obj.get('layer'), min=0, max=65535),
             loadString('Pog.src', obj.get('src')))
         pog.name = loadString('Pog.name', obj.get('name'), allowEmpty=True)
-        pog.ID=loadString('Pog.id', obj.get('id'))
         return pog

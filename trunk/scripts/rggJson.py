@@ -91,7 +91,7 @@ def loadArray(name, value, length=None):
             format(name, value))
     
 def loadCoordinates(name, value, length=None, min=None, max=None):
-    if isinstance(value, list):
+    if isinstance(value, list) or isinstance(value, tuple):
         if length is None or len(value) == length:
             return tuple(loadInteger('{name}[{coord}]'.format(name=name, coord=i),
                 value[i], min=min, max=max) for i in xrange(len(value)))
