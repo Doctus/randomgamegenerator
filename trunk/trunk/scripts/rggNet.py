@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 import re
 import rggSystem
-from rggSocket import statefulSocket
+from rggSocket import statefulSocket, generateChecksum, fileData
 from rggSystem import translate, mainWindow, signal, makeLocalFilename
 from PyQt4 import QtCore, QtNetwork
 
@@ -130,11 +130,11 @@ class BaseClient(object):
     def requestFile(self, filename):
         if filename in self.getList:
             # NOTE: could update checksum here (for refreshing the file when updated locally)
-            return
+            return False
         try:
             file = QtCore.QFile(makeLocalFilename(filename))
             if not file.open(QtCore.QFile.ReadWrite):
-                return
+                return False
             try:
                 size = file.size()
                 digest = generateChecksum(file)
@@ -142,13 +142,14 @@ class BaseClient(object):
             finally:
                 file.close()
         except IOError:
-            return
+            return False
         self.getList.add(filename)
         self.obj.sendMessage(MESSAGE_GET,
             filename=filedata.filename,
             size=filedata.size,
             checksum=filedata.checksum)
         self._updatetransfer()
+        return True
 
     def _updateSendReceive(self):
         """Determines the order of updates to prioritize server GETs."""
@@ -183,6 +184,7 @@ class BaseClient(object):
                 socket.receiveFile(self.receivedfile)
                 message = "[{0}] Accepted transfer of {filename}"
             else:
+                self._fileFailed(filename)
                 socket.sendMessage(MESSAGE_REJECT, filename)
                 message = "[{0}] Rejected transfer of {filename}"
             self.getList.discard(filename)
@@ -193,14 +195,13 @@ class BaseClient(object):
         """Opens or updates the transfer socket."""
         if not self.ready:
             return
-        if not self.getList or not self.sendList:
+        if not self.getList and not self.sendList:
             return
         if not self.xfer:
             self.openXfer()
             return
         
         self._updateSendReceive()
-        
     
     def allowSend(client, filename, size, checksum):
         """Replacable hook for determining which files should be sent."""
@@ -332,7 +333,7 @@ class BaseClient(object):
     
     def _getFile(self, socket, filename, size, checksum):
         """Responds to a file request."""
-        self.sendList[filename] = fileData(QtCore.QFile(filename), filename, size, checksum)
+        self.sendList[filename] = fileData(QtCore.QFile(makeLocalFilename(filename)), filename, size, checksum)
         self._updatetransfer()
     
     def _putFile(self, socket, filename, size, checksum):
@@ -342,8 +343,7 @@ class BaseClient(object):
             message = "[{0}] Remote duplicate PUT; ignoring {filename}"
             print message.format(socket.context, filename=self.receivedfile.filename)
         
-        # TODO: Filename conversions...
-        self.receivedfile = fileData(QtCore.QFile(filename), filename, size, checksum)
+        self.receivedfile = fileData(QtCore.QFile(makeLocalFilename(filename)), filename, size, checksum)
         self._updatetransfer()
     
     def _ignoreFile(self, socket, filename):
@@ -352,6 +352,7 @@ class BaseClient(object):
         print message.format(socket.context, filename=filename)
         if filename in self.getList:
             del self.getList[filename]
+            self._fileFailed(filename)
         self._updatetransfer()
     
     def _acceptFile(self, socket, filename):
@@ -383,6 +384,9 @@ class BaseClient(object):
         """Look more stuff to send."""
         self._updatetransfer()
     
+    def _fileFailed(self, filename):
+        """Notify that the socket did not send the specified file."""
+        pass
     
 class JsonClient(BaseClient):
     """A client that communicates with a server."""
@@ -437,6 +441,12 @@ class JsonClient(BaseClient):
         else:
             self.server.receive(self.username, data)
     
+    def requestFile(self, filename):
+        if self.ready:
+            return BaseClient.requestFile(self, filename)
+        else:
+            return False
+        
     def receive(self, obj):
         """Make the client receive some data."""
         self.objectReceived.emit(self, obj)
@@ -497,6 +507,15 @@ class JsonClient(BaseClient):
         """
     )
     
+    fileFailed = signal(object, basestring, doc=
+        """Called when a file fails to come over the wire.
+        
+        client -- this client
+        filename -- the filename of the file received
+        
+        """
+    )
+    
     # SIGNAL RESPONSES
     
     def _socketConnected(self, socket):
@@ -529,6 +548,10 @@ class JsonClient(BaseClient):
         if socket == self.xfer:
             self.fileReceived.emit(self, filename)
         super(JsonClient, self)._fileReceived(socket, filename)
+    
+    def _fileFailed(self, filename):
+        """Notify that the socket did not send the specified file."""
+        self.fileFailed.emit(self, filename)
     
 class RemoteClient(BaseClient):
     """A client on a different computer."""
@@ -589,9 +612,13 @@ class RemoteClient(BaseClient):
     def _fileReceived(self, socket, filename):
         """Emit and look for more stuff to send."""
         if socket == self.xfer:
-            self.server.receiveFile(self.username, filename)
+            self.server.fileReceived.emit(self.server, self.username, filename)
         super(RemoteClient, self)._fileReceived(socket, filename)
-
+    
+    def _fileFailed(self, filename):
+        """Notify that the socket did not send the specified file."""
+        self.server.fileFailed.emit(self.server, self.username, filename)
+    
 class JsonServer(object):
     """A server that processes JSON messages."""
     
@@ -674,7 +701,7 @@ class JsonServer(object):
         if not self.userExists(username):
             raise RuntimeError("Invalid username {0}".format(username))
         client = self.clients[self._processUsername(username)]
-        client.requestFile(filename)
+        return client.requestFile(filename)
     
     def receive(self, username, data):
         """Receive the specified data."""
@@ -829,6 +856,16 @@ class JsonServer(object):
     
     fileReceived = signal(object, basestring, basestring, doc=
         """Called when a file is received over the wire.
+        
+        server -- this server
+        username -- the username of the client
+        filename -- the filename of the file received
+        
+        """
+    )
+    
+    fileFailed = signal(object, basestring, basestring, doc=
+        """Called when a file fails to come over the wire.
         
         server -- this server
         username -- the username of the client

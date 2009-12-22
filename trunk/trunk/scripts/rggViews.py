@@ -20,8 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
 import time, random, os, base64
-import rggNameGen, rggDice, rggMap, rggTile, rggPog, rggDockWidget, rggDialogs, rggMenuBar
-from rggRPC import server, client
+import rggNameGen, rggDice, rggMap, rggTile, rggPog, rggDockWidget, rggDialogs, rggMenuBar, rggResource, rggSystem
+from rggRPC import server, client, serverRPC, clientRPC
 from rggJson import jsondump, jsonload
 from rggMenuBar import ICON_SELECT, ICON_MOVE
 from rggSystem import cameraPosition, setCameraPosition, mainWindow
@@ -57,7 +57,7 @@ class User(object):
 class _state(object):
     """A state class build to avoid all these global statements."""
     
-    Maps = []
+    Maps = {}
     currentMap = None
     
     pogSelection = set()
@@ -235,21 +235,46 @@ def disconnectGame():
 
 # MAPS
 
+def currentmap():
+    return _state.currentMap
+
+def getmap(mapID):
+    return _state.Maps.get(mapID, None)
+
+def allmaps():
+    return _state.Maps.items()
+
+def createMapID(mapname):
+    ID = mapname or rggSystem.findRandomAppend()
+    while ID in _state.Maps:
+        ID += rggSystem.findRandomAppend()
+    return ID
+
+def modifyCurrentMap():
+    sendMapUpdate(currentmap().ID, currentmap().dump())
+
+def pasteTile(position):
+    """Pastes a tile at a designated position."""
+    # TODO: RPC that just sends a tile instead of the whole map.
+    if not currentmap():
+        return
+    tile = map(lambda p, d: p // d, position, currentmap().tilesize)
+    currentmap().setTile(tile, _state.tilePastingIndex)
+    modifyCurrentMap()
+
 def switchMap(map):
     """Switches to the specified map."""
     if _state.currentMap:
         _state.currentMap.hide()
+    clearPogSelection()
     _state.currentMap = map
     if _state.currentMap:
         _state.currentMap.show()
+        print "Changed to map: {0}".format(_state.currentMap)
 
-def addMap(map):
-    """Adds a map to the list and marks it current."""
-    assert(not map in _state.Maps)
-    _state.Maps.append(map)
-    switchMap(map)
-    # broadcast map
-    #c.sendNetMessageToAll(Maps[currentMap[0]].stringform)
+def closeAllMaps():
+    switchMap(None)
+    _state.Maps = {}
 
 def newMap():
     """Allows the user to choose a new map."""
@@ -263,7 +288,7 @@ def newMap():
     
     if dialog.exec_(mainWindow, accept):
         map = dialog.save()
-        addMap(map)
+        sendMapUpdate(None, map.dump())
 
 def loadMap():
     """Allows the user to load a new map."""
@@ -273,11 +298,11 @@ def loadMap():
         return
     try:
         obj = jsonload(filename)
+        map = rggMap.Map.load(obj)
     except Exception as e:
-        showErrorMessage(translate('views', "Unable to read {0}."))
+        showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
         return
-    map = rggMap.Map.load(obj)
-    addMap(map)
+    sendMapUpdate(None, map.dump())
 
 def saveMap():
     """Allows the user to save the current map."""
@@ -295,7 +320,78 @@ def saveMap():
     if not filename:
         return
     
-    dumpjson(map.dump(), filename)
+    jsondump(map.dump(), filename)
+
+@serverRPC
+def respondMapUpdate(ID, mapDump):
+    """Creates or updates the map with the given ID."""
+    map = rggMap.Map.load(mapDump)
+    map.ID = ID
+    _state.Maps[ID] = map
+    if (not _state.currentMap) or (_state.currentMap.ID == ID):
+        switchMap(map)
+
+@clientRPC
+def sendMapUpdate(user, ID, mapDump):
+    """Creates or updates the specified map."""
+    if not getmap(ID):
+        ID = createMapID(mapDump['mapname'])
+    rggResource.srm.processFile(user, mapDump['tileset'])
+    for pogDump in mapDump['pogs'].values():
+        rggResource.srm.processFile(user, pogDump['src'])
+    respondMapUpdate(allusers(), ID, mapDump)
+
+# POGS
+
+def clearPogSelection():
+    _state.pogSelection = set()
+    _state.pogHover = None
+
+def createPog(pogMap, pog):
+    """Creates a new pog."""
+    sendUpdatePog(pogMap.ID, None, pog.dump())
+
+def modifyPog(pogMap, pog):
+    assert(pog.ID)
+    sendUpdatePog(pogMap.ID, pog.ID, pog.dump())
+
+def placePog(pogpath):
+    """Places a pog on the map."""
+    if _state.currentMap is None:
+        return
+    _state.pogPlacement = True
+    _state.pogPath = pogpath
+
+def movePogs(displacement):
+    """Moves pogs by a specified displacement."""
+    for pog in _state.pogSelection:
+        pog.displace(displacement)
+        modifyPog(currentmap(), pog)
+
+@serverRPC
+def respondUpdatePog(mapID, pogID, pogDump):
+    pogMap = _state.Maps[mapID]
+    pog = rggPog.Pog.load(pogDump)
+    pog.ID = pogID
+    if pogID in pogMap.Pogs:
+        old = pogMap.Pogs[pogID]
+        if old in _state.pogSelection:
+            _state.pogSelection.discard(old)
+            _state.pogSelection.add(pog)
+        if old == _state.pogHover:
+            _state.pogHover = None
+    pogMap.Pogs[pogID] = pog
+
+@clientRPC
+def sendUpdatePog(user, mapID, pogID, pogDump):
+    pogMap = getmap(mapID)
+    rggResource.srm.processFile(user, pogDump['src'])
+    if not pogMap:
+        return
+    # HACK: Relies on the fact that responses are locally synchronous
+    if not pogID or pogID not in pogMap.Pogs:
+        pogID = pogMap._findUniqueID(pogDump['src'])
+    respondUpdatePog(allusers(), mapID, pogID, pogDump)
 
 # DICE
 
@@ -345,25 +441,13 @@ def reportCamera():
     say(translate('views', 'x: {0}\ny: {1}', 'formats camera reporting.').format(*cameraPosition()))
 
 
-def placePog(pogpath):
-    """Places a pog on the map."""
-    if _state.currentMap is None:
-        return
-    _state.pogPlacement = True
-    _state.pogPath = pogpath
-
 # MOUSE ACTIONS
 
 def mouseDrag(screenPosition, mapPosition, displacement):
     if _state.pogSelection:
-        for pog in _state.pogSelection:
-            pog.displace(displacement)
-        # Send net message
-        #c.sendNetMessageToAll('p! m ' + str(manipulatedPogs[0].ID) + ' ' + str(manipulatedPogs[0].x) + ' '
-        #                              + str(manipulatedPogs[0].y))
-    elif _state.tilePasting:
-        tile = map(lambda p, d: p // d, mapPosition, _state.currentMap.tilesize)
-        _state.currentMap.setTile(tile, _state.tilePastingIndex)
+        movePogs(displacement)
+    elif _state.tilePasting and currentmap():
+        pasteTile(mapPosition)
 
 def mouseMove(screenPosition, mapPosition, displacement):
     icon = _state.menu.selectedIcon
@@ -375,9 +459,9 @@ def mouseMove(screenPosition, mapPosition, displacement):
         return
     
     if _state.mouseButton is None:
-        if _state.currentMap is None:
+        if currentmap() is None:
             return
-        tooltipPog = _state.currentMap.findTopPog(mapPosition)
+        tooltipPog = currentmap().findTopPog(mapPosition)
         if _state.pogHover == tooltipPog:
             return
         _state.pogHover = tooltipPog
@@ -390,7 +474,7 @@ def mouseMove(screenPosition, mapPosition, displacement):
 
 def mousePress(screenPosition, mapPosition, button):
     
-    if _state.currentMap is None:
+    if currentmap() is None:
         return
     
     icon = _state.menu.selectedIcon
@@ -403,16 +487,17 @@ def mousePress(screenPosition, mapPosition, button):
         if _state.pogPlacement:
             _state.pogPlacement = False
             infograb = QtGui.QPixmap(_state.pogPath)
-            _state.currentMap.addPog(rggPog.Pog(
+            pog = rggPog.Pog(
                 mapPosition,
                 (infograb.width(), infograb.height()),
                 1,
-                _state.pogPath))
-            #c.sendNetMessageToAll('p! c ' + " ".join([str(x+c.getCamX()), str(y+c.getCamY()), str(infograb.width()), str(infograb.height()), placingPog[1]]))
+                _state.pogPath)
+            createPog(currentmap(), pog)
             return
         elif _state.tilePasting:
             tile = map(lambda p, s: p // s, mapPosition, _state.currentMap.tilesize)
-            _state.currentMap.setTile(tile, _state.tilePastingIndex)
+            currentmap().setTile(tile, _state.tilePastingIndex)
+            modifyCurrentMap()
             return
     
     if button == BUTTON_LEFT:
@@ -423,7 +508,7 @@ def mousePress(screenPosition, mapPosition, button):
             return
         _state.pogSelection.add(pog)
     elif button == BUTTON_LEFT + BUTTON_CONTROL:
-        pog = _state.currentMap.findTopPog(mapPosition)
+        pog = currentmap().findTopPog(mapPosition)
         if not pog:
             return
         if pog in _state.pogSelection:
@@ -431,7 +516,7 @@ def mousePress(screenPosition, mapPosition, button):
         else:
             _state.pogSelection.add(pog)
     elif button == BUTTON_RIGHT:
-        pog = _state.currentMap.findTopPog(mapPosition)
+        pog = currentmap().findTopPog(mapPosition)
         if pog is not None:
             selected = showPopupMenuAt(
                 screenPosition,
@@ -443,7 +528,7 @@ def mousePress(screenPosition, mapPosition, button):
                 if name is None:
                     return
                 pog.name = name
-                #c.sendNetMessageToAll('p! n ' + str(manipulatedPogs[1].ID) + ' ' + unicode(manipulatedPogs[1].name))
+                modifyPog(currentmap(), pog)
             elif selected == 1:
                 prompt = translate('views', "Enter a generator command. See /randomname for syntax. Multi-pog compatible.")
                 gentype = promptString(prompt)
@@ -452,7 +537,7 @@ def mousePress(screenPosition, mapPosition, button):
                 gentype = ''.join(gentype.split()).lower()
                 for selectedPog in set([pog] + list(_state.pogSelection)):
                     selectedPog.name = rggNameGen.getName(gentype)
-                    #c.sendNetMessageToAll('p! n ' + str(manipulatedPogs[1].ID) + ' ' + unicode(manipulatedPogs[1].name))
+                    modifyPog(currentmap(), selectedPog)
             elif selected == 2:
                 prompt = translate('views', "Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.")
                 newlayer = promptInteger(prompt, min=0, max=65535)
@@ -460,7 +545,7 @@ def mousePress(screenPosition, mapPosition, button):
                     return
                 for selectedPog in set([pog] + list(_state.pogSelection)):
                     selectedPog.layer = newlayer
-                    #c.sendNetMessageToAll('p! l ' + str(manipulatedPogs[1].ID) + ' ' + str(manipulatedPogs[1].layer))
+                    modifyPog(currentmap(), pog)
         else:
             if not _state.tilePasting:
                 selected = showPopupMenuAt(
@@ -481,8 +566,7 @@ def mousePress(screenPosition, mapPosition, button):
                 if size is None:
                     return
                 pog = rgg.Pog(mapPosition, size, 1, src)
-                _state.currentMap.addPog(pog)
-                #c.sendNetMessageToAll('p! c ' + " ".join([str(x), str(y), str(pogsizeW), str(pogsizeH), pogsrc]))
+                createPog(currentmap(), pog)
             elif selected == 1:
                 if not _state.tilePasting:
                     _state.tilePasting = True
