@@ -16,3 +16,5 @@ class tile(_bmainmod.bImage):
                                               int(h), int(tile), int(layer), str(filename))
         #print 'pyimage created'
 
+    def destroy(self):
+        self.DELETEME()

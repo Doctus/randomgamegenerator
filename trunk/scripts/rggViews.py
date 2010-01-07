@@ -375,6 +375,7 @@ def respondUpdatePog(mapID, pogID, pogDump):
     pog.ID = pogID
     if pogID in pogMap.Pogs:
         old = pogMap.Pogs[pogID]
+        old.hide()
         if old in _state.pogSelection:
             _state.pogSelection.discard(old)
             _state.pogSelection.add(pog)

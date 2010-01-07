@@ -52,7 +52,9 @@ class Pog(object):
         return self.position
 
     def hide(self):
-        self.tile = None
+        if self.tile:
+            self.tile.destroy()
+            self.tile = None
 
     def show(self):
         if self.hidden:
@@ -105,6 +107,7 @@ class Pog(object):
     
     def _updateSrc(self, crm, filename, translation):
         if filename == self._src and self.tile:
+            self.tile.destroy()
             self.tile = self._makeTile()
     
     def dump(self):
