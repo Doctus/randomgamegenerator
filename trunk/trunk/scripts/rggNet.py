@@ -90,7 +90,6 @@ class BaseClient(object):
     def _openXfer(self, socket):
         """Open the transfer socket."""
         assert(self.ready)
-        assert(socket.ready)
         self._closeXfer()
         self.xfer = socket
         socket.connected.connect(self._socketConnected)
@@ -147,7 +146,7 @@ class BaseClient(object):
         self.obj.sendMessage(MESSAGE_GET,
             filename=filedata.filename,
             size=filedata.size,
-            checksum=filedata.checksum)
+            checksum=filedata.digest)
         self._updatetransfer()
         return True
 
@@ -198,7 +197,7 @@ class BaseClient(object):
         if not self.getList and not self.sendList:
             return
         if not self.xfer:
-            self.openXfer()
+            self._openXfer()
             return
         
         self._updateSendReceive()
@@ -305,7 +304,7 @@ class BaseClient(object):
                 return
         else:
             return
-        if ((command == MESSAGE_ACTIVATE) == self.ready):
+        if ((command == MESSAGE_ACTIVATE) == socket.ready):
             message = "[{0}] Unexpected command {command}"
             print message.format(socket.context, command=command)
             return
@@ -333,7 +332,7 @@ class BaseClient(object):
     
     def _getFile(self, socket, filename, size, checksum):
         """Responds to a file request."""
-        self.sendList[filename] = fileData(QtCore.QFile(makeLocalFilename(filename)), filename, size, checksum)
+        self.sendList.add(fileData(QtCore.QFile(makeLocalFilename(filename)), filename, size, checksum))
         self._updatetransfer()
     
     def _putFile(self, socket, filename, size, checksum):
@@ -432,7 +431,7 @@ class JsonClient(BaseClient):
     
     def _openXfer(self):
         """Open the transfer socket."""
-        BaseClient._openXfer(self, statefulSocket(name="C-XFR", connectionData=self.connectionData))
+        BaseClient._openXfer(self, statefulSocket(name="C-XFR", hostname=self.hostname, port=self.port))
     
     def send(self, data):
         """Call to send an object over the wire."""
@@ -534,7 +533,6 @@ class JsonClient(BaseClient):
     def _activateSocket(self, socket, username):
         """Activates the socket."""
         if socket == self.xfer:
-            assert(username == self.username)
             socket.activate()
             self._updatetransfer()
         elif socket == self.obj:
@@ -572,6 +570,12 @@ class RemoteClient(BaseClient):
     @property
     def isConnected(self):
         return bool(self.obj)
+    
+    # HACK: Bugfix.
+    def _openXfer(self, socket=None):
+        """A true hack to fix an edge case."""
+        if socket is not None:
+            BaseClient._openXfer(self, socket)
     
     # send/receive are reversed for ducking
     def receive(self, data):
@@ -955,19 +959,20 @@ class JsonServer(object):
             socket.sendMessage(MESSAGE_ACTIVATE, username=username)
         else:
             # Make sure identities match
+            username = self._processUsername(username)
             if username not in self.clients:
                 message = "Transfer protocol username does not match {username}"
                 message = message.format(username=username)
                 self._forbidSocket(socket, message)
                 return
-            client = self.clients[self._processUsername(username)]
+            client = self.clients[username]
             if client == self.client:
                 message = "Transfer protocol attempt to match server user."
                 message = message.format(username=username)
                 self._forbidSocket(socket, message)
                 return
             assert(client.ready)
-            if client.obj.peerAddress() != socket.peerAddress():
+            if client.obj.socket.peerAddress() != socket.socket.peerAddress():
                 message = "Transfer protocol attempt to match user from different IP."
                 message = message.format(username=username)
                 self._forbidSocket(socket, message)
@@ -977,7 +982,7 @@ class JsonServer(object):
             client._openXfer(socket)
             socket.sendMessage(MESSAGE_ACTIVATE, username=username)
             message = "[{0}:{1}] Transfer socket connected to {username}"
-            print message.format(socket.context, client.obj.context)
+            print message.format(socket.context, client.obj.context, username=username)
 
 
 def localHost():
