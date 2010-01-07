@@ -63,6 +63,7 @@ class wGLWidget : public QGLWidget
     void resizeGL(int w, int h);
 
     void addLine(int x, int y, int w, int h);
+    void deleteLine(int x, int y, int w, int h);
 
     GLuint createTexture(QImage *image);
     void redrawTexture(QImage *image, GLuint texture);

@@ -24,6 +24,8 @@ from rggSystem import translate, mainWindow
 
 ICON_SELECT = 0
 ICON_MOVE = 1
+ICON_DRAW = 2
+ICON_DELETE = 3
 
 class menuBar(object):
     """An object representing the menu bar."""
@@ -61,6 +63,14 @@ class menuBar(object):
         moveIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-move-icon.png"), "Move Tool", main)
         moveIcon.setShortcut("Ctrl+M");
         moveIcon.setToolTip("Move Tool (Ctrl+M)");
+
+        drawIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-freehand-icon.png"), "Draw Tool", main)
+        drawIcon.setShortcut("Ctrl+E");
+        drawIcon.setToolTip("Draw Tool (Ctrl+E)");
+
+        deleteIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-eraser-icon.png"), "Delete Tool", main)
+        deleteIcon.setShortcut("Ctrl+R");
+        deleteIcon.setToolTip("Delete Tool (Ctrl+R)");
         
         # MENUS
         
@@ -81,17 +91,27 @@ class menuBar(object):
         menubar.addSeparator()
         menubar.addAction(selectIcon)
         menubar.addAction(moveIcon)
+        menubar.addAction(drawIcon)
+        menubar.addAction(deleteIcon)
 
         # EVENTS
         
         self.selectedIcon = 0
         selectIcon.triggered.connect(self.selectIconClicked)
         moveIcon.triggered.connect(self.moveIconClicked)
+        drawIcon.triggered.connect(self.drawIconClicked)
+        deleteIcon.triggered.connect(self.deleteIconClicked)
     
     def selectIconClicked(self):
         self.selectedIcon = ICON_SELECT
     
     def moveIconClicked(self):
         self.selectedIcon = ICON_MOVE
+
+    def drawIconClicked(self):
+        self.selectedIcon = ICON_DRAW
+
+    def deleteIconClicked(self):
+        self.selectedIcon = ICON_DELETE
     
     

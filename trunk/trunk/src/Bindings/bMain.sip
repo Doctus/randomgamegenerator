@@ -55,6 +55,7 @@ public:
     int getTileCountOfImage(QString filename);
 
     void addLine(int x, int y, int w, int h);
+    void deleteLine(int x, int y, int w, int h);
 
     /*void addTranslationFile(QString filename);
     void removeTranslationFile(QString filename);*/
