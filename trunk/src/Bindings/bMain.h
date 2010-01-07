@@ -64,7 +64,7 @@ class bMain : public QObject
     void changeImage(QString oldFilename, QString newFilename);
     int getTileCountOfImage(QString filename);
 
-    void addPoint(int x, int y);
+    void addLine(int x, int y, int w, int h);
 
     /*void addTranslationFile(QString filename);
     void removeTranslationFile(QString filename);*/
