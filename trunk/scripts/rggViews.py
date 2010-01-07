@@ -369,8 +369,13 @@ def placePog(pogpath):
 def movePogs(displacement):
     """Moves pogs by a specified displacement."""
     for pog in _state.pogSelection:
-        pog.displace(displacement)
-        modifyPog(currentmap(), pog)
+        from rggPog import Pog
+        # TODO: Make pog movement transfer much more efficient.
+        dup = Pog(pog.position, pog.dimensions, pog.layer, pog.src)
+        dup.displace(displacement)
+        dup.ID = pog.ID
+        modifyPog(currentmap(), dup)
+        dup.hide()
 
 @serverRPC
 def respondUpdatePog(mapID, pogID, pogDump):
