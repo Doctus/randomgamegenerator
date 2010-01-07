@@ -44,6 +44,8 @@ class bImage
     GLuint getTextureId();
     void setTextureId(GLuint id);
     QRect getRect();
+
+    void DELETEME();
 };
 
 #endif // BIMAGE_H

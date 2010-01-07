@@ -94,4 +94,6 @@ class bImage
     void setH(int h);
     void setTile(int tile);
     void setLayer(int layer);
+
+    void DELETEME();
 };
