@@ -27,13 +27,13 @@ class Pog(object):
         self._layer = layer
         self._src = srcfile
         self.name = None
-        self.tile = None
+        self._tileStore = None
         self.show()
         rggResource.crm.listen(srcfile, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
     
     @property
     def hidden(self):
-        return not self.tile
+        return not self._tile
     
     @property
     def position(self):
@@ -44,21 +44,29 @@ class Pog(object):
         self._position = position
         if not self.hidden:
             x, y = position
-            self.tile.setX(x)
-            self.tile.setY(y)
+            self._tile.setX(x)
+            self._tile.setY(y)
+    
+    @property
+    def _tile(self):
+        return self._tileStore
+    
+    @_tile.setter
+    def _tile(self, tile):
+        if self._tileStore:
+            self._tileStore.destroy()
+        self._tileStore = tile
     
     def displace(self, displacement):
         self.position = map(lambda p,d: p + d, self.position, displacement)
         return self.position
 
     def hide(self):
-        if self.tile:
-            self.tile.destroy()
-            self.tile = None
+        self._tile = None
 
     def show(self):
         if self.hidden:
-            self.tile = self._makeTile()
+            self._tile = self._makeTile()
     
     @property
     def layer(self):
@@ -68,7 +76,7 @@ class Pog(object):
     def layer(self, layer):
         self._layer = layer
         if not self.hidden:
-            self.tile.setLayer(int(layer))
+            self._tile.setLayer(int(layer))
     
     @property
     def src(self):
@@ -106,9 +114,8 @@ class Pog(object):
         return rggTile.tile(self.position, self.dimensions, 0, self.layer, src)
     
     def _updateSrc(self, crm, filename, translation):
-        if filename == self._src and self.tile:
-            self.tile.destroy()
-            self.tile = self._makeTile()
+        if filename == self._src and self._tile:
+            self._tile = self._makeTile()
     
     def dump(self):
         """Serialize to an object valid for JSON dumping."""
