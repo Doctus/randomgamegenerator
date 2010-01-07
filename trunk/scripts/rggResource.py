@@ -109,7 +109,7 @@ class clientResourceMapper(object):
         # Clean out old listeners
         oldlisteners = self._listeners
         self._listeners = defaultdict(list)
-        for filename, listeners in oldlisteners.values():
+        for filename, listeners in oldlisteners.items():
             newlist = [listener for listener in self._listeners if listener()]
             if len(newlist):
                 self._listeners[filename] = newlist
