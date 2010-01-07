@@ -54,6 +54,8 @@ public:
     void changeImage(QString oldFilename, QString newFilename);
     int getTileCountOfImage(QString filename);
 
+    void addPoint(int x, int y);
+
     /*void addTranslationFile(QString filename);
     void removeTranslationFile(QString filename);*/
 

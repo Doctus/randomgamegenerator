@@ -22,6 +22,9 @@ class wGLWidget(QGLWidget):
 
         super(QGLWidget, self).__init__(QGLFormat(QGL.DoubleBuffer | QGL.AlphaChannel), parent)
 
+        self.resize(parent.width(), parent.height())
+        self.glInit()
+
     def check_size(self, img):
         for size in img.size:
             while True:
@@ -38,8 +41,8 @@ class wGLWidget(QGLWidget):
         w, h = ppm.size
         data = ppm.tostring()
 
-        tex = glGenTextures(1)
-        glBindTexture(GL_TEXTURE_2D, tex)
+        tex = glGenTextures(20)
+        glBindTexture(GL_TEXTURE_2D, tex[0])
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h,
                 0, GL_RGBA, GL_UNSIGNED_BYTE, data)
 
@@ -49,9 +52,12 @@ class wGLWidget(QGLWidget):
             print "GLError: " + gluErrorString(error)
             return False
 
-        return tex
+        return tex[0]
 
     def initializeGL(self):
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         ppm_path = os.path.join(os.path.dirname(__file__), u"texture2.ppm")
         tex = self.ppm2texture(ppm_path)
 

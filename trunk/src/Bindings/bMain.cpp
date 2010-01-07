@@ -212,6 +212,11 @@ int bMain::getTileCountOfImage(QString filename)
     return -1;
 }
 
+void bMain::addPoint(int x, int y)
+{
+    mainGame->mGLWidget->addPoint(x, y);
+}
+
 /* This is a wonderful idea, but it requires all widgets using tr() to re-implement changeEvent
  * and check if a LanguageChange event comes by. If so, re-translate every tr() by
  * calling widget->setText() on everything that requires re-translation. *sigh*
