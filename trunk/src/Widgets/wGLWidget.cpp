@@ -57,8 +57,6 @@ wGLWidget::wGLWidget(QWidget* parent, cGame *mGame) : QGLWidget(QGLFormat(QGL::F
     setFocusPolicy(Qt::StrongFocus);
     setMouseTracking(true);
 
-    lines.append(QRect(0, 0, 15, 15));
-
     //OpenGL is initialized here, instead of somewhere inside Qt4, otherwise it Segfaults due to doing stuff prior to OpenGL being initialized. Or something.
     glInit();
 }
