@@ -134,3 +134,8 @@ QRect bImage::getRect()
 {
     return QRect(x, y, w, h);
 }
+
+void bImage::DELETEME()
+{
+    delete this;
+}
