@@ -494,6 +494,7 @@ def mousePress(screenPosition, mapPosition, button):
                 1,
                 _state.pogPath)
             createPog(currentmap(), pog)
+            pog.hide()
             return
         elif _state.tilePasting:
             tile = map(lambda p, s: p // s, mapPosition, _state.currentMap.tilesize)
