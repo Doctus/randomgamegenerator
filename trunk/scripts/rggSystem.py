@@ -215,7 +215,7 @@ def makeLocalFilename(filename):
 def makePortableFilename(filename):
     """Attempts to convert a local path to a portable, relative, unique path."""
     # TODO: Implement filename conversion
-    return filename
+    return filename.replace('\\', '/')
 
 def drawLine(x, y, w, h):
     _main.addLine(x, y, w, h)
