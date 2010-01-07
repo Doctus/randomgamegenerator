@@ -57,7 +57,7 @@ wGLWidget::wGLWidget(QWidget* parent, cGame *mGame) : QGLWidget(QGLFormat(QGL::F
     setFocusPolicy(Qt::StrongFocus);
     setMouseTracking(true);
 
-    points.append(QPoint(0, 0));
+    lines.append(QRect(0, 0, 15, 15));
 
     //OpenGL is initialized here, instead of somewhere inside Qt4, otherwise it Segfaults due to doing stuff prior to OpenGL being initialized. Or something.
     glInit();
@@ -89,6 +89,8 @@ void wGLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
+    glEnable(GL_TEXTURE_RECTANGLE_ARB);
+
     vector< vector<bImage*> > images = mGame->mTilesetManager->getImages();
     QRect *camTest = new QRect(cam->getCam(zoom), cam->getBounds(zoom));
 
@@ -101,16 +103,22 @@ void wGLWidget::paintGL()
         }
     }
 
-    if(points.size() > 0)
+    glDisable(GL_TEXTURE_RECTANGLE_ARB);
+
+    glBegin(GL_LINES);
+    foreach(QRect line, lines)
     {
-        glBegin(GL_POINTS);
-        foreach(QPoint point, points)
+        if(camTest->contains(line.topLeft()) || camTest->contains(line.bottomRight()))
         {
-            if(camTest->contains(point))
-                glVertex2f(point.x()-cam->getAbsoluteCam().x(), point.y()-cam->getAbsoluteCam().y());
+            int x = (line.x()-cam->getAbsoluteCam().x())*zoom;
+            int y = (line.y()-cam->getAbsoluteCam().y())*zoom;
+            int w = (line.width()-cam->getAbsoluteCam().x())*zoom;
+            int h = (line.height()-cam->getAbsoluteCam().y())*zoom;
+            glVertex2i(x, y);
+            glVertex2i(w, h);
         }
-        glEnd();
     }
+    glEnd();
 
     delete(camTest);
 
@@ -174,9 +182,9 @@ void wGLWidget::resizeGL(int w, int h)
     cam->setBounds(w, h);
 }
 
-void wGLWidget::addPoint(int x, int y)
+void wGLWidget::addLine(int x, int y, int w, int h)
 {
-    points.append(QPoint(x, y));
+    lines.append(QRect(x, y, w, h));
 }
 
 GLuint wGLWidget::createTexture(QImage *image)

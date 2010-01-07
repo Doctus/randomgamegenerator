@@ -212,9 +212,9 @@ int bMain::getTileCountOfImage(QString filename)
     return -1;
 }
 
-void bMain::addPoint(int x, int y)
+void bMain::addLine(int x, int y, int w, int h)
 {
-    mainGame->mGLWidget->addPoint(x, y);
+    mainGame->mGLWidget->addLine(x, y, w, h);
 }
 
 /* This is a wonderful idea, but it requires all widgets using tr() to re-implement changeEvent
