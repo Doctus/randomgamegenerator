@@ -22,6 +22,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #ifdef WIN32
   #define GL_TEXTURE_RECTANGLE_ARB GL_TEXTURE_2D //This abolishes POT textures, but at least it works! (god damn microsoft and its shitty products)
+
+//blatantly stolen from Box2D
+inline uint b2NextPowerOfTwo(uint x)
+{
+        x |= (x >> 1);
+        x |= (x >> 2);
+        x |= (x >> 4);
+        x |= (x >> 8);
+        x |= (x >> 16);
+        return x + 1;
+}
 #endif
 
 std::string translateGLError(GLenum errorcode)
@@ -46,6 +57,8 @@ wGLWidget::wGLWidget(QWidget* parent, cGame *mGame) : QGLWidget(QGLFormat(QGL::F
     setFocusPolicy(Qt::StrongFocus);
     setMouseTracking(true);
 
+    points.append(QPoint(0, 0));
+
     //OpenGL is initialized here, instead of somewhere inside Qt4, otherwise it Segfaults due to doing stuff prior to OpenGL being initialized. Or something.
     glInit();
 }
@@ -60,6 +73,8 @@ void wGLWidget::initializeGL()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glViewport(0, 0, width(), height());
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+    //glPointSize(5);
 
     /*cout << "db: " << doubleBuffer() << endl;
     cout << "ac: " << format().alpha() << endl;
@@ -86,65 +101,21 @@ void wGLWidget::paintGL()
         }
     }
 
+    if(points.size() > 0)
+    {
+        glBegin(GL_POINTS);
+        foreach(QPoint point, points)
+        {
+            if(camTest->contains(point))
+                glVertex2f(point.x()-cam->getAbsoluteCam().x(), point.y()-cam->getAbsoluteCam().y());
+        }
+        glEnd();
+    }
+
     delete(camTest);
 
     if(doubleBuffer()) //This check seems a bit redundant...as we force it to double buffer. But nonetheless.
         swapBuffers();
-}
-
-void wGLWidget::drawImage(QImage *originalImage, int x, int y)
-{
-    GLuint texture;
-    GLenum error;
-
-    QImage image = QGLWidget::convertToGLFormat(*originalImage);
-
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture);
-
-    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, 4, image.width(), image.height(), 0,
-                 GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
-
-    //note, Somehow, qt4 reverses bottom and top. Somehow.
-    glBegin(GL_QUADS);
-        //Top-left vertex (corner)
-#ifdef WIN32
-        glTexCoord2i(0, 1);
-#else
-        glTexCoord2i(0, image.height()); //image/texture
-#endif
-        glVertex3i(x, y, 0); //screen coordinates
-
-        //Bottom-left vertex (corner)
-#ifdef WIN32
-        glTexCoord2i(1, 1);
-#else
-        glTexCoord2i(image.width(), image.height());
-#endif
-        glVertex3i(x+image.width(), y, 0);
-
-        //Bottom-right vertex (corner)
-#ifdef WIN32
-        glTexCoord2i(1, 0);
-#else
-        glTexCoord2i(image.width(), 0);
-#endif
-        glVertex3i(x+image.width(), y+image.height(), 0);
-
-        //Top-right vertex (corner)
-        glTexCoord2i(0, 0);
-        glVertex3i(x, y+image.height(), 0);
-    glEnd();
-
-    glDeleteTextures(1, &texture);
-
-    if((error = glGetError()) != GL_NO_ERROR)
-    {
-        cout << "GLError: " << translateGLError(error);
-    }
 }
 
 void wGLWidget::drawImage(GLuint texture, int x, int y, int w, int h)
@@ -203,6 +174,11 @@ void wGLWidget::resizeGL(int w, int h)
     cam->setBounds(w, h);
 }
 
+void wGLWidget::addPoint(int x, int y)
+{
+    points.append(QPoint(x, y));
+}
+
 GLuint wGLWidget::createTexture(QImage *image)
 {
     GLuint texture;
@@ -216,8 +192,25 @@ GLuint wGLWidget::createTexture(QImage *image)
     glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+#ifdef WIN32
+    GLvoid *scaledImage[b2NextPowerOfTwo(img.width())*b2NextPowerOfTwo(img.height())];
+    GLint ret = gluScaleImage(GL_RGBA, img.width(), img.height(), GL_UNSIGNED_BYTE, img.bits(),
+                  b2NextPowerOfTwo(img.width()), b2NextPowerOfTwo(img.height()), GL_UNSIGNED_BYTE, scaledImage);
+
+    if(ret != 0)
+    {
+        cout << "A gl error happened in gluScaleImage: " << translateGLError(glGetError()) << endl;
+        throw "GL error";
+        return 0;
+    }
+
+    glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, b2NextPowerOfTwo(img.width()), b2NextPowerOfTwo(img.height()), 0,
+                 GL_RGBA, GL_UNSIGNED_BYTE, scaledImage);
+#else
     glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, img.width(), img.height(), 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
+#endif
+
 
     //cout << "Generated texture number: " << texture << endl;
 
@@ -248,8 +241,24 @@ void wGLWidget::redrawTexture(QImage *image, GLuint texture)
     glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+#ifdef WIN32
+    GLvoid *scaledImage[b2NextPowerOfTwo(img.width())*b2NextPowerOfTwo(img.height())];
+    GLint ret = gluScaleImage(GL_RGBA, img.width(), img.height(), GL_UNSIGNED_BYTE, img.bits(),
+                  b2NextPowerOfTwo(img.width()), b2NextPowerOfTwo(img.height()), GL_UNSIGNED_BYTE, scaledImage);
+
+    if(ret != 0)
+    {
+        cout << "A gl error happened in gluScaleImage: " << translateGLError(glGetError()) << endl;
+        throw "GL error";
+        return;
+    }
+
+    glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, b2NextPowerOfTwo(img.width()), b2NextPowerOfTwo(img.height()), 0,
+                 GL_RGBA, GL_UNSIGNED_BYTE, scaledImage);
+#else
     glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, img.width(), img.height(), 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
+#endif
 
     if((error = glGetError()) != GL_NO_ERROR)
     {

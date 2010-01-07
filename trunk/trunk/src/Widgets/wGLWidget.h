@@ -50,6 +50,7 @@ class wGLWidget : public QGLWidget
     bool shiftHeld, ctrlHeld;
     bool mouseButtonHeld;
     //QVector<QTooltip*> tooltips;
+    QVector<QPoint> points;
 
     friend class bMain;
 
@@ -58,9 +59,10 @@ class wGLWidget : public QGLWidget
 
     void initializeGL();
     void paintGL();
-    void drawImage(QImage *originalImage, int x, int y);
     void drawImage(GLuint texture, int x, int y, int w, int h);
     void resizeGL(int w, int h);
+
+    void addPoint(int x, int y);
 
     GLuint createTexture(QImage *image);
     void redrawTexture(QImage *image, GLuint texture);
