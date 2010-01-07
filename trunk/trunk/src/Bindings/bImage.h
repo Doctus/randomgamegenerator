@@ -15,6 +15,7 @@ class bImage
     int id;
     int x, y, w, h;
     int layer;
+    bool isDestroyed;
     QString filename;
     GLuint textureId;
 

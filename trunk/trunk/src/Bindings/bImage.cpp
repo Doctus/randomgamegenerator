@@ -28,6 +28,7 @@ bImage::bImage(int x, int y, int w, int h, int tile, int layer, QString filename
     id = countId++;
     this->tile = tile;
     this->filename = filename;
+    this->isDestroyed = false;
 
     if(bMain::getGameInstance() == NULL)
         cout << "ERROR! ERROR!" << endl << "ERROR! ERROR!" << endl << "ERROR! ERROR!" << endl;
@@ -39,7 +40,8 @@ bImage::bImage(int x, int y, int w, int h, int tile, int layer, QString filename
 
 bImage::~bImage()
 {
-    bMain::getGameInstance()->mTilesetManager->removeImage(this, layer);
+    if(!isDestroyed)
+        bMain::getGameInstance()->mTilesetManager->removeImage(this, layer);
     //cout << "removed image " << id << ":" << filename.toStdString() << endl;
 }
 
@@ -137,5 +139,9 @@ QRect bImage::getRect()
 
 void bImage::DELETEME()
 {
-    delete this;
+    if(!isDestroyed)
+    {
+        bMain::getGameInstance()->mTilesetManager->removeImage(this, layer);
+        isDestroyed = true;
+    }
 }
