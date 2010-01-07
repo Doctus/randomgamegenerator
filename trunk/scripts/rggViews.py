@@ -23,11 +23,12 @@ import time, random, os, base64
 import rggNameGen, rggDice, rggMap, rggTile, rggPog, rggDockWidget, rggDialogs, rggMenuBar, rggResource, rggSystem
 from rggRPC import server, client, serverRPC, clientRPC
 from rggJson import jsondump, jsonload
-from rggMenuBar import ICON_SELECT, ICON_MOVE
+from rggMenuBar import ICON_SELECT, ICON_MOVE, ICON_DRAW, ICON_DELETE
 from rggSystem import cameraPosition, setCameraPosition, mainWindow
 from rggSystem import translate, showErrorMessage, displayTooltip
 from rggSystem import showPopupMenuAt, IMAGE_FILTER
 from rggSystem import promptString, promptInteger, promptCoordinates, promptSaveFile, promptLoadFile
+from rggSystem import drawLine, deleteLine
 from rggDialogs import newMapDialog, hostDialog, joinDialog
 from PyQt4 import QtCore, QtGui
 
@@ -71,6 +72,9 @@ class _state(object):
     
     pogPlacement = False
     pogPath = "path"
+
+    previousLinePlacement = None #(0, 0) expected
+    nextLinePlacement = None
     
     @staticmethod
     def initialize():
@@ -394,6 +398,24 @@ def sendUpdatePog(user, mapID, pogID, pogDump):
         pogID = pogMap._findUniqueID(pogDump['src'])
     respondUpdatePog(allusers(), mapID, pogID, pogDump)
 
+# DRAWING
+
+@serverRPC
+def respondLine(x, y, w, h):
+    drawLine(x, y, w, h)
+
+@clientRPC
+def sendLine(user, x, y, w, h):
+    respondLine(allusers(), x, y, w, h)
+
+@serverRPC
+def respondDeleteLine(x, y, w, h):
+    deleteLine(x, y, w, h)
+
+@clientRPC
+def sendDeleteLine(user, x, y, w, h):
+    respondDeleteLine(allusers(), x, y, w, h)
+
 # DICE
 
 def rollDice(dice):
@@ -456,22 +478,31 @@ def mouseMove(screenPosition, mapPosition, displacement):
         if _state.mouseButton == BUTTON_LEFT:
             setCameraPosition(map(lambda c, d: c - d, cameraPosition(), displacement))
         return
-    elif icon != ICON_SELECT: #selectIcon
-        return
-    
-    if _state.mouseButton is None:
-        if currentmap() is None:
-            return
-        tooltipPog = currentmap().findTopPog(mapPosition)
-        if _state.pogHover == tooltipPog:
-            return
-        _state.pogHover = tooltipPog
-        if tooltipPog is None:
-            return
-        displayPosition = map(lambda t, c: t - c, tooltipPog.tooltipPosition(), cameraPosition())
-        displayTooltip(tooltipPog.tooltipText(), displayPosition)
-    elif _state.mouseButton == BUTTON_LEFT:
-        return mouseDrag(screenPosition, mapPosition, displacement)
+    if icon == ICON_SELECT: #selectIcon
+        if _state.mouseButton is None:
+            if currentmap() is None:
+                return
+            tooltipPog = currentmap().findTopPog(mapPosition)
+            if _state.pogHover == tooltipPog:
+                return
+            _state.pogHover = tooltipPog
+            if tooltipPog is None:
+                return
+            displayPosition = map(lambda t, c: t - c, tooltipPog.tooltipPosition(), cameraPosition())
+            displayTooltip(tooltipPog.tooltipText(), displayPosition)
+        elif _state.mouseButton == BUTTON_LEFT:
+            return mouseDrag(screenPosition, mapPosition, displacement)
+    elif icon == ICON_DRAW: #drawIcon
+        if _state.mouseButton == BUTTON_LEFT:
+            if _state.previousLinePlacement != None:
+                sendLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1])
+            _state.previousLinePlacement = mapPosition
+    elif icon == ICON_DELETE: #deleteIcon
+        if _state.mouseButton == BUTTON_LEFT:
+            if _state.previousLinePlacement != None:
+                _state.nextLinePlacement = mapPosition #this is bottomRight of the square that we want to delete.
+            else:
+                _state.previousLinePlacement = mapPosition #We only do this so that we have a topLeft
 
 def mousePress(screenPosition, mapPosition, button):
     
@@ -481,107 +512,147 @@ def mousePress(screenPosition, mapPosition, button):
     icon = _state.menu.selectedIcon
     if icon == ICON_MOVE:
         return
-    elif icon != ICON_SELECT:
-        return
-    
-    if button == BUTTON_LEFT or button == BUTTON_LEFT + BUTTON_CONTROL:
-        if _state.pogPlacement:
-            _state.pogPlacement = False
-            infograb = QtGui.QPixmap(_state.pogPath)
-            pog = rggPog.Pog(
-                mapPosition,
-                (infograb.width(), infograb.height()),
-                1,
-                _state.pogPath)
-            createPog(currentmap(), pog)
-            pog.hide()
-            return
-        elif _state.tilePasting:
-            tile = map(lambda p, s: p // s, mapPosition, _state.currentMap.tilesize)
-            currentmap().setTile(tile, _state.tilePastingIndex)
-            modifyCurrentMap()
-            return
-    
-    if button == BUTTON_LEFT:
-        pog = _state.currentMap.findTopPog(mapPosition)
-        if pog not in _state.pogSelection:
-            _state.pogSelection = set()
-        if not pog:
-            return
-        _state.pogSelection.add(pog)
-    elif button == BUTTON_LEFT + BUTTON_CONTROL:
-        pog = currentmap().findTopPog(mapPosition)
-        if not pog:
-            return
-        if pog in _state.pogSelection:
-            _state.pogSelection.remove(pog)
-        else:
-            _state.pogSelection.add(pog)
-    elif button == BUTTON_RIGHT:
-        pog = currentmap().findTopPog(mapPosition)
-        if pog is not None:
-            selected = showPopupMenuAt(
-                screenPosition,
-                [translate('views', 'Set name'),
-                    translate('views', 'Generate name'),
-                    translate('views', 'Set Layer')])
-            if selected == 0:
-                name = promptString(translate('views', "Enter a name for this pog."))
-                if name is None:
-                    return
-                pog.name = name
-                modifyPog(currentmap(), pog)
-            elif selected == 1:
-                prompt = translate('views', "Enter a generator command. See /randomname for syntax. Multi-pog compatible.")
-                gentype = promptString(prompt)
-                if gentype is None:
-                    return
-                gentype = ''.join(gentype.split()).lower()
-                for selectedPog in set([pog] + list(_state.pogSelection)):
-                    selectedPog.name = rggNameGen.getName(gentype)
-                    modifyPog(currentmap(), selectedPog)
-            elif selected == 2:
-                prompt = translate('views', "Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.")
-                newlayer = promptInteger(prompt, min=0, max=65535)
-                if newlayer is None:
-                    return
-                for selectedPog in set([pog] + list(_state.pogSelection)):
-                    selectedPog.layer = newlayer
-                    modifyPog(currentmap(), pog)
-        else:
-            if not _state.tilePasting:
-                selected = showPopupMenuAt(
-                    screenPosition,
-                    [translate('views', "Create Pog (Temp Command)"),
-                        translate('views', "Begin Tile Pasting (Temp Command)")])
-            else:
-                selected = showPopupMenuAt(
-                    screenPosition,
-                    [translate('views', "Create Pog (Temp Command)"),
-                        translate('views', "Cease Tile Pasting (Temp Command)")])
-            if selected == 0:
-                src = promptLoadFile(translate('views', "Load Pog"), IMAGE_FILTER)
-                if src is None:
-                    return
-                size = promptCoordinates(translate('views', "What is the width of the image?"),
-                    translate('views', "What is the height of the image?"))
-                if size is None:
-                    return
-                pog = rgg.Pog(mapPosition, size, 1, src)
+    if icon == ICON_SELECT:
+        if button == BUTTON_LEFT or button == BUTTON_LEFT + BUTTON_CONTROL:
+            if _state.pogPlacement:
+                _state.pogPlacement = False
+                infograb = QtGui.QPixmap(_state.pogPath)
+                pog = rggPog.Pog(
+                    mapPosition,
+                    (infograb.width(), infograb.height()),
+                    1,
+                    _state.pogPath)
                 createPog(currentmap(), pog)
-            elif selected == 1:
+                pog.hide()
+                return
+            elif _state.tilePasting:
+                tile = map(lambda p, s: p // s, mapPosition, _state.currentMap.tilesize)
+                currentmap().setTile(tile, _state.tilePastingIndex)
+                modifyCurrentMap()
+                return
+        
+        if button == BUTTON_LEFT:
+            pog = _state.currentMap.findTopPog(mapPosition)
+            if pog not in _state.pogSelection:
+                _state.pogSelection = set()
+            if not pog:
+                return
+            _state.pogSelection.add(pog)
+        elif button == BUTTON_LEFT + BUTTON_CONTROL:
+            pog = currentmap().findTopPog(mapPosition)
+            if not pog:
+                return
+            if pog in _state.pogSelection:
+                _state.pogSelection.remove(pog)
+            else:
+                _state.pogSelection.add(pog)
+        elif button == BUTTON_LEFT + BUTTON_CONTROL:
+            pog = currentmap().findTopPog(mapPosition)
+            if not pog:
+                return
+            if pog in _state.pogSelection:
+                _state.pogSelection.remove(pog)
+            else:
+                _state.pogSelection.add(pog)
+        elif button == BUTTON_RIGHT:
+            pog = currentmap().findTopPog(mapPosition)
+            if pog is not None:
+                selected = showPopupMenuAt(
+                    screenPosition,
+                    [translate('views', 'Set name'),
+                        translate('views', 'Generate name'),
+                        translate('views', 'Set Layer')])
+                if selected == 0:
+                    name = promptString(translate('views', "Enter a name for this pog."))
+                    if name is None:
+                        return
+                    pog.name = name
+                    modifyPog(currentmap(), pog)
+                elif selected == 1:
+                    prompt = translate('views', "Enter a generator command. See /randomname for syntax. Multi-pog compatible.")
+                    gentype = promptString(prompt)
+                    if gentype is None:
+                        return
+                    gentype = ''.join(gentype.split()).lower()
+                    for selectedPog in set([pog] + list(_state.pogSelection)):
+                        selectedPog.name = rggNameGen.getName(gentype)
+                        modifyPog(currentmap(), selectedPog)
+                elif selected == 2:
+                    prompt = translate('views', "Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.")
+                    newlayer = promptInteger(prompt, min=0, max=65535)
+                    if newlayer is None:
+                        return
+                    for selectedPog in set([pog] + list(_state.pogSelection)):
+                        selectedPog.layer = newlayer
+                        modifyPog(currentmap(), pog)
+            else:
                 if not _state.tilePasting:
-                    _state.tilePasting = True
-                    tile = map(lambda p, c: p // c, mapPosition, _state.currentMap.tilesize)
-                    _state.tilePastingIndex = _state.currentMap.getTile(tile)
+                    selected = showPopupMenuAt(
+                        screenPosition,
+                        [translate('views', "Create Pog (Temp Command)"),
+                            translate('views', "Begin Tile Pasting (Temp Command)")])
                 else:
-                    _state.tilePasting = False
-    #elif button == BUTTON_MIDDLE: #DEBUG STUFF
-    #    Maps[currentMap[0]].debugMorphTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], c.getTileCountOfImage(Maps[currentMap[0]].tileset))
+                    selected = showPopupMenuAt(
+                        screenPosition,
+                        [translate('views', "Create Pog (Temp Command)"),
+                            translate('views', "Cease Tile Pasting (Temp Command)")])
+                if selected == 0:
+                    src = promptLoadFile(translate('views', "Load Pog"), IMAGE_FILTER)
+                    if src is None:
+                        return
+                    size = promptCoordinates(translate('views', "What is the width of the image?"),
+                        translate('views', "What is the height of the image?"))
+                    if size is None:
+                        return
+                    pog = rgg.Pog(mapPosition, size, 1, src)
+                    createPog(currentmap(), pog)
+                elif selected == 1:
+                    if not _state.tilePasting:
+                        _state.tilePasting = True
+                        tile = map(lambda p, c: p // c, mapPosition, _state.currentMap.tilesize)
+                        _state.tilePastingIndex = _state.currentMap.getTile(tile)
+                    else:
+                        _state.tilePasting = False
+        #elif button == BUTTON_MIDDLE: #DEBUG STUFF
+        #    Maps[currentMap[0]].debugMorphTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], c.getTileCountOfImage(Maps[currentMap[0]].tileset))
+
+        #endif icon == ICON_SELECT
+    elif icon == ICON_DRAW:
+        if button == BUTTON_LEFT:
+            if _state.previousLinePlacement != None:
+                sendLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1])
+            _state.previousLinePlacement = mapPosition
+    elif icon == ICON_DELETE:
+        if button == BUTTON_LEFT:
+            _state.previousLinePlacement = mapPosition
+                
 
 
 def mouseRelease(screenPosition, mapPosition, button):
     _state.mouseButton = None
+
+    icon = _state.menu.selectedIcon
+    if(icon == ICON_DELETE):
+        if(_state.previousLinePlacement != None and _state.nextLinePlacement != None):
+
+            x = _state.previousLinePlacement[0]
+            y = _state.previousLinePlacement[1]
+            w = _state.nextLinePlacement[0]
+            h = _state.nextLinePlacement[1]
+            if(x > w):
+                tempw = w
+                w = x
+                x = tempw
+            if(y > h):
+                tempy = y
+                y = h
+                h = tempy
+
+            print '(x, y, w, h) (' + str(x) + ', ' + str(y) + ', ' + str(w) + ', ' + str(h) + ')' 
+
+            sendDeleteLine(x, y, w, h)
+
+            _state.nextLinePlacement = mapPosition
 
 def mouseMoveResponse(x, y):
     #print 'move', x, y

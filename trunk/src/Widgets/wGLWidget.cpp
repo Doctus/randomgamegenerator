@@ -185,6 +185,22 @@ void wGLWidget::addLine(int x, int y, int w, int h)
     lines.append(QRect(x, y, w, h));
 }
 
+void wGLWidget::deleteLine(int x, int y, int w, int h)
+{
+    QRect boundaries(x, y, w, h);
+    uint i = 0;
+    while(i < lines.size()) //I think that deleting an item from QVector makes the next item take the place of the deleted item, and thus having its place decremented by one.
+    {
+        if(boundaries.contains(lines[i].topLeft()) || boundaries.contains(lines[i].bottomRight()))
+        {
+            cout << "Removing line : (" << lines[i].x() << ", " << lines[i].y() << ", " << lines[i].width() << ", " << lines[i].height() << ")" << endl;
+            lines.remove(i);
+        }
+        else
+            i++;
+    }
+}
+
 GLuint wGLWidget::createTexture(QImage *image)
 {
     GLuint texture;

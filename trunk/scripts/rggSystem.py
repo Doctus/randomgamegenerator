@@ -216,3 +216,9 @@ def makePortableFilename(filename):
     """Attempts to convert a local path to a portable, relative, unique path."""
     # TODO: Implement filename conversion
     return filename
+
+def drawLine(x, y, w, h):
+    _main.addLine(x, y, w, h)
+
+def deleteLine(x, y, w, h):
+    _main.deleteLine(x, y, w, h)

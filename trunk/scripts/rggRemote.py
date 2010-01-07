@@ -59,6 +59,8 @@ def respondEmote(username, message):
 def sendEmote(user, message):
     respondEmote(allusers(), user.username, message)
 
+
+
 @serverRPC
 def respondWhisperSender(target, message):
     say(translate('remote', 'To {username}: {message}').format(
