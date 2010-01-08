@@ -6,8 +6,8 @@
 
 = Network =
   * Fix large image transfer somehow.
-    * Maybe this gets fixed by moving the network interface to python?
-    * Or what about using QStrings as a specific type in python?
+    * ~~Maybe this gets fixed by moving the network interface to python?~~
+    * ~~Or what about using QStrings as a specific type in python?~~
   * Update protocol documentation so it's actually accurate.
 
 = Interface =
@@ -30,7 +30,7 @@
   * Some default tilesets would be nice.
   * Some default pogs would be nice.
   * Animated tiles.
-  * Be able to draw points, lines, squares, etc.
+  * Be able to draw ~~points, lines,~~ squares, etc.
 
 = Generators =
   * Add more name generators.
