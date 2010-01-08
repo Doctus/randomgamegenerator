@@ -485,8 +485,8 @@ void wGLWidget::wheelEvent(QWheelEvent *event)
         if(zoom < 4.0)
             zoom *= 2;
     }
-    cout << "new zoom: " << zoom << endl << "1/zoom: " << 1/zoom << endl;
-    cout << "Bounds: " << cam->getBounds(zoom).x() << endl;
+    //cout << "new zoom: " << zoom << endl << "1/zoom: " << 1/zoom << endl;
+    //cout << "Bounds: " << cam->getBounds(zoom).x() << endl;
 }
 
 void wGLWidget::leaveEvent(QEvent *event)
