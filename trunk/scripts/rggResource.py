@@ -179,7 +179,7 @@ class clientResourceMapper(object):
     def _onFileFailed(self, client, filename):
         """Responds to a file that was not transferred."""
         current = self._status[filename]
-        if current in (STATE_LOADING, STATE_READY) and fileExists(filename):
+        if current in (STATE_UNKNOWN, STATE_LOADING, STATE_READY) and fileExists(filename):
             # Could either have verified correctly or failed to transfer
             # Either way, call it present
             status = STATE_READY
