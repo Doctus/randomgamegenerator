@@ -331,8 +331,10 @@ def respondMapUpdate(ID, mapDump):
     """Creates or updates the map with the given ID."""
     map = rggMap.Map.load(mapDump)
     map.ID = ID
+    existed = (ID in _state.Maps)
     _state.Maps[ID] = map
-    if (not _state.currentMap) or (_state.currentMap.ID == ID):
+    #if (not _state.currentMap) or (_state.currentMap.ID == ID):
+    if not existed:
         switchMap(map)
 
 @clientRPC
@@ -366,35 +368,44 @@ def placePog(pogpath):
     _state.pogPlacement = True
     _state.pogPath = pogpath
 
+# TODO: Make pog movement transfer much more efficient.
 def movePogs(displacement):
     """Moves pogs by a specified displacement."""
     for pog in _state.pogSelection:
-        from rggPog import Pog
-        # TODO: Make pog movement transfer much more efficient.
-        dup = Pog(pog.position, pog.dimensions, pog.layer, pog.src)
-        dup.displace(displacement)
-        dup.ID = pog.ID
-        modifyPog(currentmap(), dup)
-        dup.hide()
+        #from rggPog import Pog
+        #dup = Pog(pog.position, pog.dimensions, pog.layer, pog.src)
+        #dup.displace(displacement)
+        #dup.ID = pog.ID
+        pog.displace(displacement)
+        modifyPog(currentmap(), pog)
+        #dup.hide()
 
 @serverRPC
 def respondUpdatePog(mapID, pogID, pogDump):
+    """Creates or updates a pog on the client."""
+    pogMap = getmap(mapID)
+    if pogMap is None:
+        print "Attempt to change pog in nonextant map: {0}".format(mapID)
+        return
     pogMap = _state.Maps[mapID]
     pog = rggPog.Pog.load(pogDump)
     pog.ID = pogID
     if pogID in pogMap.Pogs:
         old = pogMap.Pogs[pogID]
-        old.hide()
         if old in _state.pogSelection:
             _state.pogSelection.discard(old)
             _state.pogSelection.add(pog)
         if old == _state.pogHover:
             _state.pogHover = None
-    pogMap.Pogs[pogID] = pog
+    pogMap.addPog(pog)
 
 @clientRPC
 def sendUpdatePog(user, mapID, pogID, pogDump):
+    """Creates or updates a pog on the server."""
+    #TODO: What happens when we delete a pog then get something like movement or a property change for it?
+    # Fix with different messages that don't completely change the pog, and only use this for creation.
     pogMap = getmap(mapID)
+    # Upload (or check that we already have) the image resource from the client
     rggResource.srm.processFile(user, pogDump['src'])
     if not pogMap:
         return
@@ -528,7 +539,6 @@ def mousePress(screenPosition, mapPosition, button):
                     1,
                     _state.pogPath)
                 createPog(currentmap(), pog)
-                pog.hide()
                 return
             elif _state.tilePasting:
                 tile = map(lambda p, s: p // s, mapPosition, _state.currentMap.tilesize)

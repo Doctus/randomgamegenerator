@@ -158,16 +158,19 @@ class BaseClient(object):
         """Updates the transfers to send."""
         
         while self.sendList and not self.sentfile:
-            filedata = self.sendList.itervalues().next()
+            filedata = iter(self.sendList).next()
+            self.sendList.remove(filedata)
             if self._shouldSendFile(filedata):
                 self.sentfile = filedata
                 self.xfer.sendMessage(MESSAGE_PUT,
                     filename=filedata.filename,
                     size=filedata.size,
                     digest=filedata.digest)
+                socket = self.xfer
                 message = "[{0}] Offering transfer of {filename}"
             else:
                 self.obj.sendMessage(MESSAGE_IGNORE, filename=filedata.filename)
+                socket = self.obj
                 message = "[{0}] Ignored transfer of {filename}"
             print message.format(socket.context, filename=filedata.filename)
         
@@ -179,16 +182,16 @@ class BaseClient(object):
         if self.receivedfile:
             filename = self.receivedfile.filename
             if self._shouldReceiveFile(self.receivedfile):
-                socket.sendMessage(MESSAGE_ACCEPT, filename)
-                socket.receiveFile(self.receivedfile)
+                self.xfer.sendMessage(MESSAGE_ACCEPT, filename)
+                self.xfer.receiveFile(self.receivedfile)
                 message = "[{0}] Accepted transfer of {filename}"
             else:
                 self._fileFailed(filename)
-                socket.sendMessage(MESSAGE_REJECT, filename)
+                self.xfer.sendMessage(MESSAGE_REJECT, filename)
                 message = "[{0}] Rejected transfer of {filename}"
             self.getList.discard(filename)
             self.receivedfile = None
-            print message.format(socket.context, filename=filename)
+            print message.format(self.xfer.context, filename=filename)
     
     def _updatetransfer(self):
         """Opens or updates the transfer socket."""
@@ -215,7 +218,7 @@ class BaseClient(object):
         file, filename = fileData.file, fileData.filename
         try:
             # Can we open the file?
-            if not file.open(QtCore.QFile.Read):
+            if not file.open(QtCore.QFile.ReadOnly):
                 return False
             try:
                 # Do we already have an identical copy?
@@ -350,7 +353,7 @@ class BaseClient(object):
         message = "[{0}] Remote refused to send {filename}"
         print message.format(socket.context, filename=filename)
         if filename in self.getList:
-            del self.getList[filename]
+            self.getList.remove(filename)
             self._fileFailed(filename)
         self._updatetransfer()
     
@@ -537,8 +540,8 @@ class JsonClient(BaseClient):
             self._updatetransfer()
         elif socket == self.obj:
             socket.activate()
-            self._updatetransfer()
             self.connected.emit(self, username)
+            self._updatetransfer()
             super(JsonClient, self)._activateSocket(socket, username)
     
     def _fileReceived(self, socket, filename):
@@ -955,8 +958,8 @@ class JsonServer(object):
             socket.activate()
             client = RemoteClient(username, self, socket)
             self._addClient(client)
-            self.connected.emit(self, username)
             socket.sendMessage(MESSAGE_ACTIVATE, username=username)
+            self.connected.emit(self, username)
         else:
             # Make sure identities match
             username = self._processUsername(username)

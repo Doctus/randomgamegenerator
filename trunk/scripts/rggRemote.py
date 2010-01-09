@@ -87,6 +87,7 @@ def sendWhisper(user, target, message):
 
 def clientConnect(client, username):
     """Occurs when the client is ready to start sending data."""
+    #print "Client connected."
     rggViews.renameuser(localhandle(), username)
     rggViews.closeAllMaps()
     say(translate('remote', "Welcome, {name}!".format(name=username)))
@@ -97,6 +98,7 @@ def clientDisconnect(client, errorMessage):
     errorMessage -- a human-readable error message for why the connection failed
     
     """
+    #print "Client disconnected."
     say(translate('remote', "Disconnected. {0}").format(errorMessage))
     
 def clientReceive(client, data):
@@ -122,6 +124,7 @@ def serverConnect(server, username):
     username -- a username for the client
     
     """
+    #print "Server found user."
     user = User(username)
     rggViews.adduser(user)
     say(translate('remote', '{name} has joined.').format(name=username))
@@ -131,6 +134,7 @@ def serverConnect(server, username):
 @serverRPC
 def disconnectionMessage(message, error, *args, **kwargs):
     """Special translation for a disconnection message."""
+    #print "Server dropped user."
     error = translate('socket', error)
     say(translate('error', message).format(*args, error=disconnect, **kwargs))
 

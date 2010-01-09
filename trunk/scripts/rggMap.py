@@ -35,16 +35,21 @@ class Map(object):
         
         self.Pogs = {}
         self.tileindexes = [0 for i in xrange(mapsize[0] * mapsize[1])]
-        self.hidden = False
+        self.hidden = True
         self.tiles = None
-        self._showTiles()
         
     def addPog(self, pog):
         """Adds a pog to the map, assigning it a unique id."""
         assert(pog.ID is not None)
         #if pog.ID is None:
         #    pog.ID = self._findUniqueID()
+        if pog.ID in self.Pogs:
+            self.Pogs[pog.ID].hide()
         self.Pogs[pog.ID] = pog
+        if self.hidden:
+            pog.hide()
+        else:
+            pog.show()
     
     def _findUniqueID(self, src):
         """Get a unique id for a pog."""
@@ -67,14 +72,19 @@ class Map(object):
                     pog.show()
         if includeTiles:
             if hidden:
-                self.tiles = None
+                self._deleteTiles()
             else:
-                self.reloadTiles()
+                self._createTiles()
     
     def show(self):
         return self.hide(False)
     
-    def _showTiles(self):
+    def _deleteTiles(self):
+        for tile in self.tiles:
+            tile.destroy()
+        self.tiles = None
+    
+    def _createTiles(self):
         """Show all the tiles of this map."""
         self.tiles = []
         for y in xrange(0, self.mapsize[1]):
@@ -148,8 +158,9 @@ class Map(object):
         
         pogs = loadObject('Map.pogs', obj.get('pogs'))
         for ID, pog in pogs.items():
-            pog.ID = ID
-            map.addPog(rggPog.Pog.load(pog))
+            loaded = rggPog.Pog.load(pog)
+            loaded.ID = ID
+            map.addPog(loaded)
         
         # HACK: Looks like coordinates; saves work.
         tiles = loadCoordinates('Map.tiles', obj.get('tiles'), length=len(map.tileindexes), min=0, max=65535)
