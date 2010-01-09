@@ -7,15 +7,11 @@ Open QtCreator
 
 Go to src/Bindings and sh compile.sh
 
-Copy qt4/librandom-game-generator.so.1.0.0 to scripts and rename to librandom-game-generator.so.1
-Copy src/Bindings/_bmainmod.so to scripts
-
-Be sure to export LD_LIBRARY_PATH=. before running rgg.py
+go to scripts/ and sh start.sh
 
 MAC OSX:
 
 Less of an idea.
-
 
 WINDOWS:
 

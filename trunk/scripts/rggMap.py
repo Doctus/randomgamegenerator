@@ -50,7 +50,7 @@ class Map(object):
             pog.hide()
         else:
             pog.show()
-    
+
     def _findUniqueID(self, src):
         """Get a unique id for a pog."""
         id = src or rggSystem.findRandomAppend()
