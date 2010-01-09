@@ -14,11 +14,13 @@ SOURCES += ../src/cTilesetManager.cpp \
     ../src/cTileset.cpp \
     ../src/cGame.cpp \
     ../src/cCamera.cpp \
+    ../src/cShapeManager.cpp \
     ../src/Widgets/wGLWidget.cpp \
     ../src/Widgets/wAction.cpp
 HEADERS += ../src/cTilesetManager.h \
     ../src/cTileset.h \
     ../src/cGame.h \
     ../src/cCamera.h \
+    ../src/cShapeManager.h \
     ../src/Widgets/wGLWidget.h \
     ../src/Widgets/wAction.h

@@ -33,8 +33,6 @@ bMain::bMain()
     widget = new QMainWindow(); //parent widget
     widget->resize(640, 480);
 
-
-
     QTextCodec::setCodecForTr(QTextCodec::codecForName("utf8"));
     QString locale = QLocale::system().name();
     //QString locale = "nl";
@@ -212,14 +210,25 @@ int bMain::getTileCountOfImage(QString filename)
     return -1;
 }
 
-void bMain::addLine(int x, int y, int w, int h)
+void bMain::addLine(int x, int y, int w, int h, int thickness)
 {
-    mainGame->mGLWidget->addLine(x, y, w, h);
+    mainGame->mShapeManager->addLine(x, y, w, h, thickness);
 }
 
-void bMain::deleteLine(int x, int y, int w, int h)
+void bMain::deleteLine(int x, int y, int w, int h, int thickness)
 {
-    mainGame->mGLWidget->deleteLine(x, y, w, h);
+    mainGame->mShapeManager->removeLine(x, y, w, h, thickness);
+}
+
+QVector<QRect> bMain::getLineOfThickness(int thickness)
+{
+    if(thickness < 1)
+        thickness = 1;
+    if(thickness > 3)
+        thickness = 3;
+    QVector<QRect> rects = mainGame->mShapeManager->getLines()[thickness-1];
+    cout << "size: " << rects.size() << endl;
+    return rects;
 }
 
 /* This is a wonderful idea, but it requires all widgets using tr() to re-implement changeEvent

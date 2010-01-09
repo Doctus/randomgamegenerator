@@ -25,6 +25,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <QtCore/QObject>
 #include <QtGui/QToolTip>
 
+#include <vector>
+
 #include "../cGame.h"
 #include "../Widgets/wAction.h"
 #include "../cTileset.h"
@@ -64,8 +66,9 @@ class bMain : public QObject
     void changeImage(QString oldFilename, QString newFilename);
     int getTileCountOfImage(QString filename);
 
-    void addLine(int x, int y, int w, int h);
-    void deleteLine(int x, int y, int w, int h);
+    void addLine(int x, int y, int w, int h, int thickness);
+    void deleteLine(int x, int y, int w, int h, int thickness = -1);
+    QVector<QRect> getLineOfThickness(int thickness);
 
     /*void addTranslationFile(QString filename);
     void removeTranslationFile(QString filename);*/

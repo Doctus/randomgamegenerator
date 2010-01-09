@@ -137,6 +137,14 @@ class Map(object):
     
     def dump(self):
         """Serialize to an object valid for JSON dumping."""
+        thickOne = rggSystem.getLinesOfThickness(1)
+        thickTwo = rggSystem.getLinesOfThickness(2)
+        thickThree = rggSystem.getLinesOfThickness(3)
+
+        tlines = [(line.x(), line.y(), line.width(), line.height(), 1) for line in thickOne]
+        tlines.extend([(line.x(), line.y(), line.width(), line.height(), 2) for line in thickTwo])
+        tlines.extend([(line.x(), line.y(), line.width(), line.height(), 3) for line in thickThree])
+
         return dict(
             mapname=self.mapname,
             authorname=self.authorname,
@@ -144,7 +152,11 @@ class Map(object):
             tileset=self.tileset,
             tilesize=self.tilesize,
             pogs=dict([(pog.ID, pog.dump()) for pog in self.Pogs.values()]),
-            tiles=self.tileindexes)
+            tiles=self.tileindexes,
+            #lines1=[(line.x(), line.y(), line.width(), line.height(), 1) for line in thickOne],
+            #lines2=[(line.x(), line.y(), line.width(), line.height(), 2) for line in thickTwo],
+            #lines3=[(line.x(), line.y(), line.width(), line.height(), 3) for line in thickThree])
+            lines=tlines)
     
     @staticmethod
     def load(obj):
@@ -161,6 +173,11 @@ class Map(object):
             loaded = rggPog.Pog.load(pog)
             loaded.ID = ID
             map.addPog(loaded)
+
+        #lines = loadCoordinates('Map.lines', obj.get('lines'), length=5)
+        #print lines
+        #for x, y, w, h, t in lines:
+        #    rggSystem.drawLine(x, y, w, h, t)
         
         # HACK: Looks like coordinates; saves work.
         tiles = loadCoordinates('Map.tiles', obj.get('tiles'), length=len(map.tileindexes), min=0, max=65535)
