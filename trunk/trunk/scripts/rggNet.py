@@ -182,12 +182,12 @@ class BaseClient(object):
         if self.receivedfile:
             filename = self.receivedfile.filename
             if self._shouldReceiveFile(self.receivedfile):
-                self.xfer.sendMessage(MESSAGE_ACCEPT, filename)
+                self.xfer.sendMessage(MESSAGE_ACCEPT, filename=filename)
                 self.xfer.receiveFile(self.receivedfile)
                 message = "[{0}] Accepted transfer of {filename}"
             else:
                 self._fileFailed(filename)
-                self.xfer.sendMessage(MESSAGE_REJECT, filename)
+                self.xfer.sendMessage(MESSAGE_REJECT, filename=filename)
                 message = "[{0}] Rejected transfer of {filename}"
             self.getList.discard(filename)
             self.receivedfile = None
@@ -215,14 +215,15 @@ class BaseClient(object):
     
     def _shouldSendFile(self, fileData):
         """Check if we should send a file. Does extra mutating work."""
-        file, filename = fileData.file, fileData.filename
-        try:
+        filename = fileData.filename
+        try:    
             # Can we open the file?
-            if not file.open(QtCore.QFile.ReadOnly):
+            if not fileData.file.open(QtCore.QFile.ReadOnly):
                 return False
             try:
+                file = fileData.file
                 # Do we already have an identical copy?
-                size = file.size()
+                size = fileData.file.size()
                 digest = generateChecksum(file)
                 if fileData.size is not None and fileData.digest is not None:
                     if size == fileData.size and digest == fileData.digest:
@@ -232,8 +233,8 @@ class BaseClient(object):
                 fileData.digest = digest
                 
                 # User hook
-                if not self.allowSend(filedata.filename,
-                        filedata.size, filedata.digest):
+                if not self.allowSend(fileData.filename,
+                        fileData.size, fileData.digest):
                     return False
                 
                 file = None
@@ -258,18 +259,20 @@ class BaseClient(object):
                 return False
             try:
                 # Do we already have an identical copy?
-                if file.size() != fileData.size:
-                    if generateChecksum(file) != fileData.digest:
+                if file.size() == fileData.size:
+                    if generateChecksum(file) == fileData.digest:
                         return False
                         
                 # User hook
-                if not self.allowReceipt(filedata.filename,
-                        filedata.size, filedata.digest):
+                if not self.allowReceipt(fileData.filename,
+                        fileData.size, fileData.digest):
                     return False
                 
+                file = None
                 return True
             finally:
-                file.close()
+                if file:
+                    file.close()
         except IOError:
             pass
         return False
@@ -338,14 +341,14 @@ class BaseClient(object):
         self.sendList.add(fileData(QtCore.QFile(makeLocalFilename(filename)), filename, size, checksum))
         self._updatetransfer()
     
-    def _putFile(self, socket, filename, size, checksum):
+    def _putFile(self, socket, filename, size, digest):
         """Checks whether to accept a sent file."""
         
         if self.receivedfile is not None:
             message = "[{0}] Remote duplicate PUT; ignoring {filename}"
             print message.format(socket.context, filename=self.receivedfile.filename)
         
-        self.receivedfile = fileData(QtCore.QFile(makeLocalFilename(filename)), filename, size, checksum)
+        self.receivedfile = fileData(QtCore.QFile(makeLocalFilename(filename)), filename, size, digest)
         self._updatetransfer()
     
     def _ignoreFile(self, socket, filename):
@@ -364,7 +367,6 @@ class BaseClient(object):
             print message.format(socket.context, filename=filename)
             socket._disconnectWithPrejudice()
             return
-        self.sendList.remove(filename)
         socket.sendFile(self.sentfile)
         self.sentfile = None
     
@@ -986,7 +988,7 @@ class JsonServer(object):
             socket.sendMessage(MESSAGE_ACTIVATE, username=username)
             message = "[{0}:{1}] Transfer socket connected to {username}"
             print message.format(socket.context, client.obj.context, username=username)
-
+            client._updatetransfer()
 
 def localHost():
     """Gets the name of the local machine."""

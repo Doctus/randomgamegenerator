@@ -71,7 +71,6 @@ class fileData(object):
             if self.processed != self.size:
                 message = "[{0}] Sent file {filename} has too few bytes."
                 print message.format(context, filename=self.filename)
-                self._closeWithPrejudice()
                 return None
         return data
     
@@ -85,12 +84,12 @@ class fileData(object):
         
         if result != len(chunk):
             message = "[{0}] Error writing received file data {filename}."
-            print message.format(context, self.filename)
+            print message.format(context, filename=self.filename)
             return False
         
         if self.size == self.processed and self.digest != self.checkHash.hexdigest():
             message = "[{0}] Received file checksum does not match; {filename} '{sum1}' vs '{sum2}'"
-            print message.format(context, self.filename, self.digest, self.checkHash.hexdigest())
+            print message.format(context, filename=self.filename, sum1=self.digest, sum2=self.checkHash.hexdigest())
             return False
         
         return True
@@ -279,7 +278,8 @@ class statefulSocket(object):
         """Sends serialized data."""
         result = self.socket.write(serial)
         if result == len(serial):
-            self.socket.flush()
+            # I guess flush forces synchronous sending.
+            #self.socket.flush()
             return True
             
         self._respondToSocketError("Write Error", result, text=serial)
@@ -301,10 +301,10 @@ class statefulSocket(object):
         assert(length > 0)
         data = self.socket.read(length)
         if len(data) == length:
-            return True
+            return data
         
         self._respondToSocketError("Read Error", -1, length=length)
-        return False
+        return None
     
     def sendObject(self, data):
         """Sends a JSON object over the wire.
@@ -348,7 +348,7 @@ class statefulSocket(object):
         
         filedata.seekToBeginning()
         self.sentfile = filedata
-        self.updatesend()
+        self.updateSend()
     
     def updateSend(self):
         """Continues sending the current send file."""
@@ -395,7 +395,7 @@ class statefulSocket(object):
                 if self.receivedfile.size == self.receivedfile.processed:
                     receivedfile = self.receivedfile
                     self.receivedfile = None
-                    receivedfile.close()
+                    receivedfile.file.close()
                     self.fileReceived.emit(self, receivedfile.filename)
                     # May be more available
                     continue
