@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
 from rggFields import validationError
+from rggSystem import makeLocalFilename
 import json
 
 def jsondumps(obj):
@@ -34,7 +35,7 @@ def jsondumps(obj):
 
 def jsondump(obj, filename):
     """Dump object to file."""
-    file = open(filename, 'wb')
+    file = open(makeLocalFilename(filename), 'wb')
     # compact version
     #json.dump(obj, file, separators=(',',':'))
     # pretty print
@@ -49,7 +50,7 @@ def jsonloads(str):
 
 def jsonload(filename):
     """Loads the object from a file. May throw."""
-    file = open(filename, 'rb')
+    file = open(makeLocalFilename(filename), 'rb')
     obj = json.load(file)
     file.close()
     assert(isinstance(obj, list) or isinstance(obj, dict))

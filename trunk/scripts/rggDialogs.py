@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os, os.path
 import rggMap
-from rggSystem import fake, translate, showErrorMessage, findFiles, IMAGE_EXTENSIONS, TILESET_DIR
+from rggSystem import fake, translate, showErrorMessage, findFiles, IMAGE_EXTENSIONS, TILESET_DIR, makePortableFilename
 from rggFields import integerField, stringField, dropDownField, validationError
 from rggNet import ConnectionData, localHost
 from PyQt4 import QtGui, QtCore
@@ -163,7 +163,7 @@ class newMapDialog(dialog):
             self.cleanData['mapName'],
             self.cleanData['authName'],
             (self.cleanData['mapWidth'], self.cleanData['mapHeight']),
-            os.path.join('data/tilesets', self.cleanData['tileset']),
+            makePortableFilename(os.path.join('data/tilesets', self.cleanData['tileset'])),
             (self.cleanData['tileWidth'], self.cleanData['tileHeight']))
     
 class hostDialog(dialog):
