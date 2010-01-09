@@ -1,5 +1,5 @@
 from PyQt4 import QtGui, QtCore
-from rggSystem import signal, findFiles, POG_DIR, IMAGE_EXTENSIONS
+from rggSystem import signal, findFiles, POG_DIR, IMAGE_EXTENSIONS, makePortableFilename
 import os, os.path
 
 class chatLineEdit(QtGui.QLineEdit):
@@ -197,7 +197,7 @@ class pogPalette(QtGui.QDockWidget):
     
     def place(self, pog):
         """Place a pog on the map."""
-        self.pogPlaced.emit(os.path.join(POG_DIR, unicode(pog.text())))
+        self.pogPlaced.emit(makePortableFilename(os.path.join(POG_DIR, unicode(pog.text()))))
 
     pogPlaced = signal(basestring, doc=
         """Called to request pog placement on the map."""

@@ -169,7 +169,7 @@ def promptLoadFile(title, filter):
         filter)
     if not filename:
         return None
-    return unicode(filename)
+    return makePortableFilename(unicode(filename))
 
 def promptSaveFile(title, filter):
     filename = QtGui.QFileDialog.getSaveFileName(mainWindow,
@@ -178,7 +178,7 @@ def promptSaveFile(title, filter):
         filter)
     if not filename:
         return None
-    return unicode(filename)
+    return makePortableFilename(unicode(filename))
 
 def findFiles(dir, extensions):
     """Get the list of files with one of the given extensions."""
@@ -189,7 +189,9 @@ def findFiles(dir, extensions):
         #filenames.sort()
         for filename in filenames:
             if os.path.splitext(filename)[1] in extensions:
-                files.append(os.path.join(dirpath, filename)[len(dir) + 1:])
+                name = os.path.join(dirpath, filename)[len(dir) + 1:]
+                print "found file:", name, makePortableFilename(name)
+                files.append(makePortableFilename(name))
     #files.sort()
     return files
     
