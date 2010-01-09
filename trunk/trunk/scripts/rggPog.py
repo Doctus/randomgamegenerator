@@ -28,7 +28,6 @@ class Pog(object):
         self._src = srcfile
         self.name = None
         self._tileStore = None
-        self.show()
         rggResource.crm.listen(srcfile, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
     
     @property

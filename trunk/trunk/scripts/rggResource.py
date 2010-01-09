@@ -87,7 +87,7 @@ class clientResourceMapper(object):
         if not hasattr(root, KEEP_ALIVE_FIELD):
             setattr(root, KEEP_ALIVE_FIELD, [])
         getattr(root, KEEP_ALIVE_FIELD).append(response)
-        self._listeners[filename] = weakref.ref(response)
+        self._listeners[filename].append(weakref.ref(response))
     
     def updateStatus(self, filename, status):
         """Responds to a status update sent from the server."""
@@ -161,13 +161,14 @@ class clientResourceMapper(object):
         return RESOURCE_LOADING[kind]
     
     def _makeResponse(self, weakroot, kind, callback):
-        last = None
+        # Made list to kludge nonlocal keyword
+        last = [None]
         def response(filename):
             if not weakroot():
                 return
             current = self._rawtranslate(filename, kind)
-            if current != last:
-                last = current
+            if current != last[0]:
+                last[0] = current
                 callback(self, filename, current)
         return response
     
