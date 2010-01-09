@@ -106,10 +106,10 @@ QString randomTitle()
 
 cGame::cGame(QWidget *parent) : QObject(parent)
 {
+    mShapeManager = new cShapeManager();
+
     mGLWidget = new wGLWidget(parent, this);
     ((QMainWindow*)parent)->setCentralWidget(mGLWidget);
-
-    //mDockWidgets = new wDockWidgets((QMainWindow*)parent, this);
 
     mTilesetManager = new cTilesetManager(mGLWidget);
 
@@ -120,18 +120,19 @@ cGame::cGame(QWidget *parent) : QObject(parent)
     QTimer *timer2 = new QTimer(this);
     connect(timer , SIGNAL(timeout()), this, SLOT(draw()));
     connect(timer2, SIGNAL(timeout()), this, SLOT(displayFPS()));
-    timer ->start(15);
-    timer2->start(5000);
+    timer ->start(50);
+    timer2->start(1000);
 }
 
 cGame::~cGame()
 {
     delete mTilesetManager;
+    delete mShapeManager;
+    delete mGLWidget;
 }
 
 void cGame::draw()
 {
-
     mGLWidget->updateGL();
 
     FPScounter++;

@@ -18,7 +18,6 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
-
 import time, random, os, base64
 import rggNameGen, rggDice, rggMap, rggTile, rggPog, rggDockWidget, rggDialogs, rggMenuBar, rggResource, rggSystem
 from rggRPC import server, client, serverRPC, clientRPC
@@ -75,6 +74,8 @@ class _state(object):
 
     previousLinePlacement = None #(0, 0) expected
     nextLinePlacement = None
+
+    thickness = 1;
     
     @staticmethod
     def initialize():
@@ -417,12 +418,12 @@ def sendUpdatePog(user, mapID, pogID, pogDump):
 # DRAWING
 
 @serverRPC
-def respondLine(x, y, w, h):
-    drawLine(x, y, w, h)
+def respondLine(x, y, w, h, thickness):
+    drawLine(x, y, w, h, thickness)
 
 @clientRPC
-def sendLine(user, x, y, w, h):
-    respondLine(allusers(), x, y, w, h)
+def sendLine(user, x, y, w, h, thickness):
+    respondLine(allusers(), x, y, w, h, thickness)
 
 @serverRPC
 def respondDeleteLine(x, y, w, h):
@@ -431,6 +432,15 @@ def respondDeleteLine(x, y, w, h):
 @clientRPC
 def sendDeleteLine(user, x, y, w, h):
     respondDeleteLine(allusers(), x, y, w, h)
+
+def setThicknessToOne():
+    _state.thickness = 1
+
+def setThicknessToTwo():
+    _state.thickness = 2
+
+def setThicknessToThree():
+    _state.thickness = 3
 
 # DICE
 
@@ -511,7 +521,7 @@ def mouseMove(screenPosition, mapPosition, displacement):
     elif icon == ICON_DRAW: #drawIcon
         if _state.mouseButton == BUTTON_LEFT:
             if _state.previousLinePlacement != None:
-                sendLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1])
+                sendLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.thickness)
             _state.previousLinePlacement = mapPosition
     elif icon == ICON_DELETE: #deleteIcon
         if _state.mouseButton == BUTTON_LEFT:
@@ -634,8 +644,6 @@ def mousePress(screenPosition, mapPosition, button):
         #endif icon == ICON_SELECT
     elif icon == ICON_DRAW:
         if button == BUTTON_LEFT:
-            if _state.previousLinePlacement != None:
-                sendLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1])
             _state.previousLinePlacement = mapPosition
     elif icon == ICON_DELETE:
         if button == BUTTON_LEFT:

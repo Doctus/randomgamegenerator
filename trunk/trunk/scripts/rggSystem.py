@@ -219,8 +219,11 @@ def makePortableFilename(filename):
     # TODO: Implement filename conversion
     return filename.replace('\\', '/')
 
-def drawLine(x, y, w, h):
-    _main.addLine(x, y, w, h)
+def drawLine(x, y, w, h, thickness):
+    _main.addLine(x, y, w, h, thickness)
 
-def deleteLine(x, y, w, h):
-    _main.deleteLine(x, y, w, h)
+def deleteLine(x, y, w, h, thickness = -1):
+    _main.deleteLine(x, y, w, h, thickness)
+
+def getLinesOfThickness(thickness):
+    return _main.getLineOfThickness(thickness)

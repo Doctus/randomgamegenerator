@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 %Import QtCore/QtCoremod.sip
 %Import QtGui/QtGuimod.sip
+//%Import stdvector.sip
 //%Import QtOpenGL/QtOpenGLmod.sip
 //%Import QtNetwork/QtNetworkmod.sip
 
@@ -54,8 +55,9 @@ public:
     void changeImage(QString oldFilename, QString newFilename);
     int getTileCountOfImage(QString filename);
 
-    void addLine(int x, int y, int w, int h);
-    void deleteLine(int x, int y, int w, int h);
+    void addLine(int x, int y, int w, int h, int thickness);
+    void deleteLine(int x, int y, int w, int h, int thickness = -1);
+    QVector<QRect> getLineOfThickness(int thickness);
 
     /*void addTranslationFile(QString filename);
     void removeTranslationFile(QString filename);*/

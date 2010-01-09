@@ -33,6 +33,7 @@ class wGLWidget;
 
 #include "../cCamera.h"
 #include "../cGame.h"
+#include "../cShapeManager.h"
 #include "../Bindings/bImage.h"
 #include "../Bindings/bMain.h"
 
@@ -50,7 +51,6 @@ class wGLWidget : public QGLWidget
     bool shiftHeld, ctrlHeld;
     bool mouseButtonHeld;
     //QVector<QTooltip*> tooltips;
-    QVector<QRect> lines;
 
     friend class bMain;
 
@@ -61,9 +61,6 @@ class wGLWidget : public QGLWidget
     void paintGL();
     void drawImage(GLuint texture, int x, int y, int w, int h);
     void resizeGL(int w, int h);
-
-    void addLine(int x, int y, int w, int h);
-    void deleteLine(int x, int y, int w, int h);
 
     GLuint createTexture(QImage *image);
     void redrawTexture(QImage *image, GLuint texture);

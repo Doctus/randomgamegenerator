@@ -55,6 +55,10 @@ class menuBar(object):
         
         self.disconnectAct = QtGui.QAction("&Disconnect", main)
         self.disconnectAct.setShortcut("Ctrl+D")
+
+        self.thicknessOneAct = QtGui.QAction("&One", main)
+        self.thicknessTwoAct = QtGui.QAction("&Two", main)
+        self.thicknessThreeAct = QtGui.QAction("&Three", main)
         
         selectIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-select-icon.png"), "Select Tool", main)
         selectIcon.setShortcut("Ctrl+T");
@@ -83,11 +87,21 @@ class menuBar(object):
         internetMenu.addAction(self.hostGameAct)
         internetMenu.addAction(self.joinGameAct)
         internetMenu.addAction(self.disconnectAct)
+
+        thicknessMenu = QtGui.QMenu("&Thickness", main)
+        thicknessMenu.addAction(self.thicknessOneAct)
+        thicknessMenu.addAction(self.thicknessTwoAct)
+        thicknessMenu.addAction(self.thicknessThreeAct)
+
+        drawMenu = QtGui.QMenu("&Draw", main)
+        drawMenu.addMenu(thicknessMenu)
+
         
         # MENUBAR
 
         menubar.addMenu(fileMenu)
         menubar.addMenu(internetMenu)
+        menubar.addMenu(drawMenu)
         menubar.addSeparator()
         menubar.addAction(selectIcon)
         menubar.addAction(moveIcon)

@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 class cGame;
 
 #include "cTilesetManager.h"
+#include "cShapeManager.h"
 #include "Widgets/wGLWidget.h"
 #include "Bindings/bMain.h"
 #include "Bindings/bImage.h"
@@ -39,6 +40,7 @@ class cGame : public QObject
     private:
     cTilesetManager *mTilesetManager;
     wGLWidget *mGLWidget;
+    cShapeManager *mShapeManager;
 
     QString title;
 
