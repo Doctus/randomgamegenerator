@@ -180,6 +180,14 @@ def promptSaveFile(title, filter):
         return None
     return makePortableFilename(unicode(filename))
 
+def promptButtonSelection(prompt, text=[], defaultButton = 0):
+    convertedText = ()
+    if text is not tuple: #lists/dictionaries make this function a sad panda :(
+        convertedText = (text)
+    else:
+        convertedText = text
+    return _main.displayUserDialogChoice(prompt, convertedText, defaultButton)
+
 def findFiles(dir, extensions):
     """Get the list of files with one of the given extensions."""
     files = []
@@ -224,6 +232,9 @@ def drawLine(x, y, w, h, thickness):
 
 def deleteLine(x, y, w, h, thickness = -1):
     _main.deleteLine(x, y, w, h, thickness)
+
+def clearLines():
+    _main.clearLines()
 
 def getLinesOfThickness(thickness):
     return _main.getLineOfThickness(thickness)

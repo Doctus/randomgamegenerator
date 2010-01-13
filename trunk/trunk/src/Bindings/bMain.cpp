@@ -220,6 +220,11 @@ void bMain::deleteLine(int x, int y, int w, int h, int thickness)
     mainGame->mShapeManager->removeLine(x, y, w, h, thickness);
 }
 
+void bMain::clearLines()
+{
+    mainGame->mShapeManager->clearLines();
+}
+
 QVector<QRect> bMain::getLineOfThickness(int thickness)
 {
     if(thickness < 1)
@@ -227,7 +232,7 @@ QVector<QRect> bMain::getLineOfThickness(int thickness)
     if(thickness > 3)
         thickness = 3;
     QVector<QRect> rects = mainGame->mShapeManager->getLines()[thickness-1];
-    cout << "size: " << rects.size() << endl;
+    //cout << "size: " << rects.size() << endl;
     return rects;
 }
 

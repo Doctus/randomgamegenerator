@@ -211,14 +211,14 @@ camera.documentation = fake.translate('chatdoc',
     """)
     
 
-#@chat('swapmap')
-#def swapmap(message):
-#    rggViews.chooseMap()
+@chat('swapmap')
+def swapmap(message):
+    rggViews.chooseMap()
 
-#swapmap.documentation = fake.translate('chatdoc',
-#    """/swapmap: Load a new map.
-#    
-#    """)
+swapmap.documentation = fake.translate('chatdoc',
+    """/swapmap: Load a new map.
+    <br>
+    """)
 
 @chat('placepog', hidden=True)
 def placepog(message):

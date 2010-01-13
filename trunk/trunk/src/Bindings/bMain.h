@@ -30,6 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../cGame.h"
 #include "../Widgets/wAction.h"
 #include "../cTileset.h"
+#include "../cShapeManager.h"
 
 
 class bMain : public QObject
@@ -68,6 +69,7 @@ class bMain : public QObject
 
     void addLine(int x, int y, int w, int h, int thickness);
     void deleteLine(int x, int y, int w, int h, int thickness = -1);
+    void clearLines();
     QVector<QRect> getLineOfThickness(int thickness);
 
     /*void addTranslationFile(QString filename);
