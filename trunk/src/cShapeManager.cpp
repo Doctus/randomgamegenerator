@@ -138,6 +138,14 @@ void cShapeManager::removeLine(int x, int y, int w, int h, int thickness)
     }
 }
 
+void cShapeManager::clearLines()
+{
+    for(int i = 0; i < lines.size(); i++)
+    {
+        lines[i].clear();
+    }
+}
+
 QVector< QVector<QRect> > cShapeManager::getLines()
 {
     return lines;

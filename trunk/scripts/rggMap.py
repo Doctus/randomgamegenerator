@@ -34,6 +34,7 @@ class Map(object):
         self.tilesize = tilesize
         
         self.Pogs = {}
+        self.lines = []
         self.tileindexes = [0 for i in xrange(mapsize[0] * mapsize[1])]
         self.hidden = True
         self.tiles = None
@@ -58,7 +59,7 @@ class Map(object):
             id += rggSystem.findRandomAppend()
         return id
     
-    def hide(self, hidden=True, includeTiles=True, includePogs=True):
+    def hide(self, hidden=True, includeTiles=True, includePogs=True, includeLines=True):
         """Hide or show all pogs and tiles."""
         if hidden == self.hidden:
             return
@@ -75,6 +76,11 @@ class Map(object):
                 self._deleteTiles()
             else:
                 self._createTiles()
+        if includeLines:
+            if hidden:
+                self.storeLines()
+            else:
+                self.restoreLines()
     
     def show(self):
         return self.hide(False)
@@ -134,16 +140,24 @@ class Map(object):
                 top = pog
                 layer = top.layer
         return top
-    
-    def dump(self):
-        """Serialize to an object valid for JSON dumping."""
+
+    def storeLines(self):
         thickOne = rggSystem.getLinesOfThickness(1)
         thickTwo = rggSystem.getLinesOfThickness(2)
         thickThree = rggSystem.getLinesOfThickness(3)
 
-        tlines = [(line.x(), line.y(), line.width(), line.height(), 1) for line in thickOne]
-        tlines.extend([(line.x(), line.y(), line.width(), line.height(), 2) for line in thickTwo])
-        tlines.extend([(line.x(), line.y(), line.width(), line.height(), 3) for line in thickThree])
+        self.lines = [(line.x(), line.y(), line.width(), line.height(), 1) for line in thickOne]
+        self.lines.extend([(line.x(), line.y(), line.width(), line.height(), 2) for line in thickTwo])
+        self.lines.extend([(line.x(), line.y(), line.width(), line.height(), 3) for line in thickThree])
+
+    def restoreLines(self):
+        for line in self.lines:
+            rggSystem.drawLine(line[0], line[1], line[2], line[3], line[4])
+    
+    def dump(self):
+        """Serialize to an object valid for JSON dumping."""
+
+        self.storeLines()
 
         return dict(
             mapname=self.mapname,
@@ -153,10 +167,7 @@ class Map(object):
             tilesize=self.tilesize,
             pogs=dict([(pog.ID, pog.dump()) for pog in self.Pogs.values()]),
             tiles=self.tileindexes,
-            #lines1=[(line.x(), line.y(), line.width(), line.height(), 1) for line in thickOne],
-            #lines2=[(line.x(), line.y(), line.width(), line.height(), 2) for line in thickTwo],
-            #lines3=[(line.x(), line.y(), line.width(), line.height(), 3) for line in thickThree])
-            lines=tlines)
+            lines=self.lines)
     
     @staticmethod
     def load(obj):
@@ -178,6 +189,8 @@ class Map(object):
         for line in lines:
             x, y, w, h, t = loadCoordinates('Map.lines[]', line)
             rggSystem.drawLine(x, y, w, h, t)
+
+        map.storeLines()
         
         # HACK: Looks like coordinates; saves work.
         tiles = loadCoordinates('Map.tiles', obj.get('tiles'), length=len(map.tileindexes), min=0, max=65535)

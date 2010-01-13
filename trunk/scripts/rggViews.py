@@ -272,10 +272,32 @@ def switchMap(map):
     if _state.currentMap:
         _state.currentMap.hide()
     clearPogSelection()
+    clearLines()
     _state.currentMap = map
     if _state.currentMap:
         _state.currentMap.show()
         print "Changed to map: {0}".format(_state.currentMap)
+
+def chooseMap():
+    mapNames = []
+    mapIDs = []
+    defaultButton = 0
+    i = 0
+
+    if len(_state.Maps) <= 1:
+        say(translate('views', 'There are no maps to switch between.'))
+        return
+
+    for ID in _state.Maps:
+        mapNames.append(_state.Maps[ID].mapname)
+        mapIDs.append(ID)
+        if ID == _state.currentMap.ID:
+            defaultButton = i
+        i += 1
+
+    selectedButton = rggSystem.promptButtonSelection("Which map do you want to switch to?", mapNames, defaultButton)
+    sendMapSwitch(mapIDs[selectedButton])
+    
 
 def closeAllMaps():
     switchMap(None)
@@ -347,6 +369,24 @@ def sendMapUpdate(user, ID, mapDump):
     for pogDump in mapDump['pogs'].values():
         rggResource.srm.processFile(user, pogDump['src'])
     respondMapUpdate(allusers(), ID, mapDump)
+
+@serverRPC
+def respondMapSwitch(ID, handle):
+    map = getmap(ID)
+    disallow = rggSystem.promptButtonSelection('User "{user}" has switched to map "{map}", do you want to switch too?'.format(user=handle, map=map.mapname), ['Yes', 'No'], 1)
+
+    if map and not disallow:
+        switchMap(map)
+
+@clientRPC
+def sendMapSwitch(user, ID):
+    if getmap(ID):
+        if len(allusersbut(localuser())) > 0:
+            respondMapSwitch(allusersbut(localuser()), ID, localhandle())
+
+        map = getmap(ID)
+        if map:
+            switchMap(map)
 
 # POGS
 
@@ -441,6 +481,9 @@ def setThicknessToTwo():
 
 def setThicknessToThree():
     _state.thickness = 3
+
+def clearLines():
+    rggSystem.clearLines()
 
 # DICE
 

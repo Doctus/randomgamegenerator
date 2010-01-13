@@ -43,6 +43,7 @@ class cShapeManager
 
     void addLine(int x, int y, int w, int h, int thickness);
     void removeLine(int x, int y, int w, int h, int thickness);
+    void clearLines();
     QVector< QVector<QRect> > getLines();
 };
 

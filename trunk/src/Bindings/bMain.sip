@@ -57,6 +57,7 @@ public:
 
     void addLine(int x, int y, int w, int h, int thickness);
     void deleteLine(int x, int y, int w, int h, int thickness = -1);
+    void clearLines();
     QVector<QRect> getLineOfThickness(int thickness);
 
     /*void addTranslationFile(QString filename);
