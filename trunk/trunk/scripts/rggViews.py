@@ -373,16 +373,16 @@ def sendMapUpdate(user, ID, mapDump):
 @serverRPC
 def respondMapSwitch(ID, handle):
     map = getmap(ID)
-    disallow = rggSystem.promptButtonSelection('User "{user}" has switched to map "{map}", do you want to switch too?'.format(user=handle, map=map.mapname), ['Yes', 'No'], 1)
+    if map:
+        disallow = rggSystem.promptButtonSelection('User "{user}" has switched to map "{map}", do you want to switch too?'.format(user=handle, map=map.mapname), ['Yes', 'No'], 1)
 
-    if map and not disallow:
-        switchMap(map)
+        if not disallow:
+            switchMap(map)
 
 @clientRPC
 def sendMapSwitch(user, ID):
     if getmap(ID):
-        if len(allusersbut(localuser())) > 0:
-            respondMapSwitch(allusersbut(localuser()), ID, localhandle())
+        respondMapSwitch(allusersbut(user), ID, unicode(user))
 
         map = getmap(ID)
         if map:
