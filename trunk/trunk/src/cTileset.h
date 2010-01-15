@@ -60,8 +60,7 @@ class cTileset
 
     string getFilename();
 
-    void reload();
-    //void changeImage(QString filename);
+    map<unsigned int, GLuint> reload();
 
     private:
     void loadImage();

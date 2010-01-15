@@ -67,6 +67,16 @@ cTileset* cTilesetManager::findTileset(int id)
     return tilesets[pos]; //exception?
 }
 
+int cTilesetManager::getTilesetId(string filename)
+{
+    cTileset *set = findTileset(filename);
+
+    if(set != NULL)
+        return set->getId();
+
+    return -1;
+}
+
 cTileset* cTilesetManager::findTileset(string filename)
 {
     for(unsigned int i = 0; i < tilesets.size(); i++)
@@ -138,14 +148,30 @@ void cTilesetManager::changeLayerOfImage(bImage *img, int oldLayer, int newLayer
 
 void cTilesetManager::changeImage(QString oldFilename, QString newFilename)
 {
-    cTileset *set = findTileset(oldFilename.toStdString()); //This needs to be changed everywhere, to accomodate for UTF-8 T_T?
+    changeImage(oldFilename.toStdString(), newFilename.toStdString());
+}
+
+void cTilesetManager::changeImage(string oldFilename, string newFilename)
+{
+    cTileset *set = findTileset(oldFilename); //This needs to be changed everywhere, to accomodate for UTF-8 T_T?
 
     if(set != NULL)
     {
         if(oldFilename == newFilename)
-            set->reload();
-        //else
-            //set->changeImage(filename);
+        {
+            map<unsigned int, GLuint> textureIds = set->reload();
+            if(textureIds.size() > 0)
+            {
+                foreach(vector<bImage*> layer, images)
+                {
+                    foreach(bImage *image, layer)
+                    {
+                        if(image->getTilesetId() == set->id)
+                            image->setTextureId(set->getTextureId(image->getTile()));
+                    }
+                }
+            }
+        }
     }
 }
 

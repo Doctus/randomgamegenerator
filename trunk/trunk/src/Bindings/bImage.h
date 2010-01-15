@@ -17,6 +17,7 @@ class bImage
     int layer;
     bool isDestroyed;
     QString filename;
+    int tilesetId;
     GLuint textureId;
 
     bImage();
@@ -33,6 +34,7 @@ class bImage
     int getTile();
     int getLayer();
     QString getFilename();
+    int getTilesetId();
 
     void setX(int x);
     void setY(int y);

@@ -35,6 +35,8 @@ bImage::bImage(int x, int y, int w, int h, int tile, int layer, QString filename
 
     bMain::getGameInstance()->mTilesetManager->addImage(this, layer);
 
+    this->tilesetId = bMain::getGameInstance()->mTilesetManager->getTilesetId(filename.toStdString());
+
     //cout << "created image " << id << ":" << filename.toStdString() << endl;
 }
 
@@ -83,6 +85,11 @@ int bImage::getLayer()
 QString bImage::getFilename()
 {
     return filename;
+}
+
+int bImage::getTilesetId()
+{
+    return tilesetId;
 }
 
 
