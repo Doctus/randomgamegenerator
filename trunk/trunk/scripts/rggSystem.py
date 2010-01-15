@@ -238,3 +238,7 @@ def clearLines():
 
 def getLinesOfThickness(thickness):
     return _main.getLineOfThickness(thickness)
+
+def reloadImage(filename):
+    """Reloads the specified image file."""
+    return _main.changeImage(filename, filename)

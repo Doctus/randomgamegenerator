@@ -216,7 +216,7 @@ class BaseClient(object):
     def _shouldSendFile(self, fileData):
         """Check if we should send a file. Does extra mutating work."""
         filename = fileData.filename
-        try:    
+        try:
             # Can we open the file?
             if not fileData.file.open(QtCore.QFile.ReadOnly):
                 return False
