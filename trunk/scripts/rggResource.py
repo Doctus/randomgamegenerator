@@ -173,7 +173,6 @@ class clientResourceMapper(object):
     
     def _onFileReceived(self, client, filename):
         """Responds to a file being successfully transferred."""
-        print "RECEIVED TRANSFER {filename}".format(filename=filename)
         # HACK: Using reload image on not-necessarily-image files
         reloadImage(filename)
         self._update(filename, STATE_READY)
@@ -181,7 +180,6 @@ class clientResourceMapper(object):
     def _onFileFailed(self, client, filename):
         """Responds to a file that was not transferred."""
         current = self._status[filename]
-        print "FAILED TO RECEIVE {filename}".format(filename=filename)
         if current in (STATE_UNKNOWN, STATE_LOADING, STATE_READY) and fileExists(filename):
             # Could either have verified correctly or failed to transfer
             # Either way, call it present

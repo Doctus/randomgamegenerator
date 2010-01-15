@@ -113,9 +113,7 @@ class Pog(object):
         return rggTile.tile(self.position, self.dimensions, 0, self.layer, src)
     
     def _updateSrc(self, crm, filename, translation):
-        print "UPDATED POG {filename};{src};{translation}".format(filename=filename,src=self._src,translation=translation)
         if filename == self._src and self._tile:
-            print "UPDATED POG SUCCESSFULLY"
             self._tile = self._makeTile()
     
     def dump(self):
