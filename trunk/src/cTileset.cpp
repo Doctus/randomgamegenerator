@@ -89,21 +89,33 @@ string cTileset::getFilename()
 }
 
 
-void cTileset::reload()
+map<unsigned int, GLuint> cTileset::reload()
 {
-    if(image->isNull()) //do we even want to reload the image if it's non-null?
+    map<unsigned int, GLuint> oldTextureIds;
+
+    if(image != NULL) //do we even want to reload the image if it's non-null?
     {
-        cout << "Reloading tileset" << endl;
+        oldTextureIds = textureIds; //this actually is deep copy.
         delete image;
         loadImage();
     }
+
+    return oldTextureIds;
 }
 
 
 void cTileset::loadImage()
 {
+    for(unsigned int i = 0; i < textureIds.size(); i++)
+    {
+        mGLWidget->deleteTexture(textureIds.at(i));
+    }
+
     image = new QImage(filename.c_str());
     textureIds.clear();
+
+    if(image->isNull())
+        return;
 
     int tile = 0;
     for(int y = 0; y < image->height(); y += tileHeight)
@@ -130,7 +142,7 @@ void cTileset::loadImage()
         }
     }
 
-    cout << "created image \"" << filename.c_str() << "\" with " << tile << " tiles." << endl;
+    //cout << "created image \"" << filename.c_str() << "\" with " << tile << " tiles." << endl;
 }
 
 
