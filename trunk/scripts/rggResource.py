@@ -24,6 +24,7 @@ import os, os.path
 from collections import defaultdict
 from PyQt4 import QtCore, QtGui
 from rggRPC import client, server, clientRPC, serverRPC
+from rggSystem import reloadImage
 
 RESOURCE_IMAGE = "image"
 RESOURCE_SOUND = "sound"
@@ -82,8 +83,7 @@ class clientResourceMapper(object):
         
         """
         # NOTE: Weak references always get me in trouble...
-        weakroot = weakref.ref(root)
-        response = self._makeResponse(weakroot, kind, callback)
+        response = self._makeResponse(kind, callback)
         if not hasattr(root, KEEP_ALIVE_FIELD):
             setattr(root, KEEP_ALIVE_FIELD, [])
         getattr(root, KEEP_ALIVE_FIELD).append(response)
@@ -133,21 +133,22 @@ class clientResourceMapper(object):
         # Avoid the loop unless there's been an actual change
         oldstatus = self._status[filename]
         exists = fileExists(filename)
-        if oldstatus != status or exists != self._exists[filename]:
-            self._status[filename] = status
-            self._exists[filename] = exists
-            
-            # Broadcast the changes to all listeners
-            needClean = False
-            for listener in self._listeners[filename]:
-                cb = listener()
-                if cb:
-                    cb(filename)
-                else:
-                    needClean = True
-            # Clean up expired weak references
-            if needClean:
-                self._listeners[filename] = [listener for listener in self._listeners[filename] if listener()]
+        
+        #if oldstatus != status or exists != self._exists[filename]:
+        self._status[filename] = status
+        self._exists[filename] = exists
+        
+        # Broadcast the changes to all listeners
+        needClean = False
+        for listener in self._listeners[filename]:
+            cb = listener()
+            if cb:
+                cb(filename)
+            else:
+                needClean = True
+        # Clean up expired weak references
+        if needClean:
+            self._listeners[filename] = [listener for listener in self._listeners[filename] if listener()]
     
     def _rawtranslate(self, filename, kind):
         """Translates the given filename based on availability."""
@@ -160,25 +161,27 @@ class clientResourceMapper(object):
             return filename
         return RESOURCE_LOADING[kind]
     
-    def _makeResponse(self, weakroot, kind, callback):
-        # Made list to kludge nonlocal keyword
-        last = [None]
+    def _makeResponse(self, kind, callback):
+        # array is replacement for nonlocal keyword
+        #last = [None]
         def response(filename):
-            if not weakroot():
-                return
             current = self._rawtranslate(filename, kind)
-            if current != last[0]:
-                last[0] = current
-                callback(self, filename, current)
+            #if last[0] != current:
+            #    last[0] = current
+            callback(self, filename, current)
         return response
     
     def _onFileReceived(self, client, filename):
         """Responds to a file being successfully transferred."""
+        print "RECEIVED TRANSFER {filename}".format(filename=filename)
+        # HACK: Using reload image on not-necessarily-image files
+        reloadImage(filename)
         self._update(filename, STATE_READY)
     
     def _onFileFailed(self, client, filename):
         """Responds to a file that was not transferred."""
         current = self._status[filename]
+        print "FAILED TO RECEIVE {filename}".format(filename=filename)
         if current in (STATE_UNKNOWN, STATE_LOADING, STATE_READY) and fileExists(filename):
             # Could either have verified correctly or failed to transfer
             # Either way, call it present
@@ -288,6 +291,7 @@ def _sendStatusRequest(user, fileList):
     _respondStatus(user, srm.getStatus(fileList))
 
 def fileExists(filename):
+    # TODO: Implement file existence test.
     return True
 
     
