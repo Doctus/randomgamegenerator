@@ -267,7 +267,7 @@ class joinDialog(dialog):
         return dict(
             username=stringField(translate('joinDialog', 'Username'),
                 value=data.get('username', translate('joinDialog', 'Anonymous'))),
-            host=stringField(translate('joinDialog', 'Host Name'),
+            host=stringField(translate('joinDialog', 'Host Name (IP)'),
                 value=data.get('host', localHost())),
             port=integerField(translate('joinDialog', 'Port'),
                 min=1, max=65535, value=data.get('port', 6812)))
