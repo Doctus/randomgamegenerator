@@ -108,7 +108,7 @@ void cTileset::loadImage()
 {
     for(unsigned int i = 0; i < textureIds.size(); i++)
     {
-        mGLWidget->deleteTexture(textureIds.at(i));
+        mGLWidget->deleteTexture(textureIds[i]);
     }
 
     image = new QImage(filename.c_str());
