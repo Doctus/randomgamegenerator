@@ -38,3 +38,6 @@
   * Pog generator.
   * Quest/Story generator.
   * Character generator.
+
+= Awesome =
+  * Add Cirno.
