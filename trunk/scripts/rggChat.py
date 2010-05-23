@@ -109,17 +109,10 @@ def advice(message):
     rggViews.generateAdvice()
 
 advice.documentation = fake.translate('chatdoc', 
-    """/techniquename: Generate a technique name.<dl>
-    <dt>Alternate spelling:</dt>
-        <dd>/techname</dd>
-    
+    """/advice: Generate some random, probably nonsensical advice.<dl>
+
     <dt>Syntax:</dt>
-        <dd>/techniquename</dd>
-        <dd>/techniquename arguments...</dd>
-    
-    <dt>Examples:</dt>
-        <dd>/techniquename</dd>
-        <dd>/techniquename ...</dd>
+        <dd>/advice</dd>
     </dl><br>
     """)
 
