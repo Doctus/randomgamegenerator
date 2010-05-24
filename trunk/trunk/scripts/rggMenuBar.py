@@ -47,6 +47,9 @@ class menuBar(object):
         self.saveMapAct = QtGui.QAction("&Save Map As...", main)
         self.saveMapAct.setShortcut("Ctrl+S")
         
+        self.closeMapAct = QtGui.QAction("&Close All Maps", main)
+        self.closeMapAct.setShortcut("Ctrl+Shift+W")
+        
         self.hostGameAct = QtGui.QAction("&Host Game", main)
         self.hostGameAct.setShortcut("Ctrl+H")
 
@@ -82,6 +85,7 @@ class menuBar(object):
         fileMenu.addAction(self.newMapAct)
         fileMenu.addAction(self.loadMapAct)
         fileMenu.addAction(self.saveMapAct)
+        fileMenu.addAction(self.closeMapAct)
         
         internetMenu = QtGui.QMenu("&Internet", main)
         internetMenu.addAction(self.hostGameAct)
