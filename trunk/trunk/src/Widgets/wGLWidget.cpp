@@ -200,12 +200,14 @@ GLuint wGLWidget::createTexture(QImage *image)
     glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 #ifdef WIN32
-    GLvoid *scaledImage[b2NextPowerOfTwo(img.width())*b2NextPowerOfTwo(img.height())];
+    GLvoid *scaledImage = new char[b2NextPowerOfTwo(img.width())*b2NextPowerOfTwo(img.height())];
     GLint ret = gluScaleImage(GL_RGBA, img.width(), img.height(), GL_UNSIGNED_BYTE, img.bits(),
                   b2NextPowerOfTwo(img.width()), b2NextPowerOfTwo(img.height()), GL_UNSIGNED_BYTE, scaledImage);
 
     if(ret != 0)
     {
+		delete scaledImage;
+
         cout << "A gl error happened in gluScaleImage: " << translateGLError(glGetError()) << endl;
         throw "GL error";
         return 0;
@@ -213,6 +215,7 @@ GLuint wGLWidget::createTexture(QImage *image)
 
     glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, b2NextPowerOfTwo(img.width()), b2NextPowerOfTwo(img.height()), 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, scaledImage);
+	delete scaledImage;
 #else
     glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, img.width(), img.height(), 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
