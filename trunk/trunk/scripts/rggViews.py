@@ -415,7 +415,8 @@ def movePogs(displacement):
     selection = _state.pogSelection.copy()
     for pog in selection:
         pog.displace(displacement)
-        modifyPog(currentmap(), pog)
+        #modifyPog(currentmap(), pog)
+        sendMovementPog(currentmap().ID, pog.ID, pog.dump())
 
 @serverRPC
 def respondUpdatePog(mapID, pogID, pogDump):
@@ -450,6 +451,23 @@ def sendUpdatePog(user, mapID, pogID, pogDump):
     if not pogID or pogID not in pogMap.Pogs:
         pogID = pogMap._findUniqueID(pogDump['src'])
     respondUpdatePog(allusers(), mapID, pogID, pogDump)
+
+@clientRPC
+def sendMovementPog(user, mapID, pogID, pogDump):
+    """Creates or updates a pog on the server."""
+    #TODO: What happens when we delete a pog then get something like movement or a property change for it?
+    # Fix with different messages that don't completely change the pog, and only use this for creation.
+    pogMap = getmap(mapID)
+    # Upload (or check that we already have) the image resource from the client
+    rggResource.srm.processFile(user, pogDump['src'])
+    if not pogMap:
+        return
+    # HACK: Relies on the fact that responses are locally synchronous
+    if not pogID or pogID not in pogMap.Pogs:
+        pogID = pogMap._findUniqueID(pogDump['src'])
+    users = allusers()
+    users.remove(user)
+    respondUpdatePog(users, mapID, pogID, pogDump)
 
 # DRAWING
 
@@ -695,6 +713,9 @@ def mouseRelease(screenPosition, mapPosition, button):
     _state.mouseButton = None
 
     icon = _state.menu.selectedIcon
+    if(icon == ICON_SELECT):
+      for pog in _state.pogSelection:
+        sendUpdatePog(currentmap().ID, pog.ID, pog.dump())
     if(icon == ICON_DELETE):
         if(_state.previousLinePlacement != None and _state.nextLinePlacement != None):
 
