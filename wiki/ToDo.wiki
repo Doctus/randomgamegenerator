@@ -40,4 +40,4 @@
   * Character generator.
 
 = Awesome =
-  * Add Cirno.
+  * Add Cirno. (Probably as an optional add-on due to memory consumption.)
