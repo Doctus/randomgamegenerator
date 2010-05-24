@@ -412,10 +412,9 @@ def placePog(pogpath):
 # TODO: Make pog movement transfer much more efficient.
 def movePogs(displacement):
     """Moves pogs by a specified displacement."""
-    for pog in _state.pogSelection:
+    selection = _state.pogSelection.copy()
+    for pog in selection:
         pog.displace(displacement)
-    #If this is done in a single loop, it behaves erratically with 3+ pogs.
-    for pog in _state.pogSelection:
         modifyPog(currentmap(), pog)
 
 @serverRPC
