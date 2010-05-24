@@ -200,7 +200,7 @@ GLuint wGLWidget::createTexture(QImage *image)
     glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 #ifdef WIN32
-    GLvoid *scaledImage = new char[b2NextPowerOfTwo(img.width())*b2NextPowerOfTwo(img.height())];
+    GLvoid *scaledImage = new char[b2NextPowerOfTwo(img.width())*b2NextPowerOfTwo(img.height())*4];
     GLint ret = gluScaleImage(GL_RGBA, img.width(), img.height(), GL_UNSIGNED_BYTE, img.bits(),
                   b2NextPowerOfTwo(img.width()), b2NextPowerOfTwo(img.height()), GL_UNSIGNED_BYTE, scaledImage);
 
