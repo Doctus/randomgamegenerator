@@ -413,13 +413,10 @@ def placePog(pogpath):
 def movePogs(displacement):
     """Moves pogs by a specified displacement."""
     for pog in _state.pogSelection:
-        #from rggPog import Pog
-        #dup = Pog(pog.position, pog.dimensions, pog.layer, pog.src)
-        #dup.displace(displacement)
-        #dup.ID = pog.ID
         pog.displace(displacement)
+    #If this is done in a single loop, it behaves erratically with 3+ pogs.
+    for pog in _state.pogSelection:
         modifyPog(currentmap(), pog)
-        #dup.hide()
 
 @serverRPC
 def respondUpdatePog(mapID, pogID, pogDump):
@@ -614,14 +611,15 @@ def mousePress(screenPosition, mapPosition, button):
                 _state.pogSelection.remove(pog)
             else:
                 _state.pogSelection.add(pog)
-        elif button == BUTTON_LEFT + BUTTON_CONTROL:
-            pog = currentmap().findTopPog(mapPosition)
-            if not pog:
-                return
-            if pog in _state.pogSelection:
-                _state.pogSelection.remove(pog)
-            else:
-                _state.pogSelection.add(pog)
+        #Was this duplicated for a reason? I don't see any.
+        #elif button == BUTTON_LEFT + BUTTON_CONTROL:
+        #    pog = currentmap().findTopPog(mapPosition)
+        #    if not pog:
+        #        return
+        #    if pog in _state.pogSelection:
+        #        _state.pogSelection.remove(pog)
+        #    else:
+        #        _state.pogSelection.add(pog)
         elif button == BUTTON_RIGHT:
             pog = currentmap().findTopPog(mapPosition)
             if pog is not None:
