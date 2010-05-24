@@ -32,7 +32,7 @@ QString randomTitle()
 {
     srand(time(NULL));
 
-    int rand1 = rand() % 7;
+    int rand1 = rand() % 8;
     int rand2 = rand() % 5;
     int rand3 = rand() % 5;
 
@@ -60,6 +60,9 @@ QString randomTitle()
         break;
         case 6:
         title += "Unpredictable ";
+        break;
+        case 7:
+        title += "Aleatory ";
         break;
     }
 
