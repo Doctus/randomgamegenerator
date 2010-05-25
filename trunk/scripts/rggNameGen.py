@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 #
 #rggNameGen - for the Random Game Generator project
 #
@@ -159,6 +159,32 @@ def _getArtifactWeaponName():
   pat = pat.replace("$weap", random.choice(weaps))
   pat = pat.replace("$Weap", random.choice(weaps).capitalize())
   return pat
+
+def _getMacguffinName(genre="fantasy"):
+  if genre == "fantasy":
+    patterns = ["the $item of $name",
+                "the $item of $thing",
+                "the $adj $item of $name",
+                "the $adj $item of $thing",
+                "the $item of $adj $thing",
+                "$name's $item of $thing"]
+    itemTypes = ["eye", "scepter", "staff", "shield", "blade", "orb",
+                 "sphere", "wand", "helm", "hand", "amulet", "ring"]
+    stuff = ["power", "wisdom", "undeath", "destruction", "life", "holiness",
+             "ice", "flames", "death", "silence", "immortality"]
+    adjectives = ["freezing", "unlimited", "ultimate", "endless", "lost",
+                  "forgotten", "ancient", "mystical", "arcane", "divine",
+                  "forbidden", "perfect", "brilliant"]
+    result = random.choice(patterns)
+    result = result.replace("$item", random.choice(itemTypes).capitalize())
+    result = result.replace("$thing", random.choice(stuff).capitalize())
+    result = result.replace("$adj", random.choice(adjectives).capitalize())
+    result = result.replace("$name", random.choice([_getDwarvenMaleName().capitalize(),
+                                                   _getJapaneseRandomName().capitalize(),
+                                                   _getFrenchRandomName().capitalize()]))
+    return result
+  return "The Great MacGuffin"
+    
 
 def _generateAdvice():
   anto = [['+cold', '+heat'], ['wisdom', '+fool'], ['+light', '+darkness'],
@@ -378,7 +404,8 @@ def _getKaleidoscope():
 
 def getName(nametype):
   '''Return a random name of a type defined by the input string.
-      The input can be the name of a valid style (dwarf, Japanese, or elf)
+      Some generators distinguish male and female names - the input can 
+      be the name of a valid style (e.g. 'dwarf' or 'French')
       in which case either a male or female name will be returned
       with equal probability, or it can take a form like 'dwarfmale'
       if a specific gender is desired.
@@ -397,9 +424,10 @@ def getName(nametype):
              "frenchmale":_getFrenchMaleName,
              "frenchfemale":_getFrenchFemaleName,
              "french":_getFrenchRandomName,
+             "macguffin":_getMacguffinName,
              "kaijyuu":_getKaleidoscope}
   if nametype == "keys":
     return typedic.keys()
   if nametype == 'kaikeys':
-    return ['dwarfmale', 'japanesefull', 'french', 'weapon', 'eviltitle']
+    return ['dwarfmale', 'japanesefull', 'french', 'weapon', 'eviltitle', 'macguffin']
   return typedic[nametype]()
