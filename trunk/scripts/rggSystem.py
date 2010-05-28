@@ -214,7 +214,7 @@ def findRandomAppend():
     # Can't spell swear words without vowels
     # Left out l and v because they look enough like i and u
     letters = '256789bcdfghjkmnpqrstwxz'
-    return letters[random.randint(0, len(letters) - 1)];
+    return random.choice(letters)
 
 
 def makeLocalFilename(filename):
