@@ -35,7 +35,7 @@ class chatWidget(QtGui.QDockWidget):
 
     def __init__(self, mainWindow):
         super(QtGui.QDockWidget, self).__init__(mainWindow)
-        self.setWindowTitle(self.tr("Chat"))
+        self.setWindowTitle(self.tr("OOC Chat / System"))
         self.widgetEditor = QtGui.QTextBrowser(mainWindow)
         self.widgetLineInput = chatLineEdit(mainWindow)
         self.widget = QtGui.QWidget(mainWindow)
@@ -66,6 +66,52 @@ class chatWidget(QtGui.QDockWidget):
     chatInput = signal(basestring, doc=
         """Called when chat input is received.
         
+        text -- the message entered
+        
+        """
+    )
+    
+class ICChatWidget(QtGui.QDockWidget):
+
+    def __init__(self, mainWindow):
+        super(QtGui.QDockWidget, self).__init__(mainWindow)
+        self.setWindowTitle(self.tr("IC Chat"))
+        self.widgetEditor = QtGui.QTextBrowser(mainWindow)
+        self.widgetLineInput = chatLineEdit(mainWindow)
+        self.widget = QtGui.QWidget(mainWindow)
+        self.widgetEditor.setReadOnly(True)
+        self.widgetEditor.setOpenLinks(False)
+        self.characterSelector = QtGui.QComboBox(mainWindow)
+        self.characterSelector.addItem("TestRobot")
+        self.characterSelector.addItem("TestDinosaur")
+        self.layout = QtGui.QBoxLayout(2)
+        self.layout.addWidget(self.widgetEditor)
+        self.layout.addWidget(self.widgetLineInput)
+        self.layout.addWidget(self.characterSelector)
+        self.widget.setLayout(self.layout)
+        self.setWidget(self.widget)
+        mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self)
+        
+        self.widgetLineInput.returnPressed.connect(self.processInput)
+    
+    def insertMessage(self, mes):
+        self.scroll = (self.widgetEditor.verticalScrollBar().value() ==
+                   self.widgetEditor.verticalScrollBar().maximum())
+        self.widgetEditor.append(mes)
+        if self.scroll:
+            self.widgetEditor.verticalScrollBar().setValue(self.widgetEditor.verticalScrollBar().maximum())
+    
+    def processInput(self):
+        self.newmes = unicode(self.widgetLineInput.text())
+        self.widgetLineInput.clear()
+        self.widgetLineInput.addMessage(self.newmes)
+        self.ICChatInput.emit(self.newmes,
+                              unicode(self.characterSelector.currentText()))
+    
+    ICChatInput = signal(basestring, basestring, doc=
+        """Called when in-character chat input is received.
+        
+        charname -- the character name currently selected
         text -- the message entered
         
         """

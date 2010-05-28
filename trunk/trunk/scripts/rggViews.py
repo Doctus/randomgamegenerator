@@ -84,6 +84,7 @@ class _state(object):
         _state.dwidget = rggDockWidget.diceRoller(mainWindow)
         _state.pwidget = rggDockWidget.pogPalette(mainWindow)
         _state.cwidget = rggDockWidget.chatWidget(mainWindow)
+        _state.icwidget = rggDockWidget.ICChatWidget(mainWindow)
         _state.users = {}
         _state.localuser = User(client.username)
         _state.users[client.username] = _state.localuser
@@ -92,12 +93,15 @@ class _state(object):
 # MESSAGES
 
 def say(message):
-    """Say an IC message."""
+    """Say an IC message. This documentation is a lie."""
     _state.cwidget.insertMessage(message)
 
 def announce(message):
-    """Say an OOC message."""
+    """Say an OOC message. This documentation is a lie."""
     _state.cwidget.insertMessage(message)
+    
+def ICSay(message):
+    _state.icwidget.insertMessage(message)
 
 def linkedName(name):
     return translate('views', '<a href="/tell {name}" title="{name}">{name}</a>').format(name=name)
@@ -510,6 +514,7 @@ def rollDice(dice):
             name=linkedName(localuser().username),
             roll=rggDice.roll(dice))
         say(text)
+        ICSay(text)
         #c.sendNetMessageToAll(text)
 
 def addMacro():

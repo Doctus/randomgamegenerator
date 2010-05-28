@@ -3,7 +3,7 @@ if __name__ == '__main__':
     from rggSystem import injectMain
     main = injectMain()
     
-    import rggSystem, rggRPC, rggChat, rggViews, rggRemote
+    import rggSystem, rggRPC, rggChat, rggICChat, rggViews, rggRemote
     
     # Initialize view state.
     s = rggViews._state
@@ -19,6 +19,7 @@ if __name__ == '__main__':
     
     # chat widget
     s.cwidget.chatInput.connect(rggChat.chat)
+    s.icwidget.ICChatInput.connect(rggICChat.chat)
     
     # dice widget
     s.dwidget.rollRequested.connect(rggViews.rollDice)

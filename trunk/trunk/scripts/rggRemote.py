@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 import re
 import rggViews, rggRPC
 from rggSystem import translate, fake
-from rggViews import say, announce, linkedName, currentmap, getmap, allmaps
+from rggViews import say, ICSay, announce, linkedName, currentmap, getmap, allmaps
 from rggViews import localhandle,localuser, getuser, allusers, allusersbut, usernames, User
 from rggRPC import clientRPC, serverRPC
 
@@ -48,6 +48,16 @@ def respondSay(username, message):
 @clientRPC
 def sendSay(user, message):
     respondSay(allusers(), user.username, message)
+    
+@serverRPC
+def respondICSay(chname, message):
+    ICSay(translate('remote', '{name}: {sayText}').format(
+        name=linkedName(chname),
+        sayText=message))
+
+@clientRPC
+def sendICSay(user, message, chname):
+    respondICSay(allusers(), chname, message)
 
 @serverRPC
 def respondEmote(username, message):
@@ -59,7 +69,15 @@ def respondEmote(username, message):
 def sendEmote(user, message):
     respondEmote(allusers(), user.username, message)
 
+@serverRPC
+def respondICEmote(chname, message):
+    ICSay(translate('remote', '<i>{name} {emote}</i>').format(
+        name=linkedName(chname),
+        emote=message))
 
+@clientRPC
+def sendICEmote(user, message, chname):
+    respondICEmote(allusers(), chname, message)
 
 @serverRPC
 def respondWhisperSender(target, message):
