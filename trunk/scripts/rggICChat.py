@@ -53,8 +53,8 @@ def squish(message):
     return ''.join(message.split()).lower()
 
 @chat('say', hidden=True)
-def sayChat(message, chname):
-    rggRemote.sendICSay(message, chname)
+def sayChat(message, chname, portrait):
+    rggRemote.sendICSay(message, chname, portrait)
     
 sayChat.documentation = fake.translate('chatdoc', 
     """/say: Say a chat message. You do not need to write this as a command.<dl>
@@ -65,7 +65,7 @@ sayChat.documentation = fake.translate('chatdoc',
     """)
 
 @chat('randomname')
-def randomname(message, chname):
+def randomname(message, chname, portrait):
     if len(message) <= 0:
         ICSay(translate('chat',
             "Syntax: /randomname NAMETYPE. Caps and spaces "
@@ -86,7 +86,7 @@ randomname.documentation = fake.translate('chatdoc',
     """)
 
 @chat('techniquename', 'techname')
-def techname(message, chname):
+def techname(message, chname, portrait):
     rggViews.generateTechnique(message)
 
 techname.documentation = fake.translate('chatdoc', 
@@ -105,7 +105,7 @@ techname.documentation = fake.translate('chatdoc',
     """)
 
 @chat('advice')
-def advice(message, chname):
+def advice(message, chname, portrait):
     rggViews.generateAdvice()
 
 advice.documentation = fake.translate('chatdoc', 
@@ -117,7 +117,7 @@ advice.documentation = fake.translate('chatdoc',
     """)
 
 @chat('roll')
-def roll(message, chname):
+def roll(message, chname, portrait):
     if not message:
         dice = '2d6'
     else:
@@ -137,12 +137,12 @@ roll.documentation = fake.translate('chatdoc',
     """)
 
 @chat('emote', 'me')
-def emote(message, chname):
+def emote(message, chname, portrait):
     if not message:
         ICSay(translate('chat', "Syntax: /me DOES ACTION. Displays '[HANDLE] DOES "
                 "ACTION' in italic font."))
     else:
-        rggRemote.sendICEmote(message, chname)
+        rggRemote.sendICEmote(message, chname, portrait)
 
 emote.documentation = fake.translate('chatdoc',
     """Display an emote in italics.<dl>
@@ -156,7 +156,7 @@ emote.documentation = fake.translate('chatdoc',
     """)
 
 @chat('whisper', 'w', 't', 'tell', 'msg', 'message')
-def whisper(message, chname):
+def whisper(message, chname, portrait):
     if not message:
         ICSay(translate('chat', "Syntax: /whisper HANDLE MESSAGE. Sends a message "
             "only to the specified user. Spaces MUST be correct."
@@ -183,7 +183,7 @@ whisper.documentation = fake.translate('chatdoc',
     </dl><br>
     """)
 
-def chat(st, chname):
+def chat(st, chname, portrait):
     """Parses and executes chat commands."""
     st = unicode(st)
     
@@ -204,7 +204,7 @@ def chat(st, chname):
     #print command, message
     
     if command in chatCommands:
-        chatCommands[command](message, chname)
+        chatCommands[command](message, chname, portrait)
     else:
         if command not in ('help', '?'):
             ICSay(translate('chatdoc', "Invalid command.", 'Unknown chat command name.'))
