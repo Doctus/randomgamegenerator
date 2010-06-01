@@ -44,6 +44,7 @@ IMAGE_FILTER = fake.translate('system', 'Images ({imageList})').format(
     imageList=','.join('*{ext}'.format(ext=ext) for ext in IMAGE_EXTENSIONS))
 TILESET_DIR = 'data/tilesets'
 POG_DIR = 'data/pogs'
+PORTRAIT_DIR = 'data/portraits'
 
 _main = None
 mainWindow = None

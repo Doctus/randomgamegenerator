@@ -340,3 +340,93 @@ class joinDialog(dialog):
         return ConnectionData(self.cleanData['host'], self.cleanData['port'],
             self.cleanData['username'])
     
+class newCharacterDialog(dialog):
+    """A dialog used to create a new character for in-character chat."""
+    
+    def __init__(self, **kwargs):
+        """Initializes the dialog data."""
+        super(newCharacterDialog, self).__init__()
+        self.fields = self._createFields(kwargs)
+    
+    def _createFields(self, data):
+        """Create the fields used by this dialog."""
+        
+        return dict(
+            listid=stringField(
+                translate('newCharacterDialog', 'List ID'),
+                value=data.get('listid', translate('newCharacterDialog', 'New Character'))),
+            charactername=stringField(
+                translate('newCharacterDialog', 'Character Name'),
+                value=data.get('charactername', translate('newCharacterDialog', ''))),
+            portrait=stringField(
+                translate('newCharacterDialog', 'Portrait'),
+                value=data.get('portrait', translate('newCharacterDialog', 'default_portrait_1.png'))))
+    
+    def _interpretFields(self, fields):
+        """Interpret the fields into a dictionary of clean items."""
+        return dict((key, field.clean()) for key, field in fields.items())
+    
+    def exec_(self, parent, accept):
+        """Executes this dialog as modal, ensuring OK is only hit with valid data.
+        
+        parent -- the parent object of this dialog
+        accept() -- Acceptance function;
+            return True to accept data, False to continue (you should show an error)
+        
+        returns: True if the OK button is hit and the acceptance function passes.
+        
+        """
+        
+        widget = QtGui.QDialog(parent)
+        
+        # Buttons
+        okayButton = QtGui.QPushButton(translate('newCharacterDialog', "Create"))
+        okayButton.setDefault(True)
+        cancelButton = QtGui.QPushButton(translate('newCharacterDialog', "Cancel"))
+        
+        # Add fields
+        formLayout = QtGui.QFormLayout()
+        for id in ('listid', 'charactername', 'portrait'):
+            field = self.fields[id]
+            formLayout.addRow(
+                translate('newCharacterDialog', '{0}: ', 'Row layout').format(field.name),
+                field.widget(widget))
+        
+        # Add buttons
+        theLesserOrFalseBox = QtGui.QBoxLayout(0)
+        theLesserOrFalseBox.addWidget(okayButton)
+        theLesserOrFalseBox.addWidget(cancelButton)
+        
+        # Position both
+        grandBox = QtGui.QBoxLayout(2)
+        grandBox.addLayout(formLayout)
+        grandBox.addLayout(theLesserOrFalseBox)
+        
+        # Set up the widget
+        widget.setLayout(grandBox)
+        widget.setModal(True)
+        widget.setWindowTitle(translate('newCharacterDialog', "Create Character"))
+        
+        # Allow user to specify validation
+        def okayPressed():
+            if accept():
+                widget.accept()
+        
+        # Signals
+        widget.connect(okayButton, QtCore.SIGNAL('pressed()'), okayPressed)
+        widget.connect(cancelButton, QtCore.SIGNAL('pressed()'), widget.reject)
+        
+        # Show to user
+        return (widget.exec_() == QtGui.QDialog.Accepted)
+        
+    def clean(self):
+        """Check for errors and return well-formatted data."""
+        self.cleanData = self._interpretFields(self.fields)
+        return self.cleanData
+    
+    def save(self):
+        """Make a new character and return it."""
+        assert(self.cleanData)
+        return([self.cleanData['listid'], 
+                self.cleanData['charactername'], 
+                self.cleanData['portrait']])

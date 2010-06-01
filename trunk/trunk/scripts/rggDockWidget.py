@@ -1,5 +1,6 @@
 from PyQt4 import QtGui, QtCore
 from rggSystem import signal, findFiles, POG_DIR, IMAGE_EXTENSIONS, makePortableFilename
+from rggDialogs import newCharacterDialog
 import os, os.path
 
 class chatLineEdit(QtGui.QLineEdit):
@@ -82,17 +83,23 @@ class ICChatWidget(QtGui.QDockWidget):
         self.widgetEditor.setReadOnly(True)
         self.widgetEditor.setOpenLinks(False)
         self.characterSelector = QtGui.QComboBox(mainWindow)
-        self.characterSelector.addItem("TestRobot")
-        self.characterSelector.addItem("TestDinosaur")
+        self.characterAddButton = QtGui.QPushButton(self.tr("Add New"), mainWindow)
         self.layout = QtGui.QBoxLayout(2)
+        self.layoutni = QtGui.QBoxLayout(1)
         self.layout.addWidget(self.widgetEditor)
         self.layout.addWidget(self.widgetLineInput)
-        self.layout.addWidget(self.characterSelector)
+        self.layoutni.addWidget(self.characterAddButton)
+        self.layoutni.addWidget(self.characterSelector)
+        self.layout.addLayout(self.layoutni)
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
         mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self)
         
+        #TODO: Store and access characters in a better fashion.
+        self.characters = []
+        
         self.widgetLineInput.returnPressed.connect(self.processInput)
+        self.connect(self.characterAddButton, QtCore.SIGNAL('pressed()'), self.newCharacter)
     
     def insertMessage(self, mes):
         self.scroll = (self.widgetEditor.verticalScrollBar().value() ==
@@ -100,22 +107,37 @@ class ICChatWidget(QtGui.QDockWidget):
         self.widgetEditor.append(mes)
         if self.scroll:
             self.widgetEditor.verticalScrollBar().setValue(self.widgetEditor.verticalScrollBar().maximum())
-    
+            
+    def newCharacter(self):
+        dialog = newCharacterDialog()
+        
+        def accept():
+            valid = dialog.is_valid()
+            if not valid:
+                showErrorMessage(dialog.error)
+            return valid
+        
+        if dialog.exec_(self.parentWidget(), accept):
+            newchar = dialog.save()
+            self.characterSelector.addItem(newchar[0])
+            self.characters.append(newchar)
+        
     def processInput(self):
         self.newmes = unicode(self.widgetLineInput.text())
         self.widgetLineInput.clear()
         self.widgetLineInput.addMessage(self.newmes)
         self.ICChatInput.emit(self.newmes,
-                              unicode(self.characterSelector.currentText()))
+                            unicode(self.characters[self.characterSelector.currentIndex()][1]),
+                            unicode(self.characters[self.characterSelector.currentIndex()][2]))
     
-    ICChatInput = signal(basestring, basestring, doc=
+    ICChatInput = signal(basestring, basestring, basestring, doc=
         """Called when in-character chat input is received.
         
         charname -- the character name currently selected
         text -- the message entered
+        portrait -- the portrait path, relative to data/portraits
         
-        """
-    )
+        """)
     
 class diceRoller(QtGui.QDockWidget):
 

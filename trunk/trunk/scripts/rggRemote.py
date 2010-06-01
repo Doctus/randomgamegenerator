@@ -19,9 +19,9 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
-import re
-import rggViews, rggRPC
-from rggSystem import translate, fake
+import re, os
+import rggViews, rggRPC, rggResource
+from rggSystem import translate, fake, makePortableFilename, PORTRAIT_DIR
 from rggViews import say, ICSay, announce, linkedName, currentmap, getmap, allmaps
 from rggViews import localhandle,localuser, getuser, allusers, allusersbut, usernames, User
 from rggRPC import clientRPC, serverRPC
@@ -50,14 +50,21 @@ def sendSay(user, message):
     respondSay(allusers(), user.username, message)
     
 @serverRPC
-def respondICSay(chname, message):
-    ICSay(translate('remote', '{name}: {sayText}').format(
+def respondICSay(chname, message, portrait):
+    if len(portrait) > 1:
+        portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
+        ICSay(translate('remote', '<table><tr><td><img src={port}></td><td>{name}: {sayText}</td></tr></table><br />').format(
+            port=portfile,                                                        
+            name=linkedName(chname),
+            sayText=message))
+    else:
+        ICSay(translate('remote', '{name}: {sayText}</p>').format(                                                       
         name=linkedName(chname),
         sayText=message))
 
 @clientRPC
-def sendICSay(user, message, chname):
-    respondICSay(allusers(), chname, message)
+def sendICSay(user, message, chname, portrait):
+    respondICSay(allusers(), chname, message, portrait)
 
 @serverRPC
 def respondEmote(username, message):
@@ -70,14 +77,22 @@ def sendEmote(user, message):
     respondEmote(allusers(), user.username, message)
 
 @serverRPC
-def respondICEmote(chname, message):
-    ICSay(translate('remote', '<i>{name} {emote}</i>').format(
-        name=linkedName(chname),
-        emote=message))
+def respondICEmote(chname, message, portrait):
+    if len(portrait) > 1:
+        portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
+        ICSay(translate('remote', '<table><tr><td><img src={port}></td><td><i>{name} {emote}</i></td></tr></table><br />').format(
+            port=portfile,                                                                      
+            name=linkedName(chname),
+            emote=message))
+    else:
+        ICSay(translate('remote', '<i>{name} {emote}</i>').format(                                                                    
+            name=linkedName(chname),
+            emote=message))
+        
 
 @clientRPC
-def sendICEmote(user, message, chname):
-    respondICEmote(allusers(), chname, message)
+def sendICEmote(user, message, chname, portrait):
+    respondICEmote(allusers(), chname, message, portrait)
 
 @serverRPC
 def respondWhisperSender(target, message):
