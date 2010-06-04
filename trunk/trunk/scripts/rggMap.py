@@ -42,6 +42,7 @@ class Map(object):
     def addPog(self, pog):
         """Adds a pog to the map, assigning it a unique id."""
         assert(pog.ID is not None)
+        import rggEvent
         #if pog.ID is None:
         #    pog.ID = self._findUniqueID()
         if pog.ID in self.Pogs:
@@ -51,6 +52,7 @@ class Map(object):
             pog.hide()
         else:
             pog.show()
+        rggEvent.pogAddedEvent(pog)
 
     def _findUniqueID(self, src):
         """Get a unique id for a pog."""

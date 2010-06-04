@@ -273,11 +273,13 @@ def pasteTile(position):
 
 def switchMap(map):
     """Switches to the specified map."""
+    import rggEvent
     if _state.currentMap:
         _state.currentMap.hide()
     clearPogSelection()
     clearLines()
     _state.currentMap = map
+    rggEvent.mapChangedEvent(map)
     if _state.currentMap:
         _state.currentMap.show()
         print "Changed to map: {0}".format(_state.currentMap)

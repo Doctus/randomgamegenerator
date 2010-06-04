@@ -3,7 +3,7 @@ if __name__ == '__main__':
     from rggSystem import injectMain
     main = injectMain()
     
-    import rggSystem, rggRPC, rggChat, rggICChat, rggViews, rggRemote
+    import rggSystem, rggRPC, rggChat, rggICChat, rggViews, rggRemote, rggEvent
     
     # Initialize view state.
     s = rggViews._state
@@ -13,13 +13,13 @@ if __name__ == '__main__':
     # amounts to configuration
     
     # mouse events
-    main.mouseMoveSignal.connect(rggViews.mouseMoveResponse)
-    main.mousePressSignal.connect(rggViews.mousePressResponse)
-    main.mouseReleaseSignal.connect(rggViews.mouseReleaseResponse)
+    main.mouseMoveSignal.connect(rggEvent.mouseMoveEvent)
+    main.mousePressSignal.connect(rggEvent.mousePressEvent)
+    main.mouseReleaseSignal.connect(rggEvent.mouseReleaseEvent)
     
     # chat widget
-    s.cwidget.chatInput.connect(rggChat.chat)
-    s.icwidget.ICChatInput.connect(rggICChat.chat)
+    s.cwidget.chatInput.connect(rggEvent.chatInputEvent)
+    s.icwidget.ICChatInput.connect(rggEvent.ICChatInputEvent)
     
     # dice widget
     s.dwidget.rollRequested.connect(rggViews.rollDice)
