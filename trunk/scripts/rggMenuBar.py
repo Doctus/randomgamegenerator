@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 from PyQt4 import QtGui, QtCore
 from rggSystem import translate, mainWindow
+import sys, os
 
 ICON_SELECT = 0
 ICON_MOVE = 1
@@ -63,6 +64,19 @@ class menuBar(object):
         self.thicknessTwoAct = QtGui.QAction("&Two", main)
         self.thicknessThreeAct = QtGui.QAction("&Three", main)
         
+        self.pluginsActs = []
+        self.pluginsModules = []
+        self.pluginsInits = []
+        sys.path.append('plugins')
+        for folder in os.listdir('plugins'):
+                if folder == ".svn":
+                        continue
+                self.pluginsActs.append(QtGui.QAction(unicode(folder), main))
+                self.pluginsModules.append(__import__(folder))
+                self.pluginsModules[-1].initialize(main)
+                self.pluginsInits.append(self.pluginsModules[-1].hajimeru)
+                self.pluginsActs[-1].triggered.connect(self.pluginsInits[-1])
+        
         selectIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-select-icon.png"), "Select Tool", main)
         selectIcon.setShortcut("Ctrl+T");
         selectIcon.setToolTip("Select Tool (Ctrl+T)");
@@ -99,13 +113,18 @@ class menuBar(object):
 
         drawMenu = QtGui.QMenu("&Draw", main)
         drawMenu.addMenu(thicknessMenu)
-
+        
+        pluginsMenu = QtGui.QMenu("&Plugins", main)
+        for act in self.pluginsActs:
+                print act
+                pluginsMenu.addAction(act)
         
         # MENUBAR
 
         menubar.addMenu(fileMenu)
         menubar.addMenu(internetMenu)
         menubar.addMenu(drawMenu)
+        menubar.addMenu(pluginsMenu)
         menubar.addSeparator()
         menubar.addAction(selectIcon)
         menubar.addAction(moveIcon)
