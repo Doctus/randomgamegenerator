@@ -133,7 +133,7 @@ class clientResourceMapper(object):
         # Avoid the loop unless there's been an actual change
         oldstatus = self._status[filename]
         exists = fileExists(filename)
-        
+
         #if oldstatus != status or exists != self._exists[filename]:
         self._status[filename] = status
         self._exists[filename] = exists
@@ -157,9 +157,10 @@ class clientResourceMapper(object):
             return RESOURCE_INVALID[kind]
         # Use old data so we don't have to check
         # the file system or broadcast each time
-        if self._exists[filename]:
+        '''if self._exists[filename]:
             return filename
-        return RESOURCE_LOADING[kind]
+        return RESOURCE_LOADING[kind]'''
+        return filename
     
     def _makeResponse(self, kind, callback):
         # array is replacement for nonlocal keyword
