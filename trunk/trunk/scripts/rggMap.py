@@ -120,7 +120,13 @@ class Map(object):
         t = x + self.mapsize[0] * y
         self.tileindexes[t] = index
         if not self.hidden:
-            self.tiles[t].setTile(self.tileindexes[t])
+            self.tiles[t].destroy()
+            self.tiles[t] = (
+                rggTile.tile((x * self.tilesize[0], y * self.tilesize[1]),
+                    self.tilesize,
+                    self.tileindexes[t],
+                    0,
+                    self.tileset))
     
     def _setIndexes(self, indexes):
         if len(indexes) != len(self.tileindexes):
