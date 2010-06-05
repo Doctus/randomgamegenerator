@@ -188,6 +188,9 @@ class Map(object):
             map.addPog(loaded)
 
         lines = loadArray('Map.lines', obj.get('lines'))
+        map.lines = []
+        for line in lines:
+            map.lines.append(loadCoordinates('Map.lines[]', line))
         
         # HACK: Looks like coordinates; saves work.
         tiles = loadCoordinates('Map.tiles', obj.get('tiles'), length=len(map.tileindexes), min=0, max=65535)
