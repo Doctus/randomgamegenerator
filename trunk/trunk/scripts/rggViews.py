@@ -362,8 +362,7 @@ def respondMapUpdate(ID, mapDump):
     map.ID = ID
     existed = (ID in _state.Maps)
     _state.Maps[ID] = map
-    #if (not _state.currentMap) or (_state.currentMap.ID == ID):
-    if not existed:
+    if not existed or (_state.currentMap and _state.currentMap.ID == ID):
         switchMap(map)
 
 @clientRPC
