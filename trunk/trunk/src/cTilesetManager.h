@@ -49,6 +49,7 @@ class cTilesetManager
 
     cTileset* findTileset(int id);
     cTileset* findTileset(string filename);
+    vector<cTileset*> findTilesets(string filename);
 
     int getTilesetId(string filename);
 

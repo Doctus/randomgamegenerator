@@ -88,12 +88,42 @@ cTileset* cTilesetManager::findTileset(string filename)
     return NULL; //exception?
 }
 
+vector<cTileset*> cTilesetManager::findTilesets(string filename)
+{
+    vector<cTileset*> sets;
+
+    for(unsigned int i = 0; i < tilesets.size(); i++)
+    {
+        if(tilesets[i]->getFilename() == filename)
+            sets.push_back(tilesets[i]);
+    }
+
+    return sets; //exception?
+}
+
 
 void cTilesetManager::addImage(bImage* img, int layer)
 {
-    cTileset *set = findTileset(img->getFilename().toStdString());
+    vector<cTileset*> sets = findTilesets(img->getFilename().toStdString());
+    cTileset* set = NULL;
+    bool triedSetting = false;
 
-    if(set == NULL)
+    if(sets.size() == 0)
+    {
+        set = loadTileset(img->getW(), img->getH(), img->getFilename().toStdString()); //this can still return NULL.
+        triedSetting = true;
+    }
+    else
+    {
+        for(unsigned i = 0; i < sets.size(); i++)
+        {
+            cTileset* tempset = sets[i];
+            if(tempset->getTileWidth() == img->getW() || tempset->getTileHeight() == img->getH())
+                set = tempset;
+        }
+    }
+
+    if(set == NULL && !triedSetting)
         set = loadTileset(img->getW(), img->getH(), img->getFilename().toStdString()); //this can still return NULL.
 
     if(set != NULL)
