@@ -64,8 +64,8 @@ class bMain : public QObject
     void setCam(int x, int y);
     void adjustCam(int x, int y);
 
-    void changeImage(QString oldFilename, QString newFilename);
-    int getTileCountOfImage(QString filename);
+    void changeImage(QString oldFilename, QString newFilename, int tileWidth, int tileHeight);
+    int getTileCountOfImage(QString filename, int tileWidth, int tileHeight);
 
     void addLine(int x, int y, int w, int h, int thickness);
     void deleteLine(int x, int y, int w, int h, int thickness = -1);
