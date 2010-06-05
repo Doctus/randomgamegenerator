@@ -48,10 +48,10 @@ class cTilesetManager
     void removeTileset(int id);
 
     cTileset* findTileset(int id);
-    cTileset* findTileset(string filename);
+    cTileset* findTileset(string filename, int tileWidth, int tileHeight);
     vector<cTileset*> findTilesets(string filename);
 
-    int getTilesetId(string filename);
+    int getTilesetId(string filename, int tileWidth, int tileHeight);
 
     void addImage(bImage *img, int layer);
     void removeImage(bImage *img, int layer);
@@ -59,8 +59,8 @@ class cTilesetManager
     bool changeTileOfImage(bImage *img, int tile);
     void changeLayerOfImage(bImage *img, int oldLayer, int newLayer);
 
-    void changeImage(QString oldFilename, QString newFilename);
-    void changeImage(string oldFilename,  string newFilename);
+    void changeImage(QString oldFilename, QString newFilename, int tileWidth, int tileHeight);
+    void changeImage(string oldFilename,  string newFilename, int tileWidth, int tileHeight);
 
     vector< vector<bImage*> > getImages();
 

@@ -195,14 +195,14 @@ void bMain::adjustCam(int x, int y)
 }
 
 
-void bMain::changeImage(QString oldFilename, QString newFilename)
+void bMain::changeImage(QString oldFilename, QString newFilename, int tileWidth, int tileHeight)
 {
-    mainGame->mTilesetManager->changeImage(oldFilename, newFilename);
+    mainGame->mTilesetManager->changeImage(oldFilename, newFilename, tileWidth, tileHeight);
 }
 
-int bMain::getTileCountOfImage(QString filename)
+int bMain::getTileCountOfImage(QString filename, int tileWidth, int tileHeight)
 {
-    cTileset *set = mainGame->mTilesetManager->findTileset(filename.toStdString());
+    cTileset *set = mainGame->mTilesetManager->findTileset(filename.toStdString(), tileWidth, tileHeight);
 
     if(set != NULL)
         return set->getHighestTile();

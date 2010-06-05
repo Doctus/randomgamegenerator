@@ -29,7 +29,11 @@ cTilesetManager::cTilesetManager(wGLWidget *mGLWidget)
 cTileset* cTilesetManager::loadTileset(int tileWidth, int tileHeight, string filename)
 {
     id++;
-    cTileset* set = NULL;
+    cTileset* set = findTileset(filename, tileWidth, tileHeight);
+
+    if(set != NULL)
+        return set;
+
     try
     {
         set = new cTileset(id, mGLWidget, tileWidth, tileHeight, filename);
@@ -39,6 +43,7 @@ cTileset* cTilesetManager::loadTileset(int tileWidth, int tileHeight, string fil
     {
         id--;
     }
+
     return set;
 }
 
@@ -67,9 +72,9 @@ cTileset* cTilesetManager::findTileset(int id)
     return tilesets[pos]; //exception?
 }
 
-int cTilesetManager::getTilesetId(string filename)
+int cTilesetManager::getTilesetId(string filename, int tileWidth, int tileHeight)
 {
-    cTileset *set = findTileset(filename);
+    cTileset *set = findTileset(filename, tileWidth, tileHeight);
 
     if(set != NULL)
         return set->getId();
@@ -77,11 +82,11 @@ int cTilesetManager::getTilesetId(string filename)
     return -1;
 }
 
-cTileset* cTilesetManager::findTileset(string filename)
+cTileset* cTilesetManager::findTileset(string filename, int tileWidth, int tileHeight)
 {
     for(unsigned int i = 0; i < tilesets.size(); i++)
     {
-        if(tilesets[i]->getFilename() == filename)
+        if(tilesets[i]->getFilename() == filename && tilesets[i]->getTileWidth() == tileWidth && tilesets[i]->getTileHeight() == tileHeight)
             return tilesets[i];
     }
 
@@ -153,11 +158,11 @@ void cTilesetManager::removeImage(bImage* img, int layer)
 
 bool cTilesetManager::changeTileOfImage(bImage *img, int tile)
 {
-    cTileset *set = findTileset(img->getFilename().toStdString());
+    cTileset *set = findTileset(img->getFilename().toStdString(), img->getW(), img->getH());
 
     if(set != NULL)
     {
-        if(tile <= set->getHighestTile())
+        if(tile > set->getHighestTile())
             img->setTextureId(set->getTextureId(0));
         else
             img->setTextureId(set->getTextureId(tile));
@@ -176,14 +181,14 @@ void cTilesetManager::changeLayerOfImage(bImage *img, int oldLayer, int newLayer
     images[newLayer].push_back(img);
 }
 
-void cTilesetManager::changeImage(QString oldFilename, QString newFilename)
+void cTilesetManager::changeImage(QString oldFilename, QString newFilename, int tileWidth, int tileHeight)
 {
-    changeImage(oldFilename.toStdString(), newFilename.toStdString());
+    changeImage(oldFilename.toStdString(), newFilename.toStdString(), tileWidth, tileHeight);
 }
 
-void cTilesetManager::changeImage(string oldFilename, string newFilename)
+void cTilesetManager::changeImage(string oldFilename, string newFilename, int tileWidth, int tileHeight)
 {
-    cTileset *set = findTileset(oldFilename); //This needs to be changed everywhere, to accomodate for UTF-8 T_T?
+    cTileset *set = findTileset(oldFilename, tileWidth, tileHeight); //This needs to be changed everywhere, to accomodate for UTF-8 T_T?
 
     if(set != NULL)
     {

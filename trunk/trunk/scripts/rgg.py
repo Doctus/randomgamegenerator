@@ -1,4 +1,3 @@
-
 if __name__ == '__main__':
     from rggSystem import injectMain
     main = injectMain()
