@@ -188,11 +188,6 @@ class Map(object):
             map.addPog(loaded)
 
         lines = loadArray('Map.lines', obj.get('lines'))
-        for line in lines:
-            x, y, w, h, t = loadCoordinates('Map.lines[]', line)
-            rggSystem.drawLine(x, y, w, h, t)
-
-        map.storeLines()
         
         # HACK: Looks like coordinates; saves work.
         tiles = loadCoordinates('Map.tiles', obj.get('tiles'), length=len(map.tileindexes), min=0, max=65535)
