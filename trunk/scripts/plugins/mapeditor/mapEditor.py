@@ -3,11 +3,11 @@ import rggEvent, rggViews, rggPog, rggSystem
 
 class mapEditorLabel(QtGui.QLabel):
     
-    def __init__(self, tilesize, width):
+    def __init__(self, tilesize, width, currentTile=0):
         super(QtGui.QLabel, self).__init__()
         self.tilex, self.tiley = tilesize
         self.wrap = width / self.tilex
-        self.currentTile = 0
+        self.currentTile = currentTile
     
     def mousePressEvent(self, ev):
         self.currentTile = (ev.x()/self.tilex) + (ev.y()/self.tiley)*self.wrap
@@ -24,6 +24,7 @@ class mapEditor(QtGui.QDockWidget):
         self.layout = QtGui.QBoxLayout(2)
         self.scrollarea = QtGui.QScrollArea(mainWindow)
         self.layout.addWidget(self.scrollarea)
+        self.tilelabel = None
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
         mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, self)
@@ -39,7 +40,6 @@ class mapEditor(QtGui.QDockWidget):
         if self.isVisible():
             clickedtile = ((rggSystem.cameraPosition()[0] + x) / self.tilelabel.tilex,
                            (rggSystem.cameraPosition()[1] + y) / self.tilelabel.tiley)
-            print "modifying tile at " + str(clickedtile) + " to tile index " + str(self.tilelabel.currentTile)
             rggViews._state.currentMap.setTile(clickedtile, self.tilelabel.currentTile)
             rggViews.modifyCurrentMap()
             rggEvent.setEaten()
@@ -52,7 +52,10 @@ class mapEditor(QtGui.QDockWidget):
         if newMap != None:
             self.tilepixmap = QtGui.QPixmap()
             self.tilepixmap.load(newMap.tileset)
-            self.tilelabel = mapEditorLabel(newMap.tilesize, self.tilepixmap.width())
+            if self.tilelabel is None:
+                self.tilelabel = mapEditorLabel(newMap.tilesize, self.tilepixmap.width())
+            else:
+                self.tilelabel = mapEditorLabel(newMap.tilesize, self.tilepixmap.width(), self.tilelabel.currentTile)
             self.tilelabel.setPixmap(self.tilepixmap)
             self.scrollarea.setWidget(self.tilelabel)
 
