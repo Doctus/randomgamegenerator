@@ -494,16 +494,20 @@ def clearLines():
 
 # DICE
 
-def rollDice(dice):
+def rollDice(dice, private=False):
     """Rolls the specified dice."""
     if not rggDice.isRollValid(dice):
         say(translate('views', "Invalid dice roll. See /roll documentation for help."))
     else:
+        import rggRemote
         text = translate('views', "{name} rolls {roll}").format(
             name=linkedName(localuser().username),
             roll=rggDice.roll(dice))
-        say(text)
-        ICSay(text)
+        if private:
+            say(text)
+            ICSay(text)
+        else:
+            rggRemote.sendDice(text)
         #c.sendNetMessageToAll(text)
 
 def addMacro():

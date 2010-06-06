@@ -237,7 +237,7 @@ def chat(st):
     """Parses and executes chat commands."""
     st = unicode(st)
     
-    if (len(st) <= 0) or ('title=' in st):
+    if (len(st) <= 0):
         return
     if ('<' in st and '>' not in st) or ('<' in st and '>' in st and '<' in str(st)[str(st).rfind('>'):]):
         say(translate('chat', "Please type &#38;#60; if you wish to include &#60; in your message."))
