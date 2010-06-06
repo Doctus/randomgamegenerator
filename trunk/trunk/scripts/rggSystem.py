@@ -141,6 +141,9 @@ def displayTooltip(text, position):
 def showPopupMenuAt(position, choices):
     return _main.showPopupMenuAt(position[0], position[1], choices)
 
+def showPopupMenuAtAbs(position, choices):
+    return _main.showPopupMenuAtAbs(position[0], position[1], choices)
+
 def promptString(prompt, title=translate('system', "Input", 'default string prompt title')):
     text, ok = QtGui.QInputDialog.getText(mainWindow, title, prompt)
     if not ok:

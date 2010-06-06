@@ -25,18 +25,20 @@ class pogListWidget(QtGui.QListWidget):
         QtGui.QListWidget.__init__(self)
 
     def mousePressEvent(self, event): #listwidget generated events
-        pos = QtGui.QCursor.pos()
+        pos = event.globalPos()
         x = pos.x()
         y = pos.y()
         item = self.itemAt(event.x(), event.y())
 
         if item is not None and event.button() == QtCore.Qt.RightButton:
             event.accept()
-            selection = rggSystem.showPopupMenuAt([x, y], ['center'])
+            selection = rggSystem.showPopupMenuAtAbs([x, y], ['center'])
             if selection == 0:
                 camsiz = rggSystem.cameraSize()
                 pospog = item.getPog().position
-                newpos = (pospog[0] - camsiz[0]/2, pospog[1] - camsiz[1]/2)
+                pogw = item.getPog()._tile.getW()
+                pogh = item.getPog()._tile.getH()
+                newpos = (pospog[0] - camsiz[0]/2 + pogw/2, pospog[1] - camsiz[1]/2 + pogh/2)
                 rggSystem.setCameraPosition(newpos)
         else:
             super(QtGui.QListWidget, self).mousePressEvent(event)
