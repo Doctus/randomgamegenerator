@@ -1,17 +1,22 @@
 import rggViews, rggChat, rggICChat
 
+# Globals
+
 _eaten = False
 _mouseMoveListeners = []
 _mousePressListeners = []
 _mouseReleaseListeners = []
 _chatInputListeners = []
 _ICChatInputListeners = []
-_pogAddedListeners = []
+_pogUpdateListeners = []
+_pogSelectionChangedListeners = []
 _mapChangedListeners = []
 
 def setEaten():
   global _eaten
   _eaten = True
+
+# Add listener functions
 
 def addMouseMoveListener(listener):
   _mouseMoveListeners.append(listener)
@@ -28,10 +33,16 @@ def addChatInputListener(listener):
 def addICChatInputListener(listener):
   _ICChatInputListeners.append(listener)
 
-def addPogAddedListener(listener):
-  _pogAddedListeners.append(listener)
+def addPogUpdateListener(listener):
+  _pogUpdateListeners.append(listener)
+
+def addPogSelectionChangedListener(listener):
+  _pogSelectionChangedListeners.append(listener)
+
 def addMapChangedListener(listener):
   _mapChangedListeners.append(listener)
+
+# Event functions
 
 def mouseMoveEvent(x, y):
   global _eaten
@@ -83,9 +94,13 @@ def ICChatInputEvent(st, chname, portrait):
   if not _eaten:
     rggICChat.chat(st, chname, portrait)
 
-def pogAddedEvent(pog):
-  for listener in _pogAddedListeners:
-    listener.pogAddedResponse(pog)
+def pogUpdateEvent(pog): #may either add a new pog, or update an existing one. Beware.
+  for listener in _pogUpdateListeners:
+    listener.pogUpdateResponse(pog)
+
+def pogSelectionChangedEvent():
+  for listener in _pogSelectionChangedListeners:
+    listener.pogSelectionChangedResponse()
 
 def mapChangedEvent(newMap):
   for listener in _mapChangedListeners:
