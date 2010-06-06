@@ -66,9 +66,6 @@ class _state(object):
     mouseButton = None
     mousePosition = (0, 0)
     
-    tilePasting = False
-    tilePastingIndex = 0
-    
     pogPlacement = False
     pogPath = "path"
 
@@ -261,15 +258,6 @@ def createMapID(mapname):
 
 def modifyCurrentMap():
     sendMapUpdate(currentmap().ID, currentmap().dump())
-
-def pasteTile(position):
-    """Pastes a tile at a designated position."""
-    # TODO: RPC that just sends a tile instead of the whole map.
-    if not currentmap():
-        return
-    tile = map(lambda p, d: p // d, position, currentmap().tilesize)
-    currentmap().setTile(tile, _state.tilePastingIndex)
-    modifyCurrentMap()
 
 def switchMap(map):
     """Switches to the specified map."""
@@ -558,8 +546,6 @@ def reportCamera():
 def mouseDrag(screenPosition, mapPosition, displacement):
     if _state.pogSelection:
         movePogs(displacement)
-    elif _state.tilePasting and currentmap():
-        pasteTile(mapPosition)
 
 def mouseMove(screenPosition, mapPosition, displacement):
     icon = _state.menu.selectedIcon
@@ -597,14 +583,32 @@ def mousePress(screenPosition, mapPosition, button):
     
     if currentmap() is None:
         return
-
+    
     import rggEvent
     
     icon = _state.menu.selectedIcon
     if icon == ICON_MOVE:
         return
     if icon == ICON_SELECT:
-        if button == BUTTON_LEFT or button == BUTTON_LEFT + BUTTON_CONTROL:
+        if button == BUTTON_LEFT + BUTTON_CONTROL:
+            if _state.pogPlacement:
+                infograb = QtGui.QPixmap(_state.pogPath)
+                pog = rggPog.Pog(
+                    mapPosition,
+                    (infograb.width(), infograb.height()),
+                    1,
+                    _state.pogPath)
+                createPog(currentmap(), pog)
+                return
+            pog = currentmap().findTopPog(mapPosition)
+            if not pog:
+                return
+            if pog in _state.pogSelection:
+                _state.pogSelection.remove(pog)
+            else:
+                _state.pogSelection.add(pog)
+            rggEvent.pogSelectionChangedEvent()
+        elif button == BUTTON_LEFT:
             if _state.pogPlacement:
                 _state.pogPlacement = False
                 infograb = QtGui.QPixmap(_state.pogPath)
@@ -615,13 +619,6 @@ def mousePress(screenPosition, mapPosition, button):
                     _state.pogPath)
                 createPog(currentmap(), pog)
                 return
-            elif _state.tilePasting:
-                tile = map(lambda p, s: p // s, mapPosition, _state.currentMap.tilesize)
-                currentmap().setTile(tile, _state.tilePastingIndex)
-                modifyCurrentMap()
-                return
-        
-        if button == BUTTON_LEFT:
             pog = _state.currentMap.findTopPog(mapPosition)
             if pog not in _state.pogSelection:
                 _state.pogSelection = set()
@@ -629,24 +626,6 @@ def mousePress(screenPosition, mapPosition, button):
                 return
             _state.pogSelection.add(pog)
             rggEvent.pogSelectionChangedEvent()
-        elif button == BUTTON_LEFT + BUTTON_CONTROL:
-            pog = currentmap().findTopPog(mapPosition)
-            if not pog:
-                return
-            if pog in _state.pogSelection:
-                _state.pogSelection.remove(pog)
-            else:
-                _state.pogSelection.add(pog)
-            rggEvent.pogSelectionChangedEvent()
-        #Was this duplicated for a reason? I don't see any.
-        #elif button == BUTTON_LEFT + BUTTON_CONTROL:
-        #    pog = currentmap().findTopPog(mapPosition)
-        #    if not pog:
-        #        return
-        #    if pog in _state.pogSelection:
-        #        _state.pogSelection.remove(pog)
-        #    else:
-        #        _state.pogSelection.add(pog)
         elif button == BUTTON_RIGHT:
             pog = currentmap().findTopPog(mapPosition)
             if pog is not None:
@@ -679,16 +658,12 @@ def mousePress(screenPosition, mapPosition, button):
                         selectedPog.layer = newlayer
                         modifyPog(currentmap(), pog)
             else:
-                if not _state.tilePasting:
-                    selected = showPopupMenuAt(
+                pass
+                #Keeping so we don't have to look up the syntax when adding a real command.
+                '''selected = showPopupMenuAt(
                         screenPosition,
                         [translate('views', "Create Pog (Temp Command)"),
                             translate('views', "Begin Tile Pasting (Temp Command)")])
-                else:
-                    selected = showPopupMenuAt(
-                        screenPosition,
-                        [translate('views', "Create Pog (Temp Command)"),
-                            translate('views', "Cease Tile Pasting (Temp Command)")])
                 if selected == 0:
                     src = promptLoadFile(translate('views', "Load Pog"), IMAGE_FILTER)
                     if src is None:
@@ -698,18 +673,7 @@ def mousePress(screenPosition, mapPosition, button):
                     if size is None:
                         return
                     pog = rgg.Pog(mapPosition, size, 1, src)
-                    createPog(currentmap(), pog)
-                elif selected == 1:
-                    if not _state.tilePasting:
-                        _state.tilePasting = True
-                        tile = map(lambda p, c: p // c, mapPosition, _state.currentMap.tilesize)
-                        _state.tilePastingIndex = _state.currentMap.getTile(tile)
-                    else:
-                        _state.tilePasting = False
-        #elif button == BUTTON_MIDDLE: #DEBUG STUFF
-        #    Maps[currentMap[0]].debugMorphTile([(x+c.getCamX())/Maps[currentMap[0]].tilesize[0], (y+c.getCamY())/Maps[currentMap[0]].tilesize[1]], c.getTileCountOfImage(Maps[currentMap[0]].tileset))
-
-        #endif icon == ICON_SELECT
+                    createPog(currentmap(), pog)'''
     elif icon == ICON_DRAW:
         if button == BUTTON_LEFT:
             _state.previousLinePlacement = mapPosition
