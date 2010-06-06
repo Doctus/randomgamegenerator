@@ -40,6 +40,17 @@ def respondError(message, *args, **kwargs):
     say(translate('error', message).format(*args, **kwargs))
 
 @serverRPC
+def respondDice(username, message):
+    say(translate('remote', '{sayText}').format(
+        sayText=message))
+    ICSay(translate('remote', '{sayText}').format(                                                       
+        sayText=message))
+        
+@clientRPC
+def sendDice(user, message):
+    respondDice(allusers(), user.username, message)
+
+@serverRPC
 def respondSay(username, message):
     say(translate('remote', '{name}: {sayText}').format(
         name=linkedName(username),
