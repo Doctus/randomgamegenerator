@@ -140,6 +140,24 @@ int bMain::showPopupMenuAt(int x, int y, QVector<QString> actionTexts)
     return selectedAction->getId();
 }
 
+int bMain::showPopupMenuAtAbs(int x, int y, QVector<QString> actionTexts)
+{
+    QMenu *popup = new QMenu((QWidget*)mainGame->parent());
+    int idCounter = 0;
+
+    foreach(QString str, actionTexts)
+    {
+        popup->addAction(new wAction(str, (QWidget*)mainGame->parent(), idCounter++));
+    }
+
+    wAction *selectedAction = (wAction*)popup->exec(QPoint(x, y));
+
+    if(selectedAction == 0)
+        return -1;
+
+    return selectedAction->getId();
+}
+
 void bMain::displayTooltip(QString text, int x, int y)
 {
     QWidget *w = (QWidget*)mainGame->parent();

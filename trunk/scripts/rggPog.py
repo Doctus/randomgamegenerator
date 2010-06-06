@@ -16,7 +16,7 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
-import rggTile, rggResource
+import rggTile, rggResource, rggSystem
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
 class Pog(object):
@@ -114,6 +114,7 @@ class Pog(object):
     
     def _updateSrc(self, crm, filename, translation):
         if filename == self._src and self._tile:
+            #rggSystem.reloadImage(filename, self.dimensions[0], self.dimensions[1])
             self._tile = self._makeTile()
     
     def dump(self):

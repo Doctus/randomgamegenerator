@@ -175,7 +175,7 @@ class clientResourceMapper(object):
     def _onFileReceived(self, client, filename):
         """Responds to a file being successfully transferred."""
         # HACK: Using reload image on not-necessarily-image files
-        reloadImage(filename)
+        #reloadImage(filename)
         self._update(filename, STATE_READY)
     
     def _onFileFailed(self, client, filename):
