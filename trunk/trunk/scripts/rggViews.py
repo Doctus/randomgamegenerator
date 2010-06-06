@@ -597,6 +597,8 @@ def mousePress(screenPosition, mapPosition, button):
     
     if currentmap() is None:
         return
+
+    import rggEvent
     
     icon = _state.menu.selectedIcon
     if icon == ICON_MOVE:
@@ -626,6 +628,7 @@ def mousePress(screenPosition, mapPosition, button):
             if not pog:
                 return
             _state.pogSelection.add(pog)
+            rggEvent.pogSelectionChangedEvent()
         elif button == BUTTON_LEFT + BUTTON_CONTROL:
             pog = currentmap().findTopPog(mapPosition)
             if not pog:
@@ -634,6 +637,7 @@ def mousePress(screenPosition, mapPosition, button):
                 _state.pogSelection.remove(pog)
             else:
                 _state.pogSelection.add(pog)
+            rggEvent.pogSelectionChangedEvent()
         #Was this duplicated for a reason? I don't see any.
         #elif button == BUTTON_LEFT + BUTTON_CONTROL:
         #    pog = currentmap().findTopPog(mapPosition)

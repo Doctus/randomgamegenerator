@@ -29,9 +29,21 @@ class pogListWidget(QtGui.QListWidget):
         x = pos.x()
         y = pos.y()
         item = self.itemAt(event.x(), event.y())
+        event.accept()
 
-        if item is not None and event.button() == QtCore.Qt.RightButton:
-            event.accept()
+        if item is None:
+            return
+
+        if event.button == QtCore.Qt.LeftButton:
+            if item.isSelected():
+                rggViews._state.pogSelection.remove(item.getPog())
+                item.setSelected(False)
+                print 'pog', item.getPog().ID, 'deselected'
+            else:
+                rggViews._state.pogSelection.add(item.getPog())
+                item.setSelected(True)
+                print 'pog', item.getPog().ID, 'selected'
+        elif event.button() == QtCore.Qt.RightButton:
             selection = rggSystem.showPopupMenuAtAbs([x, y], ['center'])
             if selection == 0:
                 camsiz = rggSystem.cameraSize()
@@ -40,8 +52,6 @@ class pogListWidget(QtGui.QListWidget):
                 pogh = item.getPog()._tile.getH()
                 newpos = (pospog[0] - camsiz[0]/2 + pogw/2, pospog[1] - camsiz[1]/2 + pogh/2)
                 rggSystem.setCameraPosition(newpos)
-        else:
-            super(QtGui.QListWidget, self).mousePressEvent(event)
 
 class pogWidget(QtGui.QDockWidget):
 
@@ -55,11 +65,13 @@ class pogWidget(QtGui.QDockWidget):
 
         currentMap = rggViews._state.currentMap
         self.mapChangedResponse(currentMap)
+        self.pogSelectionChangedResponse()
 
-        rggEvent.addPogAddedListener(self)
+        rggEvent.addPogUpdateListener(self)
         rggEvent.addMapChangedListener(self)
+        rggEvent.addPogSelectionChangedListener(self)
         
-    def pogAddedResponse(self, pog):
+    def pogUpdateResponse(self, pog):
         for x in xrange(self.listWidget.count()):
             if self.listWidget.item(x).getPog().ID == pog.ID:
                 self.listWidget.item(x).setPog(pog)
@@ -67,11 +79,26 @@ class pogWidget(QtGui.QDockWidget):
 
         self.listWidget.addItem(pogItem(pog))
 
+    def pogSelectionChangedResponse(self):
+        selectedPogs = rggViews._state.pogSelection
+        print 'selectedPogs:', selectedPogs
+
+        for x in xrange(self.listWidget.count()):
+            item = self.listWidget.item(x)
+            print 'item:', item.getPog()
+            if item.getPog() in selectedPogs:
+                item.setSelected(True)
+                print 'pog', item.getPog().ID, 'selected'
+            else:
+                item.setSelected(False)
+                print 'pog', item.getPog().ID, 'deselected'
+
+
     def mapChangedResponse(self, newMap):
         self.listWidget.clear()
         if newMap != None:
             for pog in newMap.Pogs:
-                self.pogAddedResponse(newMap.Pogs[pog])
+                self.pogUpdateResponse(newMap.Pogs[pog])
 
 def hajimaru(mainwindow):
     widget = pogWidget(mainwindow)

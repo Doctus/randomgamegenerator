@@ -52,7 +52,7 @@ class Map(object):
             pog.hide()
         else:
             pog.show()
-        rggEvent.pogAddedEvent(pog)
+        rggEvent.pogUpdateEvent(pog)
 
     def _findUniqueID(self, src):
         """Get a unique id for a pog."""
