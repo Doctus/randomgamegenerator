@@ -208,6 +208,9 @@ def findFiles(dir, extensions):
 def cameraPosition():
     return (_main.getCamX(), _main.getCamY())
 
+def cameraSize():
+    return (_main.getCamW(), _main.getCamH())
+
 def setCameraPosition(position):
     _main.setCam(position[0], position[1])
 

@@ -1,5 +1,5 @@
 from PyQt4 import QtCore, QtGui
-import rggEvent, rggViews, rggPog
+import rggEvent, rggViews, rggPog, rggSystem
 
 class pogItem(QtGui.QListWidgetItem):
 
@@ -19,13 +19,35 @@ class pogItem(QtGui.QListWidgetItem):
           name += " (hidden)"
         self.setText(name)
 
+class pogListWidget(QtGui.QListWidget):
+
+    def __init__(self, parent):
+        QtGui.QListWidget.__init__(self)
+
+    def mousePressEvent(self, event): #listwidget generated events
+        pos = QtGui.QCursor.pos()
+        x = pos.x()
+        y = pos.y()
+        item = self.itemAt(event.x(), event.y())
+
+        if item is not None and event.button() == QtCore.Qt.RightButton:
+            event.accept()
+            selection = rggSystem.showPopupMenuAt([x, y], ['center'])
+            if selection == 0:
+                camsiz = rggSystem.cameraSize()
+                pospog = item.getPog().position
+                newpos = (pospog[0] - camsiz[0]/2, pospog[1] - camsiz[1]/2)
+                rggSystem.setCameraPosition(newpos)
+        else:
+            super(QtGui.QListWidget, self).mousePressEvent(event)
+
 class pogWidget(QtGui.QDockWidget):
 
     def __init__(self, mainWindow):
         super(QtGui.QDockWidget, self).__init__(mainWindow)
 
         self.setWindowTitle(self.tr("Pogs"))
-        self.listWidget = QtGui.QListWidget(mainWindow)
+        self.listWidget = pogListWidget(mainWindow)
         self.setWidget(self.listWidget)
         mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, self)
 
