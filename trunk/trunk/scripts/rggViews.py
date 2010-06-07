@@ -363,6 +363,26 @@ def sendMapUpdate(user, ID, mapDump):
         rggResource.srm.processFile(user, pogDump['src'])
     respondMapUpdate(allusers(), ID, mapDump)
 
+'''@serverRPC
+def respondTileUpdate(ID, mapDump):
+    """Creates or updates the map with the given ID."""
+    map = rggMap.Map.load(mapDump)
+    map.ID = ID
+    existed = (ID in _state.Maps)
+    _state.Maps[ID] = map
+    if not existed or (_state.currentMap and _state.currentMap.ID == ID):
+        switchMap(map)
+
+@clientRPC
+def sendTileUpdate(user, ID, mapDump):
+    """Creates or updates the specified map."""
+    if not getmap(ID):
+        ID = createMapID(mapDump['mapname'])
+    rggResource.srm.processFile(user, mapDump['tileset'])
+    for pogDump in mapDump['pogs'].values():
+        rggResource.srm.processFile(user, pogDump['src'])
+    respondMapUpdate(allusers(), ID, mapDump)'''
+
 @serverRPC
 def respondMapSwitch(ID, handle):
     map = getmap(ID)
@@ -412,8 +432,7 @@ def movePogs(displacement):
     selection = _state.pogSelection.copy()
     for pog in selection:
         pog.displace(displacement)
-        #modifyPog(currentmap(), pog)
-        sendMovementPog(currentmap().ID, pog.ID, pog.dump())
+        sendMovementPog(currentmap().ID, pog.ID, pog.position)
 
 @serverRPC
 def respondUpdatePog(mapID, pogID, pogDump):
@@ -422,7 +441,6 @@ def respondUpdatePog(mapID, pogID, pogDump):
     if pogMap is None:
         print "Attempt to change pog in nonextant map: {0}".format(mapID)
         return
-    #pogMap = _state.Maps[mapID]
     pog = rggPog.Pog.load(pogDump)
     pog.ID = pogID
     if pogID in pogMap.Pogs:
@@ -456,7 +474,6 @@ def respondDeletePog(mapID, pogID):
     if pogMap is None:
         print "Attempt to delete pog in nonextant map: {0}".format(mapID)
         return
-    #pogMap = _state.Maps[mapID]
     if pogID in pogMap.Pogs:
         old = pogMap.Pogs[pogID]
         if old in _state.pogSelection:
@@ -475,22 +492,24 @@ def sendDeletePog(user, mapID, pogID):
     # HACK: Relies on the fact that responses are locally synchronous
     respondDeletePog(allusers(), mapID, pogID)
 
-@clientRPC
-def sendMovementPog(user, mapID, pogID, pogDump):
-    """Creates or updates a pog on the server."""
-    #TODO: What happens when we delete a pog then get something like movement or a property change for it?
-    # Fix with different messages that don't completely change the pog, and only use this for creation.
+@serverRPC
+def respondMovementPog(mapID, pogID, newpos):
+    """Creates or updates a pog on the client."""
     pogMap = getmap(mapID)
-    # Upload (or check that we already have) the image resource from the client
-    rggResource.srm.processFile(user, pogDump['src'])
+    if pogMap is None:
+        print "Attempt to move pog in nonextant map: {0}".format(mapID)
+        return
+    if pogID in pogMap.Pogs:
+        pog = pogMap.Pogs[pogID]
+        pog.position = newpos
+
+@clientRPC
+def sendMovementPog(user, mapID, pogID, newpos):
+    """Creates or updates a pog on the server."""
+    pogMap = getmap(mapID)
     if not pogMap:
         return
-    # HACK: Relies on the fact that responses are locally synchronous
-    if not pogID or pogID not in pogMap.Pogs:
-        pogID = pogMap._findUniqueID(pogDump['src'])
-    users = allusers()
-    users.remove(user)
-    respondUpdatePog(users, mapID, pogID, pogDump)
+    respondMovementPog(allusersbut(user), mapID, pogID, newpos)
 
 # DRAWING
 
