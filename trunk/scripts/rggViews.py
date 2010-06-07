@@ -363,25 +363,21 @@ def sendMapUpdate(user, ID, mapDump):
         rggResource.srm.processFile(user, pogDump['src'])
     respondMapUpdate(allusers(), ID, mapDump)
 
-'''@serverRPC
-def respondTileUpdate(ID, mapDump):
+@serverRPC
+def respondTileUpdate(mapID, tile, newTileIndex):
     """Creates or updates the map with the given ID."""
-    map = rggMap.Map.load(mapDump)
-    map.ID = ID
-    existed = (ID in _state.Maps)
-    _state.Maps[ID] = map
-    if not existed or (_state.currentMap and _state.currentMap.ID == ID):
-        switchMap(map)
+    map = getmap(mapID)
+    if not map:
+        return
+    map.setTile(tile, newTileIndex)
 
 @clientRPC
-def sendTileUpdate(user, ID, mapDump):
+def sendTileUpdate(user, mapID, tile, newTileIndex):
     """Creates or updates the specified map."""
-    if not getmap(ID):
-        ID = createMapID(mapDump['mapname'])
-    rggResource.srm.processFile(user, mapDump['tileset'])
-    for pogDump in mapDump['pogs'].values():
-        rggResource.srm.processFile(user, pogDump['src'])
-    respondMapUpdate(allusers(), ID, mapDump)'''
+    map = getmap(mapID)
+    if not map or not map.tilePosExists(tile):
+        return
+    respondTileUpdate(allusers(), mapID, tile, newTileIndex)
 
 @serverRPC
 def respondMapSwitch(ID, handle):
@@ -450,6 +446,7 @@ def respondUpdatePog(mapID, pogID, pogDump):
             _state.pogSelection.add(pog)
         if old == _state.pogHover:
             _state.pogHover = None
+        old._tile.destroy()
     pogMap.addPog(pog)
 
 @clientRPC
@@ -510,6 +507,28 @@ def sendMovementPog(user, mapID, pogID, newpos):
     if not pogMap:
         return
     respondMovementPog(allusersbut(user), mapID, pogID, newpos)
+
+@serverRPC
+def respondHidePog(mapID, pogID, hidden):
+    """Creates or updates a pog on the client."""
+    pogMap = getmap(mapID)
+    if pogMap is None:
+        print "Attempt to move pog in nonextant map: {0}".format(mapID)
+        return
+    if pogID in pogMap.Pogs:
+        pog = pogMap.Pogs[pogID]
+        if hidden:
+            pog.hide()
+        else:
+            pog.show()
+
+@clientRPC
+def sendHidePog(user, mapID, pogID, hidden):
+    """Creates or updates a pog on the server."""
+    pogMap = getmap(mapID)
+    if not pogMap:
+        return
+    respondHidePog(allusers(), mapID, pogID, hidden)
 
 # DRAWING
 

@@ -122,6 +122,10 @@ class Map(object):
         self.tileindexes[t] = index
         if not self.hidden:
             self.tiles[t].setTile(self.tileindexes[t])
+
+    def tilePosExists(self, tilepos):
+        x, y = tilepos
+        return ((0 <= x <= self.mapsize[0]) and (0 <= y <= self.mapsize[1]))
     
     def _setIndexes(self, indexes):
         if len(indexes) != len(self.tileindexes):
