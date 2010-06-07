@@ -155,11 +155,6 @@ class clientResourceMapper(object):
         status = self._status[filename]
         if status == STATE_INVALID:
             return RESOURCE_INVALID[kind]
-        # Use old data so we don't have to check
-        # the file system or broadcast each time
-        '''if self._exists[filename]:
-            return filename
-        return RESOURCE_LOADING[kind]'''
         return filename
     
     def _makeResponse(self, kind, callback):

@@ -23,6 +23,7 @@ class pogListWidget(QtGui.QListWidget):
 
     def __init__(self, parent):
         QtGui.QListWidget.__init__(self)
+        self.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
 
     def mousePressEvent(self, event): #listwidget generated events
         pos = event.globalPos()
@@ -34,17 +35,8 @@ class pogListWidget(QtGui.QListWidget):
         if item is None:
             return
 
-        if event.button == QtCore.Qt.LeftButton:
-            if item.isSelected():
-                rggViews._state.pogSelection.remove(item.getPog())
-                item.setSelected(False)
-                print 'pog', item.getPog().ID, 'deselected'
-            else:
-                rggViews._state.pogSelection.add(item.getPog())
-                item.setSelected(True)
-                print 'pog', item.getPog().ID, 'selected'
-        elif event.button() == QtCore.Qt.RightButton:
-            selection = rggSystem.showPopupMenuAtAbs([x, y], ['center'])
+        if event.button() == QtCore.Qt.RightButton:
+            selection = rggSystem.showPopupMenuAtAbs([x, y], ['Center', 'Delete'])
             if selection == 0:
                 camsiz = rggSystem.cameraSize()
                 pospog = item.getPog().position
@@ -52,6 +44,20 @@ class pogListWidget(QtGui.QListWidget):
                 pogh = item.getPog()._tile.getH()
                 newpos = (pospog[0] - camsiz[0]/2 + pogw/2, pospog[1] - camsiz[1]/2 + pogh/2)
                 rggSystem.setCameraPosition(newpos)
+            elif selection == 1:
+                rggViews.deletePog(rggViews.currentmap(), item.getPog())
+                self.takeItem(self.row(item))
+        else:
+            super(QtGui.QListWidget, self).mousePressEvent(event)
+
+    def selectionChanged(self, selected, deselected):
+        super(QtGui.QListWidget, self).selectionChanged(selected, deselected)
+        for index in selected.indexes():
+            item = self.item(index.row())
+            rggViews._state.pogSelection.add(item.getPog())
+        for index in deselected.indexes():
+            item = self.item(index.row())
+            rggViews._state.pogSelection.remove(item.getPog())
 
 class pogWidget(QtGui.QDockWidget):
 
@@ -81,18 +87,13 @@ class pogWidget(QtGui.QDockWidget):
 
     def pogSelectionChangedResponse(self):
         selectedPogs = rggViews._state.pogSelection
-        print 'selectedPogs:', selectedPogs
 
         for x in xrange(self.listWidget.count()):
             item = self.listWidget.item(x)
-            print 'item:', item.getPog()
             if item.getPog() in selectedPogs:
                 item.setSelected(True)
-                print 'pog', item.getPog().ID, 'selected'
             else:
                 item.setSelected(False)
-                print 'pog', item.getPog().ID, 'deselected'
-
 
     def mapChangedResponse(self, newMap):
         self.listWidget.clear()
