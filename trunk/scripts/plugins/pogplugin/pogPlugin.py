@@ -36,7 +36,12 @@ class pogListWidget(QtGui.QListWidget):
             return
 
         if event.button() == QtCore.Qt.RightButton:
-            selection = rggSystem.showPopupMenuAtAbs([x, y], ['Center', 'Delete'])
+            hide = 'Hide'
+
+            if item.getPog().hidden:
+                hide = 'Show'
+
+            selection = rggSystem.showPopupMenuAtAbs([x, y], ['Center', hide, 'Delete'])
             if selection == 0:
                 camsiz = rggSystem.cameraSize()
                 pospog = item.getPog().position
@@ -45,6 +50,13 @@ class pogListWidget(QtGui.QListWidget):
                 newpos = (pospog[0] - camsiz[0]/2 + pogw/2, pospog[1] - camsiz[1]/2 + pogh/2)
                 rggSystem.setCameraPosition(newpos)
             elif selection == 1:
+                pog = item.getPog()
+                if pog.hidden:
+                  pog.show()
+                else:
+                  pog.hide()
+                item.setPog(pog)
+            elif selection == 2:
                 rggViews.deletePog(rggViews.currentmap(), item.getPog())
                 self.takeItem(self.row(item))
         else:

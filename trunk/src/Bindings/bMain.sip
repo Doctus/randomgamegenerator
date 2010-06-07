@@ -91,7 +91,9 @@ class bImage
     int getH();
     int getTile();
     int getLayer();
+    bool getHidden();
     QString getFilename();
+    int getTilesetId();
 
     void setX(int x);
     void setY(int y);
@@ -99,6 +101,7 @@ class bImage
     void setH(int h);
     void setTile(int tile);
     void setLayer(int layer);
+    void setHidden(bool hidden);
 
     void DELETEME();
 };

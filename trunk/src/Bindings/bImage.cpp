@@ -25,6 +25,7 @@ bImage::bImage(int x, int y, int w, int h, int tile, int layer, QString filename
     this->w = w;
     this->h = h;
     this->layer = layer;
+    this->hidden = false;
     id = countId++;
     this->tile = tile;
     this->filename = filename;

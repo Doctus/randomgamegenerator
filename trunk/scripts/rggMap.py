@@ -45,13 +45,14 @@ class Map(object):
         import rggEvent
         #if pog.ID is None:
         #    pog.ID = self._findUniqueID()
-        if pog.ID in self.Pogs:
-            self.Pogs[pog.ID].hide()
+        #if pog.ID in self.Pogs:
+            #self.Pogs[pog.ID].hide()
         self.Pogs[pog.ID] = pog
         if self.hidden:
             pog.hide()
-        else:
-            pog.show()
+        #else:
+            #pog.show()
+        pog._tile = pog._makeTile()
         rggEvent.pogUpdateEvent(pog)
 
     def _findUniqueID(self, src):
