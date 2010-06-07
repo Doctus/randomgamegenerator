@@ -395,6 +395,10 @@ def modifyPog(pogMap, pog):
     assert(pog.ID)
     sendUpdatePog(pogMap.ID, pog.ID, pog.dump())
 
+def deletePog(pogMap, pog):
+    assert(pog.ID)
+    sendDeletePog(pogMap.ID, pog.ID)
+
 def placePog(pogpath):
     """Places a pog on the map."""
     if _state.currentMap is None:
@@ -418,7 +422,7 @@ def respondUpdatePog(mapID, pogID, pogDump):
     if pogMap is None:
         print "Attempt to change pog in nonextant map: {0}".format(mapID)
         return
-    pogMap = _state.Maps[mapID]
+    #pogMap = _state.Maps[mapID]
     pog = rggPog.Pog.load(pogDump)
     pog.ID = pogID
     if pogID in pogMap.Pogs:
@@ -444,6 +448,32 @@ def sendUpdatePog(user, mapID, pogID, pogDump):
     if not pogID or pogID not in pogMap.Pogs:
         pogID = pogMap._findUniqueID(pogDump['src'])
     respondUpdatePog(allusers(), mapID, pogID, pogDump)
+
+@serverRPC
+def respondDeletePog(mapID, pogID):
+    """Deletes a pog on the client."""
+    pogMap = getmap(mapID)
+    if pogMap is None:
+        print "Attempt to delete pog in nonextant map: {0}".format(mapID)
+        return
+    #pogMap = _state.Maps[mapID]
+    if pogID in pogMap.Pogs:
+        old = pogMap.Pogs[pogID]
+        if old in _state.pogSelection:
+            _state.pogSelection.discard(old)
+        if old == _state.pogHover:
+            _state.pogHover = None
+        pogMap.Pogs[pogID]._tile.destroy()
+        del pogMap.Pogs[pogID]
+
+@clientRPC
+def sendDeletePog(user, mapID, pogID):
+    """Deletes a pog on the server."""
+    pogMap = getmap(mapID)
+    if not pogMap:
+        return
+    # HACK: Relies on the fact that responses are locally synchronous
+    respondDeletePog(allusers(), mapID, pogID)
 
 @clientRPC
 def sendMovementPog(user, mapID, pogID, pogDump):

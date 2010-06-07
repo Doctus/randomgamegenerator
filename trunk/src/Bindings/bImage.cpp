@@ -82,6 +82,12 @@ int bImage::getLayer()
     return layer;
 }
 
+bool bImage::getHidden()
+{
+    return hidden;
+}
+
+
 QString bImage::getFilename()
 {
     return filename;
@@ -126,6 +132,11 @@ void bImage::setLayer(int layer)
 
     bMain::getGameInstance()->mTilesetManager->changeLayerOfImage(this, this->layer, layer);
     this->layer = layer;
+}
+
+void bImage::setHidden(bool hidden)
+{
+    this->hidden = hidden;
 }
 
 

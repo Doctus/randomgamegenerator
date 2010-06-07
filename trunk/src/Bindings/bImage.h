@@ -15,6 +15,7 @@ class bImage
     int id;
     int x, y, w, h;
     int layer;
+    bool hidden;
     bool isDestroyed;
     QString filename;
     int tilesetId;
@@ -33,6 +34,7 @@ class bImage
     int getH();
     int getTile();
     int getLayer();
+    bool getHidden();
     QString getFilename();
     int getTilesetId();
 
@@ -42,6 +44,7 @@ class bImage
     void setH(int h);
     void setTile(int tile);
     void setLayer(int layer);
+    void setHidden(bool hidden);
 
     //librandom-game-generator only
     GLuint getTextureId();

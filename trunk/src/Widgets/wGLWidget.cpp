@@ -96,7 +96,7 @@ void wGLWidget::paintGL()
     {
         foreach(bImage *img, layer)
         {
-            if(camTest->intersects(img->getRect()))
+            if(!img->getHidden() && camTest->intersects(img->getRect()))
                 drawImage(img->getTextureId(), img->getX()-cam->getAbsoluteCam().x(), img->getY()-cam->getAbsoluteCam().y(), img->getW(), img->getH());
         }
     }

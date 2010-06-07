@@ -62,10 +62,14 @@ class Pog(object):
 
     def hide(self):
         self._tile = None
+        #if self._tile:
+            #self._tile.setHidden(True)
 
     def show(self):
         if self.hidden:
             self._tile = self._makeTile()
+        #if self._tile:
+            #self._tile.setHidden(False)
     
     @property
     def layer(self):
