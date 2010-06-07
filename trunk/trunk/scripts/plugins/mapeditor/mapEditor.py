@@ -50,17 +50,16 @@ class mapEditor(QtGui.QDockWidget):
         if self.isVisible() and self.painting:
             clickedtile = ((rggSystem.cameraPosition()[0] + x) / self.tilelabel.tilex,
                            (rggSystem.cameraPosition()[1] + y) / self.tilelabel.tiley)
-            rggViews._state.currentMap.setTile(clickedtile, self.tilelabel.currentTile)
-            rggViews.modifyCurrentMap()
+            rggViews.sendTileUpdate(rggViews._state.currentMap.ID, clickedtile, self.tilelabel.currentTile)
             rggEvent.setEaten()
 
     def mouseMoveResponse(self, x, y):
         if self.isVisible() and self.painting and self.dragging:
             clickedtile = ((rggSystem.cameraPosition()[0] + x) / self.tilelabel.tilex,
                            (rggSystem.cameraPosition()[1] + y) / self.tilelabel.tiley)
-            if rggViews._state.currentMap.getTile(clickedtile) != self.tilelabel.currentTile:
-                rggViews._state.currentMap.setTile(clickedtile, self.tilelabel.currentTile)
-                rggViews.modifyCurrentMap()
+            currentmap = rggViews._state.currentMap
+            if currentmap.tilePosExists(clickedtile) and currentmap.getTile(clickedtile) != self.tilelabel.currentTile:
+                rggViews.sendTileUpdate(currentmap.ID, clickedtile, self.tilelabel.currentTile)
             rggEvent.setEaten()
             
     def mouseReleaseResponse(self, x, y, t):

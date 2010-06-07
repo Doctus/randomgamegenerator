@@ -6,6 +6,7 @@ class pogItem(QtGui.QListWidgetItem):
     def __init__(self, pog):
         QtGui.QListWidgetItem.__init__(self)
         self.setPog(pog)
+        self.dead = False
 
     def getPog(self):
         return self.__pog
@@ -56,8 +57,10 @@ class pogListWidget(QtGui.QListWidget):
                 else:
                   pog.hide()
                 item.setPog(pog)
+                rggViews.sendHidePog(rggViews._state.currentMap.ID, pog.ID, pog.hidden)
             elif selection == 2:
                 rggViews.deletePog(rggViews.currentmap(), item.getPog())
+                item.dead = True
                 self.takeItem(self.row(item))
         else:
             super(QtGui.QListWidget, self).mousePressEvent(event)
@@ -66,10 +69,12 @@ class pogListWidget(QtGui.QListWidget):
         super(QtGui.QListWidget, self).selectionChanged(selected, deselected)
         for index in selected.indexes():
             item = self.item(index.row())
-            rggViews._state.pogSelection.add(item.getPog())
+            if not item.dead:
+                rggViews._state.pogSelection.add(item.getPog())
         for index in deselected.indexes():
             item = self.item(index.row())
-            rggViews._state.pogSelection.remove(item.getPog())
+            if not item.dead:
+                rggViews._state.pogSelection.remove(item.getPog())
 
 class pogWidget(QtGui.QDockWidget):
 
