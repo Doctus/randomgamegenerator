@@ -87,7 +87,9 @@ class clientResourceMapper(object):
         if not hasattr(root, KEEP_ALIVE_FIELD):
             setattr(root, KEEP_ALIVE_FIELD, [])
         getattr(root, KEEP_ALIVE_FIELD).append(response)
+        self._listeners[filename] = [listener for listener in self._listeners[filename] if listener()]
         self._listeners[filename].append(weakref.ref(response))
+        #print "LISTEN", len(self._listeners[filename])
     
     def updateStatus(self, filename, status):
         """Responds to a status update sent from the server."""
