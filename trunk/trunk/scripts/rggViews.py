@@ -452,6 +452,7 @@ def respondUpdatePog(mapID, pogID, pogDump):
 @clientRPC
 def sendUpdatePog(user, mapID, pogID, pogDump):
     """Creates or updates a pog on the server."""
+    
     #TODO: What happens when we delete a pog then get something like movement or a property change for it?
     # Fix with different messages that don't completely change the pog, and only use this for creation.
     pogMap = getmap(mapID)
@@ -477,8 +478,7 @@ def respondDeletePog(mapID, pogID):
             _state.pogSelection.discard(old)
         if old == _state.pogHover:
             _state.pogHover = None
-        pogMap.Pogs[pogID]._tile.destroy()
-        del pogMap.Pogs[pogID]
+        pogMap.removePog(old)
 
 @clientRPC
 def sendDeletePog(user, mapID, pogID):
