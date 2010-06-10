@@ -205,29 +205,6 @@ class diceRoller(QtGui.QDockWidget):
     macroRequested = signal(doc=
         """Called when the add macro button is pressed."""
     )
-    
-
-
-#It turns out to be hard to do the map editor as I intended because HTML can't get individual tiles,
-# and nothing that can display individual tiles seems to have appropriate "word wrap". -Doctus
-'''class mapEditor(QtGui.QDockWidget):
-
-    def __init__(self, mainWindow):
-        super(QtGui.QDockWidget, self).__init__("Map Editor", mainWindow)
-        self.widget = QtGui.QWidget(mainWindow)
-        self.mainLayout = QtGui.QBoxLayout(2)
-        self.tileArea = QtGui.QTextEdit(' ', mainWindow)
-        self.tileArea.setReadOnly(True)
-        self.mainLayout.addWidget(self.tileArea)
-        self.widget.setLayout(self.mainLayout)
-        self.setWidget(self.widget)
-        mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self)
-
-    def updateTileset(self, tileset, maxtiles):
-        self.extraordinaryPineapple = []
-        for tile in range(0, maxtiles):
-            self.extraordinaryPineapple.append(<img src="data/pogs/yue.png">
-        self.tileArea.setHTML('''
 
 class pogPalette(QtGui.QDockWidget):
     """The list of loaded pogs."""
@@ -270,19 +247,4 @@ class pogPalette(QtGui.QDockWidget):
     pogPlaced = signal(basestring, doc=
         """Called to request pog placement on the map."""
     )
-    
-class characterSheet(QtGui.QDockWidget):
-
-    def __init__(self, mainWindow, charName):
-        super(QtGui.QDockWidget, self).__init__(mainWindow)
-        try:
-            self.setWindowTitle(charName)
-        except:
-            self.setWindowTitle(self.tr("Character Sheet"))
-        self.fields = []
-
-class characterSheet_DND3dot5e(characterSheet):
-    
-    def __init__(self, mainWindow, charName):
-        characterSheet.__init__(self, mainWindow, charName)
     
