@@ -18,7 +18,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 import sys
-import rggTile, rggPog, rggSystem, random
+import rggTile, rggPog, rggSystem, random, rggResource
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
 class Map(object):
@@ -38,6 +38,8 @@ class Map(object):
         self.tileindexes = [0 for i in xrange(mapsize[0] * mapsize[1])]
         self.hidden = True
         self.tiles = None
+        
+        rggResource.crm.listen(tileset, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
         
     def addPog(self, pog):
         """Adds a pog to the map, assigning it a unique id."""
@@ -102,15 +104,20 @@ class Map(object):
     
     def _createTiles(self):
         """Show all the tiles of this map."""
-        self.tiles = []
+        src = rggResource.crm.translateFile(self.tileset, rggResource.RESOURCE_IMAGE)
+        self.tiles = [None]*self.mapsize[0]*self.mapsize[1]
         for y in xrange(0, self.mapsize[1]):
             for x in xrange(0, self.mapsize[0]):
-                self.tiles.append(rggTile.tile(
+                self.tiles[x+y*self.mapsize[0]] = (rggTile.tile(
                     (x * self.tilesize[0], y * self.tilesize[1]),
                     self.tilesize,
-                    self.tileindexes[len(self.tiles)],
+                    self.tileindexes[x+y*self.mapsize[0]],
                     0,
-                    self.tileset))
+                    src))
+                    
+    def _updateSrc(self, crm, filename, translation):
+        if filename == self.tileset and self.tiles:
+            self._createTiles()
     
     def getTile(self, tile):
         """Change the specified tile."""
