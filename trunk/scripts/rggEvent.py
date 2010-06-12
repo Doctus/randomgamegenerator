@@ -9,6 +9,7 @@ _mouseReleaseListeners = []
 _chatInputListeners = []
 _ICChatInputListeners = []
 _pogUpdateListeners = []
+_pogDeleteListeners = []
 _pogSelectionChangedListeners = []
 _mapChangedListeners = []
 
@@ -35,6 +36,9 @@ def addICChatInputListener(listener):
 
 def addPogUpdateListener(listener):
   _pogUpdateListeners.append(listener)
+
+def addPogDeleteListener(listener):
+  _pogDeleteListeners.append(listener)
 
 def addPogSelectionChangedListener(listener):
   _pogSelectionChangedListeners.append(listener)
@@ -97,6 +101,10 @@ def ICChatInputEvent(st, chname, portrait):
 def pogUpdateEvent(pog): #may either add a new pog, or update an existing one. Beware.
   for listener in _pogUpdateListeners:
     listener.pogUpdateResponse(pog)
+
+def pogDeleteEvent(pog):
+  for listener in _pogDeleteListeners:
+    listener.pogDeleteResponse(pog)
 
 def pogSelectionChangedEvent():
   for listener in _pogSelectionChangedListeners:

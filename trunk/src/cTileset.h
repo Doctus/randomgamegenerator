@@ -59,6 +59,8 @@ class cTileset
     GLuint getTextureId(int x, int y);
 
     string getFilename();
+    int getW();
+    int getH();
 
     map<unsigned int, GLuint> reload();
 

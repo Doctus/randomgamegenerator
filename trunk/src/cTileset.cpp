@@ -88,6 +88,16 @@ string cTileset::getFilename()
     return filename;
 }
 
+int cTileset::getW()
+{
+    return image->width();
+}
+
+int cTileset::getH()
+{
+    return image->height();
+}
+
 
 map<unsigned int, GLuint> cTileset::reload()
 {

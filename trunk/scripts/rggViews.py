@@ -27,7 +27,7 @@ from rggSystem import cameraPosition, setCameraPosition, mainWindow
 from rggSystem import translate, showErrorMessage, displayTooltip
 from rggSystem import showPopupMenuAt, IMAGE_FILTER
 from rggSystem import promptString, promptInteger, promptCoordinates, promptSaveFile, promptLoadFile
-from rggSystem import drawLine, deleteLine
+from rggSystem import drawLine, deleteLine, getZoom
 from rggDialogs import newMapDialog, hostDialog, joinDialog
 from PyQt4 import QtCore, QtGui
 
@@ -634,7 +634,8 @@ def mouseMove(screenPosition, mapPosition, displacement):
             _state.pogHover = tooltipPog
             if tooltipPog is None:
                 return
-            displayPosition = map(lambda t, c: t - c, tooltipPog.tooltipPosition(), cameraPosition())
+            ttpos = (tooltipPog.tooltipPosition()[0]*getZoom(), tooltipPog.tooltipPosition()[1]*getZoom())
+            displayPosition = map(lambda t, c: t - c, ttpos, cameraPosition())
             displayTooltip(tooltipPog.tooltipText(), displayPosition)
         elif _state.mouseButton == BUTTON_LEFT:
             return mouseDrag(screenPosition, mapPosition, displacement)
@@ -701,7 +702,7 @@ def mousePress(screenPosition, mapPosition, button):
             pog = currentmap().findTopPog(mapPosition)
             if pog is not None:
                 selected = showPopupMenuAt(
-                    screenPosition,
+                    (screenPosition[0]*getZoom(), screenPosition[1]*getZoom()),
                     [translate('views', 'Set name'),
                         translate('views', 'Generate name'),
                         translate('views', 'Set Layer')])

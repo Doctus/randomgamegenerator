@@ -51,6 +51,13 @@ class Map(object):
         pog._tile = pog._makeTile()
         rggEvent.pogUpdateEvent(pog)
 
+    def removePog(self, pog):
+        assert(pog.ID is not None)
+        import rggEvent
+        rggEvent.pogDeleteEvent(self.Pogs[pog.ID])
+        self.Pogs[pog.ID].destroy()
+        self.Pogs[pog.ID] = None
+
     def _findUniqueID(self, src):
         """Get a unique id for a pog."""
         id = src or rggSystem.findRandomAppend()

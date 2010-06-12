@@ -65,6 +65,9 @@ class bMain : public QObject
     void setCam(int x, int y);
     void adjustCam(int x, int y);
 
+    void setZoom(float zoom);
+    float getZoom();
+
     void changeImage(QString oldFilename, QString newFilename, int tileWidth, int tileHeight);
     int getTileCountOfImage(QString filename, int tileWidth, int tileHeight);
 
