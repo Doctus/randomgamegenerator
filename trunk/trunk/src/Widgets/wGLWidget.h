@@ -66,6 +66,9 @@ class wGLWidget : public QGLWidget
     void redrawTexture(QImage *image, GLuint texture);
     void deleteTexture(GLuint texture);
 
+    void  setZoom(float zoom);
+    float getZoom();
+
     protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);

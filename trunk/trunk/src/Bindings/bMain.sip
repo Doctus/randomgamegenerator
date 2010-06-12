@@ -53,6 +53,9 @@ public:
     void setCam(int x, int y);
     void adjustCam(int x, int y);
 
+    void setZoom(float zoom);
+    float getZoom();
+
     void changeImage(QString oldFilename, QString newFilename, int tileWidth, int tileHeight);
     int getTileCountOfImage(QString filename, int tileWidth, int tileHeight);
 
@@ -94,6 +97,9 @@ class bImage
     bool getHidden();
     QString getFilename();
     int getTilesetId();
+
+    int getTilesetW();
+    int getTilesetH();
 
     void setX(int x);
     void setY(int y);

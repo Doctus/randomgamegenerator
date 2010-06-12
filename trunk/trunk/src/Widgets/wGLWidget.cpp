@@ -291,6 +291,22 @@ void wGLWidget::deleteTexture(GLuint texture)
 }
 
 
+void wGLWidget::setZoom(float zoom)
+{
+    if(zoom < 0.25)
+        zoom = 0.25;
+    if(zoom > 4.00)
+        zoom = 4.00;
+
+    this->zoom = zoom;
+}
+
+float wGLWidget::getZoom()
+{
+    return zoom;
+}
+
+
 void wGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     /*if(selectedIcon == IconType::select && mouseButtonHeld)
@@ -394,7 +410,7 @@ void wGLWidget::wheelEvent(QWheelEvent *event)
 {
     if(event->delta() < 0)
     {
-        if(zoom > 0.50)
+        if(zoom > 0.25)
             zoom /= 2;
     }
     else if(event->delta() > 0)

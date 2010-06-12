@@ -38,6 +38,9 @@ class bImage
     QString getFilename();
     int getTilesetId();
 
+    int getTilesetW();
+    int getTilesetH();
+
     void setX(int x);
     void setY(int y);
     void setW(int w);

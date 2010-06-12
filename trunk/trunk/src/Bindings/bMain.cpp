@@ -213,6 +213,17 @@ void bMain::adjustCam(int x, int y)
 }
 
 
+void bMain::setZoom(float zoom)
+{
+    mainGame->mGLWidget->setZoom(zoom);
+}
+
+float bMain::getZoom()
+{
+    return mainGame->mGLWidget->getZoom();
+}
+
+
 void bMain::changeImage(QString oldFilename, QString newFilename, int tileWidth, int tileHeight)
 {
     mainGame->mTilesetManager->changeImage(oldFilename, newFilename, tileWidth, tileHeight);

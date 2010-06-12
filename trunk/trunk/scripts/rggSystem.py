@@ -250,3 +250,9 @@ def getLinesOfThickness(thickness):
 def reloadImage(filename, tilewidth, tileheight):
     """Reloads the specified image file."""
     return _main.changeImage(filename, filename, tilewidth, tileheight)
+
+def setZoom(zoom):
+    _main.setZoom(zoom)
+
+def getZoom():
+    return _main.getZoom()

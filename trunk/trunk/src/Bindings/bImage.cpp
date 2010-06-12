@@ -100,6 +100,17 @@ int bImage::getTilesetId()
 }
 
 
+int bImage::getTilesetW()
+{
+    return bMain::getGameInstance()->mTilesetManager->findTileset(tilesetId)->getW();
+}
+
+int bImage::getTilesetH()
+{
+    return bMain::getGameInstance()->mTilesetManager->findTileset(tilesetId)->getH();
+}
+
+
 void bImage::setX(int x)
 {
     this->x = x;
