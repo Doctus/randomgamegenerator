@@ -45,15 +45,9 @@ class Map(object):
         """Adds a pog to the map, assigning it a unique id."""
         assert(pog.ID is not None)
         import rggEvent
-        #if pog.ID is None:
-        #    pog.ID = self._findUniqueID()
-        #if pog.ID in self.Pogs:
-            #self.Pogs[pog.ID].hide()
         self.Pogs[pog.ID] = pog
         if self.hidden:
-            pog.hide()
-        #else:
-            #pog.show()
+            pog._realHide(True)
         pog._tile = pog._makeTile()
         rggEvent.pogUpdateEvent(pog)
 
