@@ -109,8 +109,9 @@ class Map(object):
                     src))
                     
     def _updateSrc(self, crm, filename, translation):
-        if filename == self.tileset and self.tiles:
-            rggSystem.reloadImage(filename, self.mapsize[0]*self.tilesize[0], self.mapsize[1]*self.tilesize[1])
+        if filename == self.tileset:
+            rggSystem.reloadImage(filename, self.tilesize[0], self.tilesize[1])
+            self._createTiles()
     
     def getTile(self, tile):
         """Change the specified tile."""
