@@ -394,8 +394,7 @@ def sendMapSwitch(user, ID):
         respondMapSwitch(allusersbut(user), ID, unicode(user))
 
         map = getmap(ID)
-        if map:
-            switchMap(map)
+        switchMap(map)
 
 # POGS
 

@@ -118,8 +118,7 @@ class Pog(object):
     
     def _updateSrc(self, crm, filename, translation):
         if filename == self._src and self._tile:
-            #rggSystem.reloadImage(filename, self.dimensions[0], self.dimensions[1])
-            self._tile = self._makeTile()
+            rggSystem.reloadImage(filename, self.dimensions[0], self.dimensions[1])
     
     def dump(self):
         """Serialize to an object valid for JSON dumping."""
