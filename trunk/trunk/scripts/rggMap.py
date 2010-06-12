@@ -72,10 +72,11 @@ class Map(object):
         if includePogs:
             if hidden:
                 for pog in self.Pogs.values():
-                    pog.hide()
+                    pog._realHide(True)
             else:
                 for pog in self.Pogs.values():
-                    pog.show()
+                    if not pog.hidden:
+                        pog._realHide(False)
         if includeTiles:
             if hidden:
                 self._deleteTiles()

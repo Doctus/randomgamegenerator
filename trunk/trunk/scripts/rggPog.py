@@ -28,14 +28,12 @@ class Pog(object):
         self._src = srcfile
         self.name = None
         self._tileStore = None
+        self._fakeHidden = False
         rggResource.crm.listen(srcfile, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
     
     @property
     def hidden(self):
-        if self._tile is not None:
-            return self._tile.getHidden()
-        else:
-            return True
+        return self._fakeHidden
     
     @property
     def position(self):
@@ -64,12 +62,21 @@ class Pog(object):
         return self.position
 
     def hide(self):
+        self._fakeHidden = True
         if self._tile:
             self._tile.setHidden(True)
 
     def show(self):
+        self._fakeHidden = False
         if self._tile:
             self._tile.setHidden(False)
+
+    def _realHide(self, hide):
+        '''This makes the pog not redraw, but not necessarily hidden in a map.
+           If a map hides and consecutively shows, we don't want previously hidden pogs to be shown.
+        '''
+        if self._tile:
+            self._tile.setHidden(hide)
     
     @property
     def layer(self):
