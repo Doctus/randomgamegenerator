@@ -18,7 +18,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 import sys
-import rggTile, rggPog, rggSystem, random, rggResource
+import rggTile, rggPog, rggSystem, rggResource, random
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
 class Map(object):
@@ -38,7 +38,7 @@ class Map(object):
         self.tileindexes = [0 for i in xrange(mapsize[0] * mapsize[1])]
         self.hidden = True
         self.tiles = None
-        
+
         rggResource.crm.listen(tileset, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
         
     def addPog(self, pog):
@@ -56,13 +56,6 @@ class Map(object):
             #pog.show()
         pog._tile = pog._makeTile()
         rggEvent.pogUpdateEvent(pog)
-        
-    def removePog(self, pog):
-        "Removes a pog from this map."
-        assert(pog.ID is not None)
-        if pog.ID in self.Pogs:
-            del self.Pogs[pog.ID]
-            pog._tile = None
 
     def _findUniqueID(self, src):
         """Get a unique id for a pog."""
@@ -117,7 +110,7 @@ class Map(object):
                     
     def _updateSrc(self, crm, filename, translation):
         if filename == self.tileset and self.tiles:
-            self._createTiles()
+            rggSystem.reloadImage(filename, self.mapsize[0]*self.tilesize[0], self.mapsize[1]*self.tilesize[1])
     
     def getTile(self, tile):
         """Change the specified tile."""
