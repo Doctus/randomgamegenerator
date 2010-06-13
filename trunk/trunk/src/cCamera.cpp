@@ -28,20 +28,14 @@ cCamera::cCamera(int x, int y, int w, int h)
     this->h = h;
 }
 
-QPoint cCamera::getAbsoluteCam()
+QPoint cCamera::getCam()
 {
     return QPoint(x, y);
 }
 
-QPoint cCamera::getAbsoluteBounds()
+QPoint cCamera::getAbsoluteBounds(float zoom)
 {
-    return QPoint(x+w, y+h);
-}
-
-QPoint cCamera::getCam(float zoom)
-{
-    //return QPoint(x * (1/zoom), y * (1/zoom));
-    return QPoint(x, y);
+    return QPoint(int(w * (1/zoom)), int(h * (1/zoom)));
 }
 
 QPoint cCamera::getBounds(float zoom)

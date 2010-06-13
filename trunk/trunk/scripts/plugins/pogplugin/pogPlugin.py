@@ -48,8 +48,7 @@ class pogListWidget(QtGui.QListWidget):
                 pospog = item.getPog().position
                 pogw = item.getPog()._tile.getW()
                 pogh = item.getPog()._tile.getH()
-                #newpos = (pospog[0] - camsiz[0]/2 + pogw/2, pospog[1] - camsiz[1]/2 + pogh/2)
-                newpos = (pospog[0]-150, pospog[1]-150)
+                newpos = (pospog[0] - camsiz[0]/2 + pogw/2, pospog[1] - camsiz[1]/2 + pogh/2)
                 rggSystem.setCameraPosition(newpos)
             elif selection == 1:
                 pog = item.getPog()

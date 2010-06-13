@@ -257,7 +257,7 @@ def createMapID(mapname):
     return ID
 
 def modifyCurrentMap():
-    sendMapUpdate(currentmap().ID, currentmap().dump())
+    sendMapCreate(currentmap().ID, currentmap().dump())
 
 def switchMap(map):
     """Switches to the specified map."""
@@ -309,7 +309,7 @@ def newMap():
     
     if dialog.exec_(mainWindow, accept):
         map = dialog.save()
-        sendMapUpdate(None, map.dump())
+        sendMapCreate(None, map.dump())
 
 def loadMap():
     """Allows the user to load a new map."""
@@ -323,7 +323,7 @@ def loadMap():
     except Exception as e:
         showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
         return
-    sendMapUpdate(None, map.dump())
+    sendMapCreate(None, map.dump())
 
 def saveMap():
     """Allows the user to save the current map."""
@@ -344,7 +344,7 @@ def saveMap():
     jsondump(map.dump(), filename)
 
 @serverRPC
-def respondMapUpdate(ID, mapDump):
+def respondMapCreate(ID, mapDump):
     """Creates or updates the map with the given ID."""
     map = rggMap.Map.load(mapDump)
     map.ID = ID
@@ -354,14 +354,14 @@ def respondMapUpdate(ID, mapDump):
         switchMap(map)
 
 @clientRPC
-def sendMapUpdate(user, ID, mapDump):
+def sendMapCreate(user, ID, mapDump):
     """Creates or updates the specified map."""
     if not getmap(ID):
         ID = createMapID(mapDump['mapname'])
     rggResource.srm.processFile(user, mapDump['tileset'])
     for pogDump in mapDump['pogs'].values():
         rggResource.srm.processFile(user, pogDump['src'])
-    respondMapUpdate(allusers(), ID, mapDump)
+    respondMapCreate(allusers(), ID, mapDump)
 
 @serverRPC
 def respondTileUpdate(mapID, tile, newTileIndex):
@@ -381,20 +381,21 @@ def sendTileUpdate(user, mapID, tile, newTileIndex):
 
 @serverRPC
 def respondMapSwitch(ID, handle):
-    map = getmap(ID)
-    if map:
-        disallow = rggSystem.promptButtonSelection('User "{user}" has switched to map "{map}", do you want to switch too?'.format(user=handle, map=map.mapname), ['Yes', 'No'], 1)
+    mappe = getmap(ID)
+    if mappe:
+        #disallow = rggSystem.promptButtonSelection('User "{user}" has switched to map "{mapname}", do you want to switch too?'.format(user=handle, mapname=mappe.mapname), ['Yes', 'No'], 1)
 
-        if not disallow:
-            switchMap(map)
+        #if disallow == 0:
+        switchMap(mappe)
 
 @clientRPC
 def sendMapSwitch(user, ID):
-    if getmap(ID):
-        respondMapSwitch(allusersbut(user), ID, unicode(user))
+    mappe = getmap(ID)
+    if mappe:
+        #respondMapSwitch(allusersbut(user), ID, unicode(user))
+        respondMapSwitch(allusers(), ID, unicode(user))
 
-        map = getmap(ID)
-        switchMap(map)
+        #switchMap(mappe)
 
 # POGS
 
@@ -634,8 +635,9 @@ def mouseMove(screenPosition, mapPosition, displacement):
             _state.pogHover = tooltipPog
             if tooltipPog is None:
                 return
-            ttpos = (tooltipPog.tooltipPosition()[0]*getZoom(), tooltipPog.tooltipPosition()[1]*getZoom())
-            displayPosition = map(lambda t, c: t - c, ttpos, cameraPosition())
+            displayPosition = [tooltipPog.tooltipPosition()[0]*getZoom(), tooltipPog.tooltipPosition()[1]*getZoom()]
+            displayPosition[0] -= cameraPosition()[0]*getZoom()
+            displayPosition[1] -= cameraPosition()[1]*getZoom()
             displayTooltip(tooltipPog.tooltipText(), displayPosition)
         elif _state.mouseButton == BUTTON_LEFT:
             return mouseDrag(screenPosition, mapPosition, displacement)
