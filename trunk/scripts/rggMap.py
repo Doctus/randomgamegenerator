@@ -39,8 +39,10 @@ class Map(object):
         self.hidden = True
         self.tiles = None
 
+        self._createTiles()
+
         rggResource.crm.listen(tileset, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
-        
+
     def addPog(self, pog):
         """Adds a pog to the map, assigning it a unique id."""
         assert(pog.ID is not None)
@@ -80,9 +82,9 @@ class Map(object):
                         pog._realHide(False)
         if includeTiles:
             if hidden:
-                self._deleteTiles()
+                self._hideTiles()
             else:
-                self._createTiles()
+                self._showTiles()
         if includeLines:
             if hidden:
                 self.storeLines()
@@ -91,6 +93,14 @@ class Map(object):
     
     def show(self):
         return self.hide(False)
+
+    def _hideTiles(self):
+        for tile in self.tiles:
+            tile.setHidden(True)
+
+    def _showTiles(self):
+        for tile in self.tiles:
+            tile.setHidden(False)
     
     def _deleteTiles(self):
         for tile in self.tiles:
@@ -103,12 +113,14 @@ class Map(object):
         self.tiles = [None]*self.mapsize[0]*self.mapsize[1]
         for y in xrange(0, self.mapsize[1]):
             for x in xrange(0, self.mapsize[0]):
-                self.tiles[x+y*self.mapsize[0]] = (rggTile.tile(
+                temptile = (rggTile.tile(
                     (x * self.tilesize[0], y * self.tilesize[1]),
                     self.tilesize,
                     self.tileindexes[x+y*self.mapsize[0]],
                     0,
                     src))
+                temptile.setHidden(self.hidden)
+                self.tiles[x+y*self.mapsize[0]] = temptile
                     
     def _updateSrc(self, crm, filename, translation):
         if filename == self.tileset:

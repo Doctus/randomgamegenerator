@@ -183,22 +183,22 @@ QMainWindow* bMain::getMainWindow()
 
 int bMain::getCamX()
 {
-    return mainGame->mGLWidget->cam->getAbsoluteCam().x();
+    return mainGame->mGLWidget->cam->getCam().x();
 }
 
 int bMain::getCamY()
 {
-    return mainGame->mGLWidget->cam->getAbsoluteCam().y();
+    return mainGame->mGLWidget->cam->getCam().y();
 }
 
 int bMain::getCamW()
 {
-    return mainGame->mGLWidget->cam->getAbsoluteBounds().x();
+    return mainGame->mGLWidget->cam->getAbsoluteBounds(getZoom()).x();
 }
 
 int bMain::getCamH()
 {
-    return mainGame->mGLWidget->cam->getAbsoluteBounds().y();
+    return mainGame->mGLWidget->cam->getAbsoluteBounds(getZoom()).y();
 }
 
 

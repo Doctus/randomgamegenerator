@@ -90,14 +90,14 @@ void wGLWidget::paintGL()
     glEnable(GL_TEXTURE_RECTANGLE_ARB);
 
     vector< vector<bImage*> > images = mGame->mTilesetManager->getImages();
-    QRect *camTest = new QRect(cam->getCam(zoom), cam->getBounds(zoom));
+    QRect *camTest = new QRect(cam->getCam(), cam->getBounds(zoom));
 
     foreach(vector<bImage*> layer, images)
     {
         foreach(bImage *img, layer)
         {
             if(!img->getHidden() && camTest->intersects(img->getRect()))
-                drawImage(img->getTextureId(), img->getX()-cam->getAbsoluteCam().x(), img->getY()-cam->getAbsoluteCam().y(), img->getW(), img->getH());
+                drawImage(img->getTextureId(), img->getX()-cam->getCam().x(), img->getY()-cam->getCam().y(), img->getW(), img->getH());
         }
     }
 
@@ -112,10 +112,10 @@ void wGLWidget::paintGL()
         {
             if(camTest->contains(line.topLeft()) || camTest->contains(line.bottomRight()))
             {
-                int x = (line.x()-cam->getAbsoluteCam().x())*zoom;
-                int y = (line.y()-cam->getAbsoluteCam().y())*zoom;
-                int w = (line.width()-cam->getAbsoluteCam().x())*zoom;
-                int h = (line.height()-cam->getAbsoluteCam().y())*zoom;
+                int x = (line.x()-cam->getCam().x())*zoom;
+                int y = (line.y()-cam->getCam().y())*zoom;
+                int w = (line.width()-cam->getCam().x())*zoom;
+                int h = (line.height()-cam->getCam().y())*zoom;
                 glVertex2i(x, y);
                 glVertex2i(w, h);
             }

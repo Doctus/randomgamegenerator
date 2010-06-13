@@ -1,4 +1,5 @@
-rm moc_bMain.cpp sip*
+echo "removing previously created files"
+rm -f moc_bMain.cpp sip* *.o
 
 if [ -f /usr/bin/moc-qt4 ]
 then
@@ -7,6 +8,16 @@ else
 	moc bMain.h -o moc_bMain.cpp
 fi
 
+echo "creating new files"
 python configure.py
-#g++ -shared -pipe -fPIC -O2 -Wall -g3 -ggdb -W -D_REENTRANT -DQT_CORE_LIB -DQT_GUI_LIB -I. -I/usr/include/python2.6 -lpython2.6 `pkg-config --cflags --libs QtGui` `pkg-config --cflags gl` ../../qt4/librandom-game-generator.so *.cpp -o _bmainmod.so
-g++ -shared -pipe -fPIC -O2 -Wall  -DQT_NO_DEBUG -DNDEBUG -W -D_REENTRANT -DQT_CORE_LIB -DQT_GUI_LIB -I. -I/usr/include/python2.6 -lpython2.6 `pkg-config --cflags --libs QtGui` `pkg-config --cflags gl` ../../qt4/librandom-game-generator.so *.cpp -o _bmainmod.so
+
+DEFINES="-DQT_NO_DEBUG -DNDEBUG -W -D_REENTRANT -DQT_CORE_LIB -DQT_GUI_LIB"
+CFLAGS="-pipe -fPIC -O2 -Wall -march=native -fomit-frame-pointer"
+FILES="*.cpp"
+for file in $FILES; do
+  output=`echo $file | sed 's/.cpp/.o/'`
+  echo "compiling $file into $output"
+	g++ -c $CFLAGS $DEFINES -I. -I/usr/include/python2.6 `pkg-config --cflags QtGui` `pkg-config --cflags gl` $file -o $output
+done
+
+g++ -shared $CFLAGS $DEFINES -lpython2.6 `pkg-config --libs QtGui` `pkg-config --libs gl` ../../qt4/librandom-game-generator.so *.o -o _bmainmod.so
