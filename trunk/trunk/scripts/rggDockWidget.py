@@ -238,7 +238,7 @@ class pogPalette(QtGui.QDockWidget):
         self.pogs = findFiles(POG_DIR, IMAGE_EXTENSIONS)
         self.pogs.sort(cmp=lambda x,y: cmp(x.lower(), y.lower()))
         for greatJustice in self.pogs:
-            icon = QtGui.QIcon(QtGui.QIcon(greatJustice).pixmap(QtCore.QSize(32, 32)))
+            icon = QtGui.QIcon(QtGui.QIcon(os.path.join(POG_DIR, greatJustice)).pixmap(QtCore.QSize(32, 32)))
             self.pogArea.addItem(QtGui.QListWidgetItem(icon, greatJustice))
     
     def place(self, pog):
