@@ -250,6 +250,9 @@ def getmap(mapID):
 def allmaps():
     return _state.Maps.items()
 
+def getAllMaps():
+    return _state.Maps.values()
+
 def createMapID(mapname):
     ID = mapname or rggSystem.findRandomAppend()
     while ID in _state.Maps:
