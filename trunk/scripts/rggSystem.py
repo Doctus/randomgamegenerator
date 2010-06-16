@@ -46,6 +46,7 @@ TILESET_DIR = 'data/tilesets'
 POG_DIR = 'data/pogs'
 PORTRAIT_DIR = 'data/portraits'
 PLUGINS_DIR = 'plugins'
+LOG_DIR = 'logs'
 
 _main = None
 mainWindow = None

@@ -1,5 +1,5 @@
 from PyQt4 import QtGui, QtCore
-from rggSystem import signal, findFiles, POG_DIR, IMAGE_EXTENSIONS, makePortableFilename
+from rggSystem import signal, findFiles, POG_DIR, LOG_DIR, IMAGE_EXTENSIONS, makePortableFilename
 from rggDialogs import newCharacterDialog
 import os, os.path
 
@@ -57,6 +57,14 @@ class chatWidget(QtGui.QDockWidget):
         self.widgetEditor.append(mes)
         if self.scroll:
             self.widgetEditor.verticalScrollBar().setValue(self.widgetEditor.verticalScrollBar().maximum())
+        try:
+            try:
+                self.logfile = open(os.path.join(LOG_DIR, 'DEBUGchatlog.txt'), 'a')
+                self.logfile.write(mes+"\n")
+            finally:
+                self.logfile.close()
+        except:
+            pass
     
     def processInput(self):
         self.newmes = unicode(self.widgetLineInput.text())
@@ -107,6 +115,14 @@ class ICChatWidget(QtGui.QDockWidget):
         self.widgetEditor.append(mes)
         if self.scroll:
             self.widgetEditor.verticalScrollBar().setValue(self.widgetEditor.verticalScrollBar().maximum())
+        try:
+            try:
+                self.logfile = open(os.path.join(LOG_DIR, 'DEBUGchatlog.txt'), 'a')
+                self.logfile.write(mes+"\n")
+            finally:
+                self.logfile.close()
+        except:
+            pass
             
     def newCharacter(self):
         dialog = newCharacterDialog()
