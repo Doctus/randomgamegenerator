@@ -71,10 +71,10 @@ class menuBar(object):
         for folder in os.listdir('plugins'):
                 if folder == ".svn":
                         continue
-                self.pluginsActs.append(QtGui.QAction(unicode(folder), main))
                 self.pluginsModules.append(__import__(folder))
                 self.pluginsModules[-1].initialize(main)
                 self.pluginsInits.append(self.pluginsModules[-1].hajimeru)
+                self.pluginsActs.append(QtGui.QAction(unicode(self.pluginsModules[-1].title()), main))
                 self.pluginsActs[-1].triggered.connect(self.pluginsInits[-1])
         
         selectIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-select-icon.png"), "Select Tool", main)
