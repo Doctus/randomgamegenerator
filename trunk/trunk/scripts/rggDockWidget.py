@@ -145,28 +145,23 @@ class diceRoller(QtGui.QDockWidget):
         super(QtGui.QDockWidget, self).__init__(mainWindow)
         self.setWindowTitle(self.tr("Dice"))
         self.realwidget = QtGui.QWidget(mainWindow) #I messed up on the initial setup and was too lazy to rename everything.
-        self.widget = QtGui.QBoxLayout(2)
+        self.widget = QtGui.QGridLayout(mainWindow)
         self.diceArea = QtGui.QListWidget(mainWindow)
         self.macros = [QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), "Sample: 2d6"),
                        QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), "Sample: 4k2")]
         for m in self.macros:
             self.diceArea.addItem(m)
         self.diceArea.currentRowChanged.connect(self.changeCurrentMacro)
-        
-        self.controlArea = QtGui.QWidget(mainWindow)
-        self.controlLayout = QtGui.QBoxLayout(2)
         self.rollbutton = QtGui.QPushButton(self.tr("Roll"), mainWindow)
         self.addmacrobutton = QtGui.QPushButton(self.tr("Add Macro"), mainWindow)
         self.removemacrobutton = QtGui.QPushButton(self.tr("Delete Macro"), mainWindow)
         self.connect(self.rollbutton, QtCore.SIGNAL('pressed()'), self.rollDice)
         self.connect(self.addmacrobutton, QtCore.SIGNAL('pressed()'), self.summonMacro)
         self.connect(self.removemacrobutton, QtCore.SIGNAL('pressed()'), self.removeCurrentMacro)
-        self.controlLayout.addWidget(self.rollbutton)
-        self.controlLayout.addWidget(self.addmacrobutton)
-        self.controlLayout.addWidget(self.removemacrobutton)
-        self.controlArea.setLayout(self.controlLayout)
-        self.widget.addWidget(self.diceArea)
-        self.widget.addWidget(self.controlArea)
+        self.widget.addWidget(self.diceArea, 0, 0, 1, 3)
+        self.widget.addWidget(self.rollbutton, 1, 0)
+        self.widget.addWidget(self.addmacrobutton, 1, 1)
+        self.widget.addWidget(self.removemacrobutton, 1, 2)
         self.realwidget.setLayout(self.widget)
         self.setWidget(self.realwidget)
         mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
