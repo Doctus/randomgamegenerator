@@ -26,6 +26,8 @@
     * Maybe other stuff
   * ~~Option for separate IC/OOC chat.~~
   * Snap pogs to grid
+  * Designate DM
+  * DM request dice rolls from players.
 
 = Graphics =
   * Some default tilesets would be nice.
