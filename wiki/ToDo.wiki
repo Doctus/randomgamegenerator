@@ -22,8 +22,9 @@
   * More pog editing commands:
     * Edit layer
     * More associated data
+    * Resize'em!
     * Maybe other stuff
-  * Option for separate IC/OOC chat.
+  * ~~Option for separate IC/OOC chat.~~
   * Snap pogs to grid
 
 = Graphics =
