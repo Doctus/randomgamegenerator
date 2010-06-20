@@ -692,6 +692,7 @@ def mousePress(screenPosition, mapPosition, button):
                 pog = rggPog.Pog(
                     mapPosition,
                     (infograb.width(), infograb.height()),
+                    (infograb.width(), infograb.height()),
                     1,
                     _state.pogPath)
                 createPog(currentmap(), pog)

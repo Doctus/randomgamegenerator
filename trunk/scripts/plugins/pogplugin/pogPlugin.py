@@ -1,6 +1,80 @@
 from PyQt4 import QtCore, QtGui
 import rggEvent, rggViews, rggPog, rggSystem
 
+class resizeDialog(QtGui.QDialog):
+
+    def __init__(self, origx, origy, currw, currh):
+        QtGui.QDialog.__init__(self)
+        self.owlabel = QtGui.QLabel("Original Width:")
+        self.ohlabel = QtGui.QLabel("Orignal Height:")
+        self.owlabel2 = QtGui.QLabel(str(origx))
+        self.ohlabel2 = QtGui.QLabel(str(origy))
+
+        self.wlabel = QtGui.QLabel("Width:")
+        self.hlabel = QtGui.QLabel("Height:")
+
+        self.wBox = QtGui.QSpinBox()
+        self.hBox = QtGui.QSpinBox()
+        self.wBox.setRange(1, 1000)
+        self.hBox.setRange(1, 1000)
+        self.wBox.setValue(currw)
+        self.hBox.setValue(currh)
+
+        self.okButton = QtGui.QPushButton("Ok")
+        self.cancelButton = QtGui.QPushButton("Cancel")
+
+        self.okButton.clicked.connect(self.okPressed)
+        self.cancelButton.clicked.connect(self.cancelPressed)
+
+        self.layout = QtGui.QGridLayout()
+        self.layout.addWidget(self.owlabel, 0, 0)
+        self.layout.addWidget(self.ohlabel, 1, 0)
+        self.layout.addWidget(self.owlabel2, 0, 1)
+        self.layout.addWidget(self.ohlabel2, 1, 1)
+
+        self.layout.addWidget(self.wlabel, 2, 0)
+        self.layout.addWidget(self.hlabel, 3, 0)
+        self.layout.addWidget(self.wBox, 2, 1)
+        self.layout.addWidget(self.hBox, 3, 1)
+        self.layout.addWidget(self.okButton, 4, 0)
+        self.layout.addWidget(self.cancelButton, 4, 1)
+        self.setLayout(self.layout)
+
+    def okPressed(self, checked):
+        self.done(1)
+
+    def cancelPressed(self, checked):
+        self.done(0)
+
+class layerDialog(QtGui.QDialog):
+
+    def __init__(self, currl):
+        QtGui.QDialog.__init__(self)
+        self.label = QtGui.QLabel("Layer:")
+        self.box = QtGui.QSpinBox()
+
+        self.box.setRange(1, 1000)
+        self.box.setValue(currl)
+
+        self.okButton = QtGui.QPushButton("Ok")
+        self.cancelButton = QtGui.QPushButton("Cancel")
+
+        self.okButton.clicked.connect(self.okPressed)
+        self.cancelButton.clicked.connect(self.cancelPressed)
+
+        self.layout = QtGui.QGridLayout()
+        self.layout.addWidget(self.label, 0, 0)
+        self.layout.addWidget(self.box, 0, 1)
+        self.layout.addWidget(self.okButton, 1, 0)
+        self.layout.addWidget(self.cancelButton, 1, 1)
+        self.setLayout(self.layout)
+
+    def okPressed(self, checked):
+        self.done(1)
+
+    def cancelPressed(self, checked):
+        self.done(0)
+
 class pogItem(QtGui.QListWidgetItem):
 
     def __init__(self, pog):
@@ -42,7 +116,7 @@ class pogListWidget(QtGui.QListWidget):
             if item.getPog().hidden:
                 hide = 'Show'
 
-            selection = rggSystem.showPopupMenuAtAbs([x, y], ['Center', hide, 'Delete'])
+            selection = rggSystem.showPopupMenuAtAbs([x, y], ['Center', hide, 'Resize', 'Change Layer', 'Delete'])
             if selection == 0:
                 camsiz = rggSystem.cameraSize()
                 pospog = item.getPog().position
@@ -59,6 +133,16 @@ class pogListWidget(QtGui.QListWidget):
                 item.setPog(pog)
                 rggViews.sendHidePog(rggViews._state.currentMap.ID, pog.ID, pog.hidden)
             elif selection == 2:
+                pog = item.getPog()
+                d = resizeDialog(pog._tile.getW(), pog._tile.getH(), pog.size[0], pog.size[1])
+                if d.exec_():
+                    pog.size = (d.wBox.value(), d.hBox.value())
+            elif selection == 3:
+                pog = item.getPog()
+                d = layerDialog(pog.layer)
+                if d.exec_():
+                    pog.layer = d.box.value()
+            elif selection == 4:
                 rggViews.deletePog(rggViews.currentmap(), item.getPog())
                 item.dead = True
                 self.takeItem(self.row(item))

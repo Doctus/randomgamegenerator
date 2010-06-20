@@ -116,6 +116,7 @@ class Map(object):
                 temptile = (rggTile.tile(
                     (x * self.tilesize[0], y * self.tilesize[1]),
                     self.tilesize,
+                    self.tilesize,
                     self.tileindexes[x+y*self.mapsize[0]],
                     0,
                     src))

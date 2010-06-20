@@ -17,7 +17,7 @@ FILES="*.cpp"
 for file in $FILES; do
   output=`echo $file | sed 's/.cpp/.o/'`
   echo "compiling $file into $output"
-	g++ -c $CFLAGS $DEFINES -I. -I/usr/include/python2.6 `pkg-config --cflags QtGui` `pkg-config --cflags gl` $file -o $output
+  g++ -c $CFLAGS $DEFINES -I. -I/usr/include/python2.6 `pkg-config --cflags QtGui` `pkg-config --cflags gl` $file -o $output
 done
 
 g++ -shared $CFLAGS $DEFINES -lpython2.6 `pkg-config --libs QtGui` `pkg-config --libs gl` ../../qt4/librandom-game-generator.so *.o -o _bmainmod.so

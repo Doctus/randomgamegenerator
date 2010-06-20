@@ -20,10 +20,11 @@ import rggTile, rggResource, rggSystem
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
 class Pog(object):
-    def __init__(self, position, dimensions, layer, srcfile):
+    def __init__(self, position, texturedimensions, size, layer, srcfile):
         self.ID = None
         self._position = position
-        self.dimensions = dimensions
+        self.texturedimensions = texturedimensions
+        self._size = size
         self._layer = layer
         self._src = srcfile
         self.name = None
@@ -56,6 +57,17 @@ class Pog(object):
         if self._tileStore:
             self._tileStore.destroy()
         self._tileStore = tile
+
+    @property
+    def size(self):
+        return self._size
+
+    @size.setter
+    def size(self, size):
+        self._size = size
+        if self._tileStore:
+            self._tileStore.setDrawW(size[0])
+            self._tileStore.setDrawH(size[1])
     
     def displace(self, displacement):
         self.position = map(lambda p,d: p + d, self.position, displacement)
@@ -96,7 +108,7 @@ class Pog(object):
         if self.hidden: return False
         x, y = point
         sx, sy = self.position
-        sw, sh = self.dimensions
+        sw, sh = self.size
         if (sx > x or sx + sw < x or
             sy > y or sy + sh < y):
             return False
@@ -121,17 +133,18 @@ class Pog(object):
     
     def _makeTile(self):
         src = rggResource.crm.translateFile(self._src, rggResource.RESOURCE_IMAGE)
-        return rggTile.tile(self.position, self.dimensions, 0, self.layer, src)
+        return rggTile.tile(self.position, self.texturedimensions, self.size, 0, self.layer, src)
     
     def _updateSrc(self, crm, filename, translation):
         if filename == self._src and self._tile:
-            rggSystem.reloadImage(filename, self.dimensions[0], self.dimensions[1])
+            rggSystem.reloadImage(filename, self.texturedimensions[0], self.texturedimensions[1])
     
     def dump(self):
         """Serialize to an object valid for JSON dumping."""
         return dict(
             position=self.position,
-            dimensions=self.dimensions,
+            texturedimensions=self.texturedimensions,
+            size=self.size,
             layer=self.layer,
             src=self._src,
             name=self.name)
@@ -141,7 +154,8 @@ class Pog(object):
         """Deserialize a new map from a dictionary."""
         pog = Pog(
             loadCoordinates('Pog.position', obj.get('position'), length=2),
-            loadCoordinates('Pog.dimensions', obj.get('dimensions'), length=2, min=1, max=65535),
+            loadCoordinates('Pog.texturedimensions', obj.get('texturedimensions'), length=2, min=1, max=65535),
+            loadCoordinates('Pog.size', obj.get('size'), length=2, min=1, max=65535),
             loadInteger('Pog.layer', obj.get('layer'), min=0, max=65535),
             loadString('Pog.src', obj.get('src')))
         pog.name = loadString('Pog.name', obj.get('name'), allowEmpty=True)

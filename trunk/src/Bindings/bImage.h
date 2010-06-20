@@ -13,7 +13,7 @@ class bImage
     int tile;
     static int countId;
     int id;
-    int x, y, w, h;
+    int x, y, w, h, drawW, drawH;
     int layer;
     bool hidden;
     bool isDestroyed;
@@ -24,7 +24,7 @@ class bImage
     bImage();
 
     public:
-    bImage(int x, int y, int w, int h, int tile, int layer, QString filename);
+    bImage(int x, int y, int w, int h, int drawW, int drawH, int tile, int layer, QString filename);
     ~bImage();
 
     int getId();
@@ -32,6 +32,8 @@ class bImage
     int getY();
     int getW();
     int getH();
+    int getDrawW();
+    int getDrawH();
     int getTile();
     int getLayer();
     bool getHidden();
@@ -45,6 +47,8 @@ class bImage
     void setY(int y);
     void setW(int w);
     void setH(int h);
+    void setDrawW(int w);
+    void setDrawH(int h);
     void setTile(int tile);
     void setLayer(int layer);
     void setHidden(bool hidden);

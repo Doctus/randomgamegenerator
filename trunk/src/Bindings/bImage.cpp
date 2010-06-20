@@ -18,12 +18,14 @@ bImage::bImage()
     filename = "";
 }
 
-bImage::bImage(int x, int y, int w, int h, int tile, int layer, QString filename)
+bImage::bImage(int x, int y, int w, int h, int drawW, int drawH, int tile, int layer, QString filename)
 {
     this->x = x;
     this->y = y;
     this->w = w;
     this->h = h;
+    this->drawW = drawW;
+    this->drawH = drawH;
     this->layer = layer;
     this->hidden = false;
     id = countId++;
@@ -71,6 +73,16 @@ int bImage::getW()
 int bImage::getH()
 {
     return h;
+}
+
+int bImage::getDrawW()
+{
+    return drawW;
+}
+
+int bImage::getDrawH()
+{
+    return drawH;
 }
 
 int bImage::getTile()
@@ -129,6 +141,16 @@ void bImage::setW(int w)
 void bImage::setH(int h)
 {
     this->h = h;
+}
+
+void bImage::setDrawW(int w)
+{
+    this->drawW = w;
+}
+
+void bImage::setDrawH(int h)
+{
+    this->drawH = h;
 }
 
 void bImage::setTile(int tile)
