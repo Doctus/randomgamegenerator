@@ -59,7 +59,7 @@ class wGLWidget : public QGLWidget
 
     void initializeGL();
     void paintGL();
-    void drawImage(GLuint texture, int x, int y, int w, int h);
+    void drawImage(GLuint texture, int x, int y, int textureW, int textureH, int drawW, int drawH);
     void resizeGL(int w, int h);
 
     GLuint createTexture(QImage *image);

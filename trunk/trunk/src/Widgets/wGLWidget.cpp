@@ -97,7 +97,8 @@ void wGLWidget::paintGL()
         foreach(bImage *img, layer)
         {
             if(!img->getHidden() && camTest->intersects(img->getRect()))
-                drawImage(img->getTextureId(), img->getX()-cam->getCam().x(), img->getY()-cam->getCam().y(), img->getW(), img->getH());
+                drawImage(img->getTextureId(), img->getX()-cam->getCam().x(), img->getY()-cam->getCam().y(), img->getW(), img->getH(),
+                          img->getDrawW(), img->getDrawH());
         }
     }
 
@@ -130,7 +131,7 @@ void wGLWidget::paintGL()
         swapBuffers();
 }
 
-void wGLWidget::drawImage(GLuint texture, int x, int y, int w, int h)
+void wGLWidget::drawImage(GLuint texture, int x, int y, int textureW, int textureH, int drawW, int drawH)
 {
     GLenum error;
 
@@ -144,7 +145,7 @@ void wGLWidget::drawImage(GLuint texture, int x, int y, int w, int h)
 #ifdef WIN32
         glTexCoord2i(0, 1);
 #else
-        glTexCoord2i(0, h); //image/texture
+        glTexCoord2i(0, textureH); //image/texture
 #endif
         glVertex3f(x*zoom, y*zoom, 0); //screen coordinates
 
@@ -152,21 +153,21 @@ void wGLWidget::drawImage(GLuint texture, int x, int y, int w, int h)
 #ifdef WIN32
         glTexCoord2i(1, 1);
 #else
-        glTexCoord2i(w, h);
+        glTexCoord2i(textureW, textureH);
 #endif
-        glVertex3f((x+w)*zoom, y*zoom, 0);
+        glVertex3f((x+drawW)*zoom, y*zoom, 0);
 
         //Bottom-right vertex (corner)
 #ifdef WIN32
         glTexCoord2i(1, 0);
 #else
-        glTexCoord2i(w, 0);
+        glTexCoord2i(textureW, 0);
 #endif
-        glVertex3f((x+w)*zoom, (y+h)*zoom, 0);
+        glVertex3f((x+drawW)*zoom, (y+drawH)*zoom, 0);
 
         //Top-right vertex (corner)
         glTexCoord2i(0, 0);
-        glVertex3f(x*zoom, (y+h)*zoom, 0);
+        glVertex3f(x*zoom, (y+drawH)*zoom, 0);
     glEnd();
 
     if((error = glGetError()) != GL_NO_ERROR)
