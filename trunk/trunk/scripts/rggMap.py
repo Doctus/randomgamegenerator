@@ -58,7 +58,7 @@ class Map(object):
         import rggEvent
         rggEvent.pogDeleteEvent(self.Pogs[pog.ID])
         self.Pogs[pog.ID]._tile.destroy()
-        self.Pogs[pog.ID] = None
+        del self.Pogs[pog.ID]
 
     def _findUniqueID(self, src):
         """Get a unique id for a pog."""
