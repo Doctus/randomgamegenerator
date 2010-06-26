@@ -9,6 +9,7 @@ class resizeDialog(QtGui.QDialog):
         self.ohlabel = QtGui.QLabel("Orignal Height:")
         self.owlabel2 = QtGui.QLabel(str(origx))
         self.ohlabel2 = QtGui.QLabel(str(origy))
+        self.setWindowTitle("Resize Pog")
 
         self.wlabel = QtGui.QLabel("Width:")
         self.hlabel = QtGui.QLabel("Height:")
@@ -52,6 +53,7 @@ class layerDialog(QtGui.QDialog):
         QtGui.QDialog.__init__(self)
         self.label = QtGui.QLabel("Layer:")
         self.box = QtGui.QSpinBox()
+        self.setWindowTitle("Set Layer")
 
         self.box.setRange(1, 1000)
         self.box.setValue(currl)
