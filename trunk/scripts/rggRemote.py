@@ -174,7 +174,7 @@ def serverConnect(server, username):
     rggViews.adduser(user)
     say(translate('remote', '{name} has joined.').format(name=username))
     for ID, map in allmaps():
-        rggViews.respondMapUpdate(user, ID, map.dump())
+        rggViews.respondMapCreate(user, ID, map.dump())
 
 @serverRPC
 def disconnectionMessage(message, error, *args, **kwargs):
