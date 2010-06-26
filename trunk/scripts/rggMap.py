@@ -57,7 +57,7 @@ class Map(object):
         assert(pog.ID is not None)
         import rggEvent
         rggEvent.pogDeleteEvent(self.Pogs[pog.ID])
-        self.Pogs[pog.ID].destroy()
+        self.Pogs[pog.ID]._tile.destroy()
         self.Pogs[pog.ID] = None
 
     def _findUniqueID(self, src):
