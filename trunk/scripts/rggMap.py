@@ -143,8 +143,7 @@ class Map(object):
         assert(0 <= y <= self.mapsize[1])
         t = x + self.mapsize[0] * y
         self.tileindexes[t] = index
-        if not self.hidden:
-            self.tiles[t].setTile(self.tileindexes[t])
+        self.tiles[t].setTile(self.tileindexes[t])
 
     def tilePosExists(self, tilepos):
         x, y = tilepos
@@ -154,10 +153,9 @@ class Map(object):
         if len(indexes) != len(self.tileindexes):
             return
         self.tileindexes[:] = indexes[:]
-        if not self.hidden:
-            for i in xrange(len(indexes)):
-                self.tiles[i].setTile(self.tileindexes[i])
-                #print self.tileindexes[i], self.tiles[i].getTile()
+        for i in xrange(len(indexes)):
+            self.tiles[i].setTile(self.tileindexes[i])
+            #print self.tileindexes[i], self.tiles[i].getTile()
     
     def findTopPog(self, position):
         """Returns the top pog at a given position, or None."""
