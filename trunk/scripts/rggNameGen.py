@@ -58,11 +58,9 @@ def _getDwarvenMaleName():
   return _assembleName(phonemes, random.choice(patterns))
 
 def _getDwarvenFemaleName():
-  '''lolz, I don't know of any!'''
   return _getDwarvenMaleName()
 
 def _getJapaneseMaleName():
-  '''Data drawn from personal knowledge (special case)'''
   names = ['Risuke', 'Ichirou', 'Heisuke', 'Hajime', 'Tarou',
            'Keisuke', 'Hideki', 'Shuusuke', 'Touya', 'Minoru',
            'Mitsuo', 'Tetsuji', 'Hideo', 'Shuuji', 'Shinnosuke',
@@ -73,7 +71,6 @@ def _getJapaneseMaleName():
   return random.choice(names)
 
 def _getJapaneseFemaleName():
-  '''Data drawn from personal knowledge (special case)'''
   names = ['Yohko', 'Megumi', 'Sakura', 'Hanako', 'Ai', 'Hirano',
            'Takako', 'Nana', 'Izumi', 'Aki', 'Yuki', 'Yoshiko',
            'Aya', 'Yuri', 'Hina', 'Rina', 'Yuuna', 'Yukiko', 'Mai',
@@ -86,7 +83,6 @@ def _getJapaneseRandomName():
   return _getJapaneseFemaleName()
 
 def _getJapaneseSurname():
-  '''Data drawn from personal knowledge (special case)'''
   names = ['Yagi', 'Tanaka', 'Ueda', 'Yamagawa', 'Yamamoto',
            'Munenori', 'Satou', 'Suzuki', 'Takahashi', 'Watanabe',
            'Itou', 'Nakamura', 'Kobayashi', 'Saitou', 'Katou', 'Yoshida',
@@ -185,6 +181,28 @@ def _getMacguffinName(genre="fantasy"):
     return result
   return "The Great MacGuffin"
     
+def _getProverb():
+  patterns = ["$nadj $thing draws $entities",
+              "never $verb a$adj $entity",
+              "a$adj $entity and a$adj $entity $frequency meet",
+              "$verb $nadj $entities"]
+  adjectives = [" good", "n honest", " bad", "n evil", " wasted", " wise", 
+                " ill"]
+  things = ["seed", "counsel", "work", "riches", "effort", "time"]
+  entities = [["thief", "thieves"], ["bird", "birds"],
+              ["flatterer", "flatterers"]]
+  verbs = ["trust", "kill", "harm", "be"]
+  frequencies = ["often", "seldom", "never", "sometimes"]
+  result = random.choice(patterns)
+  while "$nadj" in result: result = result.replace("$nadj", random.choice(adjectives)[1:].strip(), 1)
+  while "$adj" in result: result = result.replace("$adj", random.choice(adjectives), 1)
+  while "$thing" in result: result = result.replace("$thing", random.choice(things), 1)
+  while "$entity" in result: result = result.replace("$entity", random.choice(entities)[0], 1)
+  while "$entities" in result: result = result.replace("$entities", random.choice(entities)[1], 1)
+  while "$verb" in result: result = result.replace("$verb", random.choice(verbs), 1)
+  while "$frequency" in result: result = result.replace("$frequency", random.choice(frequencies), 1)
+  result = result.capitalize() + "."
+  return result
 
 def _generateAdvice():
   anto = [['+cold', '+heat'], ['wisdom', '+fool'], ['+light', '+darkness'],
@@ -425,6 +443,7 @@ def getName(nametype):
              "frenchfemale":_getFrenchFemaleName,
              "french":_getFrenchRandomName,
              "macguffin":_getMacguffinName,
+             "proverb":_getProverb,
              "kaijyuu":_getKaleidoscope}
   if nametype == "keys":
     return typedic.keys()
