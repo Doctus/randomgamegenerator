@@ -619,8 +619,13 @@ def reportCamera():
 # MOUSE ACTIONS
 
 def mouseDrag(screenPosition, mapPosition, displacement):
-    if _state.pogSelection:
+    if _state.pogSelection and _state.mouseButton == BUTTON_LEFT:
         movePogs(displacement)
+    elif _state.mouseButton == BUTTON_LEFT:
+        setCameraPosition(map(lambda c, d: c - d, cameraPosition(), displacement))
+        return
+    if _state.mouseButton == BUTTON_RIGHT:
+        setCameraPosition(map(lambda c, d: c - d, cameraPosition(), displacement))
 
 def mouseMove(screenPosition, mapPosition, displacement):
     icon = _state.menu.selectedIcon
@@ -643,6 +648,8 @@ def mouseMove(screenPosition, mapPosition, displacement):
             displayPosition[1] -= cameraPosition()[1]*getZoom()
             displayTooltip(tooltipPog.tooltipText(), displayPosition)
         elif _state.mouseButton == BUTTON_LEFT:
+            return mouseDrag(screenPosition, mapPosition, displacement)
+        elif _state.mouseButton == BUTTON_RIGHT:
             return mouseDrag(screenPosition, mapPosition, displacement)
     elif icon == ICON_DRAW: #drawIcon
         if _state.mouseButton == BUTTON_LEFT:
