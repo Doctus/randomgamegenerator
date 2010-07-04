@@ -6,7 +6,7 @@ It might be handy to have a numbered list of things to do for easy reference, I 
 
 = The List =
 
-  # Remove demo plugin
+  # ~~Remove demo plugin~~
   # Add scrolling besides the move tool
   # Investigate the oddities with map display / map switching
   # Fix mysterious pog bunshin effect
