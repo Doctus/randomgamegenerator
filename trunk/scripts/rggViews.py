@@ -322,7 +322,7 @@ def loadMap():
         return
     try:
         obj = jsonload(filename)
-        map = rggMap.Map.load(obj)
+        map = rggMap.Map.load(obj, True)
     except Exception as e:
         showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
         return

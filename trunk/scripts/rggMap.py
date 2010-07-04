@@ -43,13 +43,14 @@ class Map(object):
 
         rggResource.crm.listen(tileset, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
 
-    def addPog(self, pog):
+    def addPog(self, pog, dumpmode=False):
         """Adds a pog to the map, assigning it a unique id."""
         assert(pog.ID is not None)
         import rggEvent
         self.Pogs[pog.ID] = pog
         if self.hidden:
             pog._realHide(True)
+        if dumpmode: return
         pog._tile = pog._makeTile()
         rggEvent.pogUpdateEvent(pog)
 
@@ -198,7 +199,7 @@ class Map(object):
             lines=self.lines)
     
     @staticmethod
-    def load(obj):
+    def load(obj, dumpmode=False):
         """Deserialize a new map from a dictionary."""
         map = Map(
             loadString('Map.mapname', obj.get('mapname')),
@@ -211,7 +212,7 @@ class Map(object):
         for ID, pog in pogs.items():
             loaded = rggPog.Pog.load(pog)
             loaded.ID = ID
-            map.addPog(loaded)
+            map.addPog(loaded, dumpmode)
 
         lines = loadArray('Map.lines', obj.get('lines'))
         map.lines = []
