@@ -36,9 +36,11 @@ class chatWidget(QtGui.QDockWidget):
 
     def __init__(self, mainWindow):
         super(QtGui.QDockWidget, self).__init__(mainWindow)
+        self.setToolTip(self.tr("A widget for out-of-character chat and system messages."))
         self.setWindowTitle(self.tr("OOC Chat / System"))
         self.widgetEditor = QtGui.QTextBrowser(mainWindow)
         self.widgetLineInput = chatLineEdit(mainWindow)
+        self.widgetLineInput.setToolTip(self.tr("Type text here and press Enter or Return to transmit it."))
         self.widget = QtGui.QWidget(mainWindow)
         self.widgetEditor.setReadOnly(True)
         self.widgetEditor.setOpenLinks(False)
@@ -84,14 +86,18 @@ class ICChatWidget(QtGui.QDockWidget):
 
     def __init__(self, mainWindow):
         super(QtGui.QDockWidget, self).__init__(mainWindow)
+        self.setToolTip(self.tr("A widget for in-character chat."))
         self.setWindowTitle(self.tr("IC Chat"))
         self.widgetEditor = QtGui.QTextBrowser(mainWindow)
         self.widgetLineInput = chatLineEdit(mainWindow)
+        self.widgetLineInput.setToolTip(self.tr("Type text here and press Enter or Return to transmit it."))
         self.widget = QtGui.QWidget(mainWindow)
         self.widgetEditor.setReadOnly(True)
         self.widgetEditor.setOpenLinks(False)
         self.characterSelector = QtGui.QComboBox(mainWindow)
+        self.characterSelector.setToolTip(self.tr("Select the character to be displayed as the speaker of entered text."))
         self.characterAddButton = QtGui.QPushButton(self.tr("Add New"), mainWindow)
+        self.characterAddButton.setToolTip(self.tr("Add a new in-character chat character via a dialog box."))
         self.layout = QtGui.QBoxLayout(2)
         self.layoutni = QtGui.QBoxLayout(1)
         self.layout.addWidget(self.widgetEditor)
@@ -169,8 +175,11 @@ class diceRoller(QtGui.QDockWidget):
             self.diceArea.addItem(m)
         self.diceArea.currentRowChanged.connect(self.changeCurrentMacro)
         self.rollbutton = QtGui.QPushButton(self.tr("Roll"), mainWindow)
+        self.rollbutton.setToolTip(self.tr("Roll dice according to the selected macro."))
         self.addmacrobutton = QtGui.QPushButton(self.tr("Add Macro"), mainWindow)
+        self.addmacrobutton.setToolTip(self.tr("Add a new macro via a dialog box."))
         self.removemacrobutton = QtGui.QPushButton(self.tr("Delete Macro"), mainWindow)
+        self.removemacrobutton.setToolTip(self.tr("Remove the currently selected macro."))
         self.connect(self.rollbutton, QtCore.SIGNAL('pressed()'), self.rollDice)
         self.connect(self.addmacrobutton, QtCore.SIGNAL('pressed()'), self.summonMacro)
         self.connect(self.removemacrobutton, QtCore.SIGNAL('pressed()'), self.removeCurrentMacro)
@@ -223,6 +232,7 @@ class pogPalette(QtGui.QDockWidget):
     def __init__(self, mainWindow):
         """Initializes the pog palette."""
         super(QtGui.QDockWidget, self).__init__(mainWindow)
+        self.setToolTip(self.tr("Double-click on a pog, then click once in the game window to place it."))
         self.setWindowTitle(self.tr("Pog Palette"))
         self.widget = QtGui.QWidget(mainWindow)
         self.mainLayout = QtGui.QBoxLayout(2)
@@ -230,6 +240,7 @@ class pogPalette(QtGui.QDockWidget):
         self.controlArea = QtGui.QWidget(mainWindow)
         self.controlLayout = QtGui.QBoxLayout(2)
         self.addpogbutton = QtGui.QPushButton(self.tr("Update"), mainWindow)
+        self.addpogbutton.setToolTip(self.tr("Re-scan for newly added image files in the pog folder."))
         self.controlLayout.addWidget(self.addpogbutton)
         self.controlArea.setLayout(self.controlLayout)
         self.mainLayout.addWidget(self.pogArea)
