@@ -1,0 +1,17 @@
+#summary Don't we already have a to-do?!
+
+= Introduction =
+
+It might be handy to have a numbered list of things to do for easy reference, I thought. Please cross off things when completed, but don't re-number, to avoid confusion.
+
+= The List =
+
+  # Remove demo plugin
+  # Add scrolling besides the move tool
+  # Investigate the oddities with map display / map switching
+  # Fix mysterious pog bunshin effect
+  # Add capability to designate a "DM" user
+  # Cirno
+  # Examine the HTML interpretation in chat to ensure it works smoothly
+  # Tooltips for various features
+  # Help file / documentation
