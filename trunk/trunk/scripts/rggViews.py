@@ -317,7 +317,8 @@ def newMap():
 def loadMap():
     """Allows the user to load a new map."""
     filename = promptLoadFile(translate('views', 'Open Map'),
-        translate('views', 'Random Game Map files (*.rgm)'))
+        translate('views', 'Random Game Map files (*.rgm)'),
+        rggSystem.MAP_DIR)
     if not filename:
         return
     try:
@@ -340,7 +341,8 @@ def saveMap():
     #    map.authorname = unicode(promptString("Who is the author of this map?")) or map.authorname
     
     filename = promptSaveFile(translate('views', 'Save Map'),
-        translate('views', 'Random Game Map files (*.rgm)'))
+        translate('views', 'Random Game Map files (*.rgm)'),
+        rggSystem.MAP_DIR)
     if not filename:
         return
     

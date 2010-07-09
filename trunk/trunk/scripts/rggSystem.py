@@ -47,6 +47,7 @@ POG_DIR = 'data/pogs'
 PORTRAIT_DIR = 'data/portraits'
 PLUGINS_DIR = 'plugins'
 LOG_DIR = 'logs'
+MAP_DIR = 'maps'
 
 _main = None
 mainWindow = None
@@ -168,19 +169,19 @@ def promptCoordinates(prompt1, prompt2, title=translate('system', "Input", 'defa
         return None
     return (value1, value2)
 
-def promptLoadFile(title, filter):
+def promptLoadFile(title, filter, dir=''):
     filename = QtGui.QFileDialog.getOpenFileName(mainWindow,
         title,
-        '',
+        dir,
         filter)
     if not filename:
         return None
     return makePortableFilename(unicode(filename))
 
-def promptSaveFile(title, filter):
+def promptSaveFile(title, filter, dir=''):
     filename = QtGui.QFileDialog.getSaveFileName(mainWindow,
         title,
-        '',
+        dir,
         filter)
     if not filename:
         return None
