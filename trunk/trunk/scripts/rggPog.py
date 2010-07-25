@@ -20,7 +20,7 @@ import rggTile, rggResource, rggSystem
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
 class Pog(object):
-    def __init__(self, position, texturedimensions, size, layer, srcfile):
+    def __init__(self, position, texturedimensions, size, layer, srcfile, status=0):
         self.ID = None
         self._position = position
         self.texturedimensions = texturedimensions
@@ -31,10 +31,17 @@ class Pog(object):
         self._tileStore = None
         self._fakeHidden = False
         rggResource.crm.listen(srcfile, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
+        if status > 0:
+            self.hide()
     
     @property
     def hidden(self):
         return self._fakeHidden
+    
+    @property
+    def status(self):
+        if self._fakeHidden: return 1
+        return 0
     
     @property
     def position(self):
@@ -147,7 +154,8 @@ class Pog(object):
             size=self.size,
             layer=self.layer,
             src=self._src,
-            name=self.name)
+            name=self.name,
+            status=self.status)
     
     @staticmethod
     def load(obj):
@@ -157,6 +165,7 @@ class Pog(object):
             loadCoordinates('Pog.texturedimensions', obj.get('texturedimensions'), length=2, min=1, max=65535),
             loadCoordinates('Pog.size', obj.get('size'), length=2, min=1, max=65535),
             loadInteger('Pog.layer', obj.get('layer'), min=0, max=65535),
-            loadString('Pog.src', obj.get('src')))
+            loadString('Pog.src', obj.get('src')),
+            loadInteger('Pog.status', obj.get('status')))
         pog.name = loadString('Pog.name', obj.get('name'), allowEmpty=True)
         return pog

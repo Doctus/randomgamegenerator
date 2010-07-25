@@ -52,6 +52,8 @@ class Map(object):
             pog._realHide(True)
         if dumpmode: return
         pog._tile = pog._makeTile()
+        if pog.hidden:
+            pog._realHide(True)
         rggEvent.pogUpdateEvent(pog)
 
     def removePog(self, pog):
