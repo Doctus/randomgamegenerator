@@ -98,10 +98,13 @@ class ICChatWidget(QtGui.QDockWidget):
         self.characterSelector.setToolTip(self.tr("Select the character to be displayed as the speaker of entered text."))
         self.characterAddButton = QtGui.QPushButton(self.tr("Add New"), mainWindow)
         self.characterAddButton.setToolTip(self.tr("Add a new in-character chat character via a dialog box."))
+        self.characterDeleteButton = QtGui.QPushButton(self.tr("Delete"), mainWindow)
+        self.characterDeleteButton.setToolTip(self.tr("Delete the currently selected in-character chat character."))
         self.layout = QtGui.QBoxLayout(2)
         self.layoutni = QtGui.QBoxLayout(1)
         self.layout.addWidget(self.widgetEditor)
         self.layout.addWidget(self.widgetLineInput)
+        self.layoutni.addWidget(self.characterDeleteButton)
         self.layoutni.addWidget(self.characterAddButton)
         self.layoutni.addWidget(self.characterSelector)
         self.layout.addLayout(self.layoutni)
@@ -114,6 +117,7 @@ class ICChatWidget(QtGui.QDockWidget):
         
         self.widgetLineInput.returnPressed.connect(self.processInput)
         self.connect(self.characterAddButton, QtCore.SIGNAL('pressed()'), self.newCharacter)
+        self.connect(self.characterDeleteButton, QtCore.SIGNAL('pressed()'), self.deleteCharacter)
     
     def insertMessage(self, mes):
         self.scroll = (self.widgetEditor.verticalScrollBar().value() ==
@@ -143,6 +147,11 @@ class ICChatWidget(QtGui.QDockWidget):
             newchar = dialog.save()
             self.characterSelector.addItem(newchar[0])
             self.characters.append(newchar)
+            
+    def deleteCharacter(self):
+        if self.characters is not None:
+            self.characters.pop(self.characterSelector.currentIndex())
+            self.characterSelector.removeItem(self.characterSelector.currentIndex())
         
     def processInput(self):
         self.newmes = unicode(self.widgetLineInput.text())
