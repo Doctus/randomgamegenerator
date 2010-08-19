@@ -116,7 +116,6 @@ class menuBar(object):
         
         pluginsMenu = QtGui.QMenu("&Plugins", main)
         for act in self.pluginsActs:
-                print act
                 pluginsMenu.addAction(act)
         
         # MENUBAR

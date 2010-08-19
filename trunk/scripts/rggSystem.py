@@ -205,7 +205,7 @@ def findFiles(dir, extensions):
         for filename in filenames:
             if os.path.splitext(filename)[1] in extensions:
                 name = os.path.join(dirpath, filename)[len(dir) + 1:]
-                print "found file:", name, makePortableFilename(name)
+                #print "found file:", name, makePortableFilename(name)
                 files.append(makePortableFilename(name))
     #files.sort()
     return files
