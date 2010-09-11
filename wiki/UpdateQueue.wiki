@@ -15,3 +15,7 @@ It might be handy to have a numbered list of things to do for easy reference, I 
   # Tooltips for various features
   # Help file / documentation
   # Cirno
+  # Pog selection circles
+  # Investigate erasing oddities
+  # Config file (or other means) to store screen layout
+  # Config file (or other means) to store IC chat characters, dice macros, etc
