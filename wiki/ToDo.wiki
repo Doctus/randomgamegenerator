@@ -3,38 +3,59 @@
 = General =
   * ~~Something that's already been done.~~
   * Clean up some things that don't allow spaces so that they do.
+  * Screen layout should be remembered in a config file.
+  * In-character chat characters (which should maybe be renamed - "the characters in the message from the in-character chat character") should also be saved somehow, possibly in the config file
+  * The way plugins work is rather jury-rigged; at least the "selecting the plugin multiple times produces multiple instances" should be fixed
+  * The logs could do with some prettying-up - it's all just dumped into one big file at the moment
+  * Maybe some sort of music or sound support (through Phonon?)
 
 = Network =
   * Fix large image transfer somehow.
     * ~~Maybe this gets fixed by moving the network interface to python?~~
     * ~~Or what about using QStrings as a specific type in python?~~
   * Update protocol documentation so it's actually accurate.
+  * Passworded sessions, or other method(s) for controlling who may join
 
 = Interface =
-  * Some sort of pallete for pog placement.
+  * ~~Some sort of pallete for pog placement.~~
   * ~~Multiple selection of pogs.~~
-  * Better tooltips.
+  * ~~Better tooltips.~~
   * ~~Dice macros.~~
   * ~~Ability to manipulate widgets better in Python. (E.g., creating new widgets with text/images/maybe buttons)~~
   * ~~"New Map" item in file menu.~~
   * Warning in the join-game dialog that you'll lose current maps and get those the group has loaded.
   * Some sort of dialog designed for displaying information (text and/or images; maybe the same HTML subset as chat would be preferable). For stuff like, say, character sheets. Doesn't need to be editable; probably shouldn't be in fact. Might get rolled into the "widgets" thing.
-  * More pog editing commands:
-    * ~~Edit layer~~
-    * More associated data
-    * ~~Resize'em!~~
-    * Maybe other stuff
+  * Pog stuff:
+    * Ability to assign other kinds of data (perhaps even connect to full character sheets when they're implemented), which may or may not be displayed in the tooltip
+    * Think about which commands ought to be in the right-click menu and which in the plugin
+    * Automatic resize option(s) of some kind - resize to last used size or something, maybe
   * ~~Option for separate IC/OOC chat.~~
-  * Snap pogs to grid
-  * Designate DM
-  * DM request dice rolls from players.
-  * Show a green circle(or something else) around pogs if they're selected.
+  * Show a green circle (or something else) around pogs if they're selected.
+  * CG display system (pops up a box with a large picture, most likely)
+  * Multiple map layers which the camera and pogs can easily switch between
+  * Ability to change an existing map's tileset
+
+= Game Support =
+  * Designate "DM" user
+  * Allow DM to request dice rolls from players
+  * "Display Grid" option - separate from tileset size; square and hex grids (and other weird shapes if there's any evidence they've been used)
+  * Option to snap pogs to grid
+  * Some sort of distance-measuring in conjunction with grid (e.g. at minimum, able to measure that it's 10 grid units from point A to point B)
+    * Would be nice to support display in other unit forms - defining that e.g. 10 pixels or 1 grid unit represents a metre, or so forth
+    * Would be nice, if a (square) grid is used, to be able to specify the metric - Euclidean, Manhattan, Chebyshev, and whatever D&D 3.5's metric is called
+  * Fog of War
+    * Probably makes the most sense in conjunction with a grid - however, it seems possible to have an "only show pogs within X range of a pog" even without a grid?
+    * Ability to specify which tiles or tile types block sight for different vision types
+    * Ability to define arbitrary vision types for the above purpose
+      * Options for different vision types - whether to calculate centre-to-centre etc.
+  * Camera lock to a particular pog or so forth
+    * Alternate control schemes, like using arrow keys or WASD to move a pog
 
 = Graphics =
   * Some default tilesets would be nice.
   * Some default pogs would be nice.
   * Animated tiles.
-  * Be able to draw ~~points, lines,~~ squares, etc.
+  * Be able to draw ~~points, lines,~~ rectangles, curves or circles, etc.
 
 = Generators =
   * Add more name generators.
@@ -44,8 +65,9 @@
   * Character generator.
 
 = Awesome =
-  * Add Cirno. (Probably as an optional add-on due to memory consumption.)
+  * Add Cirno. (Probably as a plugin due to memory consumption.)
 
 = Bugs =
   * Deleting pogs apparently sometimes deletes the wrong ones.
   * Files in general don't always seem to be sent.
+  * Erase works strangely in some cases, especially if there's no map (should you even be able to draw without a map?)
