@@ -73,3 +73,4 @@
   * Deleting pogs apparently sometimes deletes the wrong ones.
   * Files in general don't always seem to be sent.
   * Erase works strangely in some cases, especially if there's no map (should you even be able to draw without a map?)
+  * From Kaijyuu: giving pogs extremely long names causes (potentially somewhat severe) graphical problems
