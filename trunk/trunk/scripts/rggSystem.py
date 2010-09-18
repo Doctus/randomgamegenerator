@@ -153,8 +153,8 @@ def promptString(prompt, title=translate('system', "Input", 'default string prom
     return unicode(text)
 
 def promptInteger(prompt, title=translate('system', "Input", 'default integer prompt title'),
-        min=-sys.maxint, max=sys.maxint, step=1):
-    value, ok = QtGui.QInputDialog.getInt(mainWindow, title, prompt, 0, min, max, step)
+        min=-sys.maxint, max=sys.maxint, default=0, step=1):
+    value, ok = QtGui.QInputDialog.getInt(mainWindow, title, prompt, default, min, max, step)
     if not ok:
         return None
     return int(value)

@@ -720,7 +720,8 @@ def mousePress(screenPosition, mapPosition, button):
                     (screenPosition[0]*getZoom(), screenPosition[1]*getZoom()),
                     [translate('views', 'Set name'),
                         translate('views', 'Generate name'),
-                        translate('views', 'Set Layer')])
+                        translate('views', 'Set Layer'),
+                        translate('views', 'Add/Edit Property')])
                 if selected == 0:
                     name = promptString(translate('views', "Enter a name for this pog."))
                     if name is None:
@@ -738,12 +739,21 @@ def mousePress(screenPosition, mapPosition, button):
                         modifyPog(currentmap(), selectedPog)
                 elif selected == 2:
                     prompt = translate('views', "Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.")
-                    newlayer = promptInteger(prompt, min=0, max=65535)
+                    newlayer = promptInteger(prompt, min=0, max=65535, default=pog.layer)
                     if newlayer is None:
                         return
                     for selectedPog in set([pog] + list(_state.pogSelection)):
                         selectedPog.layer = newlayer
                         modifyPog(currentmap(), pog)
+                elif selected == 3:
+                    prompt = translate('views', 'Enter a name for the property (like "Level" or "HP").')
+                    key = promptString(prompt)
+                    prompt2 = translate('views', 'Enter a value for the property.')
+                    value = promptString(prompt2)
+                    if prompt is None and prompt2 is None:
+                        return
+                    for selectedPog in set([pog] + list(_state.pogSelection)):
+                        selectedPog.editProperty(key, value)
             else:
                 pass
                 #Keeping so we don't have to look up the syntax when adding a real command.
