@@ -20,7 +20,7 @@ import rggTile, rggResource, rggSystem
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
 class Pog(object):
-    def __init__(self, position, texturedimensions, size, layer, srcfile, status=0):
+    def __init__(self, position, texturedimensions, size, layer, srcfile, status=0, properties={}):
         self.ID = None
         self._position = position
         self.texturedimensions = texturedimensions
@@ -30,6 +30,7 @@ class Pog(object):
         self.name = None
         self._tileStore = None
         self._fakeHidden = False
+        self._properties = properties
         rggResource.crm.listen(srcfile, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
         if status > 0:
             self.hide()
@@ -68,6 +69,10 @@ class Pog(object):
     @property
     def size(self):
         return self._size
+    
+    @property
+    def properties(self):
+        return self._properties
 
     @size.setter
     def size(self, size):
@@ -75,6 +80,9 @@ class Pog(object):
         if self._tileStore:
             self._tileStore.setDrawW(size[0])
             self._tileStore.setDrawH(size[1])
+            
+    def editProperty(self, key, value):
+        self._properties[key] = value
     
     def displace(self, displacement):
         self.position = map(lambda p,d: p + d, self.position, displacement)
@@ -127,8 +135,10 @@ class Pog(object):
     def tooltipText(self):
         self.atttmp = []
         if self.name is not None: self.atttmp.append(unicode(self.name))
+        for key in self._properties:
+            self.atttmp.append(": ".join([key, self._properties[key]])) 
         if self.atttmp is not []:
-            return " ".join(self.atttmp)
+            return "\n".join(self.atttmp)
         return None
 
     def deriveStringForm(self):
@@ -155,7 +165,8 @@ class Pog(object):
             layer=self.layer,
             src=self._src,
             name=self.name,
-            status=self.status)
+            status=self.status,
+            properties=self.properties)
     
     @staticmethod
     def load(obj):
@@ -166,6 +177,7 @@ class Pog(object):
             loadCoordinates('Pog.size', obj.get('size'), length=2, min=1, max=65535),
             loadInteger('Pog.layer', obj.get('layer'), min=0, max=65535),
             loadString('Pog.src', obj.get('src')),
-            loadInteger('Pog.status', obj.get('status')))
+            loadInteger('Pog.status', obj.get('status')),
+            loadObject('Pog.properties', obj.get('properties')))
         pog.name = loadString('Pog.name', obj.get('name'), allowEmpty=True)
         return pog
