@@ -40,7 +40,26 @@ def roll(inpstring):
     if inpstring.isdigit(): #just save time in this case...
         return "<b>" + inpstring + "</b> (" + inpstring + ")"
     else:
-        if inpstring.find('k') != -1:
+        if inpstring.find('dn') != -1: #for Darkest Night by Jeremy Lennert
+            dicenum = int(inpstring[0:inpstring.index('dn')])
+            target = int(inpstring[inpstring.index('dn')+2:])
+            #TO-DO: The original plan was to support modifications to the rolls,
+            #but the rule that you can apply things in the order most beneficial
+            #to you, combined with not knowing all the powers etc., makes
+            #that difficult at present. Let's improve it later.
+            results = []
+            successes = 0
+            for x in range(0, dicenum):
+                results.append(_die(6))
+            for number in results:
+                if number >= target:
+                    successes += 1
+            if successes == 1:
+                return "".join(["<b>", str(results), "</b> against ", str(target), 
+                        " (", str(successes), " unmodified success)"])
+            return "".join(["<b>", str(results), "</b> against ", str(target), 
+                        " (", str(successes), " unmodified successes)"])
+        elif inpstring.find('k') != -1:
             keepnum = int(inpstring[inpstring.index('k')+1:])
             total = 0
             results = []

@@ -176,10 +176,11 @@ class diceRoller(QtGui.QDockWidget):
         super(QtGui.QDockWidget, self).__init__(mainWindow)
         self.setWindowTitle(self.tr("Dice"))
         self.realwidget = QtGui.QWidget(mainWindow) #I messed up on the initial setup and was too lazy to rename everything.
-        self.widget = QtGui.QGridLayout(mainWindow)
+        self.widget = QtGui.QGridLayout()
         self.diceArea = QtGui.QListWidget(mainWindow)
         self.macros = [QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), "Sample: 2d6"),
-                       QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), "Sample: 4k2")]
+                       QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), "Sample: 4k2"),
+                       QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), "Sample: 1dn3")]
         for m in self.macros:
             self.diceArea.addItem(m)
         self.diceArea.currentRowChanged.connect(self.changeCurrentMacro)
