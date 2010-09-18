@@ -716,6 +716,7 @@ def mousePress(screenPosition, mapPosition, button):
         elif button == BUTTON_RIGHT:
             pog = currentmap().findTopPog(mapPosition)
             if pog is not None:
+                _state.mouseButton = None
                 selected = showPopupMenuAt(
                     (screenPosition[0]*getZoom(), screenPosition[1]*getZoom()),
                     [translate('views', 'Set name'),
