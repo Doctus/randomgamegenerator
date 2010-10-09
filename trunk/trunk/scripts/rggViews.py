@@ -703,7 +703,9 @@ def mousePress(screenPosition, mapPosition, button):
                     (infograb.width(), infograb.height()),
                     (infograb.width(), infograb.height()),
                     1,
-                    _state.pogPath)
+                    _state.pogPath,
+                    0,
+                    {})
                 createPog(currentmap(), pog)
                 return
             pog = _state.currentMap.findTopPog(mapPosition)
@@ -753,8 +755,8 @@ def mousePress(screenPosition, mapPosition, button):
                     value = promptString(prompt2)
                     if prompt is None and prompt2 is None:
                         return
-                    for selectedPog in set([pog] + list(_state.pogSelection)):
-                        selectedPog.editProperty(key, value)
+                    pog.editProperty(key, value)
+                    modifyPog(currentmap(), pog)
             else:
                 pass
                 #Keeping so we don't have to look up the syntax when adding a real command.
