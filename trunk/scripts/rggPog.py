@@ -20,7 +20,7 @@ import rggTile, rggResource, rggSystem
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
 class Pog(object):
-    def __init__(self, position, texturedimensions, size, layer, srcfile, status=0, properties={}):
+    def __init__(self, position, texturedimensions, size, layer, srcfile, status, properties):
         self.ID = None
         self._position = position
         self.texturedimensions = texturedimensions
