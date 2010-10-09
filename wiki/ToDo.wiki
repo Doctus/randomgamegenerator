@@ -74,5 +74,5 @@
   * Files in general don't always seem to be sent.
   * Erase works strangely in some cases, especially if there's no map (should you even be able to draw without a map?)
   * From Kaijyuu: giving pogs extremely long names causes (potentially somewhat severe) graphical problems
-  * Antistone: look into dialog closing/map movement problems
-  * Antistone: layers for pog editing should not default to 0, and negative layers would be useful if possible
+  * ~~Antistone: look into dialog closing/map movement problems~~
+  * Antistone: ~~layers for pog editing should not default to 0, and~~ negative layers would be useful if possible
