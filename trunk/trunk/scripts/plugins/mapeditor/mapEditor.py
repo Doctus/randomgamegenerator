@@ -20,16 +20,20 @@ class mapEditor(QtGui.QDockWidget):
         #self.__eat = True
         self.painting = True
         self.dragging = False
+        self.rectStart = None
 
         self.setWindowTitle(self.tr("Map Editor"))
         self.widget = QtGui.QWidget(mainWindow)
         self.layout = QtGui.QBoxLayout(2)
         self.scrollarea = QtGui.QScrollArea(mainWindow)
-        self.togglePaintingButton = QtGui.QCheckBox(self.tr("Tile Painting"), mainWindow)
-        self.togglePaintingButton.setTristate(False)
-        self.togglePaintingButton.setCheckState(2)
+        self.noPaintingButton = QtGui.QRadioButton(self.tr("Stop Painting"), mainWindow)
+        self.singlePaintingButton = QtGui.QRadioButton(self.tr("Single Tile Brush"), mainWindow)
+        self.singlePaintingButton.setChecked(True)
+        self.rectPaintingButton = QtGui.QRadioButton(self.tr("Area (Rectangle) Brush"), mainWindow)
         self.layout.addWidget(self.scrollarea)
-        self.layout.addWidget(self.togglePaintingButton)
+        self.layout.addWidget(self.noPaintingButton)
+        self.layout.addWidget(self.singlePaintingButton)
+        self.layout.addWidget(self.rectPaintingButton)
         self.tilelabel = None
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
@@ -37,8 +41,6 @@ class mapEditor(QtGui.QDockWidget):
 
         currentMap = rggViews._state.currentMap
         self.mapChangedResponse(currentMap)
-        
-        self.connect(self.togglePaintingButton, QtCore.SIGNAL('stateChanged(int)'), self.togglePainting)
 
         rggEvent.addMapChangedListener(self)
         rggEvent.addMousePressListener(self)
@@ -47,14 +49,18 @@ class mapEditor(QtGui.QDockWidget):
         
     def mousePressResponse(self, x, y, t):
         self.dragging = True
-        if self.isVisible() and self.painting:
+        if self.isVisible() and self.singlePaintingButton.isChecked():
             clickedtile = ((rggSystem.cameraPosition()[0] + x) / self.tilelabel.tilex,
                            (rggSystem.cameraPosition()[1] + y) / self.tilelabel.tiley)
             rggViews.sendTileUpdate(rggViews._state.currentMap.ID, clickedtile, self.tilelabel.currentTile)
             rggEvent.setEaten()
+        elif self.isVisible() and self.rectPaintingButton.isChecked():
+            self.rectStart = ((rggSystem.cameraPosition()[0] + x) / self.tilelabel.tilex,
+                           (rggSystem.cameraPosition()[1] + y) / self.tilelabel.tiley)
+            rggEvent.setEaten()
 
     def mouseMoveResponse(self, x, y):
-        if self.isVisible() and self.painting and self.dragging:
+        if self.isVisible() and self.singlePaintingButton.isChecked() and self.dragging:
             clickedtile = ((rggSystem.cameraPosition()[0] + x) / self.tilelabel.tilex,
                            (rggSystem.cameraPosition()[1] + y) / self.tilelabel.tiley)
             currentmap = rggViews._state.currentMap
@@ -64,13 +70,15 @@ class mapEditor(QtGui.QDockWidget):
             
     def mouseReleaseResponse(self, x, y, t):
         self.dragging = False
-        if self.isVisible() and self.painting:
+        if self.isVisible() and self.singlePaintingButton.isChecked():
             rggEvent.setEaten()
-            
-    def togglePainting(self, stat):
-        self.painting = stat
-        self.togglePaintingButton.setCheckState(stat)
-        self.dragging = False
+        elif self.isVisible() and self.rectPaintingButton.isChecked() and self.rectStart is not None:
+            rectEnd = ((rggSystem.cameraPosition()[0] + x) / self.tilelabel.tilex,
+                       (rggSystem.cameraPosition()[1] + y) / self.tilelabel.tiley)
+            for x in range(self.rectStart[0], rectEnd[0]+cmp(rectEnd[0], self.rectStart[0]), cmp(rectEnd[0], self.rectStart[0])):
+                for y in range(self.rectStart[1], rectEnd[1]+cmp(rectEnd[1], self.rectStart[1]), cmp(rectEnd[1], self.rectStart[1])):
+                    rggViews.sendTileUpdate(rggViews._state.currentMap.ID, (x, y), self.tilelabel.currentTile)
+            rggEvent.setEaten()
 
     def mapChangedResponse(self, newMap):
         if newMap != None:
