@@ -753,7 +753,7 @@ def mousePress(screenPosition, mapPosition, button):
                     key = promptString(prompt)
                     prompt2 = translate('views', 'Enter a value for the property.')
                     value = promptString(prompt2)
-                    if prompt is None and prompt2 is None:
+                    if key is None or value is None:
                         return
                     pog.editProperty(key, value)
                     modifyPog(currentmap(), pog)
