@@ -147,6 +147,8 @@ class BaseClient(object):
             filename=filedata.filename,
             size=filedata.size,
             checksum=filedata.digest)
+        message = "[{0}] Requested transfer of {filename} [{size} {checksum}]"
+        print message.format(self.obj.context, filename=filedata.filename, size=filedata.size,checksum=filedata.digest)
         self._updatetransfer()
         return True
 
@@ -167,12 +169,12 @@ class BaseClient(object):
                     size=filedata.size,
                     digest=filedata.digest)
                 socket = self.xfer
-                message = "[{0}] Offering transfer of {filename}"
+                message = "[{0}] Offering transfer of {filename} [{size} {checksum}]"
             else:
                 self.obj.sendMessage(MESSAGE_IGNORE, filename=filedata.filename)
                 socket = self.obj
-                message = "[{0}] Ignored transfer of {filename}"
-            print message.format(socket.context, filename=filedata.filename)
+                message = "[{0}] Ignored transfer of {filename} [{size} {checksum}]"
+            print message.format(socket.context, filename=filedata.filename, size=filedata.size,checksum=filedata.digest)
         
     
     def _updateReceive(self):
@@ -184,14 +186,14 @@ class BaseClient(object):
             if self._shouldReceiveFile(self.receivedfile):
                 self.xfer.sendMessage(MESSAGE_ACCEPT, filename=filename)
                 self.xfer.receiveFile(self.receivedfile)
-                message = "[{0}] Accepted transfer of {filename}"
+                message = "[{0}] Accepted transfer of {filename} [{size} {checksum}]"
             else:
                 self._fileFailed(filename)
                 self.xfer.sendMessage(MESSAGE_REJECT, filename=filename)
-                message = "[{0}] Rejected transfer of {filename}"
+                message = "[{0}] Rejected transfer of {filename} [{size} {checksum}]"
             self.getList.discard(filename)
             self.receivedfile = None
-            print message.format(self.xfer.context, filename=filename)
+            print message.format(self.xfer.context, filename=filename, size=self.receivedFile.size, checksum=self.receivedFile.digest)
     
     def _updatetransfer(self):
         """Opens or updates the transfer socket."""
@@ -219,6 +221,7 @@ class BaseClient(object):
         try:
             # Can we open the file?
             if not fileData.file.open(QtCore.QFile.ReadOnly):
+                print "SENDFILE Could not open"
                 return False
             try:
                 file = fileData.file
@@ -227,6 +230,7 @@ class BaseClient(object):
                 digest = generateChecksum(file)
                 if fileData.size is not None and fileData.digest is not None:
                     if size == fileData.size and digest == fileData.digest:
+                        print "SENDFILE Size and digest match"
                         return False
                 
                 fileData.size = file.size()
@@ -235,9 +239,11 @@ class BaseClient(object):
                 # User hook
                 if not self.allowSend(fileData.filename,
                         fileData.size, fileData.digest):
+                    print "SENDFILE User hook"
                     return False
                 
                 file = None
+                print "SENDFILE Success"
                 return True
             finally:
                 if file:
@@ -252,23 +258,28 @@ class BaseClient(object):
         
         # Did we ask for the file?
         if not filename in self.getList:
+            print "RECVFILE Duplicate"
             return False
         try:
             # Can we open the file?
             if not file.open(QtCore.QFile.ReadWrite):
+                print "RECVFILE Could not open"
                 return False
             try:
                 # Do we already have an identical copy?
                 if file.size() == fileData.size:
                     if generateChecksum(file) == fileData.digest:
+                        print "RECVFILE Size and digest match"
                         return False
                         
                 # User hook
                 if not self.allowReceipt(fileData.filename,
                         fileData.size, fileData.digest):
+                    print "RECVFILE User hook"
                     return False
                 
                 file = None
+                print "RECVFILE Success"
                 return True
             finally:
                 if file:
