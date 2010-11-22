@@ -20,7 +20,7 @@ import rggTile, rggResource, rggSystem
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
 class Pog(object):
-    def __init__(self, position, texturedimensions, size, layer, srcfile, status, properties):
+    def __init__(self, position, texturedimensions, size, layer, srcfile, status, locked, properties):
         self.ID = None
         self._position = position
         self.texturedimensions = texturedimensions
@@ -31,6 +31,7 @@ class Pog(object):
         self._tileStore = None
         self._fakeHidden = False
         self._properties = properties
+        self._locked = locked #locked only works for mouse movements. This means that scripts may actually be able to move the pog.
         rggResource.crm.listen(srcfile, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
         if status > 0:
             self.hide()
@@ -85,6 +86,9 @@ class Pog(object):
         self._properties[key] = value
     
     def displace(self, displacement):
+        if self._locked:
+            return self.position
+
         self.position = map(lambda p,d: p + d, self.position, displacement)
         return self.position
 
@@ -166,6 +170,7 @@ class Pog(object):
             src=self._src,
             name=self.name,
             status=self.status,
+            locked=self._locked,
             properties=self.properties)
     
     @staticmethod
@@ -178,6 +183,7 @@ class Pog(object):
             loadInteger('Pog.layer', obj.get('layer'), min=0, max=65535),
             loadString('Pog.src', obj.get('src')),
             loadInteger('Pog.status', obj.get('status')),
+            loadInteger('Pog._locked', obj.get('locked')),
             loadObject('Pog.properties', obj.get('properties')))
         pog.name = loadString('Pog.name', obj.get('name'), allowEmpty=True)
         return pog

@@ -729,6 +729,7 @@ def mousePress(screenPosition, mapPosition, button):
                     1,
                     _state.pogPath,
                     0,
+                    0,
                     {})
                 createPog(currentmap(), pog)
                 return
