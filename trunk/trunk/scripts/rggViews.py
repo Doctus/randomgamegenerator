@@ -348,6 +348,30 @@ def saveMap():
     
     jsondump(map.dump(), filename)
 
+def saveChars():
+    
+    filename = promptSaveFile(translate('views', 'Save Characters'),
+        translate('views', 'Random Game Character files (*.rgc)'),
+        rggSystem.MAP_DIR)
+    if not filename:
+        return
+    
+    jsondump(_state.icwidget.dump(), filename)
+    
+def loadChars():
+    
+    filename = promptLoadFile(translate('views', 'Open Characters'),
+        translate('views', 'Random Game Character files (*.rgc)'),
+        rggSystem.MAP_DIR)
+    if not filename:
+        return
+    try:
+        obj = jsonload(filename)
+        _state.icwidget.load(obj)
+    except Exception as e:
+        showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
+        return
+
 @serverRPC
 def respondMapCreate(ID, mapDump):
     """Creates or updates the map with the given ID."""

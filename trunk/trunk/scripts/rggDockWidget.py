@@ -1,6 +1,7 @@
 from PyQt4 import QtGui, QtCore
 from rggSystem import signal, findFiles, POG_DIR, LOG_DIR, IMAGE_EXTENSIONS, makePortableFilename
 from rggDialogs import newCharacterDialog
+from rggJson import loadObject, loadString, jsondump, jsonload
 import os, os.path
 
 class chatLineEdit(QtGui.QLineEdit):
@@ -82,6 +83,30 @@ class chatWidget(QtGui.QDockWidget):
         """
     )
     
+class ICChar():
+    """I should probably be in another file but I'm here anyway! Nyah!"""
+    
+    def __init__(self, i, na, por):
+        self.id = i
+        self.name = na
+        self.portrait = por
+        
+    def dump(self):
+        """Serialize to a (ry"""
+        return dict(
+            id=self.id,
+            name=self.name,
+            portrait=self.portrait)
+    
+    @staticmethod
+    def load(obj):
+        """Deserialize (ry"""
+        char = ICChar(
+            loadString('ICChar.id', obj.get('id')),
+            loadString('ICChar.name', obj.get('name')),
+            loadString('ICChar.portrait', obj.get('portrait')))
+        return char
+    
 class ICChatWidget(QtGui.QDockWidget):
 
     def __init__(self, mainWindow):
@@ -113,7 +138,10 @@ class ICChatWidget(QtGui.QDockWidget):
         mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self)
         
         #TODO: Store and access characters in a better fashion.
-        self.characters = []
+        try:
+            self.load(jsonload("autosave.rgc"))
+        except:
+            self.characters = []
         
         self.widgetLineInput.returnPressed.connect(self.processInput)
         self.connect(self.characterAddButton, QtCore.SIGNAL('pressed()'), self.newCharacter)
@@ -144,22 +172,47 @@ class ICChatWidget(QtGui.QDockWidget):
             return valid
         
         if dialog.exec_(self.parentWidget(), accept):
-            newchar = dialog.save()
-            self.characterSelector.addItem(newchar[0])
+            newchardat = dialog.save()
+            newchar = ICChar(*newchardat)
+            self.characterSelector.addItem(newchar.id)
             self.characters.append(newchar)
+            jsondump(self.dump(), "autosave.rgc")
+            
+    def _newChar(self, char):
+        self.characterSelector.addItem(char.id)
+        self.characters.append(char)
+        jsondump(self.dump(), "autosave.rgc")
             
     def deleteCharacter(self):
         if self.characters is not None:
             self.characters.pop(self.characterSelector.currentIndex())
             self.characterSelector.removeItem(self.characterSelector.currentIndex())
+            jsondump(self.dump(), "autosave.rgc")
         
     def processInput(self):
         self.newmes = unicode(self.widgetLineInput.text())
         self.widgetLineInput.clear()
         self.widgetLineInput.addMessage(self.newmes)
         self.ICChatInput.emit(self.newmes,
-                            unicode(self.characters[self.characterSelector.currentIndex()][1]),
-                            unicode(self.characters[self.characterSelector.currentIndex()][2]))
+                            unicode(self.characters[self.characterSelector.currentIndex()].name),
+                            unicode(self.characters[self.characterSelector.currentIndex()].portrait))
+                            
+    def dump(self):
+        """Serialize to an object valid for JSON dumping."""
+
+        return dict(
+            chars=dict([(i, char.dump()) for i, char in enumerate(self.characters)]))
+    
+    def load(self, obj):
+        """Deserialize set of IC characters from a dictionary."""
+        
+        self.characters = []
+        self.characterSelector.clear()
+        
+        chars = loadObject('ICChatWidget.chars', obj.get('chars'))
+        for ID, char in chars.items():
+            loaded = ICChar.load(char)
+            self._newChar(loaded)
     
     ICChatInput = signal(basestring, basestring, basestring, doc=
         """Called when in-character chat input is received.
