@@ -123,7 +123,7 @@ cGame::cGame(QWidget *parent) : QObject(parent)
     QTimer *timer2 = new QTimer(this);
     connect(timer , SIGNAL(timeout()), this, SLOT(draw()));
     connect(timer2, SIGNAL(timeout()), this, SLOT(displayFPS()));
-    timer ->start(33);
+    timer ->start(16);
     timer2->start(1000);
 }
 
