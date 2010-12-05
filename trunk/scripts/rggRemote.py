@@ -132,10 +132,6 @@ def sendWhisper(user, target, message):
 def respondUserJoin(username):
     say(translate('remote', "{name} has joined!".format(name=username)))
 
-@serverRPC
-def respondUserLeave(username):
-    say(translate('remote', "{name} has left the game.".format(name=username)))
-
 # LOW-LEVEL NETWORKING
 
 def clientConnect(client, username):
