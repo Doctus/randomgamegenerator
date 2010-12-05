@@ -192,8 +192,8 @@ class BaseClient(object):
                 self.xfer.sendMessage(MESSAGE_REJECT, filename=filename)
                 message = "[{0}] Rejected transfer of {filename} [{size} {checksum}]"
             self.getList.discard(filename)
-            self.receivedfile = None
             print message.format(self.xfer.context, filename=filename, size=self.receivedfile.size, checksum=self.receivedfile.digest)
+            self.receivedfile = None
     
     def _updatetransfer(self):
         """Opens or updates the transfer socket."""
