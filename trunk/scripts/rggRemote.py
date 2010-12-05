@@ -153,7 +153,7 @@ def clientDisconnect(client, errorMessage):
     
     """
     #print "Client disconnected."
-    say(translate('remote', "Disconnected. {0}").format(errorMessage))
+    sendUserActivity(translate('remote', "Disconnected. {0}").format(errorMessage))
     
 def clientReceive(client, data):
     """Occurs when the client receives data.
@@ -181,7 +181,7 @@ def serverConnect(server, username):
     #print "Server found user."
     user = User(username)
     rggViews.adduser(user)
-    respondUserActivity(translate('remote', '{name} has joined.').format(name=username))
+    sendUserActivity(translate('remote', '{name} has joined.').format(name=username))
     for ID, map in allmaps():
         rggViews.respondMapCreate(user, ID, map.dump())
 
