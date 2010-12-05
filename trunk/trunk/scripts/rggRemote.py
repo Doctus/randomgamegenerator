@@ -144,7 +144,8 @@ def clientConnect(client, username):
     #print "Client connected."
     rggViews.renameuser(localhandle(), username)
     rggViews.closeAllMaps()
-    say(translate('remote', "Welcome, {name}!".format(name=username)))
+    #say(translate('remote', "Welcome, {name}!".format(name=username)))
+    sendUserActivity(translate('remote', "Welcome, {name}!".format(name=username)))
 
 def clientDisconnect(client, errorMessage):
     """Occurs when the client connection disconnects without being told to.
@@ -181,7 +182,6 @@ def serverConnect(server, username):
     #print "Server found user."
     user = User(username)
     rggViews.adduser(user)
-    sendUserActivity(translate('remote', '{name} has joined.').format(name=username))
     for ID, map in allmaps():
         rggViews.respondMapCreate(user, ID, map.dump())
 
