@@ -132,6 +132,10 @@ def sendWhisper(user, target, message):
 def respondUserJoin(username):
     say(translate('remote', "{name} has joined!".format(name=username)))
 
+@serverRPC
+def respondUserLeave(username):
+    say(translate('remote', "{name} has left the game.".format(name=username)))
+
 # LOW-LEVEL NETWORKING
 
 def clientConnect(client, username):
@@ -148,7 +152,7 @@ def clientDisconnect(client, errorMessage):
     
     """
     #print "Client disconnected."
-    sendUserActivity(translate('remote', "Disconnected. {0}").format(errorMessage))
+    say(translate('remote', "Disconnected. {0}").format(errorMessage))
     
 def clientReceive(client, data):
     """Occurs when the client receives data.
