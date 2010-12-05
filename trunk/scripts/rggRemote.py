@@ -130,7 +130,7 @@ def sendWhisper(user, target, message):
 
 @serverRPC
 def respondUserJoin(username):
-    say(translate('remote', "{name} has joined!".format(name=username)))
+    say(translate('remote', "{name} has joined!").format(name=username))
 
 # LOW-LEVEL NETWORKING
 
@@ -139,7 +139,7 @@ def clientConnect(client, username):
     #print "Client connected."
     rggViews.renameuser(localhandle(), username)
     rggViews.closeAllMaps()
-    say(translate('remote', "Welcome, {name}!".format(name=username)))
+    say(translate('remote', "Welcome, {name}!").format(name=username))
 
 def clientDisconnect(client, errorMessage):
     """Occurs when the client connection disconnects without being told to.
