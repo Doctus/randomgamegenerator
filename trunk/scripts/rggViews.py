@@ -523,7 +523,7 @@ def respondMovementPog(mapID, pogID, newpos):
     """Creates or updates a pog on the client."""
     pogMap = getmap(mapID)
     if pogMap is None:
-        print "Attempt to move pog in nonextant map: {0}".format(mapID)
+        print "Attempt to move pog in nonexistant map: {0}".format(mapID)
         return
     if pogID in pogMap.Pogs:
         pog = pogMap.Pogs[pogID]
@@ -539,10 +539,10 @@ def sendMovementPog(user, mapID, pogID, newpos):
 
 @serverRPC
 def respondHidePog(mapID, pogID, hidden):
-    """Creates or updates a pog on the client."""
+    """Hides or shows a pog on the client."""
     pogMap = getmap(mapID)
     if pogMap is None:
-        print "Attempt to move pog in nonextant map: {0}".format(mapID)
+        print "Attempt to hide pog in nonexistant map: {0}".format(mapID)
         return
     if pogID in pogMap.Pogs:
         pog = pogMap.Pogs[pogID]
@@ -553,11 +553,30 @@ def respondHidePog(mapID, pogID, hidden):
 
 @clientRPC
 def sendHidePog(user, mapID, pogID, hidden):
-    """Creates or updates a pog on the server."""
+    """Hides or shows a pog on the server."""
     pogMap = getmap(mapID)
     if not pogMap:
         return
     respondHidePog(allusers(), mapID, pogID, hidden)
+
+@serverRPC
+def respondLockPog(mapID, pogID, locked):
+    """Locks or unlocks a pog on the client."""
+    pogMap = getmap(mapID)
+    if pogMap is None:
+        print "Attempt to lock pog in nonexistant map: {0}".format(mapID)
+        return
+    if pogID in pogMap.Pogs:
+        pog = pogMap.Pogs[pogID]
+        pog._locked = locked
+
+@clientRPC
+def sendLockPog(user, mapID, pogID, locked):
+    """Locks or unlocks a pog on the server."""
+    pogMap = getmap(mapID)
+    if not pogMap:
+        return
+    respondLockPog(allusers(), mapID, pogID, locked)
 
 # DRAWING
 

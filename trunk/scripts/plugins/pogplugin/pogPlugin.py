@@ -145,6 +145,7 @@ class pogListWidget(QtGui.QListWidget):
             elif selection == 3:
                 pog = item.getPog()
                 pog._locked = not pog._locked
+                rggViews.sendLockPog(rggViews._state.currentMap.ID, pog.ID, pog._locked)
             elif selection == 4:
                 pog = item.getPog()
                 d = layerDialog(pog.layer)
