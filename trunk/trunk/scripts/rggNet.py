@@ -184,15 +184,16 @@ class BaseClient(object):
         if self.receivedfile:
             filename = self.receivedfile.filename
             if self._shouldReceiveFile(self.receivedfile):
+                message = "[{0}] Accepted transfer of {filename} [{size} {checksum}]"
+                print message.format(self.xfer.context, filename=filename, size=self.receivedfile.size, checksum=self.receivedfile.digest)
                 self.xfer.sendMessage(MESSAGE_ACCEPT, filename=filename)
                 self.xfer.receiveFile(self.receivedfile)
-                message = "[{0}] Accepted transfer of {filename} [{size} {checksum}]"
             else:
+                message = "[{0}] Rejected transfer of {filename} [{size} {checksum}]"
+                print message.format(self.xfer.context, filename=filename, size=self.receivedfile.size, checksum=self.receivedfile.digest)
                 self._fileFailed(filename)
                 self.xfer.sendMessage(MESSAGE_REJECT, filename=filename)
-                message = "[{0}] Rejected transfer of {filename} [{size} {checksum}]"
             self.getList.discard(filename)
-            print message.format(self.xfer.context, filename=filename, size=self.receivedfile.size, checksum=self.receivedfile.digest)
             self.receivedfile = None
     
     def _updatetransfer(self):
