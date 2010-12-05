@@ -135,7 +135,7 @@ def respondUserActivity(message):
 @clientRPC
 def sendUserActivity(user, message):
     """Used when users join or leave"""
-    respondWhisperSender(allusers(), message)
+    respondUserActivity(allusers(), message)
 
 # LOW-LEVEL NETWORKING
 
