@@ -2,7 +2,7 @@
 initialization - for the Random Game Generator project            
 By Doctus (kirikayuumura.noir@gmail.com)
 
-Qt and C++ servces.
+Qt and C++ services.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
