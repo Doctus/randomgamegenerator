@@ -81,21 +81,21 @@ class menuBar(object):
                 self.pluginsActs.append(QtGui.QAction(unicode(self.pluginsModules[-1].title()), main))
                 self.pluginsActs[-1].triggered.connect(self.pluginsInits[-1])
         
-        selectIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-select-icon.png"), "Select Tool", main)
-        selectIcon.setShortcut("Ctrl+T");
-        selectIcon.setToolTip("Select Tool (Ctrl+T)");
+        self.selectIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-select-icon.png"), "Select Tool", main)
+        self.selectIcon.setShortcut("Ctrl+T")
+        self.selectIcon.setToolTip("Select Tool (Ctrl+T)")
         
-        moveIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-move-icon.png"), "Move Tool", main)
-        moveIcon.setShortcut("Ctrl+M");
-        moveIcon.setToolTip("Move Tool (Ctrl+M)");
+        self.moveIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-move-icon.png"), "Move Tool", main)
+        self.moveIcon.setShortcut("Ctrl+M")
+        self.moveIcon.setToolTip("Move Tool (Ctrl+M)")
 
-        drawIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-freehand-icon.png"), "Draw Tool", main)
-        drawIcon.setShortcut("Ctrl+E");
-        drawIcon.setToolTip("Draw Tool (Ctrl+E)");
+        self.drawIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-freehand-icon.png"), "Draw Tool", main)
+        self.drawIcon.setShortcut("Ctrl+E")
+        self.drawIcon.setToolTip("Draw Tool (Ctrl+E)")
 
-        deleteIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-eraser-icon.png"), "Delete Tool", main)
-        deleteIcon.setShortcut("Ctrl+R");
-        deleteIcon.setToolTip("Delete Tool (Ctrl+R)");
+        self.deleteIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-eraser-icon.png"), "Delete Tool", main)
+        self.deleteIcon.setShortcut("Ctrl+R")
+        self.deleteIcon.setToolTip("Delete Tool (Ctrl+R)")
         
         # MENUS
         
@@ -131,29 +131,43 @@ class menuBar(object):
         menubar.addMenu(drawMenu)
         menubar.addMenu(pluginsMenu)
         menubar.addSeparator()
-        menubar.addAction(selectIcon)
-        menubar.addAction(moveIcon)
-        menubar.addAction(drawIcon)
-        menubar.addAction(deleteIcon)
+        menubar.addAction(self.selectIcon)
+        menubar.addAction(self.moveIcon)
+        menubar.addAction(self.drawIcon)
+        menubar.addAction(self.deleteIcon)
 
         # EVENTS
         
         self.selectedIcon = 0
-        selectIcon.triggered.connect(self.selectIconClicked)
-        moveIcon.triggered.connect(self.moveIconClicked)
-        drawIcon.triggered.connect(self.drawIconClicked)
-        deleteIcon.triggered.connect(self.deleteIconClicked)
+        self.selectIcon.triggered.connect(self.selectIconClicked)
+        self.moveIcon.triggered.connect(self.moveIconClicked)
+        self.drawIcon.triggered.connect(self.drawIconClicked)
+        self.deleteIcon.triggered.connect(self.deleteIconClicked)
+        
+    def resetIcons(self):
+        self.selectIcon.setIcon(QtGui.QIcon("./data/FAD-select-icon.png"))
+        self.moveIcon.setIcon(QtGui.QIcon("./data/FAD-move-icon.png"))
+        self.drawIcon.setIcon(QtGui.QIcon("./data/FAD-freehand-icon.png"))
+        self.deleteIcon.setIcon(QtGui.QIcon("./data/FAD-eraser-icon.png"))
     
     def selectIconClicked(self):
+        self.resetIcons()
+        self.selectIcon.setIcon(QtGui.QIcon("./data/FAD-select-icon-selected.png"))
         self.selectedIcon = ICON_SELECT
     
     def moveIconClicked(self):
+        self.resetIcons()
+        self.moveIcon.setIcon(QtGui.QIcon("./data/FAD-move-icon-selected.png"))
         self.selectedIcon = ICON_MOVE
 
     def drawIconClicked(self):
+        self.resetIcons()
+        self.drawIcon.setIcon(QtGui.QIcon("./data/FAD-freehand-icon-selected.png"))
         self.selectedIcon = ICON_DRAW
 
     def deleteIconClicked(self):
+        self.resetIcons()
+        self.deleteIcon.setIcon(QtGui.QIcon("./data/FAD-eraser-icon-selected.png"))
         self.selectedIcon = ICON_DELETE
     
     
