@@ -21,9 +21,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os, os.path
 import rggMap
-from rggSystem import fake, translate, showErrorMessage, findFiles, IMAGE_EXTENSIONS, TILESET_DIR, makePortableFilename
+from rggSystem import fake, translate, showErrorMessage, findFiles, IMAGE_EXTENSIONS, TILESET_DIR, SAVE_DIR, makePortableFilename
 from rggFields import integerField, stringField, dropDownField, validationError
 from rggNet import ConnectionData, localHost
+from rggJson import loadObject, loadString, jsondump, jsonload
 from PyQt4 import QtGui, QtCore
 
 class dialog(object):
@@ -264,13 +265,23 @@ class joinDialog(dialog):
     def _createFields(self, data):
         """Create the fields used by this dialog."""
         
+        self.fieldtemp = [localHost(), 6812, translate('joinDialog', 'Anonymous')]
+        
+        try:
+            js = jsonload(os.path.join(SAVE_DIR, "net_settings.rgs"))
+            self.fieldtemp[0] = loadString('joinDialog.host', js.get('host'))
+            self.fieldtemp[1] = int(loadString('joinDialog.port', js.get('port')))
+            self.fieldtemp[2] = loadString('joinDialog.username', js.get('username'))
+        except:
+            pass
+        
         return dict(
             username=stringField(translate('joinDialog', 'Username'),
-                value=data.get('username', translate('joinDialog', 'Anonymous'))),
+                value=data.get('username', self.fieldtemp[2])),
             host=stringField(translate('joinDialog', 'Host Name (IP)'),
-                value=data.get('host', localHost())),
+                value=data.get('host', self.fieldtemp[0])),
             port=integerField(translate('joinDialog', 'Port'),
-                min=1, max=65535, value=data.get('port', 6812)))
+                min=1, max=65535, value=data.get('port', self.fieldtemp[1])))
     
     def _interpretFields(self, fields):
         """Interpret the fields into a dictionary of clean items."""
@@ -334,9 +345,18 @@ class joinDialog(dialog):
         self.cleanData = self._interpretFields(self.fields)
         return self.cleanData
     
+    def dump(self):
+        return dict(host=self.cleanData['host'],
+                    port=str(self.cleanData['port']),
+                    username=str(self.cleanData['username']))
+    
     def save(self):
         """Make a new map and return it."""
         assert(self.cleanData)
+        try:
+            jsondump(self.dump(), os.path.join(SAVE_DIR, "net_settings.rgs"))
+        except:
+            pass
         return ConnectionData(self.cleanData['host'], self.cleanData['port'],
             self.cleanData['username'])
     
