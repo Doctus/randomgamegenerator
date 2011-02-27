@@ -49,6 +49,7 @@ PLUGINS_DIR = 'plugins'
 LOG_DIR = 'save/logs'
 MAP_DIR = 'save/maps'
 CHAR_DIR = 'save/characters'
+SAVE_DIR = 'save'
 
 _main = None
 mainWindow = None
