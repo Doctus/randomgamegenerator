@@ -2,11 +2,11 @@
 
 = General =
   * ~~Something that's already been done.~~
-  * Clean up some things that don't allow spaces so that they do.
+  * ~~Clean up some things that don't allow spaces so that they do.~~
   * Screen layout should be remembered in a config file.
   * ~~In-character chat characters (which should maybe be renamed - "the characters in the message from the in-character chat character") should also be saved somehow, possibly in the config file~~
   * The way plugins work is rather jury-rigged; at least the "selecting the plugin multiple times produces multiple instances" should be fixed
-  * The logs could do with some prettying-up - it's all just dumped into one big file at the moment
+  * ~~The logs could do with some prettying-up - it's all just dumped into one big file at the moment~~
   * Maybe some sort of music or sound support (through Phonon?)
 
 = Network =
