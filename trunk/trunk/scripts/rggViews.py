@@ -352,7 +352,7 @@ def saveChars():
     
     filename = promptSaveFile(translate('views', 'Save Characters'),
         translate('views', 'Random Game Character files (*.rgc)'),
-        rggSystem.MAP_DIR)
+        rggSystem.CHAR_DIR)
     if not filename:
         return
     
@@ -362,7 +362,7 @@ def loadChars():
     
     filename = promptLoadFile(translate('views', 'Open Characters'),
         translate('views', 'Random Game Character files (*.rgc)'),
-        rggSystem.MAP_DIR)
+        rggSystem.CHAR_DIR)
     if not filename:
         return
     try:

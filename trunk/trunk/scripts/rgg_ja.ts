@@ -20,7 +20,7 @@
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="36"/>
         <source>Ctrl+N</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="39"/>
@@ -30,7 +30,7 @@
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="40"/>
         <source>Ctrl+L</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="43"/>
@@ -41,7 +41,7 @@
         <location filename="../src/Widgets/wMenuBar.cpp" line="44"/>
         <location filename="../src/Widgets/wMenuBar.cpp" line="60"/>
         <source>Ctrl+S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="47"/>
@@ -51,7 +51,7 @@
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="48"/>
         <source>Ctrl+T</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="51"/>
@@ -61,7 +61,7 @@
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="52"/>
         <source>Ctrl+H</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="55"/>
@@ -71,12 +71,12 @@
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="56"/>
         <source>Ctrl+J</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="65"/>
         <source>Ctrl+M</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/Widgets/wMenuBar.cpp" line="72"/>
