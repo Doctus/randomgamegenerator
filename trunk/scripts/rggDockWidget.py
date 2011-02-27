@@ -1,8 +1,8 @@
 from PyQt4 import QtGui, QtCore
-from rggSystem import signal, findFiles, POG_DIR, LOG_DIR, IMAGE_EXTENSIONS, makePortableFilename
+from rggSystem import signal, findFiles, POG_DIR, LOG_DIR, IMAGE_EXTENSIONS, CHAR_DIR, makePortableFilename
 from rggDialogs import newCharacterDialog
 from rggJson import loadObject, loadString, jsondump, jsonload
-import os, os.path
+import os, os.path, time
 
 class chatLineEdit(QtGui.QLineEdit):
 
@@ -62,7 +62,7 @@ class chatWidget(QtGui.QDockWidget):
             self.widgetEditor.verticalScrollBar().setValue(self.widgetEditor.verticalScrollBar().maximum())
         try:
             try:
-                self.logfile = open(os.path.join(LOG_DIR, 'DEBUGchatlog.txt'), 'a')
+                self.logfile = open(os.path.join(LOG_DIR, time.strftime("%b_%d_%Y.log", time.localtime())), 'a')
                 self.logfile.write(mes+"\n")
             finally:
                 self.logfile.close()
@@ -139,7 +139,7 @@ class ICChatWidget(QtGui.QDockWidget):
         
         #TODO: Store and access characters in a better fashion.
         try:
-            self.load(jsonload("autosave.rgc"))
+            self.load(jsonload(os.path.join(CHAR_DIR, "autosave.rgc")))
         except:
             self.characters = []
         
@@ -155,7 +155,7 @@ class ICChatWidget(QtGui.QDockWidget):
             self.widgetEditor.verticalScrollBar().setValue(self.widgetEditor.verticalScrollBar().maximum())
         try:
             try:
-                self.logfile = open(os.path.join(LOG_DIR, 'DEBUGchatlog.txt'), 'a')
+                self.logfile = open(os.path.join(LOG_DIR, time.strftime("%b_%d_%Y.log", time.localtime())), 'a')
                 self.logfile.write(mes+"\n")
             finally:
                 self.logfile.close()
@@ -176,18 +176,18 @@ class ICChatWidget(QtGui.QDockWidget):
             newchar = ICChar(*newchardat)
             self.characterSelector.addItem(newchar.id)
             self.characters.append(newchar)
-            jsondump(self.dump(), "autosave.rgc")
+            jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
             
     def _newChar(self, char):
         self.characterSelector.addItem(char.id)
         self.characters.append(char)
-        jsondump(self.dump(), "autosave.rgc")
+        jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
             
     def deleteCharacter(self):
         if self.characters is not None:
             self.characters.pop(self.characterSelector.currentIndex())
             self.characterSelector.removeItem(self.characterSelector.currentIndex())
-            jsondump(self.dump(), "autosave.rgc")
+            jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
         
     def processInput(self):
         self.newmes = unicode(self.widgetLineInput.text())

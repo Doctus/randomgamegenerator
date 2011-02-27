@@ -46,8 +46,9 @@ TILESET_DIR = 'data/tilesets'
 POG_DIR = 'data/pogs'
 PORTRAIT_DIR = 'data/portraits'
 PLUGINS_DIR = 'plugins'
-LOG_DIR = 'logs'
-MAP_DIR = 'maps'
+LOG_DIR = 'save/logs'
+MAP_DIR = 'save/maps'
+CHAR_DIR = 'save/characters'
 
 _main = None
 mainWindow = None
