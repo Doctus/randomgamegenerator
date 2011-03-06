@@ -91,9 +91,11 @@ class pogItem(QtGui.QListWidgetItem):
         self.__pog = pog
         name = pog.name
         if name == None or len(name) <= 0:
-          name = "No name"
+            name = "No name"
+        if pog._locked:
+            name += " [L]"
         if pog.hidden:
-          name += " (hidden)"
+            name += " [H]"
         self.setText(name)
 
 class pogListWidget(QtGui.QListWidget):
@@ -106,55 +108,66 @@ class pogListWidget(QtGui.QListWidget):
         pos = event.globalPos()
         x = pos.x()
         y = pos.y()
-        item = self.itemAt(event.x(), event.y())
+        specificItem = self.itemAt(event.x(), event.y())
+        if specificItem not in self.selectedItems():
+            self.setItemSelected(specificItem, True)
+        items = self.selectedItems()
         event.accept()
 
-        if item is None:
+        if items is None or specificItem is None:
             return
 
         if event.button() == QtCore.Qt.RightButton:
             hide = 'Hide'
             lock = 'Lock'
 
-            if item.getPog().hidden:
+            if specificItem.getPog().hidden:
                 hide = 'Show'
-            if item.getPog()._locked:
+            if specificItem.getPog()._locked:
                 lock = 'Unlock'
 
             selection = rggSystem.showPopupMenuAtAbs([x, y], ['Center', hide, 'Resize', lock, 'Change Layer', 'Delete'])
             if selection == 0:
                 camsiz = rggSystem.cameraSize()
-                pospog = item.getPog().position
-                pogw = item.getPog()._tile.getW()
-                pogh = item.getPog()._tile.getH()
+                pospog = specificItem.getPog().position
+                pogw = specificItem.getPog()._tile.getW()
+                pogh = specificItem.getPog()._tile.getH()
                 newpos = (pospog[0] - camsiz[0]/2 + pogw/2, pospog[1] - camsiz[1]/2 + pogh/2)
                 rggSystem.setCameraPosition(newpos)
             elif selection == 1:
-                pog = item.getPog()
-                if pog.hidden:
-                  pog.show()
-                else:
-                  pog.hide()
-                item.setPog(pog)
-                rggViews.sendHidePog(rggViews._state.currentMap.ID, pog.ID, pog.hidden)
+                for item in items:
+                    pog = item.getPog()
+                    if pog.hidden:
+                        pog.show()
+                    else:
+                        pog.hide()
+                    item.setPog(pog)
+                    rggViews.sendHidePog(rggViews._state.currentMap.ID, pog.ID, pog.hidden)
             elif selection == 2:
-                pog = item.getPog()
-                d = resizeDialog(pog._tile.getW(), pog._tile.getH(), pog.size[0], pog.size[1])
+                specificPog = specificItem.getPog()
+                d = resizeDialog(specificPog._tile.getW(), specificPog._tile.getH(), specificPog.size[0], specificPog.size[1])
                 if d.exec_():
-                    pog.size = (d.wBox.value(), d.hBox.value())
+                    for item in items:
+                        pog = item.getPog()
+                        pog.size = (d.wBox.value(), d.hBox.value())
             elif selection == 3:
-                pog = item.getPog()
-                pog._locked = not pog._locked
-                rggViews.sendLockPog(rggViews._state.currentMap.ID, pog.ID, pog._locked)
+                for item in items:
+                    pog = item.getPog()
+                    pog._locked = not pog._locked
+                    item.setPog(pog)
+                    rggViews.sendLockPog(rggViews._state.currentMap.ID, pog.ID, pog._locked)
             elif selection == 4:
-                pog = item.getPog()
-                d = layerDialog(pog.layer)
+                specificPog = specificItem.getPog()
+                d = layerDialog(specificPog.layer)
                 if d.exec_():
-                    pog.layer = d.box.value()
+                    for item in items:
+                        pog = item.getPog()
+                        pog.layer = d.box.value()
             elif selection == 5:
-                rggViews.deletePog(rggViews.currentmap(), item.getPog())
-                item.dead = True
-                self.takeItem(self.row(item))
+                for item in items:
+                    rggViews.deletePog(rggViews.currentmap(), item.getPog())
+                    item.dead = True
+                    self.takeItem(self.row(item))
         else:
             super(QtGui.QListWidget, self).mousePressEvent(event)
 
