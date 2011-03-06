@@ -49,6 +49,10 @@ class viewController(QtGui.QDockWidget):
         self.layout.addWidget(self.layerList, 1, 0, 1, 2)
         self.layout.addWidget(self.mapTitle, 3, 0)
         self.layout.addWidget(self.mapList, 4, 0, 1, 2)
+        self.refreshbutton = QtGui.QPushButton(self.tr("Force Refresh"), mainWindow)
+        self.refreshbutton.setToolTip(self.tr("Force refresh of all pog images. This really should be elsewhere but there were dependency issues."))
+        self.layout.addWidget(self.refreshbutton, 5, 0)
+        self.refreshbutton.pressed.connect(self.refreshPogs)
         self.layout.setRowMinimumHeight(2, 10)
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
@@ -68,6 +72,9 @@ class viewController(QtGui.QDockWidget):
             
     def mapChangedResponse(self, newMap):
         self.updateMaps()
+        
+    def refreshPogs(self):
+        rggViews._state.currentMap.refreshPogs()
  
 def hajimaru(mainwindow):
     widget = viewController(mainwindow)
