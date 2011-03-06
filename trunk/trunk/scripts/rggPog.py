@@ -16,6 +16,7 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
+from PyQt4 import QtGui
 import rggTile, rggResource, rggSystem
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
@@ -158,7 +159,12 @@ class Pog(object):
     
     def _updateSrc(self, crm, filename, translation):
         if filename == self._src and self._tile:
-            rggSystem.reloadImage(filename, self.texturedimensions[0], self.texturedimensions[1])
+            infograb = QtGui.QPixmap(filename)
+            rggSystem.reloadImage(filename, infograb.width(), infograb.height())
+            
+    def forceUpdate(self):
+        infograb = QtGui.QPixmap(self._src)
+        rggSystem.reloadImage(self._src, infograb.width(), infograb.height())
     
     def dump(self):
         """Serialize to an object valid for JSON dumping."""

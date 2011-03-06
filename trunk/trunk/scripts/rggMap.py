@@ -93,6 +93,10 @@ class Map(object):
                 self.storeLines()
             else:
                 self.restoreLines()
+                
+    def refreshPogs(self):
+        for pog in self.Pogs.values():
+            pog.forceUpdate()
     
     def show(self):
         return self.hide(False)
