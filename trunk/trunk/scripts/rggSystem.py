@@ -247,15 +247,12 @@ def findFiles(dir, extensions):
     return files
     
 def cameraPosition():
-    #return (_main.getCamX(), _main.getCamY())
     return mainWindow.glwidget.camera
 
 def cameraSize():
-    #return (_main.getCamW(), _main.getCamH())
     return (mainWindow.glwidget.w, mainWindow.glwidget.h)
 
 def setCameraPosition(position):
-    #_main.setCam(position[0], position[1])
     mainWindow.glwidget.camera = list(position)
 
 def findRandomAppend():
