@@ -667,10 +667,10 @@ def mouseDrag(screenPosition, mapPosition, displacement):
     if _state.pogSelection and _state.mouseButton == BUTTON_LEFT:
         movePogs(displacement)
     elif _state.mouseButton == BUTTON_LEFT:
-        setCameraPosition(map(lambda c, d: c + d, cameraPosition(), displacement))
+        setCameraPosition(map(lambda c, d,  z: c + d*z, cameraPosition(), displacement, (getZoom(), getZoom())))
         return
     if _state.mouseButton == BUTTON_RIGHT:
-        setCameraPosition(map(lambda c, d: c + d, cameraPosition(), displacement))
+        setCameraPosition(map(lambda c, d,  z: c + d*z, cameraPosition(), displacement, (getZoom(), getZoom())))
 
 def mouseMove(screenPosition, mapPosition, displacement):
     icon = _state.menu.selectedIcon
@@ -861,11 +861,11 @@ def mouseMoveResponse(x, y):
     #print 'move', x, y
     
     screenPosition = (x, y)
-    mapPosition = map(lambda p,c,d: p/d - c, screenPosition, cameraPosition(), (getZoom(), getZoom()))
-    displacement = map(lambda p,m: p - m, screenPosition, _state.mousePosition)
+    mapPosition = map(lambda p,c,d: p/d - c/d, screenPosition, cameraPosition(), (getZoom(), getZoom()))
+    displacement = map(lambda p,m,d: p/d - m/d, screenPosition, _state.mousePosition,  (getZoom(), getZoom()))
     
-    print mapPosition
-    print cameraPosition()
+    #print mapPosition
+    #print cameraPosition()
     
     mouseMove(screenPosition, mapPosition, displacement)
     
@@ -876,7 +876,7 @@ def mousePressResponse(x, y, t):
     
     
     screenPosition = (x, y)
-    mapPosition = map(lambda p,c,d: p/d - c, screenPosition, cameraPosition(), (getZoom(), getZoom()))
+    mapPosition = map(lambda p,c,d: p/d - c/d, screenPosition, cameraPosition(), (getZoom(), getZoom()))
     
     _state.mousePosition = screenPosition
     _state.mouseButton = t
@@ -887,7 +887,7 @@ def mouseReleaseResponse(x, y, t):
     #print 'release', x, y, t
     
     screenPosition = (x, y)
-    mapPosition = map(lambda p,c,d: p/d - c, screenPosition, cameraPosition(), (getZoom(), getZoom()))
+    mapPosition = map(lambda p,c,d: p/d - c/d, screenPosition, cameraPosition(), (getZoom(), getZoom()))
     
     _state.mousePosition = screenPosition
     _state.mouseButton = t
