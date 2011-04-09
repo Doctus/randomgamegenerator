@@ -667,16 +667,16 @@ def mouseDrag(screenPosition, mapPosition, displacement):
     if _state.pogSelection and _state.mouseButton == BUTTON_LEFT:
         movePogs(displacement)
     elif _state.mouseButton == BUTTON_LEFT:
-        setCameraPosition(map(lambda c, d: c - d, cameraPosition(), displacement))
+        setCameraPosition(map(lambda c, d: c + d, cameraPosition(), displacement))
         return
     if _state.mouseButton == BUTTON_RIGHT:
-        setCameraPosition(map(lambda c, d: c - d, cameraPosition(), displacement))
+        setCameraPosition(map(lambda c, d: c + d, cameraPosition(), displacement))
 
 def mouseMove(screenPosition, mapPosition, displacement):
     icon = _state.menu.selectedIcon
     if icon == ICON_MOVE: # moveIcon
         if _state.mouseButton == BUTTON_LEFT:
-            setCameraPosition(map(lambda c, d: c - d, cameraPosition(), displacement))
+            setCameraPosition(map(lambda c, d: c + d, cameraPosition(), displacement))
         return
     if icon == ICON_SELECT: #selectIcon
         if _state.mouseButton is None:
@@ -719,7 +719,7 @@ def mousePress(screenPosition, mapPosition, button):
     if icon == ICON_MOVE:
         return
     if icon == ICON_SELECT:
-        if button == BUTTON_LEFT + BUTTON_CONTROL:
+        '''if button == BUTTON_LEFT + BUTTON_CONTROL:
             if _state.pogPlacement:
                 infograb = QtGui.QPixmap(_state.pogPath)
                 pog = rggPog.Pog(
@@ -737,7 +737,8 @@ def mousePress(screenPosition, mapPosition, button):
             else:
                 _state.pogSelection.add(pog)
             rggEvent.pogSelectionChangedEvent()
-        elif button == BUTTON_LEFT:
+        el'''
+        if button == BUTTON_LEFT:
             if _state.pogPlacement:
                 _state.pogPlacement = False
                 infograb = QtGui.QPixmap(_state.pogPath)
@@ -860,8 +861,11 @@ def mouseMoveResponse(x, y):
     #print 'move', x, y
     
     screenPosition = (x, y)
-    mapPosition = map(lambda p,c: p + c, screenPosition, cameraPosition())
+    mapPosition = map(lambda p,c,d: p/d - c, screenPosition, cameraPosition(), (getZoom(), getZoom()))
     displacement = map(lambda p,m: p - m, screenPosition, _state.mousePosition)
+    
+    print mapPosition
+    print cameraPosition()
     
     mouseMove(screenPosition, mapPosition, displacement)
     
@@ -872,7 +876,7 @@ def mousePressResponse(x, y, t):
     
     
     screenPosition = (x, y)
-    mapPosition = map(lambda p,c: p + c, screenPosition, cameraPosition())
+    mapPosition = map(lambda p,c,d: p/d - c, screenPosition, cameraPosition(), (getZoom(), getZoom()))
     
     _state.mousePosition = screenPosition
     _state.mouseButton = t
@@ -883,7 +887,7 @@ def mouseReleaseResponse(x, y, t):
     #print 'release', x, y, t
     
     screenPosition = (x, y)
-    mapPosition = map(lambda p,c: p + c, screenPosition, cameraPosition())
+    mapPosition = map(lambda p,c,d: p/d - c, screenPosition, cameraPosition(), (getZoom(), getZoom()))
     
     _state.mousePosition = screenPosition
     _state.mouseButton = t

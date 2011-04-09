@@ -1,5 +1,9 @@
 if __name__ == '__main__':
     from rggSystem import injectMain
+    from PyQt4.QtCore import *
+    from PyQt4.QtGui import *
+    
+    app = QApplication(['RGG in Space'])
     main = injectMain()
     
     import rggSystem, rggRPC, rggChat, rggICChat, rggViews, rggRemote, rggEvent
@@ -12,9 +16,9 @@ if __name__ == '__main__':
     # amounts to configuration
     
     # mouse events
-    main.mouseMoveSignal.connect(rggEvent.mouseMoveEvent)
-    main.mousePressSignal.connect(rggEvent.mousePressEvent)
-    main.mouseReleaseSignal.connect(rggEvent.mouseReleaseEvent)
+    main.glwidget.mouseMoveSignal.connect(rggEvent.mouseMoveEvent)
+    main.glwidget.mousePressSignal.connect(rggEvent.mousePressEvent)
+    main.glwidget.mouseReleaseSignal.connect(rggEvent.mouseReleaseEvent)
     
     # chat widget
     s.cwidget.chatInput.connect(rggEvent.chatInputEvent)
@@ -55,6 +59,7 @@ if __name__ == '__main__':
     
     # Start execution
     try:
-        main.start()
+        main.show()
+        app.exec_()
     finally:
         client.close()
