@@ -23,6 +23,12 @@ import sys, random
 import os, os.path
 from PyQt4 import QtCore, QtGui
 
+class wAction(QtGui.QAction):
+
+    def __init__(self, text, parent, id):
+        QtGui.QAction.__init__(self, text, parent)
+        self.id = id
+
 class fake(object):
     """Fake translation tools."""
     
@@ -51,7 +57,6 @@ MAP_DIR = 'save/maps'
 CHAR_DIR = 'save/characters'
 SAVE_DIR = 'save'
 
-_main = None
 mainWindow = None
 
 def signal(*args, **kwargs):
@@ -123,30 +128,57 @@ class signalStorage(object):
 
 def injectMain():
     """Injects and returns the main C++ interface object."""
-    import _bmainmod
-    
-    global _main
     global mainWindow
-    
-    assert(not _main)
+
     assert(not mainWindow)
-    
-    _main = _bmainmod.bMain()
-    mainWindow = _main.getMainWindow()
-    return _main
+
+    from rggMain import *
+    mainWindow = MainWindow()
+    return mainWindow
 
 def showErrorMessage(message, title=translate('system', "Error", 'default error prompt title')):
     """Pops up an error message to the user."""
     QtGui.QMessageBox.critical(mainWindow, title, message)
 
 def displayTooltip(text, position):
-    return _main.displayTooltip(text, position[0], position[1])
+    #return _main.displayTooltip(text, position[0], position[1])
+    print "unimplemented5"
+    return False
 
 def showPopupMenuAt(position, choices):
-    return _main.showPopupMenuAt(position[0], position[1], choices)
+    popup = QtGui.QMenu(mainWindow)
+    idCounter = 0
+
+    for choice in choices:
+        popup.addAction(wAction(choice, mainWindow, idCounter))
+        idCounter += 1
+
+    realx = position[0] + (mainWindow.x() + mainWindow.glwidget.x())
+    realy = position[1] + (mainWindow.y() + mainWindow.glwidget.y())
+    selectedAction = popup.exec_(QtCore.QPoint(realx, realy))
+
+    if not selectedAction:
+        return -1
+
+    return selectedAction.id
 
 def showPopupMenuAtAbs(position, choices):
-    return _main.showPopupMenuAtAbs(position[0], position[1], choices)
+    #return _main.showPopupMenuAtAbs(position[0], position[1], choices)
+    popup = QtGui.QMenu(mainWindow)
+    idCounter = 0
+
+    for choice in choices:
+        popup.addAction(wAction(choice, mainWindow, idCounter))
+        idCounter += 1
+
+    realx = position[0]
+    realy = position[1]
+    selectedAction = popup.exec_(QtCore.QPoint(realx, realy))
+
+    if not selectedAction:
+        return -1
+
+    return selectedAction.id
 
 def promptString(prompt, title=translate('system', "Input", 'default string prompt title')):
     text, ok = QtGui.QInputDialog.getText(mainWindow, title, prompt)
@@ -195,7 +227,9 @@ def promptButtonSelection(prompt, text=[], defaultButton = 0):
         convertedText = (text)
     else:
         convertedText = text
-    return _main.displayUserDialogChoice(prompt, convertedText, defaultButton)
+    #return _main.displayUserDialogChoice(prompt, convertedText, defaultButton)
+    print "unimplemented3"
+    return False
 
 def findFiles(dir, extensions):
     """Get the list of files with one of the given extensions."""
@@ -213,13 +247,16 @@ def findFiles(dir, extensions):
     return files
     
 def cameraPosition():
-    return (_main.getCamX(), _main.getCamY())
+    #return (_main.getCamX(), _main.getCamY())
+    return mainWindow.glwidget.camera
 
 def cameraSize():
-    return (_main.getCamW(), _main.getCamH())
+    #return (_main.getCamW(), _main.getCamH())
+    return (mainWindow.glwidget.w, mainWindow.glwidget.h)
 
 def setCameraPosition(position):
-    _main.setCam(position[0], position[1])
+    #_main.setCam(position[0], position[1])
+    mainWindow.glwidget.camera = list(position)
 
 def findRandomAppend():
     """Gives a random character to append to string to make it random."""
@@ -240,23 +277,31 @@ def makePortableFilename(filename):
     return filename.replace('\\', '/')
 
 def drawLine(x, y, w, h, thickness):
-    _main.addLine(x, y, w, h, thickness)
+    #_main.addLine(x, y, w, h, thickness)
+    return False
 
 def deleteLine(x, y, w, h, thickness = -1):
-    _main.deleteLine(x, y, w, h, thickness)
+    #_main.deleteLine(x, y, w, h, thickness)
+    return False
 
 def clearLines():
-    _main.clearLines()
+    #_main.clearLines()
+    return False
 
 def getLinesOfThickness(thickness):
-    return _main.getLineOfThickness(thickness)
+    #return _main.getLineOfThickness(thickness)
+    return False
 
 def reloadImage(filename, tilewidth, tileheight):
     """Reloads the specified image file."""
-    return _main.changeImage(filename, filename, tilewidth, tileheight)
+    #return _main.changeImage(filename, filename, tilewidth, tileheight)
+    return False
 
 def setZoom(zoom):
-    _main.setZoom(zoom)
+    #_main.setZoom(zoom)
+    print "unimplemented2"
+    return False
 
 def getZoom():
-    return _main.getZoom()
+    #return _main.getZoom()
+    return mainWindow.glwidget.zoom

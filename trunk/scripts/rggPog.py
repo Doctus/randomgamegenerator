@@ -154,8 +154,11 @@ class Pog(object):
         return " ".join(self.tmp)
     
     def _makeTile(self):
+        from rggSystem import mainWindow
         src = rggResource.crm.translateFile(self._src, rggResource.RESOURCE_IMAGE)
-        return rggTile.tile(self.position, self.texturedimensions, self.size, 0, self.layer, src)
+        textureRect = (0, 0, self.texturedimensions[0], self.texturedimensions[1])
+        drawRect = (self.position[0], self.position[1], self.size[0], self.size[1])
+        return mainWindow.glwidget.createImage(src, self.layer, textureRect, drawRect)
     
     def _updateSrc(self, crm, filename, translation):
         if filename == self._src and self._tile:

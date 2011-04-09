@@ -1,28 +1,4 @@
-#import _bmainmod
-#from PyQt4 import QtCore
-
-'''class tile(_bmainmod.bImage):
-
-    #x, y, width, height, tile, layer, filename
-    def __init__(self, position, texturedimensions, drawdimensions, tile, layer, filename):
-        x, y = position
-        w, h = texturedimensions
-        dw, dh = drawdimensions
-        #for i in xrange(len(filename)):
-        #    if filename[i] == '\\':
-        #        filename = filename[:i] + '/' + filename[i+1:]
-        #print (int(x), int(y), int(w),
-        #                                      int(h), int(tile), int(layer), str(filename))
-        super(_bmainmod.bImage, self).__init__(int(x), int(y), int(w),
-                                               int(h), int(dw), int(dh),
-                                               int(tile), int(layer), str(filename))
-        #print 'pyimage created'
-
-    def destroy(self):
-        self.DELETEME()'''
-
-        
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 #
 #Image convenience class
 #
@@ -32,14 +8,16 @@ from OpenGL.GL import *
 from OpenGL.GL.ARB.vertex_buffer_object import *
 from OpenGL.arrays import ArrayDatatype as ADT
 
+import fmGlobals
+
 import numpy
 
-class tile(object):
+class Image(object):
     '''
     Class for storing image data, position and some opengl stuff
     '''
 
-    def __init__(self, imagepath, qimg, textureRect, drawRect, layer, hidden, dynamicity, glwidget):
+    def __init__(self, imagepath, qimg, textureRect, drawRect, layer, hidden, dynamicity):
         self.imagepath = imagepath
         self.drawRect = drawRect
         self.textureRect = textureRect
@@ -50,20 +28,17 @@ class tile(object):
         self.VBO = None
         self._hidden = hidden
         self.qimg = qimg
-        self.glwidget = glwidget
 
-        if self.glwidget.texext == GL_TEXTURE_2D:
+        if fmGlobals.glwidget.texext == GL_TEXTURE_2D:
             x = float(textureRect[0])/float(qimg.width()-1)
             y = float(textureRect[1])/float(qimg.height()-1)
             w = float(textureRect[2])/float(qimg.width()-1)
             h = float(textureRect[3])/float(qimg.height()-1)
             self.textureRect = [x, y, w, h]
 
-    #def __del__(self):
-        #self.glwidget.deleteImage(self)
-            
-    def destroy(self):
-        self.glwidget.deleteImage(self)
+    def __del__(self):
+        if fmGlobals != None:
+            fmGlobals.glwidget.deleteImage(self)
 
     @property
     def hidden(self):
@@ -73,28 +48,7 @@ class tile(object):
     def hidden(self, hide):
         if self._hidden != hide:
             self._hidden = hide
-            self.glwidget.hideImage(self, hide)
-            
-    def setHidden(self, hide):
-        if self._hidden != hide:
-            self._hidden = hide
-            self.glwidget.hideImage(self, hide)
-            
-    def setX(self, x):
-        drawRect = list(self.drawRect)
-        drawRect[0] = x
-        self.setDrawRect(drawRect)
-        
-    def setY(self, y):
-        drawRect = list(self.drawRect)
-        drawRect[1] = y
-        self.setDrawRect(drawRect)
-        
-    def getW(self):
-        return self.drawRect[2]
-        
-    def getH(self):
-        return self.drawRect[3]
+            fmGlobals.glwidget.hideImage(self, hide)
 
     def width(self):
         return self.drawRect[2]
@@ -105,7 +59,7 @@ class tile(object):
     def setDrawRect(self, drawRect):
         self.drawRect = drawRect
 
-        if self.glwidget.vbos:
+        if fmGlobals.vbos:
             VBOData = self.getVBOData()
             vertByteCount = ADT.arrayByteCount(VBOData)
 
@@ -114,19 +68,12 @@ class tile(object):
 
     def setTextureRect(self, textureRect):
         self.textureRect = textureRect
-        if self.glwidget.texext == GL_TEXTURE_2D:
+        if fmGlobals.glwidget.texext == GL_TEXTURE_2D:
             x = float(textureRect[0])/float(self.qimg.width())
             y = float(textureRect[1])/float(self.qimg.height())
             w = float(textureRect[2])/float(self.qimg.width())
             h = float(textureRect[3])/float(self.qimg.height())
             self.textureRect = [x, y, w, h]
-            
-        if self.glwidget.vbos:
-            VBOData = self.getVBOData()
-            vertByteCount = ADT.arrayByteCount(VBOData)
-
-            glBindBuffer(GL_ARRAY_BUFFER_ARB, self.VBO)
-            glBufferSubData(GL_ARRAY_BUFFER_ARB, int(self.offset*vertByteCount/4), vertByteCount, VBOData)
 
     def getVBOData(self):
         x, y, w, h = self.textureRect

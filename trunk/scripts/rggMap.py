@@ -18,7 +18,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 import sys
-import rggTile, rggPog, rggSystem, rggResource, random
+import rggTile, rggPog, rggSystem, rggResource, random, glwidget
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
 class Map(object):
@@ -118,16 +118,15 @@ class Map(object):
         """Show all the tiles of this map."""
         src = rggResource.crm.translateFile(self.tileset, rggResource.RESOURCE_IMAGE)
         self.tiles = [None]*self.mapsize[0]*self.mapsize[1]
+        
+        from rggSystem import mainWindow
+        #def createImage(self, qimagepath, layer, textureRect, drawRect, hidden = False, dynamicity = GL_STATIC_DRAW_ARB):
+        
         for y in xrange(0, self.mapsize[1]):
             for x in xrange(0, self.mapsize[0]):
-                temptile = (rggTile.tile(
-                    (x * self.tilesize[0], y * self.tilesize[1]),
-                    self.tilesize,
-                    self.tilesize,
-                    self.tileindexes[x+y*self.mapsize[0]],
-                    0,
-                    src))
-                temptile.setHidden(self.hidden)
+                textureRect = (0, 0, self.tilesize[0], self.tilesize[1])
+                drawRect = (x * self.tilesize[0], y * self.tilesize[1], self.tilesize[0], self.tilesize[1])
+                temptile = mainWindow.glwidget.createImage(src, 0, textureRect, drawRect, self.hidden)
                 self.tiles[x+y*self.mapsize[0]] = temptile
                     
     def _updateSrc(self, crm, filename, translation):
@@ -157,12 +156,15 @@ class Map(object):
         return ((0 <= x < self.mapsize[0]) and (0 <= y < self.mapsize[1]))
     
     def _setIndexes(self, indexes):
+        return
         if len(indexes) != len(self.tileindexes):
             return
         self.tileindexes[:] = indexes[:]
         for i in xrange(len(indexes)):
-            self.tiles[i].setTile(self.tileindexes[i])
+            #self.tiles[i].setTile(self.tileindexes[i])
             #print self.tileindexes[i], self.tiles[i].getTile()
+            #x = self.tileindexes[i]%
+            self.tiles[i].setTextureRect(())
     
     def findTopPog(self, position):
         """Returns the top pog at a given position, or None."""
@@ -177,6 +179,7 @@ class Map(object):
         return top
 
     def storeLines(self):
+        return
         thickOne = rggSystem.getLinesOfThickness(1)
         thickTwo = rggSystem.getLinesOfThickness(2)
         thickThree = rggSystem.getLinesOfThickness(3)
