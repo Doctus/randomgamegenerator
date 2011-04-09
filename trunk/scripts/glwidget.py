@@ -152,9 +152,6 @@ class GLWidget(QGLWidget):
         '''
         FILL IN LATER PLOX
         '''
-
-        qimg = QImage(qimagepath)
-        
         layer = int(layer)
         texture = None
         found = False
@@ -353,6 +350,8 @@ class GLWidget(QGLWidget):
         Create the VBO list to be passed on to the module for drawing
         vbolist could possibly be a multi-layered tuple, one tuple per layer.
         So that it doesn't have to be recalculated every time one single image is changed.
+        
+        TODO, make it recalculate per layer, instead of everything, if an image is given.
         '''
         if len(self.layers) > 0 and len(self.vbolist) > 2 and image != None:
             if image.layer == self.layers[0]:
@@ -384,6 +383,16 @@ class GLWidget(QGLWidget):
         '''
         if self.vbos:
             self.calculateVBOList()
+            
+    def getImageSize(self, image):
+    
+        qimg = None
+        if image in self.qimages:
+            qimg = self.qimages[image][0]
+        else:
+            qimg = QImage(qimagepath)
+        
+        return qimg.size()
 
     def mouseMoveEvent(self, mouse):
         self.mouseMoveSignal.emit(mouse.pos().x(), mouse.pos().y())

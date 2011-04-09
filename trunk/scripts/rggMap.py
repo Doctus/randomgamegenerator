@@ -18,8 +18,9 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 import sys
-import rggTile, rggPog, rggSystem, rggResource, random, glwidget
+import rggTile, rggPog, rggSystem, rggResource, random
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
+from rggSystem import mainWindow
 
 class Map(object):
     
@@ -118,10 +119,7 @@ class Map(object):
         """Show all the tiles of this map."""
         src = rggResource.crm.translateFile(self.tileset, rggResource.RESOURCE_IMAGE)
         self.tiles = [None]*self.mapsize[0]*self.mapsize[1]
-        
-        from rggSystem import mainWindow
-        #def createImage(self, qimagepath, layer, textureRect, drawRect, hidden = False, dynamicity = GL_STATIC_DRAW_ARB):
-        
+
         for y in xrange(0, self.mapsize[1]):
             for x in xrange(0, self.mapsize[0]):
                 textureRect = (0, 0, self.tilesize[0], self.tilesize[1])
@@ -140,7 +138,7 @@ class Map(object):
         assert(0 <= x <= self.mapsize[0])
         assert(0 <= y <= self.mapsize[1])
         t = x + self.mapsize[0] * y
-        return self.tileindexes[t]
+        return self.tileindexes[int(t)]
     
     def setTile(self, tile, index):
         """Change the specified tile."""
@@ -149,7 +147,11 @@ class Map(object):
         assert(0 <= y <= self.mapsize[1])
         t = x + self.mapsize[0] * y
         self.tileindexes[t] = index
-        self.tiles[t].setTile(self.tileindexes[t])
+        imgsize = mainWindow.glwidget.getImageSize(rggResource.crm.translateFile(self.tileset, rggResource.RESOURCE_IMAGE))
+        
+        x = self.tileindexes[t]%(imgsize.width()/self.tilesize[0])*self.tilesize[0]
+        y = int((index*self.tilesize[0])/imgsize.width())*self.tilesize[1]
+        self.tiles[t].setTextureRect((x, y, self.tilesize[0], self.tilesize[1]))
 
     def tilePosExists(self, tilepos):
         x, y = tilepos
@@ -160,11 +162,15 @@ class Map(object):
         if len(indexes) != len(self.tileindexes):
             return
         self.tileindexes[:] = indexes[:]
+        
+        imgsize = mainWindow.glwidget.getImageSize(rggResource.crm.translateFile(self.tileset, rggResource.RESOURCE_IMAGE))
+        
         for i in xrange(len(indexes)):
             #self.tiles[i].setTile(self.tileindexes[i])
             #print self.tileindexes[i], self.tiles[i].getTile()
-            #x = self.tileindexes[i]%
-            self.tiles[i].setTextureRect(())
+            x = self.tileindexes[t]%(imgsize.width()/self.tilesize[0])*self.tilesize[0]
+            y = int((index*self.tilesize[0])/imgsize.width())*self.tilesize[1]
+            self.tiles[i].setTextureRect((x, y, self.tilesize[0], self.tilesize[1]))
     
     def findTopPog(self, position):
         """Returns the top pog at a given position, or None."""
