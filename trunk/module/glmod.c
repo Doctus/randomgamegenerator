@@ -7,6 +7,8 @@
 #include <Python.h>
 #include <vector>
 
+#define GL_GLEXT_PROTOTYPES 1
+
 #ifdef __APPLE__
     #include <OpenGL/gl.h>
 #else
