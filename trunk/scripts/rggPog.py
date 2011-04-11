@@ -118,7 +118,7 @@ class Pog(object):
     def layer(self, layer):
         self._layer = layer
         if not self.hidden:
-            self._tile.setLayer(int(layer))
+            self._tile.layer = int(layer)
     
     @property
     def src(self):

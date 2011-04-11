@@ -75,6 +75,7 @@ class Map(object):
         """Hide or show all pogs and tiles."""
         if hidden == self.hidden:
             return
+        mainWindow.glwidget.reserveVBOSize(self.mapsize[0] * self.mapsize[1])
         self.hidden = hidden
         if includePogs:
             if hidden:
