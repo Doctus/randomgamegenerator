@@ -12,13 +12,15 @@
 #ifdef __APPLE__
     #include <OpenGL/gl.h>
 #else
-    #include <GL/gl.h>
-    
     #ifdef _WIN32
+        #undef GL_GLEXT_PROTOTYPES
+        #include <GL/gl.h>
         #define WIN32_LEAN_AND_MEAN 1
         #include <windows.h>
         #include "glext.h"
         PFNGLBINDBUFFERPROC glBindBuffer = NULL;
+    #else
+        #include <GL/gl.h>
     #endif
 #endif
 
