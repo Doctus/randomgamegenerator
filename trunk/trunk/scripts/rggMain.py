@@ -30,10 +30,3 @@ class MainWindow(QMainWindow):
 
     def drawTimerTimeout(self):
         self.glwidget.updateGL()
-
-'''if __name__ == '__main__':
-    app = QApplication(['Fantasia Majestical'])
-    window = MainWindow()
-    window.show()
-    window.start()
-    app.exec_()'''
