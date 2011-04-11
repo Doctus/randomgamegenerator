@@ -741,8 +741,7 @@ def mousePress(screenPosition, mapPosition, button):
             else:
                 _state.pogSelection.add(pog)
             rggEvent.pogSelectionChangedEvent()
-        el
-        if button == BUTTON_LEFT:
+        elif button == BUTTON_LEFT:
             if _state.pogPlacement:
                 _state.pogPlacement = False
                 infograb = QtGui.QPixmap(_state.pogPath)
