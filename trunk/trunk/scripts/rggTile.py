@@ -43,7 +43,7 @@ class tile(object):
         self.imagepath = imagepath
         self.drawRect = drawRect
         self.textureRect = textureRect
-        self.layer = layer
+        self._layer = layer
         self.dynamicity = dynamicity
         self.textureId = None
         self.offset = None
@@ -51,6 +51,7 @@ class tile(object):
         self._hidden = hidden
         self.qimg = qimg
         self.glwidget = glwidget
+        self.createLayer = False
 
         if self.glwidget.texext == GL_TEXTURE_2D:
             x = float(textureRect[0])/float(qimg.width()-1)
@@ -74,6 +75,15 @@ class tile(object):
         if self._hidden != hide:
             self._hidden = hide
             self.glwidget.hideImage(self, hide)
+            
+    @property
+    def layer(self):
+        return self._layer
+        
+    @layer.setter
+    def layer(self, newlayer):
+        self.glwidget.setLayer(self, newlayer)
+        self._layer = newlayer
             
     def setHidden(self, hide):
         if self._hidden != hide:

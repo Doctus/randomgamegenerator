@@ -5,6 +5,7 @@
  */
 
 #include <Python.h>
+#include <vector>
 
 #ifdef __APPLE__
     #include <OpenGL/gl.h>
@@ -23,7 +24,20 @@
 
 GLenum extension = GL_TEXTURE_RECTANGLE_ARB;
 
-int *texid, *offsets, VBO, stride, arrSize;
+class VBOEntry
+{
+    public:
+    unsigned int texid, offset;
+
+    VBOEntry(unsigned int texid, unsigned int offset)
+    {
+        this->texid = texid;
+        this->offset = offset;
+    }
+};
+
+int VBO, stride;
+std::vector<std::vector<VBOEntry> > entries;
 
 static PyObject * glmod_drawTexture(PyObject *self, PyObject* args)
 {
@@ -60,7 +74,7 @@ static PyObject * glmod_drawTexture(PyObject *self, PyObject* args)
 
 static PyObject * glmod_drawVBO(PyObject *self, PyObject* args)
 {
-    int i, lastid = -1;
+    int i, k, lastid = -1;
 
     glBindBuffer(GL_ARRAY_BUFFER_ARB, VBO);
     glTexCoordPointer(2, GL_FLOAT, stride, 0);
@@ -69,15 +83,18 @@ static PyObject * glmod_drawVBO(PyObject *self, PyObject* args)
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-    for(i = 0; i < arrSize; i++)
+    for(i = 0; i < entries.size(); i++)
     {
-        if(lastid != texid[i])
+        for(k = 0; k < entries[i].size(); k++)
         {
-            glBindTexture(extension, texid[i]);
-            lastid = texid[i];
-        }
+            if(lastid != entries[i][k].texid)
+            {
+                glBindTexture(extension, entries[i][k].texid);
+                lastid = entries[i][k].texid;
+            }
 
-        glDrawArrays(GL_QUADS, offsets[i], 4);
+            glDrawArrays(GL_QUADS, entries[i][k].offset, 4);
+        }
     }
 
     glDisableClientState(GL_VERTEX_ARRAY);
@@ -90,31 +107,86 @@ static PyObject * glmod_drawVBO(PyObject *self, PyObject* args)
 static PyObject * glmod_setVBO(PyObject *self, PyObject* args)
 {
     PyObject *tuple = PyTuple_GetItem(args, 0);
-    int i, x;
-
-    if(PyTuple_Size(tuple) % 2 != 0)
-    {
-        printf("Failure with size: %i\n", PyTuple_Size(tuple));
-        return PyInt_FromLong(-1L);
-    }
-
-    free(texid);
-    free(offsets);
-
-    arrSize = (PyTuple_Size(tuple)-2)/2;
-    texid = (int*)malloc(arrSize*sizeof(int));
-    offsets = (int*)malloc(arrSize*sizeof(int));
+    int i, j;
+    unsigned int texid, offset;
+    PyObject *layer= NULL;
+    
+    entries.clear();
 
     VBO = PyInt_AsLong(PyTuple_GetItem(tuple, 0));
     stride = PyInt_AsLong(PyTuple_GetItem(tuple, 1));
 
     for(i = 2; i < PyTuple_Size(tuple); i++)
     {
-        x = PyInt_AsLong(PyTuple_GetItem(tuple, i));
-        if(i % 2 == 0)
-            texid[(i-2)/2] = x;
-        else
-            offsets[(i-2)/2] = x;
+        entries.push_back(std::vector<VBOEntry>());
+        layer = PyTuple_GetItem(tuple, i);
+        for(j = 0; j < PyTuple_Size(layer); j += 2)
+        {
+            texid = PyInt_AsLong(PyTuple_GetItem(layer, j));
+            offset = PyInt_AsLong(PyTuple_GetItem(layer, j+1));
+            
+            entries[i-2].push_back(VBOEntry(texid, offset));
+        }
+    }
+
+    return PyInt_FromLong(0L);
+}
+
+static PyObject * glmod_insertVBOlayer(PyObject *self, PyObject* args)
+{
+    PyObject *tuple = PyTuple_GetItem(args, 0);
+    int j;
+    unsigned int texid, offset, insertBeforeLayer;
+
+    insertBeforeLayer = PyInt_AsLong(PyTuple_GetItem(tuple, 0));
+    
+    entries.insert(entries.begin() + insertBeforeLayer, std::vector<VBOEntry>());
+
+    for(j = 1; j < PyTuple_Size(tuple); j += 2)
+    {
+        texid = PyInt_AsLong(PyTuple_GetItem(tuple, j));
+        offset = PyInt_AsLong(PyTuple_GetItem(tuple, j+1));
+        
+        entries[insertBeforeLayer].push_back(VBOEntry(texid, offset));
+    }
+
+    return PyInt_FromLong(0L);
+}
+
+static PyObject * glmod_setVBOlayer(PyObject *self, PyObject* args)
+{
+    PyObject *tuple = PyTuple_GetItem(args, 0);
+    int j;
+    unsigned int texid, offset, layer;
+
+    layer = PyInt_AsLong(PyTuple_GetItem(tuple, 0));
+    entries[layer].clear();
+
+    for(j = 1; j < PyTuple_Size(tuple); j += 2)
+    {
+        texid = PyInt_AsLong(PyTuple_GetItem(tuple, j));
+        offset = PyInt_AsLong(PyTuple_GetItem(tuple, j+1));
+        
+        entries[layer].push_back(VBOEntry(texid, offset));
+    }
+
+    return PyInt_FromLong(0L);
+}
+
+static PyObject * glmod_addVBOentry(PyObject *self, PyObject* args)
+{
+    PyObject *tuple = PyTuple_GetItem(args, 0);
+    int j;
+    unsigned int texid, offset, layer;
+
+    layer = PyInt_AsLong(PyTuple_GetItem(tuple, 0));
+
+    for(j = 1; j < PyTuple_Size(tuple); j += 2)
+    {
+        texid = PyInt_AsLong(PyTuple_GetItem(tuple, j));
+        offset = PyInt_AsLong(PyTuple_GetItem(tuple, j+1));
+        
+        entries[layer].push_back(VBOEntry(texid, offset));
     }
 
     return PyInt_FromLong(0L);
@@ -122,7 +194,8 @@ static PyObject * glmod_setVBO(PyObject *self, PyObject* args)
 
 static PyObject * glmod_generateTexture(PyObject *self, PyObject* args)
 {
-    int texid, w, h, ok;
+    int w, h, ok;
+    unsigned int texid;
     const char *pixels;
 
     ok = PyArg_ParseTuple(args, "iis", &w, &h, &pixels);
@@ -147,9 +220,6 @@ static PyObject * glmod_init(PyObject *self, PyObject* args)
 {
     int ok;
 
-    texid = NULL;
-    offsets = NULL;
-
     ok = PyArg_ParseTuple(args, "i", &extension);
 
     if(!ok)
@@ -173,7 +243,10 @@ static PyObject * glmod_clear(PyObject *self, PyObject* args)
 static PyMethodDef GLModMethods[] = {
     {"drawTexture",  glmod_drawTexture, METH_VARARGS, "draw a texture"},
     {"drawVBO",  glmod_drawVBO, METH_VARARGS, "draw the list of texids with VBO"},
-    {"setVBO",  glmod_setVBO, METH_VARARGS, "set the list of texids"},
+    {"setVBO",  glmod_setVBO, METH_VARARGS, "erase & set the list of VBO entries"},
+    {"insertVBOlayer",  glmod_insertVBOlayer, METH_VARARGS, "add a layer of VBO entries"},
+    {"setVBOlayer",  glmod_setVBOlayer, METH_VARARGS, "erase & set a layer of VBO entries"},
+    {"addVBOentry",  glmod_addVBOentry, METH_VARARGS, "add an entry to a layer"},
     {"generateTexture",  glmod_generateTexture, METH_VARARGS, "generate texture id"},
     {"clear",  glmod_clear, METH_VARARGS, "clear"},
     {"init",  glmod_init, METH_VARARGS, "init"},

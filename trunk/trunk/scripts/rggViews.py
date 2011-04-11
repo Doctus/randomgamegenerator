@@ -719,14 +719,18 @@ def mousePress(screenPosition, mapPosition, button):
     if icon == ICON_MOVE:
         return
     if icon == ICON_SELECT:
-        '''if button == BUTTON_LEFT + BUTTON_CONTROL:
+        if button == BUTTON_LEFT + BUTTON_CONTROL:
             if _state.pogPlacement:
                 infograb = QtGui.QPixmap(_state.pogPath)
                 pog = rggPog.Pog(
                     mapPosition,
                     (infograb.width(), infograb.height()),
+                    (infograb.width(), infograb.height()),
                     1,
-                    _state.pogPath)
+                    _state.pogPath,
+                    0,
+                    0,
+                    {})
                 createPog(currentmap(), pog)
                 return
             pog = currentmap().findTopPog(mapPosition)
@@ -737,7 +741,7 @@ def mousePress(screenPosition, mapPosition, button):
             else:
                 _state.pogSelection.add(pog)
             rggEvent.pogSelectionChangedEvent()
-        el'''
+        el
         if button == BUTTON_LEFT:
             if _state.pogPlacement:
                 _state.pogPlacement = False
@@ -832,9 +836,6 @@ def mouseRelease(screenPosition, mapPosition, button):
     _state.mouseButton = None
 
     icon = _state.menu.selectedIcon
-    if(icon == ICON_SELECT):
-      for pog in _state.pogSelection:
-        sendUpdatePog(currentmap().ID, pog.ID, pog.dump())
     if(icon == ICON_DELETE):
         if(_state.previousLinePlacement != None and _state.nextLinePlacement != None):
 
@@ -859,7 +860,7 @@ def mouseRelease(screenPosition, mapPosition, button):
 
 def mouseMoveResponse(x, y):
     #print 'move', x, y
-    
+
     screenPosition = (x, y)
     mapPosition = map(lambda p,c,d: p/d - c/d, screenPosition, cameraPosition(), (getZoom(), getZoom()))
     displacement = map(lambda p,m,d: p/d - m/d, screenPosition, _state.mousePosition,  (getZoom(), getZoom()))
@@ -873,8 +874,7 @@ def mouseMoveResponse(x, y):
 
 def mousePressResponse(x, y, t):
     #print 'press', x, y, t
-    
-    
+
     screenPosition = (x, y)
     mapPosition = map(lambda p,c,d: p/d - c/d, screenPosition, cameraPosition(), (getZoom(), getZoom()))
     

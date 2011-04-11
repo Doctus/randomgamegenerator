@@ -207,6 +207,7 @@ class GLWidget(QGLWidget):
             self.images[layer] = []
             self.layers = self.images.keys()
             self.layers.sort()
+            image.createLayer = True
 
         self.images[layer].append(image)
 
@@ -223,28 +224,14 @@ class GLWidget(QGLWidget):
 
     def reserveVBOSize(self, size):
         '''
-        Does not work yet. If this function is called, it makes glGenTextures fail
+        Reserves a VBO with the specified size as the amount of VBO entries, and re-assigns all images with the new data.
         '''
-        return
-
         if self.vbos and size > self.VBOBuffer:
             self.VBOBuffer = size
-            vertByteCount = ADT.arrayByteCount(numpy.zeros((8, 2), 'f'))
 
             glBufferDataARB(GL_ARRAY_BUFFER_ARB, self.VBOBuffer*vertByteCount, None, GL_STATIC_DRAW_ARB)
-
-            self.offset = 0
-
-            for layer in self.layers:
-                for img in self.images[layer]:
-                    img.offset = int(float(self.offset)/vertByteCount*4)
-                    VBOData = img.getVBOData()
-
-                    glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, self.offset, vertByteCount, VBOData)
-                    self.offset += vertByteCount
-
             glBindBuffer(GL_ARRAY_BUFFER_ARB, 0)
-
+            self.fillBuffers()
             self.calculateVBOList()
 
     def fillBuffers(self, image = None):
@@ -296,7 +283,7 @@ class GLWidget(QGLWidget):
         self.images[image.layer].remove(image)
 
         if self.vbos:
-            self.calculateVBOList()
+            self.calculateVBOList(image, True)
 
     def drawImage(self, image):
         global mod
@@ -345,33 +332,39 @@ class GLWidget(QGLWidget):
         glVertex3f(dx, (dy+dh), 0)
         glEnd()
         
-    def calculateVBOList(self, image = None):
+    def calculateVBOList(self, image = None, delete = False):
         '''
         Create the VBO list to be passed on to the module for drawing
         vbolist could possibly be a multi-layered tuple, one tuple per layer.
         So that it doesn't have to be recalculated every time one single image is changed.
-        
-        TODO, make it recalculate per layer, instead of everything, if an image is given.
         '''
         if len(self.layers) > 0 and len(self.vbolist) > 2 and image != None:
-            if image.layer == self.layers[0]:
-                self.vbolist.insert(2, image.offset) #note the reversed order here
-                self.vbolist.insert(2, image.textureId)
-                glmod.setVBO(tuple(self.vbolist))
-                return
-            elif image.layer == self.layers[-1]:
-                self.vbolist.append(image.textureId)
-                self.vbolist.append(image.offset)
-                glmod.setVBO(tuple(self.vbolist))
-                return
+            if delete:
+                temp = [self.layers.index(image.layer)]
+                for img in self.images[image.layer]:
+                    if img.hidden or img == image:
+                        continue
+                    temp.append(img.textureId)
+                    temp.append(img.offset)
+                glmod.setVBOlayer(tuple(temp))
+            elif image.createLayer:
+                layer = self.layers.index(image.layer)
+                glmod.insertVBOlayer((layer, image.textureId, image.offset))
+                image.createLayer = False
+            else:
+                layer = self.layers.index(image.layer)
+                glmod.addVBOentry((layer, image.textureId, image.offset))
+            return
 
         self.vbolist = [self.VBO, ADT.arrayByteCount(numpy.zeros((2, 2), 'f'))]
         for layer in self.layers:
+            temp = []
             for img in self.images[layer]:
                 if img.hidden:
                     continue
-                self.vbolist.append(img.textureId)
-                self.vbolist.append(img.offset)
+                temp.append(img.textureId)
+                temp.append(img.offset)
+            self.vbolist.append(tuple(temp))
 
         if len(self.vbolist) > 2:
             glmod.setVBO(tuple(self.vbolist))
@@ -383,6 +376,21 @@ class GLWidget(QGLWidget):
         '''
         if self.vbos:
             self.calculateVBOList()
+            
+    def setLayer(self, image, newLayer):
+        '''
+        This function should only be called from image.py
+        Use Image.layer instead.
+        '''
+        if self.vbos:
+            self.calculateVBOList(image, True)
+            image._layer = newLayer
+            if newLayer not in self.images:
+                self.images[newLayer] = []
+                self.layers = self.images.keys()
+                self.layers.sort()
+                image.createLayer = True
+            self.calculateVBOList(image)
             
     def getImageSize(self, image):
     
