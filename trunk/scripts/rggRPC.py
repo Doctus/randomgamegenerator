@@ -58,6 +58,9 @@ def serverRPC(callable):
         if hasattr(users, 'username'):
             users = (users,)
         
+        if len(users) == 0:
+            return
+        
         server.broadcast(data, users=[user.username for user in users])
     
     def receive(args, kwargs):

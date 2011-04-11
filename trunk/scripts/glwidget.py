@@ -63,11 +63,12 @@ class GLWidget(QGLWidget):
         self.vbos = False
         self.VBOBuffer = 0
         self.offset = 0
-        self.vbolist = []
         self.ctrl = False
         self.shift = False
         self.qimages = {}
         self.texext = GL_TEXTURE_RECTANGLE_ARB
+        self.lines = dict()
+        self.error = False
         
         self.setFocusPolicy(Qt.StrongFocus)
         self.setMouseTracking(True) #this may be the fix for a weird problem with leaveevents
@@ -91,9 +92,46 @@ class GLWidget(QGLWidget):
                 for img in self.images[layer]:
                     self.drawImage(img)
 
+        if mod:
+            glmod.drawLines(self.lines)
+        else:
+            for layer in self.lines:
+                glLineWidth(layer)
+                glBegin(GL_LINES)
+                for line in self.lines[layer]:
+                    glVertex2f(line[0], line[1])
+                    glVertex2f(line[2], line[3])
+                glEnd()
+
         glScaled(1/self.zoom, 1/self.zoom, 1)
         glTranslatef(-self.camera[0], -self.camera[1], 0)
         glPopMatrix()
+        
+    def addLine(self, thickness, x, y, w, h):
+        if not thickness in self.lines:
+            self.lines[thickness] = []
+            
+        self.lines[thickness].append((float(x), float(y), float(w), float(h)))
+        
+    def deleteLine(self, thickness, x, y, w, h):
+        if thickness == -1:
+            for layer in self.lines:
+                for line in self.lines[layer]:
+                    if self.pointIntersectRect((line[0], line[1]), (x, y, w, h)) \
+                       and self.pointIntersectRect((line[0] + line[2], line[1] + line[3]), (x, y, w, h)):
+                        self.lines[layer].remove(line)
+                        
+    def clearLines(self):
+        self.lines.clear()
+                    
+    def pointIntersectRect(self, point, rect): 
+    #point: (x, y)
+    #rect:  (x, y, w, h)
+        if point[0] < rect[0] or point[0] > rect[0] + rect[2]:
+            return False
+        if point[1] < rect[1] or point[1] > rect[1] + rect[3]:
+            return False
+        return True
 
     def resizeGL(self, w, h):
         '''
@@ -144,14 +182,16 @@ class GLWidget(QGLWidget):
                 self.vbos = True
                 print "VBO support initialised succesfully"
                 self.VBO = int(glGenBuffersARB(1))
+                glmod.initVBO(self.VBO, ADT.arrayByteCount(numpy.zeros((2, 2), 'f')))
             else:
                 print "VBO support initialisation failed, continuing without"
 
     #util functions
     def createImage(self, qimagepath, layer, textureRect, drawRect, hidden = False, dynamicity = GL_STATIC_DRAW_ARB):
         '''
-        FILL IN LATER PLOX
+        Creates an rggTile instance, uploads the correct image to GPU if not in cache, and some other helpful things.
         '''
+        #print "requested to create", qimagepath, layer, textureRect, drawRect, hidden
         layer = int(layer)
         texture = None
         found = False
@@ -213,11 +253,7 @@ class GLWidget(QGLWidget):
 
         if self.vbos:
             image.VBO = self.VBO
-
             self.fillBuffers(image)
-            if len(self.qimages[qimagepath]) == 3:
-                self.qimages[qimagepath].append(image.offset)
-
             self.calculateVBOList(image)
 
         return image
@@ -227,16 +263,16 @@ class GLWidget(QGLWidget):
         Reserves a VBO with the specified size as the amount of VBO entries, and re-assigns all images with the new data.
         '''
         if self.vbos and size > self.VBOBuffer:
-            self.VBOBuffer = size
+            self.VBOBuffer = nextPowerOfTwo(size+1)
+            #print "reserving size", self.VBOBuffer
 
-            glBufferDataARB(GL_ARRAY_BUFFER_ARB, self.VBOBuffer*vertByteCount, None, GL_STATIC_DRAW_ARB)
-            glBindBuffer(GL_ARRAY_BUFFER_ARB, 0)
-            self.fillBuffers()
+            self.fillBuffers(None, False)
             self.calculateVBOList()
 
-    def fillBuffers(self, image = None):
+    def fillBuffers(self, image = None, resize = True):
         '''
-        ALSO FILL IN LATER...PLOX
+        if image == None, this function requests a new BO from the GPU with a calculated size
+        if image != None, this function adds the VBO data from image to the BO in the GPU, if there is enough space.
         '''
         size = 0
         vertByteCount = ADT.arrayByteCount(numpy.zeros((8, 2), 'f'))
@@ -247,7 +283,9 @@ class GLWidget(QGLWidget):
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, self.VBO)
 
         if self.VBOBuffer <= size or image == None:
-            self.VBOBuffer = nextPowerOfTwo(size+1)
+            if resize or self.VBOBuffer <= size:
+                print "resizing from", size, "to", nextPowerOfTwo(size+1)
+                self.VBOBuffer = nextPowerOfTwo(size+1)
 
             glBufferDataARB(GL_ARRAY_BUFFER_ARB, self.VBOBuffer*vertByteCount, None, GL_STATIC_DRAW_ARB)
 
@@ -335,28 +373,30 @@ class GLWidget(QGLWidget):
     def calculateVBOList(self, image = None, delete = False):
         '''
         Create the VBO list to be passed on to the module for drawing
-        vbolist could possibly be a multi-layered tuple, one tuple per layer.
-        So that it doesn't have to be recalculated every time one single image is changed.
+        or if the change is only one image, modify it.
         '''
-        if len(self.layers) > 0 and len(self.vbolist) > 2 and image != None:
+        if len(self.layers) > 0 and image != None:
             if delete:
+                #print "setLayer"
                 temp = [self.layers.index(image.layer)]
                 for img in self.images[image.layer]:
                     if img.hidden or img == image:
                         continue
-                    temp.append(img.textureId)
+                    temp.append(int(img.textureId))
                     temp.append(img.offset)
                 glmod.setVBOlayer(tuple(temp))
             elif image.createLayer:
                 layer = self.layers.index(image.layer)
-                glmod.insertVBOlayer((layer, image.textureId, image.offset))
+                glmod.insertVBOlayer((layer, int(image.textureId), image.offset))
+                #print "addLayer", (layer, image.textureId, image.offset)
                 image.createLayer = False
             else:
                 layer = self.layers.index(image.layer)
-                glmod.addVBOentry((layer, image.textureId, image.offset))
+                #print "addEntry", (layer, image.textureId, image.offset)
+                glmod.addVBOentry((layer, int(image.textureId), image.offset))
             return
 
-        self.vbolist = [self.VBO, ADT.arrayByteCount(numpy.zeros((2, 2), 'f'))]
+        vbolist = []
         for layer in self.layers:
             temp = []
             for img in self.images[layer]:
@@ -364,10 +404,11 @@ class GLWidget(QGLWidget):
                     continue
                 temp.append(img.textureId)
                 temp.append(img.offset)
-            self.vbolist.append(tuple(temp))
+            vbolist.append(tuple(temp))
 
-        if len(self.vbolist) > 2:
-            glmod.setVBO(tuple(self.vbolist))
+        if len(vbolist) > 2:
+            #print "setVBO", vbolist
+            glmod.setVBO(tuple(vbolist))
 
     def hideImage(self, image, hide):
         '''
@@ -375,7 +416,7 @@ class GLWidget(QGLWidget):
         Use Image.hide() instead.
         '''
         if self.vbos:
-            self.calculateVBOList()
+            self.calculateVBOList(image, hide)
             
     def setLayer(self, image, newLayer):
         '''

@@ -228,8 +228,32 @@ def promptButtonSelection(prompt, text=[], defaultButton = 0):
     else:
         convertedText = text
     #return _main.displayUserDialogChoice(prompt, convertedText, defaultButton)
-    print "unimplemented3"
-    return False
+    if(len(convertedText) == 0):
+        return -1
+
+    buttons = []
+
+    from PyQt4.QtGui import *
+    questionDialog = QMessageBox(mainWindow);
+    questionDialog.setText(prompt);
+
+    j = len(convertedText) - 1
+    while(j >= 0):
+        newButton = questionDialog.addButton(convertedText[j], QMessageBox.AcceptRole);
+        buttons.insert(0, newButton);
+        if(j == defaultButton):
+            questionDialog.setDefaultButton(newButton)
+        j -= 1
+
+    questionDialog.exec_()
+
+    i = 0
+    for button in buttons:
+        if(questionDialog.clickedButton() == button):
+            return i
+        i += 1
+
+    return -1;
 
 def findFiles(dir, extensions):
     """Get the list of files with one of the given extensions."""
@@ -274,16 +298,13 @@ def makePortableFilename(filename):
     return filename.replace('\\', '/')
 
 def drawLine(x, y, w, h, thickness):
-    #_main.addLine(x, y, w, h, thickness)
-    return False
+    mainWindow.glwidget.addLine(thickness, x, y, w, h)
 
 def deleteLine(x, y, w, h, thickness = -1):
-    #_main.deleteLine(x, y, w, h, thickness)
-    return False
+    mainWindow.glwidget.deleteLine(thickness, x, y, w, h)
 
 def clearLines():
-    #_main.clearLines()
-    return False
+    mainWindow.glwidget.clearLines()
 
 def getLinesOfThickness(thickness):
     #return _main.getLineOfThickness(thickness)
@@ -300,5 +321,4 @@ def setZoom(zoom):
     return False
 
 def getZoom():
-    #return _main.getZoom()
     return mainWindow.glwidget.zoom

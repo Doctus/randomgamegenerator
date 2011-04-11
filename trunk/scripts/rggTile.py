@@ -1,27 +1,3 @@
-#import _bmainmod
-#from PyQt4 import QtCore
-
-'''class tile(_bmainmod.bImage):
-
-    #x, y, width, height, tile, layer, filename
-    def __init__(self, position, texturedimensions, drawdimensions, tile, layer, filename):
-        x, y = position
-        w, h = texturedimensions
-        dw, dh = drawdimensions
-        #for i in xrange(len(filename)):
-        #    if filename[i] == '\\':
-        #        filename = filename[:i] + '/' + filename[i+1:]
-        #print (int(x), int(y), int(w),
-        #                                      int(h), int(tile), int(layer), str(filename))
-        super(_bmainmod.bImage, self).__init__(int(x), int(y), int(w),
-                                               int(h), int(dw), int(dh),
-                                               int(tile), int(layer), str(filename))
-        #print 'pyimage created'
-
-    def destroy(self):
-        self.DELETEME()'''
-
-        
 # -*- coding: utf-8 -*-
 #
 #Image convenience class
@@ -52,6 +28,7 @@ class tile(object):
         self.qimg = qimg
         self.glwidget = glwidget
         self.createLayer = False
+        self.destroyed = False
 
         if self.glwidget.texext == GL_TEXTURE_2D:
             x = float(textureRect[0])/float(qimg.width()-1)
@@ -64,7 +41,11 @@ class tile(object):
         #self.glwidget.deleteImage(self)
             
     def destroy(self):
-        self.glwidget.deleteImage(self)
+        if not self.destroyed:
+            self.glwidget.deleteImage(self)
+            self.destroyed = True
+        else:
+            print "attempted to destroy an image twice"
 
     @property
     def hidden(self):
@@ -169,3 +150,7 @@ class tile(object):
         VBOData[7, 1] = dy+dh
 
         return VBOData
+        
+    def __str__(self):
+        text = "Image(", self.imagepath, self.drawRect, self.textureRect, self.layer, self.offset, self.textureId, self._hidden, ")"
+        return str(text)

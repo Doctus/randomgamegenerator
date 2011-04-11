@@ -37,7 +37,7 @@ class Map(object):
         self.Pogs = {}
         self.lines = []
         self.tileindexes = [0 for i in xrange(mapsize[0] * mapsize[1])]
-        self.hidden = True
+        self.hidden = False
         self.tiles = None
 
         self._createTiles()
@@ -75,7 +75,6 @@ class Map(object):
         """Hide or show all pogs and tiles."""
         if hidden == self.hidden:
             return
-        mainWindow.glwidget.reserveVBOSize(self.mapsize[0] * self.mapsize[1])
         self.hidden = hidden
         if includePogs:
             if hidden:
@@ -108,6 +107,8 @@ class Map(object):
             tile.setHidden(True)
 
     def _showTiles(self):
+        if self.tiles == None:
+            return
         for tile in self.tiles:
             tile.setHidden(False)
     
@@ -118,8 +119,14 @@ class Map(object):
     
     def _createTiles(self):
         """Show all the tiles of this map."""
+        if self.tiles != None:
+            for y in xrange(0, self.mapsize[1]):
+                for x in xrange(0, self.mapsize[0]):
+                    self.tiles[x+y*self.mapsize[0]].destroy()
+        
         src = rggResource.crm.translateFile(self.tileset, rggResource.RESOURCE_IMAGE)
         self.tiles = [None]*self.mapsize[0]*self.mapsize[1]
+        mainWindow.glwidget.reserveVBOSize(self.mapsize[0] * self.mapsize[1])
 
         for y in xrange(0, self.mapsize[1]):
             for x in xrange(0, self.mapsize[0]):

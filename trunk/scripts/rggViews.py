@@ -260,10 +260,13 @@ def createMapID(mapname):
     return ID
 
 def modifyCurrentMap():
-    sendMapCreate(currentmap().ID, currentmap().dump())
+    sendMapCreate(currentmap().ID, currentmap())
 
 def switchMap(map):
     """Switches to the specified map."""
+    if _state.currentMap == map:
+        print "not switching"
+        return
     import rggEvent
     if _state.currentMap:
         _state.currentMap.hide()
@@ -271,7 +274,7 @@ def switchMap(map):
     clearLines()
     _state.currentMap = map
     rggEvent.mapChangedEvent(map)
-    if _state.currentMap:
+    if _state.currentMap and map.hidden:
         _state.currentMap.show()
         print "Changed to map: {0}".format(_state.currentMap)
 
@@ -312,7 +315,7 @@ def newMap():
     
     if dialog.exec_(mainWindow, accept):
         map = dialog.save()
-        sendMapCreate(None, map.dump())
+        sendMapCreate(None, map)
 
 def loadMap():
     """Allows the user to load a new map."""
@@ -327,7 +330,7 @@ def loadMap():
     except Exception as e:
         showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
         return
-    sendMapCreate(None, map.dump())
+    sendMapCreate(None, map)
 
 def saveMap():
     """Allows the user to save the current map."""
@@ -374,23 +377,31 @@ def loadChars():
 
 @serverRPC
 def respondMapCreate(ID, mapDump):
-    """Creates or updates the map with the given ID."""
+    """Creates <s>or updates</s> the map with the given ID."""
+    existed = (ID in _state.Maps)
+    if existed:
+        print "ignoring map create"
+        return
     map = rggMap.Map.load(mapDump)
     map.ID = ID
-    existed = (ID in _state.Maps)
     _state.Maps[ID] = map
-    if not existed or (_state.currentMap and _state.currentMap.ID == ID):
+    if _state.currentMap and _state.currentMap.ID == ID:
         switchMap(map)
 
 @clientRPC
-def sendMapCreate(user, ID, mapDump):
+def sendMapCreate(user, ID, map):
     """Creates or updates the specified map."""
     if not getmap(ID):
-        ID = createMapID(mapDump['mapname'])
-    rggResource.srm.processFile(user, mapDump['tileset'])
-    for pogDump in mapDump['pogs'].values():
-        rggResource.srm.processFile(user, pogDump['src'])
-    respondMapCreate(allusers(), ID, mapDump)
+        ID = createMapID(map.mapname)
+    rggResource.srm.processFile(user, map.tileset)
+    for pogDump in map.Pogs.values():
+        rggResource.srm.processFile(user, pog._src)
+    existed = (ID in _state.Maps)
+    _state.Maps[ID] = map
+    map.ID = ID
+    if not existed or (_state.currentMap and _state.currentMap.ID == ID):
+        switchMap(map)
+    respondMapCreate(allusersbut(user), ID, map.dump())
 
 @serverRPC
 def respondTileUpdate(mapID, tile, newTileIndex):
@@ -488,6 +499,7 @@ def sendUpdatePog(user, mapID, pogID, pogDump):
     # Upload (or check that we already have) the image resource from the client
     rggResource.srm.processFile(user, pogDump['src'])
     if not pogMap:
+        print "no pogmap"
         return
     # HACK: Relies on the fact that responses are locally synchronous
     if not pogID or pogID not in pogMap.Pogs:
@@ -676,7 +688,7 @@ def mouseMove(screenPosition, mapPosition, displacement):
     icon = _state.menu.selectedIcon
     if icon == ICON_MOVE: # moveIcon
         if _state.mouseButton == BUTTON_LEFT:
-            setCameraPosition(map(lambda c, d: c + d, cameraPosition(), displacement))
+            setCameraPosition(map(lambda c, d,  z: c + d*z, cameraPosition(), displacement, (getZoom(), getZoom())))
         return
     if icon == ICON_SELECT: #selectIcon
         if _state.mouseButton is None:
@@ -807,21 +819,6 @@ def mousePress(screenPosition, mapPosition, button):
                     modifyPog(currentmap(), pog)
             else:
                 pass
-                #Keeping so we don't have to look up the syntax when adding a real command.
-                '''selected = showPopupMenuAt(
-                        screenPosition,
-                        [translate('views', "Create Pog (Temp Command)"),
-                            translate('views', "Begin Tile Pasting (Temp Command)")])
-                if selected == 0:
-                    src = promptLoadFile(translate('views', "Load Pog"), IMAGE_FILTER)
-                    if src is None:
-                        return
-                    size = promptCoordinates(translate('views', "What is the width of the image?"),
-                        translate('views', "What is the height of the image?"))
-                    if size is None:
-                        return
-                    pog = rgg.Pog(mapPosition, size, 1, src)
-                    createPog(currentmap(), pog)'''
     elif icon == ICON_DRAW:
         if button == BUTTON_LEFT:
             _state.previousLinePlacement = mapPosition
@@ -851,7 +848,7 @@ def mouseRelease(screenPosition, mapPosition, button):
                 y = h
                 h = tempy
 
-            print '(x, y, w, h) (' + str(x) + ', ' + str(y) + ', ' + str(w) + ', ' + str(h) + ')' 
+            #print '(x, y, w, h) (' + str(x) + ', ' + str(y) + ', ' + str(w) + ', ' + str(h) + ')' 
 
             sendDeleteLine(x, y, w, h)
 
