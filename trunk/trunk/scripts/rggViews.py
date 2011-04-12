@@ -24,7 +24,7 @@ from rggRPC import server, client, serverRPC, clientRPC
 from rggJson import jsondump, jsonload
 from rggMenuBar import ICON_SELECT, ICON_MOVE, ICON_DRAW, ICON_DELETE
 from rggSystem import cameraPosition, setCameraPosition, mainWindow
-from rggSystem import translate, showErrorMessage, displayTooltip
+from rggSystem import translate, showErrorMessage
 from rggSystem import showPopupMenuAt, IMAGE_FILTER
 from rggSystem import promptString, promptInteger, promptCoordinates, promptSaveFile, promptLoadFile
 from rggSystem import drawLine, deleteLine, getZoom
@@ -72,7 +72,7 @@ class _state(object):
     previousLinePlacement = None #(0, 0) expected
     nextLinePlacement = None
 
-    thickness = 1;
+    thickness = 1
     
     @staticmethod
     def initialize():
@@ -441,7 +441,9 @@ def sendMapSwitch(user, ID):
 
 def clearPogSelection():
     _state.pogSelection = set()
-    _state.pogHover = None
+    if _state.pogHover != None:
+        _state.pogHover.showTooltip = False
+        _state.pogHover = None
 
 def createPog(pogMap, pog):
     """Creates a new pog."""
@@ -485,6 +487,7 @@ def respondUpdatePog(mapID, pogID, pogDump):
             _state.pogSelection.discard(old)
             _state.pogSelection.add(pog)
         if old == _state.pogHover:
+            _state.pogHover.showTooltip = False
             _state.pogHover = None
         old._tile.destroy()
     pogMap.addPog(pog)
@@ -518,6 +521,7 @@ def respondDeletePog(mapID, pogID):
         if old in _state.pogSelection:
             _state.pogSelection.discard(old)
         if old == _state.pogHover:
+            _state.pogHover.showTooltip = False
             _state.pogHover = None
         pogMap.removePog(old)
 
@@ -570,6 +574,26 @@ def sendHidePog(user, mapID, pogID, hidden):
     if not pogMap:
         return
     respondHidePog(allusers(), mapID, pogID, hidden)
+
+@serverRPC
+def respondPogAttributes(mapID, pogID, name, layer, properties):
+    '''Sends various attributes of a pog over the wire.'''
+    pogMap = getmap(mapID)
+    if not pogMap:
+        return
+    if pogID in pogMap.Pogs:
+        pog = pogMap.Pogs[pogID]
+        pog.name = name
+        pog.layer = layer
+        pog.properties = properties
+
+@clientRPC
+def sendPogAttributes(user, mapID, pogID, name, layer, properties):
+    '''Sends various attributes of a pog over the wire.'''
+    pogMap = getmap(mapID)
+    if not pogMap:
+        return
+    respondPogAttributes(allusersbut(user), mapID, pogID, name, layer, properties)
 
 @serverRPC
 def respondLockPog(mapID, pogID, locked):
@@ -697,13 +721,13 @@ def mouseMove(screenPosition, mapPosition, displacement):
             tooltipPog = currentmap().findTopPog(mapPosition)
             if _state.pogHover == tooltipPog:
                 return
+            elif _state.pogHover != None:
+                _state.pogHover.showTooltip = False
             _state.pogHover = tooltipPog
             if tooltipPog is None:
                 return
-            displayPosition = [tooltipPog.tooltipPosition()[0]*getZoom(), tooltipPog.tooltipPosition()[1]*getZoom()]
-            displayPosition[0] -= cameraPosition()[0]*getZoom()
-            displayPosition[1] -= cameraPosition()[1]*getZoom()
-            displayTooltip(tooltipPog.tooltipText(), displayPosition)
+
+            tooltipPog.showTooltip = True
         elif _state.mouseButton == BUTTON_LEFT:
             return mouseDrag(screenPosition, mapPosition, displacement)
         elif _state.mouseButton == BUTTON_RIGHT:
@@ -780,7 +804,7 @@ def mousePress(screenPosition, mapPosition, button):
             if pog is not None:
                 _state.mouseButton = None
                 selected = showPopupMenuAt(
-                    (screenPosition[0]*getZoom(), screenPosition[1]*getZoom()),
+                    (screenPosition[0], screenPosition[1]),
                     [translate('views', 'Set name'),
                         translate('views', 'Generate name'),
                         translate('views', 'Set Layer'),
@@ -790,7 +814,7 @@ def mousePress(screenPosition, mapPosition, button):
                     if name is None:
                         return
                     pog.name = name
-                    modifyPog(currentmap(), pog)
+                    sendPogAttributes(currentmap(), pog.ID, pog.name, pog.layer, pog.properties)
                 elif selected == 1:
                     prompt = translate('views', "Enter a generator command. See /randomname for syntax. Multi-pog compatible.")
                     gentype = promptString(prompt)
@@ -800,6 +824,7 @@ def mousePress(screenPosition, mapPosition, button):
                     for selectedPog in set([pog] + list(_state.pogSelection)):
                         selectedPog.name = rggNameGen.getName(gentype)
                         modifyPog(currentmap(), selectedPog)
+                        sendPogAttributes(currentmap(), selectedPog.ID, selectedPog.name, selectedPog.layer, selectedPog.properties)
                 elif selected == 2:
                     prompt = translate('views', "Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.")
                     newlayer = promptInteger(prompt, min=0, max=65535, default=pog.layer)
@@ -807,7 +832,7 @@ def mousePress(screenPosition, mapPosition, button):
                         return
                     for selectedPog in set([pog] + list(_state.pogSelection)):
                         selectedPog.layer = newlayer
-                        modifyPog(currentmap(), pog)
+                        sendPogAttributes(currentmap(), pog.ID, pog.name, pog.layer, pog.properties)
                 elif selected == 3:
                     prompt = translate('views', 'Enter a name for the property (like "Level" or "HP").')
                     key = promptString(prompt)
@@ -816,7 +841,7 @@ def mousePress(screenPosition, mapPosition, button):
                     if key is None or value is None:
                         return
                     pog.editProperty(key, value)
-                    modifyPog(currentmap(), pog)
+                    sendPogAttributes(currentmap(), pog.ID, pog.name, pog.layer, pog.properties)
             else:
                 pass
     elif icon == ICON_DRAW:

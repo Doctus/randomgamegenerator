@@ -8,6 +8,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.extensions import hasGLExtension
 from OpenGL.GL.ARB.vertex_buffer_object import *
+from OpenGL.GL.ARB.framebuffer_object import *
 from OpenGL.arrays import ArrayDatatype as ADT
 
 #Only set these when creating non-development code
@@ -53,7 +54,6 @@ class GLWidget(QGLWidget):
         self.setMinimumSize(640, 480)
         self.w = 640
         self.h = 480
-        self.x = 0
         self.images = dict()
         self.lastMousePos = [0, 0]
         self.camera = [0, 0]
@@ -66,9 +66,12 @@ class GLWidget(QGLWidget):
         self.ctrl = False
         self.shift = False
         self.qimages = {}
-        self.texext = GL_TEXTURE_RECTANGLE_ARB
+        self.texext = GL_TEXTURE_2D
+        self.npot = 3
         self.lines = dict()
         self.error = False
+        self.texts = []
+        self.textid = 0
         
         self.setFocusPolicy(Qt.StrongFocus)
         self.setMouseTracking(True) #this may be the fix for a weird problem with leaveevents
@@ -102,6 +105,18 @@ class GLWidget(QGLWidget):
                     glVertex2f(line[0], line[1])
                     glVertex2f(line[2], line[3])
                 glEnd()
+
+        for text in self.texts:
+            split = text[1].split("\n")
+            if len(split[0]) == 0:
+                split.pop(0)
+            pos = -16 * (len(split) - 1)
+            for t in split:
+                if len(t) == 0:
+                    continue
+                
+                self.renderText(float(text[2][0]), float(text[2][1])+pos, 0, t)
+                pos += 16
 
         glScaled(1/self.zoom, 1/self.zoom, 1)
         glTranslatef(-self.camera[0], -self.camera[1], 0)
@@ -152,10 +167,22 @@ class GLWidget(QGLWidget):
         Initialize GL
         '''
         global mod
-
+        
+        if not hasGLExtension("GL_ARB_framebuffer_object"):
+            print "GL_ARB_framebuffer_object not supported, switching to GL_GENERATE_MIPMAP"
+            self.npot = 2
+        version = glGetString(GL_VERSION)
+        if int(version[0]) == 1 and int(version[2]) < 4: #no opengl 1.4 support
+            print "GL_GENERATE_MIPMAP not supported, not using mipmapping"
+            self.npot = 1
+        if not hasGLExtension("GL_ARB_texture_non_power_of_two"):
+            print "GL_ARB_texture_non_power_of_two not supported, switching to GL_ARB_texture_rectangle"
+            self.texext = GL_TEXTURE_RECTANGLE_ARB
+            self.npot = 1
         if not hasGLExtension("GL_ARB_texture_rectangle"):
             print "GL_TEXTURE_RECTANGLE_ARB not supported, switching to GL_TEXTURE_2D"
             self.texext = GL_TEXTURE_2D
+            self.npot = 0
 
         glEnable(self.texext)
         glEnable(GL_BLEND)
@@ -220,7 +247,7 @@ class GLWidget(QGLWidget):
         image = tile(qimagepath, qimg, textureRect, drawRect, layer, hidden, dynamicity, self)
 
         if found == False:
-            if self.texext == GL_TEXTURE_2D:
+            if self.npot == 0:
                 w = nextPowerOfTwo(qimg.width())
                 h = nextPowerOfTwo(qimg.height())
                 if w != qimg.width() or h != qimg.height():
@@ -231,12 +258,24 @@ class GLWidget(QGLWidget):
             imgdata = img.bits().asstring(img.numBytes())
 
             glBindTexture(self.texext, texture)
-
-            glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-            glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+            
+            if self.npot == 3:
+                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST)
+                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+            elif self.npot == 2:
+                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST)
+                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+                glTexParameteri(self.texext, GL_GENERATE_MIPMAP, GL_TRUE)
+            else:
+                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
 
             glTexImage2D(self.texext, 0, GL_RGBA, img.width(), img.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imgdata);
 
+            if self.npot == 3:
+                glEnable(GL_TEXTURE_2D)
+                glGenerateMipmap(GL_TEXTURE_2D)
+            
             self.qimages[qimagepath] = [qimg, texture, 1] #texture, reference count
         else:
             self.qimages[qimagepath][2] += 1
@@ -442,6 +481,24 @@ class GLWidget(QGLWidget):
             qimg = QImage(qimagepath)
         
         return qimg.size()
+        
+    def addText(self, text, pos):
+        self.texts.append([self.textid, text, pos])
+        self.textid += 1
+        return self.textid - 1
+        
+    def removeText(self, id):
+        i = 0
+        for t in self.texts:
+            if t[0] == id:
+                self.texts.pop(i)
+                return
+            i += 1
+            
+    def setTextPos(self, id, pos):
+        for t in self.texts:
+            if t[0] == id:
+                t[2] = pos
 
     def mouseMoveEvent(self, mouse):
         self.mouseMoveSignal.emit(mouse.pos().x(), mouse.pos().y())
@@ -459,10 +516,10 @@ class GLWidget(QGLWidget):
 
         if mouse.button() == Qt.LeftButton:
             button += 0
-        elif mouse.button == Qt.RightButton:
-            button += 1
-        elif mouse.button == Qt.MidButton:
+        elif mouse.button() == Qt.RightButton:
             button += 2
+        elif mouse.button() == Qt.MidButton:
+            button += 1
         self.mousePressSignal.emit(mouse.pos().x(), mouse.pos().y(), button)
 
         mouse.accept()
@@ -477,10 +534,10 @@ class GLWidget(QGLWidget):
 
         if mouse.button() == Qt.LeftButton:
             button += 0
-        elif mouse.button == Qt.RightButton:
-            button += 1
-        elif mouse.button == Qt.MidButton:
+        elif mouse.button() == Qt.RightButton:
             button += 2
+        elif mouse.button() == Qt.MidButton:
+            button += 1
         self.mouseReleaseSignal.emit(mouse.pos().x(), mouse.pos().y(), button)
 
         mouse.accept()

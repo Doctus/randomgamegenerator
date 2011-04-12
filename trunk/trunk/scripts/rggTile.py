@@ -63,8 +63,9 @@ class tile(object):
         
     @layer.setter
     def layer(self, newlayer):
-        self.glwidget.setLayer(self, newlayer)
-        self._layer = newlayer
+        if self._layer != newlayer:
+            self.glwidget.setLayer(self, newlayer)
+            self._layer = newlayer
             
     def setHidden(self, hide):
         if self._hidden != hide:
@@ -105,7 +106,7 @@ class tile(object):
 
     def setTextureRect(self, textureRect):
         self.textureRect = textureRect
-        if self.glwidget.texext == GL_TEXTURE_2D:
+        if self.glwidget.npot == 0:
             x = float(textureRect[0])/float(self.qimg.width())
             y = float(textureRect[1])/float(self.qimg.height())
             w = float(textureRect[2])/float(self.qimg.width())

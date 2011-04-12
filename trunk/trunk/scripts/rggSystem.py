@@ -140,11 +140,6 @@ def showErrorMessage(message, title=translate('system', "Error", 'default error 
     """Pops up an error message to the user."""
     QtGui.QMessageBox.critical(mainWindow, title, message)
 
-def displayTooltip(text, position):
-    #return _main.displayTooltip(text, position[0], position[1])
-    print "unimplemented5"
-    return False
-
 def showPopupMenuAt(position, choices):
     popup = QtGui.QMenu(mainWindow)
     idCounter = 0
@@ -163,7 +158,6 @@ def showPopupMenuAt(position, choices):
     return selectedAction.id
 
 def showPopupMenuAtAbs(position, choices):
-    #return _main.showPopupMenuAtAbs(position[0], position[1], choices)
     popup = QtGui.QMenu(mainWindow)
     idCounter = 0
 
@@ -227,7 +221,7 @@ def promptButtonSelection(prompt, text=[], defaultButton = 0):
         convertedText = (text)
     else:
         convertedText = text
-    #return _main.displayUserDialogChoice(prompt, convertedText, defaultButton)
+
     if(len(convertedText) == 0):
         return -1
 
