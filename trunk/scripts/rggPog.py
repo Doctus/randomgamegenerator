@@ -32,6 +32,8 @@ class Pog(object):
         self._tileStore = None
         self._fakeHidden = False
         self._properties = properties
+        self._showTooltip = False
+        self.tooltipId = -1
         self._locked = locked #locked only works for mouse movements. This means that scripts may actually be able to move the pog.
         rggResource.crm.listen(srcfile, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
         if status > 0:
@@ -45,6 +47,22 @@ class Pog(object):
     def status(self):
         if self._fakeHidden: return 1
         return 0
+        
+    @property
+    def showTooltip(self):
+        return self._showTooltip
+        
+    @showTooltip.setter
+    def showTooltip(self, show):
+        if self._showTooltip != show:
+            if self.tooltipText() == None or len(self.tooltipText()) == 0:
+                return
+            from rggSystem import mainWindow
+            if show:
+                self.tooltipId = mainWindow.glwidget.addText(self.tooltipText(), self._position)
+            else:
+                mainWindow.glwidget.removeText(self.tooltipId)
+            self._showTooltip = show
     
     @property
     def position(self):
@@ -57,6 +75,9 @@ class Pog(object):
             x, y = position
             self._tile.setX(x)
             self._tile.setY(y)
+            if self._showTooltip:
+                from rggSystem import mainWindow
+                mainWindow.glwidget.setTextPos(self.tooltipId, position)
     
     @property
     def _tile(self):
@@ -85,6 +106,10 @@ class Pog(object):
             
     def editProperty(self, key, value):
         self._properties[key] = value
+        if self._showTooltip:
+            from rggSystem import mainWindow
+            mainWindow.glwidget.removeText(self.tooltipId)
+            self.tooltipId = mainWindow.glwidget.addText(self.tooltipText(), self._position)
     
     def displace(self, displacement):
         if self._locked:
