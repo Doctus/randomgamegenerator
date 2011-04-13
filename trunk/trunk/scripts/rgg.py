@@ -11,7 +11,6 @@ if __name__ == '__main__':
     # Initialize view state.
     s = rggViews._state
     s.initialize()
-    main.s = s
     
     # EVENT WIRING
     # amounts to configuration
