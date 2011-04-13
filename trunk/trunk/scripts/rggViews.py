@@ -23,7 +23,7 @@ import rggNameGen, rggDice, rggMap, rggTile, rggPog, rggDockWidget, rggDialogs, 
 from rggRPC import server, client, serverRPC, clientRPC
 from rggJson import jsondump, jsonload
 from rggMenuBar import ICON_SELECT, ICON_MOVE, ICON_DRAW, ICON_DELETE
-from rggSystem import cameraPosition, setCameraPosition, mainWindow
+from rggSystem import cameraPosition, setCameraPosition, mainWindow, getMapPosition
 from rggSystem import translate, showErrorMessage
 from rggSystem import showPopupMenuAt, IMAGE_FILTER
 from rggSystem import promptString, promptInteger, promptCoordinates, promptSaveFile, promptLoadFile
@@ -58,7 +58,6 @@ class _state(object):
     """A state class build to avoid all these global statements."""
     
     Maps = {}
-    currentMap = None
     
     pogSelection = set()
     pogHover = None
@@ -240,9 +239,13 @@ def disconnectGame():
     say(translate('views', "Disconnected."))
 
 # MAPS
-
-def currentmap():
-    return _state.currentMap
+def topmap(mapPosition):
+    for map in _state.Maps.values():
+        size = map.pixelSize
+        if mapPosition[0] >= map.drawOffset[0] and mapPosition[0] <= map.drawOffset[0] + size[0]:
+            if mapPosition[1] >= map.drawOffset[1] and mapPosition[1] <= map.drawOffset[1] + size[1]:
+                return map
+    return None
 
 def getmap(mapID):
     return _state.Maps.get(mapID, None)
@@ -259,26 +262,9 @@ def createMapID(mapname):
         ID += rggSystem.findRandomAppend()
     return ID
 
-def modifyCurrentMap():
-    sendMapCreate(currentmap().ID, currentmap())
-
-def switchMap(map):
-    """Switches to the specified map."""
-    if _state.currentMap == map:
-        print "not switching"
-        return
-    import rggEvent
-    if _state.currentMap:
-        _state.currentMap.hide()
-    clearPogSelection()
-    clearLines()
-    _state.currentMap = map
-    rggEvent.mapChangedEvent(map)
-    if _state.currentMap and map.hidden:
-        _state.currentMap.show()
-        print "Changed to map: {0}".format(_state.currentMap)
-
 def chooseMap():
+    say(translate('views', 'This function is deprecated. Use the view controller.'))
+    return
     mapNames = []
     mapIDs = []
     defaultButton = 0
@@ -291,17 +277,23 @@ def chooseMap():
     for ID in _state.Maps:
         mapNames.append(_state.Maps[ID].mapname)
         mapIDs.append(ID)
-        if ID == _state.currentMap.ID:
-            defaultButton = i
         i += 1
 
     selectedButton = rggSystem.promptButtonSelection("Which map do you want to switch to?", mapNames, defaultButton)
-    sendMapSwitch(mapIDs[selectedButton])
+    #sendMapSwitch(mapIDs[selectedButton])
+    #_state.Maps[mapIDS[selectedButton]].
     
 
 def closeAllMaps():
     switchMap(None)
     _state.Maps = {}
+
+def internalAddMap(map):
+    pos = 0
+    for m in getAllMaps():
+        pos += m.pixelSize[0] + 25
+    map.drawOffset = (pos, 0)
+    sendMapCreate(None, map)
 
 def newMap():
     """Allows the user to choose a new map."""
@@ -315,7 +307,7 @@ def newMap():
     
     if dialog.exec_(mainWindow, accept):
         map = dialog.save()
-        sendMapCreate(None, map)
+        internalAddMap(map)
 
 def loadMap():
     """Allows the user to load a new map."""
@@ -327,17 +319,24 @@ def loadMap():
     try:
         obj = jsonload(filename)
         map = rggMap.Map.load(obj, True)
+        internalAddMap(map)
     except Exception as e:
         showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
         return
-    sendMapCreate(None, map)
 
 def saveMap():
-    """Allows the user to save the current map."""
+    """Allows the user to save a map."""
+    mapNames = []
+    mapIDs = []
+    i = 0
     
-    map = _state.currentMap
-    if _state.currentMap is None:
-        return
+    for ID in _state.Maps:
+        mapNames.append(_state.Maps[ID].mapname)
+        mapIDs.append(ID)
+        i += 1
+
+    selectedButton = rggSystem.promptButtonSelection("Which map do you want to save?", mapNames, 0)
+    map = _state.Maps[mapIDs[selectedButton]]
     # TODO: Probably better handled in a Map Properties dialog.
     #if promptChoice("Edit map info?", ['Yes', 'No'], 1) == 0:
     #    map.mapname = unicode(promptString("What is the name of this map?")) or map.mapname
@@ -378,15 +377,18 @@ def loadChars():
 @serverRPC
 def respondMapCreate(ID, mapDump):
     """Creates <s>or updates</s> the map with the given ID."""
+    print "map create"
     existed = (ID in _state.Maps)
     if existed:
         print "ignoring map create"
         return
     map = rggMap.Map.load(mapDump)
     map.ID = ID
+    pos = 0
+    for map in getAllMaps():
+        pos += map.pixelSize[0] + 100
+    map.drawOffset = (pos, 0)
     _state.Maps[ID] = map
-    if _state.currentMap and _state.currentMap.ID == ID:
-        switchMap(map)
 
 @clientRPC
 def sendMapCreate(user, ID, map):
@@ -396,12 +398,11 @@ def sendMapCreate(user, ID, map):
     rggResource.srm.processFile(user, map.tileset)
     for pogDump in map.Pogs.values():
         rggResource.srm.processFile(user, pog._src)
-    existed = (ID in _state.Maps)
+    #existed = (ID in _state.Maps)
     _state.Maps[ID] = map
     map.ID = ID
-    if not existed or (_state.currentMap and _state.currentMap.ID == ID):
-        switchMap(map)
     respondMapCreate(allusersbut(user), ID, map.dump())
+    map.show()
 
 @serverRPC
 def respondTileUpdate(mapID, tile, newTileIndex):
@@ -453,14 +454,12 @@ def modifyPog(pogMap, pog):
     assert(pog.ID)
     sendUpdatePog(pogMap.ID, pog.ID, pog.dump())
 
-def deletePog(pogMap, pog):
+def deletePog(pogMapID, pog):
     assert(pog.ID)
-    sendDeletePog(pogMap.ID, pog.ID)
+    sendDeletePog(pogMapID, pog.ID)
 
 def placePog(pogpath):
     """Places a pog on the map."""
-    if _state.currentMap is None:
-        return
     _state.pogPlacement = True
     _state.pogPath = pogpath
 
@@ -470,7 +469,7 @@ def movePogs(displacement):
     selection = _state.pogSelection.copy()
     for pog in selection:
         pog.displace(displacement)
-        sendMovementPog(currentmap().ID, pog.ID, pog.position)
+        #sendMovementPog(currentmap().ID, pog.ID, pog.position) #TODO
 
 @serverRPC
 def respondUpdatePog(mapID, pogID, pogDump):
@@ -586,6 +585,8 @@ def respondPogAttributes(mapID, pogID, name, layer, properties):
         pog.name = name
         pog.layer = layer
         pog.properties = properties
+        import rggEvent
+        rggEvent.pogUpdateEvent(pog)
 
 @clientRPC
 def sendPogAttributes(user, mapID, pogID, name, layer, properties):
@@ -593,6 +594,8 @@ def sendPogAttributes(user, mapID, pogID, name, layer, properties):
     pogMap = getmap(mapID)
     if not pogMap:
         return
+    import rggEvent
+    rggEvent.pogUpdateEvent(pogMap.Pogs[pogID])
     respondPogAttributes(allusersbut(user), mapID, pogID, name, layer, properties)
 
 @serverRPC
@@ -619,6 +622,12 @@ def sendLockPog(user, mapID, pogID, locked):
 @serverRPC
 def respondLine(x, y, w, h, thickness):
     drawLine(x, y, w, h, thickness)
+    linesDict = topmap((x, y)).linesDict
+    if not thickness in linesDict:
+        linesDict[thickness] = []
+        
+    linesDict[thickness].append((float(x), float(y), float(w), float(h)))
+    topmap((x, y)).linesDict = linesDict
 
 @clientRPC
 def sendLine(user, x, y, w, h, thickness):
@@ -713,12 +722,21 @@ def mouseMove(screenPosition, mapPosition, displacement):
     if icon == ICON_MOVE: # moveIcon
         if _state.mouseButton == BUTTON_LEFT:
             setCameraPosition(map(lambda c, d,  z: c + d*z, cameraPosition(), displacement, (getZoom(), getZoom())))
+        elif _state.mouseButton == BUTTON_RIGHT:
+            if topmap(mapPosition) is None:
+                return
+            drawOffset = list(topmap(mapPosition).drawOffset)
+            drawOffset[0] += displacement[0]*getZoom()
+            drawOffset[1] += displacement[1]*getZoom()
+            topmap(mapPosition).drawOffset = drawOffset
         return
     if icon == ICON_SELECT: #selectIcon
+        if topmap(mapPosition) is None:
+            return
         if _state.mouseButton is None:
-            if currentmap() is None:
+            if topmap(mapPosition) is None:
                 return
-            tooltipPog = currentmap().findTopPog(mapPosition)
+            tooltipPog = topmap(mapPosition).findTopPog(mapPosition)
             if _state.pogHover == tooltipPog:
                 return
             elif _state.pogHover != None:
@@ -733,6 +751,8 @@ def mouseMove(screenPosition, mapPosition, displacement):
         elif _state.mouseButton == BUTTON_RIGHT:
             return mouseDrag(screenPosition, mapPosition, displacement)
     elif icon == ICON_DRAW: #drawIcon
+        if topmap(mapPosition) is None:
+            return
         if _state.mouseButton == BUTTON_LEFT:
             if _state.previousLinePlacement != None:
                 sendLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.thickness)
@@ -746,7 +766,7 @@ def mouseMove(screenPosition, mapPosition, displacement):
 
 def mousePress(screenPosition, mapPosition, button):
     
-    if currentmap() is None:
+    if topmap(mapPosition) is None:
         return
     
     import rggEvent
@@ -766,10 +786,11 @@ def mousePress(screenPosition, mapPosition, button):
                     _state.pogPath,
                     0,
                     0,
-                    {})
-                createPog(currentmap(), pog)
+                    {},
+                    topmap(mapPosition).ID)
+                createPog(topmap(mapPosition), pog)
                 return
-            pog = currentmap().findTopPog(mapPosition)
+            pog = topmap(mapPosition).findTopPog(mapPosition)
             if not pog:
                 return
             if pog in _state.pogSelection:
@@ -789,10 +810,11 @@ def mousePress(screenPosition, mapPosition, button):
                     _state.pogPath,
                     0,
                     0,
-                    {})
-                createPog(currentmap(), pog)
+                    {},
+                    topmap(mapPosition).ID)
+                createPog(topmap(mapPosition), pog)
                 return
-            pog = _state.currentMap.findTopPog(mapPosition)
+            pog = topmap(mapPosition).findTopPog(mapPosition)
             if pog not in _state.pogSelection:
                 _state.pogSelection = set()
             if not pog:
@@ -800,7 +822,7 @@ def mousePress(screenPosition, mapPosition, button):
             _state.pogSelection.add(pog)
             rggEvent.pogSelectionChangedEvent()
         elif button == BUTTON_RIGHT:
-            pog = currentmap().findTopPog(mapPosition)
+            pog = topmap(mapPosition).findTopPog(mapPosition)
             if pog is not None:
                 _state.mouseButton = None
                 selected = showPopupMenuAt(
@@ -814,7 +836,7 @@ def mousePress(screenPosition, mapPosition, button):
                     if name is None:
                         return
                     pog.name = name
-                    sendPogAttributes(currentmap(), pog.ID, pog.name, pog.layer, pog.properties)
+                    sendPogAttributes(topmap(mapPosition).ID, pog.ID, pog.name, pog.layer, pog.properties)
                 elif selected == 1:
                     prompt = translate('views', "Enter a generator command. See /randomname for syntax. Multi-pog compatible.")
                     gentype = promptString(prompt)
@@ -823,8 +845,8 @@ def mousePress(screenPosition, mapPosition, button):
                     gentype = ''.join(gentype.split()).lower()
                     for selectedPog in set([pog] + list(_state.pogSelection)):
                         selectedPog.name = rggNameGen.getName(gentype)
-                        modifyPog(currentmap(), selectedPog)
-                        sendPogAttributes(currentmap(), selectedPog.ID, selectedPog.name, selectedPog.layer, selectedPog.properties)
+                        modifyPog(topmap(mapPosition), selectedPog)
+                        sendPogAttributes(topmap(mapPosition).ID, selectedPog.ID, selectedPog.name, selectedPog.layer, selectedPog.properties)
                 elif selected == 2:
                     prompt = translate('views', "Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.")
                     newlayer = promptInteger(prompt, min=0, max=65535, default=pog.layer)
@@ -832,7 +854,7 @@ def mousePress(screenPosition, mapPosition, button):
                         return
                     for selectedPog in set([pog] + list(_state.pogSelection)):
                         selectedPog.layer = newlayer
-                        sendPogAttributes(currentmap(), pog.ID, pog.name, pog.layer, pog.properties)
+                        sendPogAttributes(topmap(mapPosition).ID, pog.ID, pog.name, pog.layer, pog.properties)
                 elif selected == 3:
                     prompt = translate('views', 'Enter a name for the property (like "Level" or "HP").')
                     key = promptString(prompt)
@@ -841,7 +863,7 @@ def mousePress(screenPosition, mapPosition, button):
                     if key is None or value is None:
                         return
                     pog.editProperty(key, value)
-                    sendPogAttributes(currentmap(), pog.ID, pog.name, pog.layer, pog.properties)
+                    sendPogAttributes(topmap(mapPosition).ID, pog.ID, pog.name, pog.layer, pog.properties)
             else:
                 pass
     elif icon == ICON_DRAW:
@@ -883,7 +905,7 @@ def mouseMoveResponse(x, y):
     #print 'move', x, y
 
     screenPosition = (x, y)
-    mapPosition = map(lambda p,c,d: p/d - c/d, screenPosition, cameraPosition(), (getZoom(), getZoom()))
+    mapPosition = getMapPosition(screenPosition)
     displacement = map(lambda p,m,d: p/d - m/d, screenPosition, _state.mousePosition,  (getZoom(), getZoom()))
     
     #print mapPosition
@@ -897,7 +919,7 @@ def mousePressResponse(x, y, t):
     #print 'press', x, y, t
 
     screenPosition = (x, y)
-    mapPosition = map(lambda p,c,d: p/d - c/d, screenPosition, cameraPosition(), (getZoom(), getZoom()))
+    mapPosition = getMapPosition(screenPosition)
     
     _state.mousePosition = screenPosition
     _state.mouseButton = t
@@ -908,7 +930,7 @@ def mouseReleaseResponse(x, y, t):
     #print 'release', x, y, t
     
     screenPosition = (x, y)
-    mapPosition = map(lambda p,c,d: p/d - c/d, screenPosition, cameraPosition(), (getZoom(), getZoom()))
+    mapPosition = getMapPosition(screenPosition)
     
     _state.mousePosition = screenPosition
     _state.mouseButton = t

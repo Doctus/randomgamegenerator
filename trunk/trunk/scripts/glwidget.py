@@ -72,6 +72,7 @@ class GLWidget(QGLWidget):
         self.error = False
         self.texts = []
         self.textid = 0
+        self.vertByteCount = ADT.arrayByteCount(numpy.zeros((8, 2), 'f'))
         
         self.setFocusPolicy(Qt.StrongFocus)
         self.setMouseTracking(True) #this may be the fix for a weird problem with leaveevents
@@ -303,7 +304,7 @@ class GLWidget(QGLWidget):
         '''
         if self.vbos and size > self.VBOBuffer:
             self.VBOBuffer = nextPowerOfTwo(size+1)
-            #print "reserving size", self.VBOBuffer
+            print "reserving size", self.VBOBuffer
 
             self.fillBuffers(None, False)
             self.calculateVBOList()
@@ -314,7 +315,6 @@ class GLWidget(QGLWidget):
         if image != None, this function adds the VBO data from image to the BO in the GPU, if there is enough space.
         '''
         size = 0
-        vertByteCount = ADT.arrayByteCount(numpy.zeros((8, 2), 'f'))
 
         for layer in self.layers:
             size += len(self.images[layer])
@@ -322,28 +322,30 @@ class GLWidget(QGLWidget):
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, self.VBO)
 
         if self.VBOBuffer <= size or image == None:
-            if resize or self.VBOBuffer <= size:
+            if resize and self.VBOBuffer <= size:
                 print "resizing from", size, "to", nextPowerOfTwo(size+1)
                 self.VBOBuffer = nextPowerOfTwo(size+1)
 
-            glBufferDataARB(GL_ARRAY_BUFFER_ARB, self.VBOBuffer*vertByteCount, None, GL_STATIC_DRAW_ARB)
+            glBufferDataARB(GL_ARRAY_BUFFER_ARB, self.VBOBuffer*self.vertByteCount, None, GL_STATIC_DRAW_ARB)
 
             self.offset = 0
 
             for layer in self.layers:
                 for img in self.images[layer]:
-                    img.offset = int(float(self.offset)/vertByteCount*4)
+                    img.offset = int(float(self.offset)/self.vertByteCount*4)
                     VBOData = img.getVBOData()
 
-                    glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, self.offset, vertByteCount, VBOData)
-                    self.offset += vertByteCount
+                    glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, self.offset, self.vertByteCount, VBOData)
+                    self.offset += self.vertByteCount
+            
+            self.calculateVBOList()
 
         else:
-            image.offset = int(float(self.offset)/vertByteCount*4)
+            image.offset = int(float(self.offset)/self.vertByteCount*4)
             VBOData = image.getVBOData()
 
-            glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, self.offset, vertByteCount, VBOData)
-            self.offset += vertByteCount
+            glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, self.offset, self.vertByteCount, VBOData)
+            self.offset += self.vertByteCount
 
         glBindBuffer(GL_ARRAY_BUFFER_ARB, 0)
 

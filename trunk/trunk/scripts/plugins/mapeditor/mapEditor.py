@@ -39,8 +39,7 @@ class mapEditor(QtGui.QDockWidget):
         self.setWidget(self.widget)
         mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, self)
 
-        currentMap = rggViews._state.currentMap
-        self.mapChangedResponse(currentMap)
+        self.currentMap = None
 
         rggEvent.addMapChangedListener(self)
         rggEvent.addMousePressListener(self)
@@ -48,15 +47,22 @@ class mapEditor(QtGui.QDockWidget):
         rggEvent.addMouseReleaseListener(self)
         
     def mousePressResponse(self, x, y, t):
+        mapPosition = rggSystem.getMapPosition((x, y))
+        map = rggViews.topmap(mapPosition)
+        if map == None:
+            self.currentMap = None
+            return
+        if map != self.currentMap:
+            self.mapChangedResponse(map)
         if t == 0:
             self.dragging = True
             if self.isVisible() and self.singlePaintingButton.isChecked():
-                clickedtile = ((rggSystem.cameraPosition()[0] + x) / self.tilelabel.tilex,
-                            (rggSystem.cameraPosition()[1] + y) / self.tilelabel.tiley)
-                if not rggViews._state.currentMap.tilePosExists(clickedtile):
+                clickedtile = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
+                            int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
+                if not map.tilePosExists(clickedtile):
                     rggEvent.setEaten()
                     return
-                rggViews.sendTileUpdate(rggViews._state.currentMap.ID, clickedtile, self.tilelabel.currentTile)
+                rggViews.sendTileUpdate(map.ID, clickedtile, self.tilelabel.currentTile)
                 rggEvent.setEaten()
             elif self.isVisible() and self.rectPaintingButton.isChecked():
                 self.rectStart = ((rggSystem.cameraPosition()[0] + x) / self.tilelabel.tilex,
@@ -64,22 +70,25 @@ class mapEditor(QtGui.QDockWidget):
                 rggEvent.setEaten()
         elif t == 5:
             if self.isVisible() and (self.singlePaintingButton.isChecked() or self.rectPaintingButton.isChecked()):
-                currentmap = rggViews._state.currentMap
-                clickedtile = ((rggSystem.cameraPosition()[0] + x) / self.tilelabel.tilex,
-                            (rggSystem.cameraPosition()[1] + y) / self.tilelabel.tiley)
-                self.tilelabel.currentTile = currentmap.getTile(clickedtile)
+                clickedtile = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
+                            int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
+                self.tilelabel.currentTile = map.getTile(clickedtile)
                 rggEvent.setEaten()
 
     def mouseMoveResponse(self, x, y):
+        mapPosition = rggSystem.getMapPosition((x, y))
+        map = rggViews.topmap(mapPosition)
+        if map == None:
+            return
         if self.isVisible() and self.singlePaintingButton.isChecked() and self.dragging:
-            clickedtile = ((rggSystem.cameraPosition()[0] + x) / self.tilelabel.tilex,
-                           (rggSystem.cameraPosition()[1] + y) / self.tilelabel.tiley)
-            if not rggViews._state.currentMap.tilePosExists(clickedtile):
+            clickedtile = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
+                            int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
+            
+            if not map.tilePosExists(clickedtile):
                 rggEvent.setEaten()
                 return
-            currentmap = rggViews._state.currentMap
-            if currentmap.tilePosExists(clickedtile) and currentmap.getTile(clickedtile) != self.tilelabel.currentTile:
-                rggViews.sendTileUpdate(currentmap.ID, clickedtile, self.tilelabel.currentTile)
+            if map.tilePosExists(clickedtile) and map.getTile(clickedtile) != self.tilelabel.currentTile:
+                rggViews.sendTileUpdate(map.ID, clickedtile, self.tilelabel.currentTile)
             rggEvent.setEaten()
             
     def mouseReleaseResponse(self, x, y, t):
@@ -112,6 +121,7 @@ class mapEditor(QtGui.QDockWidget):
 
     def mapChangedResponse(self, newMap):
         if newMap != None:
+            self.currentMap = newMap
             self.tilepixmap = QtGui.QPixmap()
             self.tilepixmap.load(newMap.tileset)
             if self.tilelabel is None:

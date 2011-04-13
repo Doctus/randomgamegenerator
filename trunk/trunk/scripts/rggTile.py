@@ -29,6 +29,7 @@ class tile(object):
         self.glwidget = glwidget
         self.createLayer = False
         self.destroyed = False
+        self.VBOData = numpy.zeros((8, 2), 'f')
 
         if self.glwidget.texext == GL_TEXTURE_2D:
             x = float(textureRect[0])/float(qimg.width()-1)
@@ -36,9 +37,8 @@ class tile(object):
             w = float(textureRect[2])/float(qimg.width()-1)
             h = float(textureRect[3])/float(qimg.height()-1)
             self.textureRect = [x, y, w, h]
-
-    #def __del__(self):
-        #self.glwidget.deleteImage(self)
+            
+        self.setVBOData()
             
     def destroy(self):
         if not self.destroyed:
@@ -82,6 +82,16 @@ class tile(object):
         drawRect[1] = y
         self.setDrawRect(drawRect)
         
+    def setDrawW(self, w):
+        drawRect = list(self.drawRect)
+        drawRect[2] = w
+        self.setDrawRect(drawRect)
+        
+    def setDrawH(self, h):
+        drawRect = list(self.drawRect)
+        drawRect[3] = h
+        self.setDrawRect(drawRect)
+        
     def getW(self):
         return self.drawRect[2]
         
@@ -98,15 +108,20 @@ class tile(object):
         self.drawRect = drawRect
 
         if self.glwidget.vbos:
-            VBOData = self.getVBOData()
-            vertByteCount = ADT.arrayByteCount(VBOData)
+            self.setVBOData()
 
             glBindBuffer(GL_ARRAY_BUFFER_ARB, self.VBO)
-            glBufferSubData(GL_ARRAY_BUFFER_ARB, int(self.offset*vertByteCount/4), vertByteCount, VBOData)
+            glBufferSubData(GL_ARRAY_BUFFER_ARB, int(self.offset*self.glwidget.vertByteCount/4), self.glwidget.vertByteCount, self.VBOData)
+            
+    def displaceDrawRect(self, displacement):
+        self.drawRect = list(self.drawRect)
+        self.drawRect[0] = self.drawRect[0] + displacement[0]
+        self.drawRect[1] = self.drawRect[1] + displacement[1]
+        self.setDrawRect(self.drawRect)
 
     def setTextureRect(self, textureRect):
         self.textureRect = textureRect
-        if self.glwidget.npot == 0:
+        if self.glwidget.texext == GL_TEXTURE_2D:
             x = float(textureRect[0])/float(self.qimg.width())
             y = float(textureRect[1])/float(self.qimg.height())
             w = float(textureRect[2])/float(self.qimg.width())
@@ -114,44 +129,42 @@ class tile(object):
             self.textureRect = [x, y, w, h]
             
         if self.glwidget.vbos:
-            VBOData = self.getVBOData()
-            vertByteCount = ADT.arrayByteCount(VBOData)
+            self.setVBOData()
 
             glBindBuffer(GL_ARRAY_BUFFER_ARB, self.VBO)
-            glBufferSubData(GL_ARRAY_BUFFER_ARB, int(self.offset*vertByteCount/4), vertByteCount, VBOData)
+            glBufferSubData(GL_ARRAY_BUFFER_ARB, int(self.offset*self.glwidget.vertByteCount/4), self.glwidget.vertByteCount, self.VBOData)
 
     def getVBOData(self):
+        return self.VBOData
+        
+    def setVBOData(self):
         x, y, w, h = self.textureRect
         dx, dy, dw, dh = self.drawRect
 
-        VBOData = numpy.zeros((8, 2), 'f')
+        self.VBOData[0, 0] = x #tex
+        self.VBOData[0, 1] = y+h
 
-        VBOData[0, 0] = x #tex
-        VBOData[0, 1] = y+h
+        self.VBOData[1, 0] = dx #vert
+        self.VBOData[1, 1] = dy
 
-        VBOData[1, 0] = dx #vert
-        VBOData[1, 1] = dy
+        self.VBOData[2, 0] = x+w #tex
+        self.VBOData[2, 1] = y+h
 
-        VBOData[2, 0] = x+w #tex
-        VBOData[2, 1] = y+h
+        self.VBOData[3, 0] = dx+dw #vert
+        self.VBOData[3, 1] = dy
 
-        VBOData[3, 0] = dx+dw #vert
-        VBOData[3, 1] = dy
+        self.VBOData[4, 0] = x+w
+        self.VBOData[4, 1] = y
 
-        VBOData[4, 0] = x+w
-        VBOData[4, 1] = y
+        self.VBOData[5, 0] = dx+dw
+        self.VBOData[5, 1] = dy+dh
 
-        VBOData[5, 0] = dx+dw
-        VBOData[5, 1] = dy+dh
+        self.VBOData[6, 0] = x
+        self.VBOData[6, 1] = y
 
-        VBOData[6, 0] = x
-        VBOData[6, 1] = y
+        self.VBOData[7, 0] = dx
+        self.VBOData[7, 1] = dy+dh
 
-        VBOData[7, 0] = dx
-        VBOData[7, 1] = dy+dh
-
-        return VBOData
-        
     def __str__(self):
         text = "Image(", self.imagepath, self.drawRect, self.textureRect, self.layer, self.offset, self.textureId, self._hidden, ")"
         return str(text)

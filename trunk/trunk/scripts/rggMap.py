@@ -24,7 +24,7 @@ from rggSystem import mainWindow
 
 class Map(object):
     
-    def __init__(self, mapname, authorname, mapsize, tileset, tilesize):
+    def __init__(self, mapname, authorname, mapsize, tileset, tilesize, drawOffset = [0, 0]):
         """Initializes a new map."""
         
         self.ID = None
@@ -36,9 +36,11 @@ class Map(object):
         
         self.Pogs = {}
         self.lines = []
+        self.linesDict = {}
         self.tileindexes = [0 for i in xrange(mapsize[0] * mapsize[1])]
         self.hidden = False
         self.tiles = None
+        self._drawOffset = drawOffset
 
         self._createTiles()
 
@@ -70,6 +72,28 @@ class Map(object):
         while id in self.Pogs:
             id += rggSystem.findRandomAppend()
         return id
+        
+    @property
+    def pixelSize(self):
+        size = [self.mapsize[0], self.mapsize[1]]
+        size[0] *= self.tilesize[0]
+        size[1] *= self.tilesize[1]
+        return size
+
+    @property
+    def drawOffset(self):
+        return self._drawOffset
+        
+    @drawOffset.setter
+    def drawOffset(self, drawOffset):
+        displacement = [0, 0]
+        displacement[0] = drawOffset[0] - self._drawOffset[0]
+        displacement[1] = drawOffset[1] - self._drawOffset[1]
+        self._drawOffset = drawOffset
+        
+        #if not self.hidden:
+        for t in self.tiles:
+            t.displaceDrawRect(displacement)
     
     def hide(self, hidden=True, includeTiles=True, includePogs=True, includeLines=True):
         """Hide or show all pogs and tiles."""
@@ -131,7 +155,7 @@ class Map(object):
         for y in xrange(0, self.mapsize[1]):
             for x in xrange(0, self.mapsize[0]):
                 textureRect = (0, 0, self.tilesize[0], self.tilesize[1])
-                drawRect = (x * self.tilesize[0], y * self.tilesize[1], self.tilesize[0], self.tilesize[1])
+                drawRect = (x * self.tilesize[0] + self.drawOffset[0], y * self.tilesize[1] + self.drawOffset[1], self.tilesize[0], self.tilesize[1])
                 temptile = mainWindow.glwidget.createImage(src, 0, textureRect, drawRect, self.hidden)
                 self.tiles[x+y*self.mapsize[0]] = temptile
                     
@@ -157,7 +181,7 @@ class Map(object):
         self.tileindexes[t] = index
         imgsize = mainWindow.glwidget.getImageSize(rggResource.crm.translateFile(self.tileset, rggResource.RESOURCE_IMAGE))
         
-        x = self.tileindexes[t]%(imgsize.width()/self.tilesize[0])*self.tilesize[0]
+        x = index%(imgsize.width()/self.tilesize[0])*self.tilesize[0]
         y = int((index*self.tilesize[0])/imgsize.width())*self.tilesize[1]
         self.tiles[t].setTextureRect((x, y, self.tilesize[0], self.tilesize[1]))
 
@@ -193,14 +217,10 @@ class Map(object):
         return top
 
     def storeLines(self):
-        return
-        thickOne = rggSystem.getLinesOfThickness(1)
-        thickTwo = rggSystem.getLinesOfThickness(2)
-        thickThree = rggSystem.getLinesOfThickness(3)
-
-        self.lines = [(line.x(), line.y(), line.width(), line.height(), 1) for line in thickOne]
-        self.lines.extend([(line.x(), line.y(), line.width(), line.height(), 2) for line in thickTwo])
-        self.lines.extend([(line.x(), line.y(), line.width(), line.height(), 3) for line in thickThree])
+        self.lines = []
+        
+        for item in self.linesDict.items():
+            self.lines.extend( [item[1][0], item[1][1], item[1][1], item[1][1], item[0]] )
 
     def restoreLines(self):
         for line in self.lines:

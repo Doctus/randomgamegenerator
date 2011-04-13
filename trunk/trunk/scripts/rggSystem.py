@@ -301,8 +301,12 @@ def clearLines():
     mainWindow.glwidget.clearLines()
 
 def getLinesOfThickness(thickness):
-    #return _main.getLineOfThickness(thickness)
-    return False
+    lines = dict()
+    try:
+        lines = mainWindow.glwidget.lines[thickness]
+    except:
+        pass
+    return lines
 
 def reloadImage(filename, tilewidth, tileheight):
     """Reloads the specified image file."""
@@ -316,3 +320,7 @@ def setZoom(zoom):
 
 def getZoom():
     return mainWindow.glwidget.zoom
+    
+def getMapPosition(screenCoordinates):
+    mapPosition = map(lambda p,c,d: p/d - c/d, screenCoordinates, cameraPosition(), (getZoom(), getZoom()))
+    return mapPosition
