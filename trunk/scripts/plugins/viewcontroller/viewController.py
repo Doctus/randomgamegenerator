@@ -13,9 +13,10 @@ class mapItem(QtGui.QListWidgetItem):
             
 class mapListWidget(QtGui.QListWidget):
 
-    def __init__(self, parent):
+    def __init__(self, parent, controller):
         QtGui.QListWidget.__init__(self)
         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.controller = controller
 
     def mousePressEvent(self, event): #listwidget generated events
         pos = event.globalPos()
@@ -25,10 +26,17 @@ class mapListWidget(QtGui.QListWidget):
         event.accept()
         super(QtGui.QListWidget, self).mousePressEvent(event)
         if not item: return
+        self.controller.setCurrentMap(item.map)
         if event.button() == QtCore.Qt.RightButton:
-            selection = rggSystem.showPopupMenuAtAbs([x, y], ['Switch to ' + item.text()])
+            hide = "Hide " + item.text()
+            if item.map.hidden:
+                hide = "Show " + item.text()
+            selection = rggSystem.showPopupMenuAtAbs([x, y], [hide])
             if selection == 0:
-                rggViews.sendMapSwitch(item.map.ID)
+                if item.map.hidden:
+                    item.map.show()
+                else:
+                    item.map.hide()
 
 
 class viewController(QtGui.QDockWidget):
@@ -44,7 +52,7 @@ class viewController(QtGui.QDockWidget):
         self.layerTitle = QtGui.QLabel("Layers")
         self.layerList = QtGui.QListWidget(mainWindow)
         self.mapTitle = QtGui.QLabel("Maps")
-        self.mapList = mapListWidget(mainWindow)
+        self.mapList = mapListWidget(mainWindow, self)
         self.layout.addWidget(self.layerTitle, 0, 0)
         self.layout.addWidget(self.layerList, 1, 0, 1, 2)
         self.layout.addWidget(self.mapTitle, 3, 0)
@@ -57,9 +65,10 @@ class viewController(QtGui.QDockWidget):
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
         mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, self)
+        self.mainWindow = mainWindow
 
-        currentMap = rggViews.currentmap()
         self.updateMaps()
+        self.currentMap = None
         
         rggEvent.addMapChangedListener(self)
         
@@ -73,8 +82,12 @@ class viewController(QtGui.QDockWidget):
     def mapChangedResponse(self, newMap):
         self.updateMaps()
         
+    def setCurrentMap(self, map):
+        self.currentMap = map
+        
     def refreshPogs(self):
-        rggViews._state.currentMap.refreshPogs()
+        if self.currentMap != None:
+            self.currentMap.refreshPogs()
  
 def hajimaru(mainwindow):
     widget = viewController(mainwindow)
