@@ -298,56 +298,6 @@ class GLWidget(QGLWidget):
 
         return image
 
-    def reloadImage(self, qimagepath):
-        '''
-        reload a texture
-        '''
-
-        qimg = None
-        texture = 0
-
-        if qimagepath in self.qimages:
-            qimg = self.qimages[qimagepath][0]
-            if self.qimages[qimagepath][2] > 0:
-                texture = self.qimages[qimagepath][1]
-            else:
-                print "no texture for", qimagepath
-                return
-        else:
-            print "couldn't find", qimagepath
-            return
-
-        if self.npot == 0:
-            w = nextPowerOfTwo(qimg.width())
-            h = nextPowerOfTwo(qimg.height())
-            if w != qimg.width() or h != qimg.height():
-                qimg = qimg.scaled(w, h)
- 
-        img = self.convertToGLFormat(qimg)
-        texture = glGenTextures(1)
-        imgdata = img.bits().asstring(img.numBytes())
-
-        glBindTexture(self.texext, texture)
-        
-        if self.npot == 3:
-            glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST)
-            glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        elif self.npot == 2:
-            glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST)
-            glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-            glTexParameteri(self.texext, GL_GENERATE_MIPMAP, GL_TRUE)
-        else:
-            glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-            glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-
-        glTexImage2D(self.texext, 0, GL_RGBA, img.width(), img.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imgdata);
-
-        if self.npot == 3:
-            glEnable(GL_TEXTURE_2D)
-            glGenerateMipmap(GL_TEXTURE_2D)
-
-        print "reloaded", qimagepath
-
     def reserveVBOSize(self, size):
         '''
         Reserves a VBO with the specified size as the amount of VBO entries, and re-assigns all images with the new data.

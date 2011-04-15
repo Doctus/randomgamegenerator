@@ -158,10 +158,9 @@ class Map(object):
                 drawRect = (x * self.tilesize[0] + self.drawOffset[0], y * self.tilesize[1] + self.drawOffset[1], self.tilesize[0], self.tilesize[1])
                 temptile = mainWindow.glwidget.createImage(src, 0, textureRect, drawRect, self.hidden)
                 self.tiles[x+y*self.mapsize[0]] = temptile
-                    
+
     def _updateSrc(self, crm, filename, translation):
         if filename == self.tileset:
-            rggSystem.reloadImage(filename, self.tilesize[0], self.tilesize[1])
             self._createTiles()
     
     def getTile(self, tile):
