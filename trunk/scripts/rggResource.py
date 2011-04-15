@@ -37,12 +37,12 @@ VALID_STATES = (STATE_UNKNOWN, STATE_READY, STATE_LOADING, STATE_INVALID)
 
 # DEFAULT MEDIA (feel free to change)
 RESOURCE_INVALID = {
-    RESOURCE_IMAGE: "invalid.png",
-    RESOURCE_SOUND: "silent.wav"
+    RESOURCE_IMAGE: "data/invalid.png",
+    RESOURCE_SOUND: "data/silent.wav"
 }
 RESOURCE_LOADING = {
-    RESOURCE_IMAGE: "loading.png",
-    RESOURCE_SOUND: "silent.wav"
+    RESOURCE_IMAGE: "data/loading.png",
+    RESOURCE_SOUND: "data/silent.wav"
 }
 
 KEEP_ALIVE_FIELD = '_keepWeakReferenceAlive'
