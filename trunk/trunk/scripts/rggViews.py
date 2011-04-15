@@ -285,7 +285,8 @@ def chooseMap():
     
 
 def closeAllMaps():
-    switchMap(None)
+    for map in _state.Maps.values():
+        map._deleteTiles()
     _state.Maps = {}
 
 def internalAddMap(map):
@@ -731,8 +732,6 @@ def mouseMove(screenPosition, mapPosition, displacement):
             topmap(mapPosition).drawOffset = drawOffset
         return
     if icon == ICON_SELECT: #selectIcon
-        if topmap(mapPosition) is None:
-            return
         if _state.mouseButton is None:
             if topmap(mapPosition) is None:
                 return
