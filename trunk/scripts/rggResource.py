@@ -24,7 +24,6 @@ import os, os.path
 from collections import defaultdict
 from PyQt4 import QtCore, QtGui
 from rggRPC import client, server, clientRPC, serverRPC
-from rggSystem import reloadImage
 
 RESOURCE_IMAGE = "image"
 RESOURCE_SOUND = "sound"
@@ -171,8 +170,6 @@ class clientResourceMapper(object):
     
     def _onFileReceived(self, client, filename):
         """Responds to a file being successfully transferred."""
-        # HACK: Using reload image on not-necessarily-image files
-        #reloadImage(filename)
         self._update(filename, STATE_READY)
     
     def _onFileFailed(self, client, filename):

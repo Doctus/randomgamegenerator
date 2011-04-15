@@ -308,10 +308,6 @@ def getLinesOfThickness(thickness):
         pass
     return lines
 
-def reloadImage(filename, tilewidth = 0, tileheight = 0):
-    """Reloads the specified image file."""
-    return mainWindow.glwidget.reloadImage(filename)
-
 def setZoom(zoom):
     #_main.setZoom(zoom)
     print "unimplemented2"
