@@ -181,7 +181,7 @@ class Pog(object):
     
     def _makeTile(self):
         from rggSystem import mainWindow
-        self.src = rggResource.crm.translateFile(self._src, rggResource.RESOURCE_IMAGE)
+        self._src = rggResource.crm.translateFile(self._src, rggResource.RESOURCE_IMAGE)
         textureRect = (0, 0, self.texturedimensions[0], self.texturedimensions[1])
         drawRect = (self.position[0], self.position[1], self.size[0], self.size[1])
         return mainWindow.glwidget.createImage(self.src, self.layer, textureRect, drawRect)
