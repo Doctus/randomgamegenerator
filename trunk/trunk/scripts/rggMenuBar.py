@@ -68,19 +68,6 @@ class menuBar(object):
         self.thicknessTwoAct = QtGui.QAction("&Two", main)
         self.thicknessThreeAct = QtGui.QAction("&Three", main)
         
-        self.pluginsActs = []
-        self.pluginsModules = []
-        self.pluginsInits = []
-        sys.path.append('plugins')
-        for folder in os.listdir('plugins'):
-            if folder == ".svn":
-                continue
-            self.pluginsModules.append(__import__(folder))
-            self.pluginsModules[-1].initialize(main)
-            self.pluginsInits.append(self.pluginsModules[-1].hajimeru)
-            self.pluginsActs.append(QtGui.QAction(unicode(self.pluginsModules[-1].title()), main))
-            self.pluginsActs[-1].triggered.connect(self.pluginsInits[-1])
-        
         self.selectIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-select-icon.png"), "Select Tool", main)
         self.selectIcon.setShortcut("Ctrl+T")
         self.selectIcon.setToolTip("Select Tool (Ctrl+T)")
@@ -125,8 +112,16 @@ class menuBar(object):
             stylesMenu.addAction(QtGui.QAction(style, main))
         
         pluginsMenu = QtGui.QMenu("&Plugins", main)
-        for act in self.pluginsActs:
-            pluginsMenu.addAction(act)
+        
+        self.pluginsModules = []
+        self.plugins = {}
+        sys.path.append('plugins')
+        for folder in os.listdir('plugins'):
+            if folder == ".svn":
+                continue
+            self.pluginsModules.append(__import__(folder))
+            pluginsMenu.addAction(QtGui.QAction(unicode(self.pluginsModules[-1].title()), main))
+            self.plugins[unicode(self.pluginsModules[-1].title())] = folder
         
         # MENUBAR
 
@@ -150,6 +145,7 @@ class menuBar(object):
         self.deleteIcon.triggered.connect(self.deleteIconClicked)
         
         stylesMenu.triggered.connect(self.changeStyle)
+        pluginsMenu.triggered.connect(self.loadPlugin)
         
     def resetIcons(self):
         self.selectIcon.setIcon(QtGui.QIcon("./data/FAD-select-icon.png"))
@@ -176,6 +172,10 @@ class menuBar(object):
         self.resetIcons()
         self.deleteIcon.setIcon(QtGui.QIcon("./data/FAD-eraser-icon-selected.png"))
         self.selectedIcon = ICON_DELETE
+        
+    def loadPlugin(self, act):
+        exec("from " + (self.plugins[unicode(act.text())]) + " import " + (self.plugins[unicode(act.text())]))
+        exec(self.plugins[unicode(act.text())] + ".hajimaru(mainWindow)")
     
     def changeStyle(self, act):
         mainWindow.setStyleSheet(rggStyles.sheets[unicode(act.text())])
