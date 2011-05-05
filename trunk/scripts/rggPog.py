@@ -21,7 +21,7 @@ import rggTile, rggResource, rggSystem, math
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
 class Pog(object):
-    def __init__(self, position, texturedimensions, size, layer, srcfile, status, locked, properties, mapID):
+    def __init__(self, position, texturedimensions, size, layer, srcfile, status, locked, properties, mapID, alph):
         self.ID = None
         self._position = position
         self.texturedimensions = texturedimensions
@@ -35,6 +35,7 @@ class Pog(object):
         self._showTooltip = False
         self.tooltipId = -1
         self.mapID = mapID
+        self.alpha = alph
         self._locked = locked #locked only works for mouse movements. This means that scripts may actually be able to move the pog.
         rggResource.crm.listen(srcfile, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
         if status > 0:
@@ -192,7 +193,10 @@ class Pog(object):
             self._tileStore = self._makeTile()
             
     def getSelectionCircleData(self):
-        return ((self.position[0]+self.size[0]/2, self.position[1]+self.size[1]/2, -1, math.sqrt((self.size[0]**2)+(self.size[1]**2))/2))
+        if self.alpha:
+            return ((self.position[0]+self.size[0]/2, self.position[1]+self.size[1]/2, -1, (max(self.size[0], self.size[1])*1.2)/2))
+        else:
+            return ((self.position[0]+self.size[0]/2, self.position[1]+self.size[1]/2, -1, math.sqrt((self.size[0]**2)+(self.size[1]**2))/2))
             
     def forceUpdate(self):
         if self._tileStore != None:
@@ -211,7 +215,8 @@ class Pog(object):
             status=self.status,
             locked=self._locked,
             properties=self.properties,
-            mapID=self.mapID)
+            mapID=self.mapID,
+            alpha=self.alpha)
     
     @staticmethod
     def load(obj):
@@ -225,6 +230,7 @@ class Pog(object):
             loadInteger('Pog.status', obj.get('status')),
             loadInteger('Pog._locked', obj.get('locked')),
             loadObject('Pog.properties', obj.get('properties')),
-            loadString('Pog.mapID', obj.get('mapID')))
+            loadString('Pog.mapID', obj.get('mapID')),
+            loadInteger('Pog.alpha', obj.get('alpha')))
         pog.name = loadString('Pog.name', obj.get('name'), allowEmpty=True)
         return pog

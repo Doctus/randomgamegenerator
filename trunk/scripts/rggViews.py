@@ -832,7 +832,8 @@ def mousePress(screenPosition, mapPosition, button):
                     0,
                     0,
                     {},
-                    topmap(mapPosition).ID)
+                    topmap(mapPosition).ID,
+                    infograb.hasAlpha())
                 createPog(topmap(mapPosition), pog)
                 return
             pog = topmap(mapPosition).findTopPog(mapPosition)
