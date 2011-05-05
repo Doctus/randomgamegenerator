@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 from PyQt4 import QtGui, QtCore
 from rggSystem import translate, mainWindow
-import sys, os
+import sys, os, rggStyles
 
 ICON_SELECT = 0
 ICON_MOVE = 1
@@ -73,13 +73,13 @@ class menuBar(object):
         self.pluginsInits = []
         sys.path.append('plugins')
         for folder in os.listdir('plugins'):
-                if folder == ".svn":
-                        continue
-                self.pluginsModules.append(__import__(folder))
-                self.pluginsModules[-1].initialize(main)
-                self.pluginsInits.append(self.pluginsModules[-1].hajimeru)
-                self.pluginsActs.append(QtGui.QAction(unicode(self.pluginsModules[-1].title()), main))
-                self.pluginsActs[-1].triggered.connect(self.pluginsInits[-1])
+            if folder == ".svn":
+                continue
+            self.pluginsModules.append(__import__(folder))
+            self.pluginsModules[-1].initialize(main)
+            self.pluginsInits.append(self.pluginsModules[-1].hajimeru)
+            self.pluginsActs.append(QtGui.QAction(unicode(self.pluginsModules[-1].title()), main))
+            self.pluginsActs[-1].triggered.connect(self.pluginsInits[-1])
         
         self.selectIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-select-icon.png"), "Select Tool", main)
         self.selectIcon.setShortcut("Ctrl+T")
@@ -120,15 +120,20 @@ class menuBar(object):
         drawMenu = QtGui.QMenu("&Draw", main)
         drawMenu.addMenu(thicknessMenu)
         
+        stylesMenu = QtGui.QMenu("&Styles", main)
+        for style in rggStyles.sheets.keys():
+            stylesMenu.addAction(QtGui.QAction(style, main))
+        
         pluginsMenu = QtGui.QMenu("&Plugins", main)
         for act in self.pluginsActs:
-                pluginsMenu.addAction(act)
+            pluginsMenu.addAction(act)
         
         # MENUBAR
 
         menubar.addMenu(fileMenu)
         menubar.addMenu(internetMenu)
         menubar.addMenu(drawMenu)
+        menubar.addMenu(stylesMenu)
         menubar.addMenu(pluginsMenu)
         menubar.addSeparator()
         menubar.addAction(self.selectIcon)
@@ -143,6 +148,8 @@ class menuBar(object):
         self.moveIcon.triggered.connect(self.moveIconClicked)
         self.drawIcon.triggered.connect(self.drawIconClicked)
         self.deleteIcon.triggered.connect(self.deleteIconClicked)
+        
+        stylesMenu.triggered.connect(self.changeStyle)
         
     def resetIcons(self):
         self.selectIcon.setIcon(QtGui.QIcon("./data/FAD-select-icon.png"))
@@ -170,4 +177,5 @@ class menuBar(object):
         self.deleteIcon.setIcon(QtGui.QIcon("./data/FAD-eraser-icon-selected.png"))
         self.selectedIcon = ICON_DELETE
     
-    
+    def changeStyle(self, act):
+        mainWindow.setStyleSheet(rggStyles.sheets[unicode(act.text())])
