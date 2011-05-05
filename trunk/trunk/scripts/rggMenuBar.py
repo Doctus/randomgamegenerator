@@ -35,7 +35,7 @@ class menuBar(object):
         
         main = mainWindow
         
-        menubar = main.menuBar()
+        self.menubar = main.menuBar()
         
         # ACTIONS
         
@@ -111,7 +111,7 @@ class menuBar(object):
         for style in rggStyles.sheets.keys():
             stylesMenu.addAction(QtGui.QAction(style, main))
         
-        pluginsMenu = QtGui.QMenu("&Plugins", main)
+        self.pluginsMenu = QtGui.QMenu("&Plugins", main)
         
         self.pluginsModules = []
         self.plugins = {}
@@ -120,21 +120,21 @@ class menuBar(object):
             if folder == ".svn":
                 continue
             self.pluginsModules.append(__import__(folder))
-            pluginsMenu.addAction(QtGui.QAction(unicode(self.pluginsModules[-1].title()), main))
+            self.pluginsMenu.addAction(QtGui.QAction(unicode(self.pluginsModules[-1].title()), main))
             self.plugins[unicode(self.pluginsModules[-1].title())] = folder
         
         # MENUBAR
 
-        menubar.addMenu(fileMenu)
-        menubar.addMenu(internetMenu)
-        menubar.addMenu(drawMenu)
-        menubar.addMenu(stylesMenu)
-        menubar.addMenu(pluginsMenu)
-        menubar.addSeparator()
-        menubar.addAction(self.selectIcon)
-        menubar.addAction(self.moveIcon)
-        menubar.addAction(self.drawIcon)
-        menubar.addAction(self.deleteIcon)
+        self.menubar.addMenu(fileMenu)
+        self.menubar.addMenu(internetMenu)
+        self.menubar.addMenu(drawMenu)
+        self.menubar.addMenu(stylesMenu)
+        self.pluginhide = self.menubar.addMenu(self.pluginsMenu)
+        self.menubar.addSeparator()
+        self.menubar.addAction(self.selectIcon)
+        self.menubar.addAction(self.moveIcon)
+        self.menubar.addAction(self.drawIcon)
+        self.menubar.addAction(self.deleteIcon)
 
         # EVENTS
         
@@ -145,7 +145,7 @@ class menuBar(object):
         self.deleteIcon.triggered.connect(self.deleteIconClicked)
         
         stylesMenu.triggered.connect(self.changeStyle)
-        pluginsMenu.triggered.connect(self.loadPlugin)
+        self.pluginsMenu.triggered.connect(self.loadPlugin)
         
     def resetIcons(self):
         self.selectIcon.setIcon(QtGui.QIcon("./data/FAD-select-icon.png"))
@@ -176,6 +176,9 @@ class menuBar(object):
     def loadPlugin(self, act):
         exec("from " + (self.plugins[unicode(act.text())]) + " import " + (self.plugins[unicode(act.text())]))
         exec(self.plugins[unicode(act.text())] + ".hajimaru(mainWindow)")
+        self.pluginsMenu.removeAction(act)
+        if len(self.pluginsMenu.actions()) == 0:
+            self.pluginhide.setVisible(False)
     
     def changeStyle(self, act):
         mainWindow.setStyleSheet(rggStyles.sheets[unicode(act.text())])
