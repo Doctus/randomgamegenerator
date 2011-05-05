@@ -27,7 +27,7 @@ from rggSystem import cameraPosition, setCameraPosition, mainWindow, getMapPosit
 from rggSystem import translate, showErrorMessage
 from rggSystem import showPopupMenuAt, IMAGE_FILTER
 from rggSystem import promptString, promptInteger, promptCoordinates, promptSaveFile, promptLoadFile
-from rggSystem import drawLine, deleteLine, getZoom
+from rggSystem import drawLine, deleteLine, drawSelectionCircle, clearSelectionCircles, getZoom
 from rggDialogs import newMapDialog, hostDialog, joinDialog
 from PyQt4 import QtCore, QtGui
 
@@ -85,6 +85,22 @@ class _state(object):
         _state.localuser = User(client.username)
         _state.users[client.username] = _state.localuser
         
+def drawPogCircles():
+    clearSelectionCircles()
+    for pog in _state.pogSelection:
+        drawSelectionCircle(*pog.getSelectionCircleData())
+
+def addPogSelection(pog):
+    _state.pogSelection.add(pog)
+    drawPogCircles()
+
+def removePogSelection(pog):
+    _state.pogSelection.remove(pog)
+    drawPogCircles()
+    
+def setPogSelection(pog):
+    _state.pogSelection = set()
+    addPogSelection(pog)
 
 # MESSAGES
 
@@ -446,6 +462,7 @@ def clearPogSelection():
     if _state.pogHover != None:
         _state.pogHover.showTooltip = False
         _state.pogHover = None
+    drawPogCircles()
 
 def createPog(pogMap, pog):
     """Creates a new pog."""
@@ -471,6 +488,7 @@ def movePogs(displacement):
     for pog in selection:
         pog.displace(displacement)
         #sendMovementPog(currentmap().ID, pog.ID, pog.position) #TODO
+    drawPogCircles()
 
 @serverRPC
 def respondUpdatePog(mapID, pogID, pogDump):
@@ -485,12 +503,13 @@ def respondUpdatePog(mapID, pogID, pogDump):
         old = pogMap.Pogs[pogID]
         if old in _state.pogSelection:
             _state.pogSelection.discard(old)
-            _state.pogSelection.add(pog)
+            addPogSelection(pog)
         if old == _state.pogHover:
             _state.pogHover.showTooltip = False
             _state.pogHover = None
         old._tile.destroy()
     pogMap.addPog(pog)
+    drawPogCircles()
 
 @clientRPC
 def sendUpdatePog(user, mapID, pogID, pogDump):
@@ -524,6 +543,7 @@ def respondDeletePog(mapID, pogID):
             _state.pogHover.showTooltip = False
             _state.pogHover = None
         pogMap.removePog(old)
+    drawPogCircles()
 
 @clientRPC
 def sendDeletePog(user, mapID, pogID):
@@ -544,6 +564,7 @@ def respondMovementPog(mapID, pogID, newpos):
     if pogID in pogMap.Pogs:
         pog = pogMap.Pogs[pogID]
         pog.position = newpos
+    drawPogCircles()
 
 @clientRPC
 def sendMovementPog(user, mapID, pogID, newpos):
@@ -566,6 +587,7 @@ def respondHidePog(mapID, pogID, hidden):
             pog.hide()
         else:
             pog.show()
+    drawPogCircles()
 
 @clientRPC
 def sendHidePog(user, mapID, pogID, hidden):
@@ -793,9 +815,9 @@ def mousePress(screenPosition, mapPosition, button):
             if not pog:
                 return
             if pog in _state.pogSelection:
-                _state.pogSelection.remove(pog)
+                removePogSelection(pog)
             else:
-                _state.pogSelection.add(pog)
+                addPogSelection(pog)
             rggEvent.pogSelectionChangedEvent()
         elif button == BUTTON_LEFT:
             if _state.pogPlacement:
@@ -814,11 +836,11 @@ def mousePress(screenPosition, mapPosition, button):
                 createPog(topmap(mapPosition), pog)
                 return
             pog = topmap(mapPosition).findTopPog(mapPosition)
-            if pog not in _state.pogSelection:
-                _state.pogSelection = set()
             if not pog:
+                clearPogSelection()
                 return
-            _state.pogSelection.add(pog)
+            if pog not in _state.pogSelection:
+                setPogSelection(pog)
             rggEvent.pogSelectionChangedEvent()
         elif button == BUTTON_RIGHT:
             pog = topmap(mapPosition).findTopPog(mapPosition)

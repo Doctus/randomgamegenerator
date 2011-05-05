@@ -69,6 +69,7 @@ class GLWidget(QGLWidget):
         self.texext = GL_TEXTURE_2D
         self.npot = 3
         self.lines = dict()
+        self.selectionCircles = dict()
         self.error = False
         self.texts = []
         self.textid = 0
@@ -98,6 +99,7 @@ class GLWidget(QGLWidget):
 
         if mod:
             glmod.drawLines(self.lines)
+            glmod.drawSelectionCircles(self.selectionCircles)
         else:
             for layer in self.lines:
                 glLineWidth(layer)
@@ -122,6 +124,15 @@ class GLWidget(QGLWidget):
         glScaled(1/self.zoom, 1/self.zoom, 1)
         glTranslatef(-self.camera[0], -self.camera[1], 0)
         glPopMatrix()
+        
+    def addSelectionCircle(self, splasifarcity, x, y, radius):
+        if not splasifarcity in self.selectionCircles:
+            self.selectionCircles[splasifarcity] = []
+            
+        self.selectionCircles[splasifarcity].append((float(x), float(y), float(radius)))
+        
+    def clearSelectionCircles(self):
+        self.selectionCircles.clear()
         
     def addLine(self, thickness, x, y, w, h):
         if not thickness in self.lines:

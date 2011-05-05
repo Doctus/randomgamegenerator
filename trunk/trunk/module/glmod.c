@@ -210,6 +210,38 @@ static PyObject * glmod_addVBOentry(PyObject *self, PyObject* args)
     return PyInt_FromLong(0L);
 }
 
+static PyObject * glmod_drawSelectionCircles(PyObject *self, PyObject* args)
+{
+    PyObject *dict = PyTuple_GET_ITEM(args, 0);
+    int i = 0; int r = 0;
+
+    PyObject *key, *values, *value, *test;
+    Py_ssize_t pos = 0;
+
+    while (PyDict_Next(dict, &pos, &key, &values)) {
+        for(i = 0; i < PyList_Size(values); i++) 
+        {
+            value = PyList_GET_ITEM(values, i);
+            glLineWidth(3);
+            glColor3f(0.0, 1.0, 0.0);
+            glDisable(GL_TEXTURE_2D);
+            glBegin(GL_LINE_LOOP);
+            double x = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 0));
+            double y = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 1));
+		double rad = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 2));
+            for (r = 0; r < 360; r = r + 3)
+            {
+                glVertex2f(x + cos(r*0.01745329) * rad, y + sin(r*0.01745329) * rad);
+            }
+            glEnd();
+            glEnable(GL_TEXTURE_2D);
+            glColor3f(1.0, 1.0, 1.0);
+        }
+    }
+
+    return PyInt_FromLong(0L);
+}
+
 static PyObject * glmod_drawLines(PyObject *self, PyObject* args)
 {
     PyObject *dict = PyTuple_GET_ITEM(args, 0);
@@ -217,6 +249,8 @@ static PyObject * glmod_drawLines(PyObject *self, PyObject* args)
     
     PyObject *key, *values, *value, *test;
     Py_ssize_t pos = 0;
+
+    glDisable(GL_TEXTURE_2D);
 
     glBegin(GL_LINES);
     while (PyDict_Next(dict, &pos, &key, &values)) {
@@ -260,6 +294,8 @@ static PyObject * glmod_drawLines(PyObject *self, PyObject* args)
     }
     glEnd();
 
+    glEnable(GL_TEXTURE_2D);
+
     return PyInt_FromLong(0L);
 }
 
@@ -299,6 +335,7 @@ static PyMethodDef GLModMethods[] = {
     {"setVBOlayer",  glmod_setVBOlayer, METH_VARARGS, "erase & set a layer of VBO entries"},
     {"addVBOentry",  glmod_addVBOentry, METH_VARARGS, "add an entry to a layer"},
     {"drawLines",  glmod_drawLines, METH_VARARGS, "draws lines from a dict"},
+    {"drawSelectionCircles",  glmod_drawSelectionCircles, METH_VARARGS, "draws selection circles from a dict"},
     {"init",  glmod_init, METH_VARARGS, "init"},
     {"initVBO",  glmod_initVBO, METH_VARARGS, "initVBO"},
     {NULL, NULL, 0, NULL}        /* Sentinel */
