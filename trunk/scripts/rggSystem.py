@@ -291,6 +291,12 @@ def makePortableFilename(filename):
     # TODO: Implement filename conversion
     return filename.replace('\\', '/')
 
+def drawSelectionCircle(x, y, splasifarcity, radius):
+    mainWindow.glwidget.addSelectionCircle(splasifarcity, x, y, radius)
+    
+def clearSelectionCircles():
+    mainWindow.glwidget.clearSelectionCircles()
+
 def drawLine(x, y, w, h, thickness):
     mainWindow.glwidget.addLine(thickness, x, y, w, h)
 

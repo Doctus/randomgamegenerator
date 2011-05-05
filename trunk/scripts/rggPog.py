@@ -17,7 +17,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 from PyQt4 import QtGui
-import rggTile, rggResource, rggSystem
+import rggTile, rggResource, rggSystem, math
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
 class Pog(object):
@@ -191,6 +191,8 @@ class Pog(object):
             self._tileStore.destroy()
             self._tileStore = self._makeTile()
             
+    def getSelectionCircleData(self):
+        return ((self.position[0]+self.size[0]/2, self.position[1]+self.size[1]/2, -1, math.sqrt((self.size[0]**2)+(self.size[1]**2))/2))
             
     def forceUpdate(self):
         if self._tileStore != None:
