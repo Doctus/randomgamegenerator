@@ -663,15 +663,12 @@ def respondDeleteLine(x, y, w, h):
 @clientRPC
 def sendDeleteLine(user, x, y, w, h):
     respondDeleteLine(allusers(), x, y, w, h)
+    
+def _setThickness(new):
+    _state.thickness = new
 
-def setThicknessToOne():
-    _state.thickness = 1
-
-def setThicknessToTwo():
-    _state.thickness = 2
-
-def setThicknessToThree():
-    _state.thickness = 3
+def setThickness(new):
+    _setThickness(int(new.text()))
 
 def clearLines():
     rggSystem.clearLines()
