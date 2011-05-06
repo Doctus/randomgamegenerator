@@ -224,7 +224,7 @@ static PyObject * glmod_drawSelectionCircles(PyObject *self, PyObject* args)
             value = PyList_GET_ITEM(values, i);
             glLineWidth(3);
             glColor3f(0.0, 1.0, 0.0);
-            glDisable(GL_TEXTURE_2D);
+            glDisable(extension);
             glBegin(GL_LINE_LOOP);
             double x = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 0));
             double y = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 1));
@@ -234,7 +234,7 @@ static PyObject * glmod_drawSelectionCircles(PyObject *self, PyObject* args)
                 glVertex2f(x + cos(r*0.01745329) * rad, y + sin(r*0.01745329) * rad);
             }
             glEnd();
-            glEnable(GL_TEXTURE_2D);
+            glEnable(extension);
             glColor3f(1.0, 1.0, 1.0);
         }
     }
@@ -250,7 +250,7 @@ static PyObject * glmod_drawLines(PyObject *self, PyObject* args)
     PyObject *key, *values, *value, *test;
     Py_ssize_t pos = 0;
 
-    glDisable(GL_TEXTURE_2D);
+    glDisable(extension);
 
     glBegin(GL_LINES);
     while (PyDict_Next(dict, &pos, &key, &values)) {
@@ -294,7 +294,7 @@ static PyObject * glmod_drawLines(PyObject *self, PyObject* args)
     }
     glEnd();
 
-    glEnable(GL_TEXTURE_2D);
+    glEnable(extension);
 
     return PyInt_FromLong(0L);
 }
