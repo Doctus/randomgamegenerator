@@ -41,9 +41,7 @@ if __name__ == '__main__':
     s.menu.hostGameAct.triggered.connect(rggViews.hostGame)
     s.menu.joinGameAct.triggered.connect(rggViews.joinGame)
     s.menu.disconnectAct.triggered.connect(rggViews.disconnectGame)
-    s.menu.thicknessOneAct.triggered.connect(rggViews.setThicknessToOne)
-    s.menu.thicknessTwoAct.triggered.connect(rggViews.setThicknessToTwo)
-    s.menu.thicknessThreeAct.triggered.connect(rggViews.setThicknessToThree)
+    s.menu.thicknessMenu.triggered.connect(rggViews.setThickness)
     
     server = rggRPC.server
     client = rggRPC.client

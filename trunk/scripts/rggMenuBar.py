@@ -99,13 +99,12 @@ class menuBar(object):
         internetMenu.addAction(self.joinGameAct)
         internetMenu.addAction(self.disconnectAct)
 
-        thicknessMenu = QtGui.QMenu("&Thickness", main)
-        thicknessMenu.addAction(self.thicknessOneAct)
-        thicknessMenu.addAction(self.thicknessTwoAct)
-        thicknessMenu.addAction(self.thicknessThreeAct)
+        self.thicknessMenu = QtGui.QMenu("&Thickness", main)
+        for x in range(1, 11):
+            self.thicknessMenu.addAction(QtGui.QAction(str(x), main))
 
         drawMenu = QtGui.QMenu("&Draw", main)
-        drawMenu.addMenu(thicknessMenu)
+        drawMenu.addMenu(self.thicknessMenu)
         
         stylesMenu = QtGui.QMenu("&Styles", main)
         for style in rggStyles.sheets.keys():
