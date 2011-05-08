@@ -118,9 +118,12 @@ class menuBar(object):
         for folder in os.listdir('plugins'):
             if folder == ".svn":
                 continue
-            self.pluginsModules.append(__import__(folder))
-            self.pluginsMenu.addAction(QtGui.QAction(unicode(self.pluginsModules[-1].title()), main))
-            self.plugins[unicode(self.pluginsModules[-1].title())] = folder
+            try:
+                self.pluginsModules.append(__import__(folder))
+                self.pluginsMenu.addAction(QtGui.QAction(unicode(self.pluginsModules[-1].title()), main))
+                self.plugins[unicode(self.pluginsModules[-1].title())] = folder
+            except:
+                pass
         
         # MENUBAR
 
