@@ -3,14 +3,18 @@ import rggEvent, rggViews, rggPog, rggSystem
 
 class mapEditorLabel(QtGui.QLabel):
     
-    def __init__(self, tilesize, width, currentTile=0):
+    def __init__(self, tilesize, width, height, currentTile=0):
         super(QtGui.QLabel, self).__init__()
         self.tilex, self.tiley = tilesize
         self.wrap = width / self.tilex
+        self.openglfix = (height / self.tiley)-1
         self.currentTile = currentTile
     
     def mousePressEvent(self, ev):
-        self.currentTile = (ev.x()/self.tilex) + (ev.y()/self.tiley)*self.wrap
+        print self.openglfix
+        print ev.y()/self.tiley
+        print abs((ev.y()/self.tiley)-self.openglfix)
+        self.currentTile = (ev.x()/self.tilex) + abs((ev.y()/self.tiley)-self.openglfix)*self.wrap
 
 class mapEditor(QtGui.QDockWidget):
 
@@ -50,7 +54,6 @@ class mapEditor(QtGui.QDockWidget):
         mapPosition = rggSystem.getMapPosition((x, y))
         map = rggViews.topmap(mapPosition)
         if map == None:
-            self.currentMap = None
             return
         if map != self.currentMap:
             self.mapChangedResponse(map)
@@ -76,11 +79,12 @@ class mapEditor(QtGui.QDockWidget):
                 rggEvent.setEaten()
 
     def mouseMoveResponse(self, x, y):
-        mapPosition = rggSystem.getMapPosition((x, y))
-        map = rggViews.topmap(mapPosition)
-        if map == None:
-            return
-        if self.isVisible() and self.singlePaintingButton.isChecked() and self.dragging:
+        if self.dragging and self.isVisible() and self.singlePaintingButton.isChecked():
+            mapPosition = rggSystem.getMapPosition((x, y))
+            map = rggViews.topmap(mapPosition)
+            if map == None:
+                self.dragging = False
+                return
             clickedtile = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
                             int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
             
@@ -125,9 +129,9 @@ class mapEditor(QtGui.QDockWidget):
             self.tilepixmap = QtGui.QPixmap()
             self.tilepixmap.load(newMap.tileset)
             if self.tilelabel is None:
-                self.tilelabel = mapEditorLabel(newMap.tilesize, self.tilepixmap.width())
+                self.tilelabel = mapEditorLabel(newMap.tilesize, self.tilepixmap.width(), self.tilepixmap.height())
             else:
-                self.tilelabel = mapEditorLabel(newMap.tilesize, self.tilepixmap.width(), self.tilelabel.currentTile)
+                self.tilelabel = mapEditorLabel(newMap.tilesize, self.tilepixmap.width(), self.tilepixmap.height(), self.tilelabel.currentTile)
             self.tilelabel.setPixmap(self.tilepixmap)
             self.scrollarea.setWidget(self.tilelabel)
 
