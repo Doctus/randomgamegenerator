@@ -11,9 +11,6 @@ class mapEditorLabel(QtGui.QLabel):
         self.currentTile = currentTile
     
     def mousePressEvent(self, ev):
-        print self.openglfix
-        print ev.y()/self.tiley
-        print abs((ev.y()/self.tiley)-self.openglfix)
         self.currentTile = (ev.x()/self.tilex) + abs((ev.y()/self.tiley)-self.openglfix)*self.wrap
 
 class mapEditor(QtGui.QDockWidget):
