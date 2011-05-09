@@ -137,6 +137,7 @@ class stringField(dialogField):
         except:
             pass
         widget = QtGui.QLineEdit(value, parent)
+        self.widgett = widget
         return widget
     
     def _getWidgetValue(self, widget):
