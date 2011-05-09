@@ -12,8 +12,8 @@ from OpenGL.GL.ARB.framebuffer_object import *
 from OpenGL.arrays import ArrayDatatype as ADT
 
 #Only set these when creating non-development code
-OpenGL.ERROR_CHECKING = False
-OpenGL.ERROR_LOGGING = False
+#OpenGL.ERROR_CHECKING = False
+#OpenGL.ERROR_LOGGING = False
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -331,8 +331,10 @@ class GLWidget(QGLWidget):
             size += len(self.images[layer])
 
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, self.VBO)
+        
+        #print self.offset, (self.VBOBuffer*self.vertByteCount)
 
-        if self.VBOBuffer <= size or image == None:
+        if self.VBOBuffer <= size or image == None or self.offset + self.vertByteCount >= self.VBOBuffer*self.vertByteCount:
             if resize and self.VBOBuffer <= size:
                 print "resizing from", size, "to", nextPowerOfTwo(size+1)
                 self.VBOBuffer = nextPowerOfTwo(size+1)

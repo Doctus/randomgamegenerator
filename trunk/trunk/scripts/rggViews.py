@@ -310,7 +310,15 @@ def internalAddMap(map):
     for m in getAllMaps():
         pos += m.pixelSize[0] + 25
     map.drawOffset = (pos, 0)
-    sendMapCreate(None, map)
+
+    ID = createMapID(map.mapname)
+    rggResource.srm.processFile(localuser(), map.tileset)
+    for pogDump in map.Pogs.values():
+        rggResource.srm.processFile(localuser(), pog._src)
+    _state.Maps[ID] = map
+    map.ID = ID
+    
+    sendMapCreate(ID, map.dump())
 
 def newMap():
     """Allows the user to choose a new map."""
@@ -410,16 +418,8 @@ def respondMapCreate(ID, mapDump):
 @clientRPC
 def sendMapCreate(user, ID, map):
     """Creates or updates the specified map."""
-    if not getmap(ID):
-        ID = createMapID(map.mapname)
-    rggResource.srm.processFile(user, map.tileset)
-    for pogDump in map.Pogs.values():
-        rggResource.srm.processFile(user, pog._src)
-    #existed = (ID in _state.Maps)
-    _state.Maps[ID] = map
-    map.ID = ID
-    respondMapCreate(allusersbut(user), ID, map.dump())
-    map.show()
+
+    respondMapCreate(allusersbut(user), ID, map)
 
 @serverRPC
 def respondTileUpdate(mapID, tile, newTileIndex):
