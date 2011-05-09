@@ -730,7 +730,9 @@ def reportCamera():
 
 def mouseDrag(screenPosition, mapPosition, displacement):
     if _state.pogSelection and _state.mouseButton == BUTTON_LEFT:
-        movePogs(displacement)
+        if topmap(mapPosition) is not None:
+            movePogs(displacement)
+        return
     elif _state.mouseButton == BUTTON_LEFT:
         setCameraPosition(map(lambda c, d,  z: c + d*z, cameraPosition(), displacement, (getZoom(), getZoom())))
         return
