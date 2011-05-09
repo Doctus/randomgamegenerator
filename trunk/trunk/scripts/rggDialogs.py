@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os, os.path
 import rggMap
-from rggSystem import fake, translate, showErrorMessage, findFiles, IMAGE_EXTENSIONS, TILESET_DIR, SAVE_DIR, makePortableFilename
+from rggSystem import fake, translate, showErrorMessage, findFiles, IMAGE_EXTENSIONS, TILESET_DIR, PORTRAIT_DIR, SAVE_DIR, makePortableFilename
 from rggFields import integerField, stringField, dropDownField, validationError
 from rggNet import ConnectionData, localHost
 from rggJson import loadObject, loadString, jsondump, jsonload
@@ -377,7 +377,7 @@ class newCharacterDialog(dialog):
                 value=data.get('listid', translate('newCharacterDialog', 'New Character'))),
             charactername=stringField(
                 translate('newCharacterDialog', 'Character Name'),
-                value=data.get('charactername', translate('newCharacterDialog', ''))),
+                value=data.get('charactername', translate('newCharacterDialog', ' '))),
             portrait=stringField(
                 translate('newCharacterDialog', 'Portrait'),
                 value=data.get('portrait', translate('newCharacterDialog', 'default_portrait_1.png'))))
@@ -403,6 +403,7 @@ class newCharacterDialog(dialog):
         okayButton = QtGui.QPushButton(translate('newCharacterDialog', "Create"))
         okayButton.setDefault(True)
         cancelButton = QtGui.QPushButton(translate('newCharacterDialog', "Cancel"))
+        self.portraitArea = QtGui.QListWidget(parent)
         
         # Add fields
         formLayout = QtGui.QFormLayout()
@@ -422,8 +423,14 @@ class newCharacterDialog(dialog):
         grandBox.addLayout(formLayout)
         grandBox.addLayout(theLesserOrFalseBox)
         
+        evilBox = QtGui.QBoxLayout(0)
+        evilBox.addWidget(self.portraitArea)
+        evilBox.addLayout(grandBox)
+        
+        self.portraitArea.currentItemChanged.connect(self.changePort)
+        
         # Set up the widget
-        widget.setLayout(grandBox)
+        widget.setLayout(evilBox)
         widget.setModal(True)
         widget.setWindowTitle(translate('newCharacterDialog', "Create Character"))
         
@@ -436,8 +443,17 @@ class newCharacterDialog(dialog):
         widget.connect(okayButton, QtCore.SIGNAL('pressed()'), okayPressed)
         widget.connect(cancelButton, QtCore.SIGNAL('pressed()'), widget.reject)
         
+        portraits = findFiles(PORTRAIT_DIR, IMAGE_EXTENSIONS)
+        portraits.sort(cmp=lambda x,y: cmp(x.lower(), y.lower()))
+        for greatJustice in portraits:
+            icon = QtGui.QIcon(QtGui.QIcon(os.path.join(PORTRAIT_DIR, greatJustice)).pixmap(QtCore.QSize(32, 32)))
+            self.portraitArea.addItem(QtGui.QListWidgetItem(icon, greatJustice))
+        
         # Show to user
         return (widget.exec_() == QtGui.QDialog.Accepted)
+    
+    def changePort(self, portrait, previous):
+        self.fields['portrait'].widgett.setText(unicode(portrait.text()))
         
     def clean(self):
         """Check for errors and return well-formatted data."""
