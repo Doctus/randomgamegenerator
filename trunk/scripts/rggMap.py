@@ -148,9 +148,13 @@ class Map(object):
                 for x in xrange(0, self.mapsize[0]):
                     self.tiles[x+y*self.mapsize[0]].destroy()
         
+        print "deleted tiles"
+        
         src = rggResource.crm.translateFile(self.tileset, rggResource.RESOURCE_IMAGE)
         self.tiles = [None]*self.mapsize[0]*self.mapsize[1]
         mainWindow.glwidget.reserveVBOSize(self.mapsize[0] * self.mapsize[1])
+        
+        print "creating tiles"
 
         for y in xrange(0, self.mapsize[1]):
             for x in xrange(0, self.mapsize[0]):
@@ -158,6 +162,8 @@ class Map(object):
                 drawRect = (x * self.tilesize[0] + self.drawOffset[0], y * self.tilesize[1] + self.drawOffset[1], self.tilesize[0], self.tilesize[1])
                 temptile = mainWindow.glwidget.createImage(src, 0, textureRect, drawRect, self.hidden)
                 self.tiles[x+y*self.mapsize[0]] = temptile
+                
+        print "created tiles"
 
     def _updateSrc(self, crm, filename, translation):
         if filename == self.tileset:
