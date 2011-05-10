@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 #
 #main class
 #
@@ -19,6 +19,10 @@ class MainWindow(QMainWindow):
         Only initialize critical components(like opengl) here, use start() for anything else
         '''
         QMainWindow.__init__(self)
+        
+        self.setWindowTitle("RandomGameGenerator")
+        try: self.setWindowIcon(QIcon(os.path.join("data", "FAD-icon.png")))
+        except: pass
 
         self.glwidget = GLWidget(self)
         self.setCentralWidget(self.glwidget)
