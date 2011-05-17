@@ -81,6 +81,7 @@ class _state(object):
         _state.pwidget = rggDockWidget.pogPalette(mainWindow)
         _state.cwidget = rggDockWidget.chatWidget(mainWindow)
         _state.icwidget = rggDockWidget.ICChatWidget(mainWindow)
+        _state.uwidget = rggDockWidget.userListWidget(mainWindow)
         _state.users = {}
         _state.localuser = User(client.username)
         _state.users[client.username] = _state.localuser
@@ -101,6 +102,9 @@ def removePogSelection(pog):
 def setPogSelection(pog):
     _state.pogSelection = set()
     addPogSelection(pog)
+    
+def addUserToList(name, host=False):
+    _state.uwidget.addUser(name, host)
 
 # MESSAGES
 
@@ -149,6 +153,10 @@ def getuser(username):
 def usernames():
     """Returns all the usernames."""
     return _state.users.keys()
+
+def getNetUserList():
+    """Returns the user names formatted for transfer over net."""
+    return _state.uwidget.getUsers()
 
 # TODO: Name changing needs to be synched across the wire
 # The workaround is to log out and back in.
@@ -212,6 +220,7 @@ def hostGame():
         renameuser(localhandle(), connection.username)
         if client.host(connection.port):
             say(translate('views', 'Now listening on port {port}.').format(port=connection.port))
+            addUserToList(localhandle(), True)
         else:
             #TODO: better error message here
             say(translate('views', 'Unable to access network; perhaps the port is in use?'))
@@ -243,6 +252,7 @@ def killConnection():
     assert(localhandle() in usernames())
     assert(localuser() == getuser(localhandle()))
     users = {localhandle(): localuser()}
+    clearUserList()
     #print "KILL"
 
 def disconnectGame():
@@ -253,6 +263,7 @@ def disconnectGame():
     
     killConnection()
     say(translate('views', "Disconnected."))
+    clearUserList()
 
 # MAPS
 def topmap(mapPosition):
@@ -398,6 +409,18 @@ def loadChars():
     except Exception as e:
         showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
         return
+    
+@serverRPC
+def respondUserList(list):
+    for item in list:
+        addUserToList(item[0], item[1])
+        
+@serverRPC
+def respondUserRemove(name):
+    _state.uwidget.removeUser(name)
+    
+def clearUserList():
+    _state.uwidget.clearUserList()
 
 @serverRPC
 def respondMapCreate(ID, mapDump):
