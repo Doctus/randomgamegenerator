@@ -23,7 +23,7 @@ import re, os
 import rggViews, rggRPC, rggResource
 from rggSystem import translate, fake, makePortableFilename, PORTRAIT_DIR
 from rggViews import say, ICSay, announce, linkedName, getmap, allmaps
-from rggViews import localhandle,localuser, getuser, allusers, allusersbut, usernames, User
+from rggViews import localhandle, localuser, getuser, allusers, allusersbut, usernames, User, addUserToList, getNetUserList, respondUserRemove, clearUserList
 from rggRPC import clientRPC, serverRPC
 
 @serverRPC
@@ -131,6 +131,7 @@ def sendWhisper(user, target, message):
 @serverRPC
 def respondUserJoin(username):
     say(translate('remote', "{name} has joined!").format(name=username))
+    addUserToList(username)
 
 # LOW-LEVEL NETWORKING
 
@@ -149,6 +150,7 @@ def clientDisconnect(client, errorMessage):
     """
     #print "Client disconnected."
     say(translate('remote', "Disconnected. {0}").format(errorMessage))
+    clearUserList()
     
 def clientReceive(client, data):
     """Occurs when the client receives data.
@@ -179,6 +181,7 @@ def serverConnect(server, username):
     respondUserJoin(allusersbut(user), username)
     for ID, map in allmaps():
         rggViews.respondMapCreate(user, ID, map.dump())
+    rggViews.respondUserList(user, getNetUserList())
 
 @serverRPC
 def disconnectionMessage(message, error, *args, **kwargs):
@@ -198,6 +201,7 @@ def serverDisconnect(server, username, errorMessage):
     respondError(allusers(),
         fake.translate('remote', '{username} has left the game. {error}'),
             username=user.username, error=errorMessage)
+    respondUserRemove(allusers(), username)
 
 def serverReceive(server, username, data):
     """Occurs when the server receives data.

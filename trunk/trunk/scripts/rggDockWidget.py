@@ -50,7 +50,7 @@ class chatWidget(QtGui.QDockWidget):
         self.layout.addWidget(self.widgetLineInput)
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
-        mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self)
+        mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
         
         self.widgetLineInput.returnPressed.connect(self.processInput)
     
@@ -135,7 +135,7 @@ class ICChatWidget(QtGui.QDockWidget):
         self.layout.addLayout(self.layoutni)
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
-        mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self)
+        mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
         
         #TODO: Store and access characters in a better fashion.
         try:
@@ -246,13 +246,13 @@ class diceRoller(QtGui.QDockWidget):
         self.connect(self.rollbutton, QtCore.SIGNAL('pressed()'), self.rollDice)
         self.connect(self.addmacrobutton, QtCore.SIGNAL('pressed()'), self.summonMacro)
         self.connect(self.removemacrobutton, QtCore.SIGNAL('pressed()'), self.removeCurrentMacro)
-        self.widget.addWidget(self.diceArea, 0, 0, 1, 3)
+        self.widget.addWidget(self.diceArea, 0, 0)
         self.widget.addWidget(self.rollbutton, 1, 0)
-        self.widget.addWidget(self.addmacrobutton, 1, 1)
-        self.widget.addWidget(self.removemacrobutton, 1, 2)
+        self.widget.addWidget(self.addmacrobutton, 2, 0)
+        self.widget.addWidget(self.removemacrobutton, 3, 0)
         self.realwidget.setLayout(self.widget)
         self.setWidget(self.realwidget)
-        mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
+        mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self)
         self.currentMacro = -1
 
     def changeCurrentMacro(self, n):
@@ -310,7 +310,7 @@ class pogPalette(QtGui.QDockWidget):
         self.mainLayout.addWidget(self.controlArea)
         self.widget.setLayout(self.mainLayout)
         self.setWidget(self.widget)
-        mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
+        mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self)
         
         self.addpogbutton.pressed.connect(self.addPog)
         self.pogArea.itemActivated.connect(self.place)
@@ -334,3 +334,40 @@ class pogPalette(QtGui.QDockWidget):
         """Called to request pog placement on the map."""
     )
     
+class userListWidget(QtGui.QDockWidget):
+    """The list of connected users."""
+    
+    def __init__(self, mainWindow):
+        """Initializes the user list."""
+        super(QtGui.QDockWidget, self).__init__(mainWindow)
+        self.setToolTip(self.tr("People presently playing."))
+        self.setWindowTitle(self.tr("Connected Users"))
+        self.widget = QtGui.QWidget(mainWindow)
+        self.listOfUsers = QtGui.QListWidget(mainWindow)
+        self.internalList = []
+        self.layout = QtGui.QGridLayout()
+        self.layout.addWidget(self.listOfUsers, 0, 0)
+        self.widget.setLayout(self.layout)
+        self.widget.setMaximumWidth(200) #Arbitrary; keeps it from taking over 1/3 of the screen
+        self.setWidget(self.widget)
+        mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
+        
+    def addUser(self, name, host=False):
+        self.internalList.append((name, host))
+        nametmp = name
+        if host:
+            nametmp = "[Host] " + nametmp
+        self.listOfUsers.addItem(nametmp)
+        
+    def removeUser(self, name):
+        for i, item in enumerate(self.internalList):
+            if item[0] == name:
+                self.internalList.pop(i)
+                self.listOfUsers.takeItem(i)
+    
+    def getUsers(self):
+        return self.internalList
+    
+    def clearUserList(self):
+        self.internalList = []
+        self.listOfUsers.clear()
