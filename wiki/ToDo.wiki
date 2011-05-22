@@ -76,3 +76,6 @@
   * From Kaijyuu: giving pogs extremely long names causes (potentially somewhat severe) graphical problems
   * ~~Antistone: look into dialog closing/map movement problems~~
   * Antistone: ~~layers for pog editing should not default to 0, and~~ negative layers would be useful if possible
+
+  * Hidden pogs appear to be causing issues with transferring
+  * post-0.97 client seems to not be able to sync maps properly
