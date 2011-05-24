@@ -19,6 +19,7 @@
         #include <windows.h>
         #include "glext.h"
         PFNGLBINDBUFFERPROC glBindBuffer = NULL;
+        PFNGLMULTIDRAWARRAYSPROC glMultiDrawArrays = NULL;
     #else
         #include <GL/gl.h>
     #endif
@@ -78,7 +79,7 @@ static PyObject * glmod_drawTexture(PyObject *self, PyObject* args)
 
 static PyObject * glmod_drawVBO(PyObject *self, PyObject* args)
 {
-    int i, k, lastid = -1;
+    int i, k, x, lastid = -1;
 
     glBindBuffer(GL_ARRAY_BUFFER_ARB, VBO);
     glTexCoordPointer(2, GL_FLOAT, stride, 0);
@@ -89,15 +90,33 @@ static PyObject * glmod_drawVBO(PyObject *self, PyObject* args)
 
     for(i = 0; i < entries.size(); i++)
     {
-        for(k = 0; k < entries[i].size(); k++)
+        k = 0;
+        while(k < entries[i].size())
         {
+            x = k+1;
             if(lastid != entries[i][k].texid)
             {
                 glBindTexture(extension, entries[i][k].texid);
                 lastid = entries[i][k].texid;
             }
+            
+            while(lastid == entries[i][x].texid)
+            {
+                x++;
+            }
 
-            glDrawArrays(GL_QUADS, entries[i][k].offset, 4);
+            GLint firstValues[x-k];
+            GLsizei countValues[x-k];
+            
+            for(int l = 0; l <= x-k; l++)
+            {
+                firstValues[l] = entries[i][k+l].offset;
+                countValues[l] = 4;
+            }
+            
+            
+            glMultiDrawArrays(GL_QUADS, firstValues, countValues, x-k);
+            k += (x-k);
         }
     }
 
@@ -322,6 +341,9 @@ static PyObject * glmod_init(PyObject *self, PyObject* args)
     glBindBuffer = (PFNGLBINDBUFFERARBPROC)wglGetProcAddress("glBindBufferARB");
     if(glBindBuffer == NULL)
         return PyInt_FromLong(-2L); //Init went ok, but couldn't get glBindBuffer
+    glMultiDrawArrays = (PFNGLMULTIDRAWARRAYSPROC)wglGetProcAddress("glMultiDrawArraysEXT");
+    if(glMultiDrawArrays == NULL)
+        return PyInt_FromLong(-2L); //Init went ok, but couldn't get glMultiDrawArrays
 #endif
 
     return PyInt_FromLong(0L);

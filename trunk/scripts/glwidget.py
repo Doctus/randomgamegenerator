@@ -268,6 +268,8 @@ class GLWidget(QGLWidget):
             img = self.convertToGLFormat(qimg)
             texture = glGenTextures(1)
             imgdata = img.bits().asstring(img.numBytes())
+            
+            print "created texture", texture
 
             glBindTexture(self.texext, texture)
             
@@ -304,8 +306,8 @@ class GLWidget(QGLWidget):
 
         if self.vbos:
             image.VBO = self.VBO
-            self.fillBuffers(image)
-            self.calculateVBOList(image)
+            if not self.fillBuffers(image):
+                self.calculateVBOList(image)
 
         return image
 
@@ -317,8 +319,7 @@ class GLWidget(QGLWidget):
             self.VBOBuffer = nextPowerOfTwo(size+1)
             print "reserving size", self.VBOBuffer
 
-            self.fillBuffers(None, False)
-            self.calculateVBOList()
+            self.fillBuffers(None, False) #Automatically does a calculateVBOList()
 
     def fillBuffers(self, image = None, resize = True):
         '''
@@ -352,6 +353,9 @@ class GLWidget(QGLWidget):
                     self.offset += self.vertByteCount
             
             self.calculateVBOList()
+            
+            glBindBuffer(GL_ARRAY_BUFFER_ARB, 0)
+            return True
 
         else:
             image.offset = int(float(self.offset)/self.vertByteCount*4)
@@ -360,7 +364,8 @@ class GLWidget(QGLWidget):
             glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, self.offset, self.vertByteCount, VBOData)
             self.offset += self.vertByteCount
 
-        glBindBuffer(GL_ARRAY_BUFFER_ARB, 0)
+            glBindBuffer(GL_ARRAY_BUFFER_ARB, 0)
+            return False
 
     def deleteImage(self, image):
         '''
@@ -370,6 +375,7 @@ class GLWidget(QGLWidget):
         self.qimages[image.imagepath][2] -= 1
 
         if self.qimages[image.imagepath][2] <= 0:
+            print "deleting texture", image.textureId
             glDeleteTextures(image.textureId)
 
         self.images[image.layer].remove(image)
@@ -431,7 +437,7 @@ class GLWidget(QGLWidget):
         '''
         if len(self.layers) > 0 and image != None:
             if delete:
-                #print "setLayer"
+                #print "delete"
                 temp = [self.layers.index(image.layer)]
                 for img in self.images[image.layer]:
                     if img.hidden or img == image:
