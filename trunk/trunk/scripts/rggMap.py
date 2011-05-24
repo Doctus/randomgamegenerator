@@ -166,7 +166,7 @@ class Map(object):
         print "created tiles"
 
     def _updateSrc(self, crm, filename, translation):
-        if filename == self.tileset:
+        if filename == self.tileset and crm._status[filename] == rggResource.STATE_READY:
             self._createTiles()
     
     def getTile(self, tile):
