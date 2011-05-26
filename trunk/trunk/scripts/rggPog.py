@@ -41,6 +41,10 @@ class Pog(object):
         if status > 0:
             self.hide()
     
+    def destroy(self):
+        if self._tileStore:
+            self._tileStore.destroy()
+
     @property
     def hidden(self):
         return self._fakeHidden
