@@ -312,6 +312,7 @@ def chooseMap():
     
 
 def closeAllMaps():
+    clearPogSelection()
     for map in _state.Maps.values():
         map._deleteTiles()
     _state.Maps = {}
