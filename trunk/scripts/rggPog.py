@@ -232,7 +232,7 @@ class Pog(object):
             loadInteger('Pog.layer', obj.get('layer'), min=0, max=65535),
             loadString('Pog.src', obj.get('src')),
             loadInteger('Pog.status', obj.get('status')),
-            loadInteger('Pog._locked', obj.get('locked')),
+            loadInteger('Pog.locked', obj.get('locked')),
             loadObject('Pog.properties', obj.get('properties')),
             loadString('Pog.mapID', obj.get('mapID')),
             loadInteger('Pog.alpha', obj.get('alpha')))
