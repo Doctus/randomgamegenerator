@@ -508,10 +508,12 @@ def movePogs(displacement):
     """Moves pogs by a specified displacement."""
     selection = _state.pogSelection.copy()
     pogids = []
+    mapID = 0
     for pog in selection:
         pog.displace(displacement)
         pogids.append(pog.ID)
-    sendMovementPog(currentmap().ID, pogids, displacement)
+        mapID = pog.mapID
+    sendMovementPog(mapID, pogids, displacement)
     drawPogCircles()
 
 @serverRPC
