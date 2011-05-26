@@ -137,6 +137,8 @@ class Map(object):
             tile.setHidden(False)
     
     def _deleteTiles(self):
+        for pog in self.Pogs.values():
+            pog.destroy()
         for tile in self.tiles:
             tile.destroy()
         self.tiles = None

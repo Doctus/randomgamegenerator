@@ -12,8 +12,8 @@ from OpenGL.GL.ARB.framebuffer_object import *
 from OpenGL.arrays import ArrayDatatype as ADT
 
 #Only set these when creating non-development code
-#OpenGL.ERROR_CHECKING = False
-#OpenGL.ERROR_LOGGING = False
+OpenGL.ERROR_CHECKING = False
+OpenGL.ERROR_LOGGING = False
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
