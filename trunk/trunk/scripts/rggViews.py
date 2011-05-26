@@ -504,13 +504,14 @@ def placePog(pogpath):
     _state.pogPlacement = True
     _state.pogPath = pogpath
 
-# TODO: Make pog movement transfer much more efficient.
 def movePogs(displacement):
     """Moves pogs by a specified displacement."""
     selection = _state.pogSelection.copy()
+    pogids = []
     for pog in selection:
         pog.displace(displacement)
-        #sendMovementPog(currentmap().ID, pog.ID, pog.position) #TODO
+        pogids.append(pog.ID)
+    sendMovementPog(currentmap().ID, pogids, displacement)
     drawPogCircles()
 
 @serverRPC
@@ -578,24 +579,25 @@ def sendDeletePog(user, mapID, pogID):
     respondDeletePog(allusers(), mapID, pogID)
 
 @serverRPC
-def respondMovementPog(mapID, pogID, newpos):
+def respondMovementPog(mapID, pogids, displacement):
     """Creates or updates a pog on the client."""
     pogMap = getmap(mapID)
     if pogMap is None:
         print "Attempt to move pog in nonexistant map: {0}".format(mapID)
         return
-    if pogID in pogMap.Pogs:
-        pog = pogMap.Pogs[pogID]
-        pog.position = newpos
+    for pogID in pogids:
+        if pogID in pogMap.Pogs:
+            pog = pogMap.Pogs[pogID]
+            pog.displace(displacement)
     drawPogCircles()
 
 @clientRPC
-def sendMovementPog(user, mapID, pogID, newpos):
+def sendMovementPog(user, mapID, pogids, displacement):
     """Creates or updates a pog on the server."""
     pogMap = getmap(mapID)
     if not pogMap:
         return
-    respondMovementPog(allusersbut(user), mapID, pogID, newpos)
+    respondMovementPog(allusersbut(user), mapID, pogids, displacement)
 
 @serverRPC
 def respondHidePog(mapID, pogID, hidden):
