@@ -33,6 +33,8 @@ class Map(object):
         self.mapsize = mapsize
         self.tileset = tileset
         self.tilesize = tilesize
+
+        print "WWWUUUUTT"
         
         self.Pogs = {}
         self.lines = []
@@ -41,8 +43,6 @@ class Map(object):
         self.hidden = False
         self.tiles = None
         self._drawOffset = drawOffset
-
-        self._createTiles()
 
         rggResource.crm.listen(tileset, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
 
@@ -54,7 +54,6 @@ class Map(object):
         if self.hidden:
             pog._realHide(True)
         if dumpmode: return
-        pog._tile = pog._makeTile()
         if pog.hidden:
             pog._realHide(True)
         rggEvent.pogUpdateEvent(pog)
@@ -90,10 +89,11 @@ class Map(object):
         displacement[0] = drawOffset[0] - self._drawOffset[0]
         displacement[1] = drawOffset[1] - self._drawOffset[1]
         self._drawOffset = drawOffset
+        print "drawOffset:", drawOffset
         
-        #if not self.hidden:
-        for t in self.tiles:
-            t.displaceDrawRect(displacement)
+        if self.tiles != None:
+            for t in self.tiles:
+                t.displaceDrawRect(displacement)
     
     def hide(self, hidden=True, includeTiles=True, includePogs=True, includeLines=True):
         """Hide or show all pogs and tiles."""
@@ -168,8 +168,9 @@ class Map(object):
         print "created tiles"
 
     def _updateSrc(self, crm, filename, translation):
-        if filename == self.tileset and crm._status[filename] == rggResource.STATE_READY:
+        if filename == self.tileset and crm._status[filename] == rggResource.STATE_DONE:
             self._createTiles()
+        print "update src", self.ID, filename, self.tileset, crm._status[filename]
     
     def getTile(self, tile):
         """Change the specified tile."""

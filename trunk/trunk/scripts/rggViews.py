@@ -490,7 +490,9 @@ def clearPogSelection():
 
 def createPog(pogMap, pog):
     """Creates a new pog."""
-    sendUpdatePog(pogMap.ID, None, pog.dump())
+    pog.ID = pogMap._findUniqueID(pog.src)
+    pogMap.addPog(pog)
+    sendUpdatePog(pogMap.ID, pog.ID, pog.dump())
 
 def modifyPog(pogMap, pog):
     assert(pog.ID)
@@ -542,18 +544,13 @@ def respondUpdatePog(mapID, pogID, pogDump):
 def sendUpdatePog(user, mapID, pogID, pogDump):
     """Creates or updates a pog on the server."""
     
-    #TODO: What happens when we delete a pog then get something like movement or a property change for it?
-    # Fix with different messages that don't completely change the pog, and only use this for creation.
     pogMap = getmap(mapID)
     # Upload (or check that we already have) the image resource from the client
     rggResource.srm.processFile(user, pogDump['src'])
     if not pogMap:
         print "no pogmap"
         return
-    # HACK: Relies on the fact that responses are locally synchronous
-    if not pogID or pogID not in pogMap.Pogs:
-        pogID = pogMap._findUniqueID(pogDump['src'])
-    respondUpdatePog(allusers(), mapID, pogID, pogDump)
+    respondUpdatePog(allusersbut(user), mapID, pogID, pogDump)
 
 @serverRPC
 def respondDeletePog(mapID, pogID):
@@ -835,7 +832,8 @@ def mousePress(screenPosition, mapPosition, button):
                     0,
                     0,
                     {},
-                    topmap(mapPosition).ID)
+                    topmap(mapPosition).ID,
+                    infograb.hasAlpha())
                 createPog(topmap(mapPosition), pog)
                 return
             pog = topmap(mapPosition).findTopPog(mapPosition)
