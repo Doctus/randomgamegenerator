@@ -32,7 +32,8 @@ STATE_UNKNOWN = "unknown" # Nobody's asked about this file yet
 STATE_READY = "ready" # Ready on the server; currently being requested by client or already gotten
 STATE_LOADING = "loading" # Loading on the server; nothing doing on the client
 STATE_INVALID = "invalid" # Not present on server; assumed missing by client
-VALID_STATES = (STATE_UNKNOWN, STATE_READY, STATE_LOADING, STATE_INVALID)
+STATE_DONE = "done" # File downloaded successfully
+VALID_STATES = (STATE_UNKNOWN, STATE_READY, STATE_LOADING, STATE_INVALID, STATE_DONE)
 
 # DEFAULT MEDIA (feel free to change)
 RESOURCE_INVALID = {
@@ -88,6 +89,13 @@ class clientResourceMapper(object):
         getattr(root, KEEP_ALIVE_FIELD).append(response)
         self._listeners[filename] = [listener for listener in self._listeners[filename] if listener()]
         self._listeners[filename].append(weakref.ref(response))
+        current = self._status[filename]
+        if current == STATE_UNKNOWN:
+            self._update(filename, STATE_READY)
+            if not self._request(filename):
+                self._onFileFailed(None, filename)
+        else:
+            self._update(filename, current)
         #print "LISTEN", len(self._listeners[filename])
     
     def updateStatus(self, filename, status):
@@ -146,15 +154,17 @@ class clientResourceMapper(object):
             if cb:
                 cb(filename)
             else:
+                print "needClean"
                 needClean = True
         # Clean up expired weak references
         if needClean:
+            
             self._listeners[filename] = [listener for listener in self._listeners[filename] if listener()]
     
     def _rawtranslate(self, filename, kind):
         """Translates the given filename based on availability."""
         status = self._status[filename]
-        if status == STATE_INVALID:
+        if status == STATE_INVALID or status == STATE_READY:
             return RESOURCE_INVALID[kind]
         return filename
     
@@ -170,7 +180,8 @@ class clientResourceMapper(object):
     
     def _onFileReceived(self, client, filename):
         """Responds to a file being successfully transferred."""
-        self._update(filename, STATE_READY)
+        print "file", filename, "received"
+        self._update(filename, STATE_DONE)
     
     def _onFileFailed(self, client, filename):
         """Responds to a file that was not transferred."""
@@ -178,7 +189,8 @@ class clientResourceMapper(object):
         if current in (STATE_UNKNOWN, STATE_LOADING, STATE_READY) and fileExists(filename):
             # Could either have verified correctly or failed to transfer
             # Either way, call it present
-            status = STATE_READY
+            status = STATE_DONE
+            print "file", filename, "assumed received"
         else:
             # Missing on server or failed to transfer
             # Call it missing

@@ -267,7 +267,14 @@ class GLWidget(QGLWidget):
      
             img = self.convertToGLFormat(qimg)
             texture = glGenTextures(1)
-            imgdata = img.bits().asstring(img.numBytes())
+            try:
+                imgdata = img.bits().asstring(img.numBytes())
+            except:
+                import sys
+                print "requested to create", qimagepath, layer, textureRect, drawRect, hidden
+                for x in [0, 1, 2, 3]:
+                    f_code = sys._getframe(x).f_code #really bad hack to get the filename and number
+                    print "Doing it wrong in" + f_code.co_filename + ":" + str(f_code.co_firstlineno)
             
             print "created texture", texture
 
@@ -375,10 +382,10 @@ class GLWidget(QGLWidget):
         self.qimages[image.imagepath][2] -= 1
 
         if self.qimages[image.imagepath][2] <= 0:
-            print "deleting texture", image.textureId
-            glDeleteTextures(image.textureId)
+            print "deleting texture...NO WE'RE NOT!", image.textureId
+            #glDeleteTextures(image.textureId)
 
-        self.images[image.layer].remove(image)
+        #self.images[image.layer].remove(image)
 
         if self.vbos:
             self.calculateVBOList(image, True)

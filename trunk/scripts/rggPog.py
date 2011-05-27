@@ -91,7 +91,7 @@ class Pog(object):
     
     @_tile.setter
     def _tile(self, tile):
-        if self._tileStore:
+        if self._tileStore != None:
             self._tileStore.destroy()
         self._tileStore = tile
 
@@ -186,15 +186,14 @@ class Pog(object):
     
     def _makeTile(self):
         from rggSystem import mainWindow
-        self._src = rggResource.crm.translateFile(self._src, rggResource.RESOURCE_IMAGE)
+        src = rggResource.crm.translateFile(self._src, rggResource.RESOURCE_IMAGE)
         textureRect = (0, 0, self.texturedimensions[0], self.texturedimensions[1])
         drawRect = (self.position[0], self.position[1], self.size[0], self.size[1])
-        return mainWindow.glwidget.createImage(self.src, self.layer, textureRect, drawRect)
+        return mainWindow.glwidget.createImage(src, self.layer, textureRect, drawRect)
     
     def _updateSrc(self, crm, filename, translation):
-        if filename == self._src and self._tile:
-            self._tileStore.destroy()
-            self._tileStore = self._makeTile()
+        if filename == self._src and crm._status[filename] == rggResource.STATE_DONE:
+            self._tile = self._makeTile()
             
     def getSelectionCircleData(self):
         if self.alpha:
@@ -203,9 +202,7 @@ class Pog(object):
             return ((self.position[0]+self.size[0]/2, self.position[1]+self.size[1]/2, -1, math.sqrt((self.size[0]**2)+(self.size[1]**2))/2))
             
     def forceUpdate(self):
-        if self._tileStore != None:
-            self._tileStore.destroy()
-        self._tileStore = self._makeTile()
+        self._tile = self._makeTile()
     
     def dump(self):
         """Serialize to an object valid for JSON dumping."""
