@@ -178,13 +178,22 @@ class hostDialog(dialog):
     def _createFields(self, data):
         """Create the fields used by this dialog."""
         
+        self.fieldtemp = [6812, translate('hostDialog', 'Anonymous')]
+        
+        try:
+            js = jsonload(os.path.join(SAVE_DIR, "net_server.rgs"))
+            self.fieldtemp[0] = int(loadString('hostDialog.port', js.get('port')))
+            self.fieldtemp[1] = loadString('hostDialog.username', js.get('username'))
+        except:
+            pass
+        
         return dict(
             username=stringField(
                 translate('hostDialog', 'Username'),
-                value=data.get('username', translate('hostDialog', 'Anonymous'))),
+                value=data.get('username', self.fieldtemp[1])),
             port=integerField(
                 translate('hostDialog', 'Port'),
-                min=1, max=65535, value=data.get('port', 6812)))
+                min=1, max=65535, value=data.get('port', self.fieldtemp[0])))
     
     def _interpretFields(self, fields):
         """Interpret the fields into a dictionary of clean items."""
@@ -242,6 +251,10 @@ class hostDialog(dialog):
         
         # Show to user
         return (widget.exec_() == QtGui.QDialog.Accepted)
+    
+    def dump(self):
+        return dict(username=self.cleanData['username'],
+                    port=str(self.cleanData['port']))
         
     def clean(self):
         """Check for errors and return well-formatted data."""
@@ -251,6 +264,10 @@ class hostDialog(dialog):
     def save(self):
         """Make a new map and return it."""
         assert(self.cleanData)
+        try:
+            jsondump(self.dump(), os.path.join(SAVE_DIR, "net_server.rgs"))
+        except:
+            pass
         return ConnectionData(localHost(), self.cleanData['port'],
             self.cleanData['username'])
     
