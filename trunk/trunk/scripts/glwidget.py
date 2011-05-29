@@ -385,7 +385,7 @@ class GLWidget(QGLWidget):
             print "deleting texture...NO WE'RE NOT!", image.textureId
             #glDeleteTextures(image.textureId)
 
-        #self.images[image.layer].remove(image)
+        self.images[image.layer].remove(image)
 
         if self.vbos:
             self.calculateVBOList(image, True)
