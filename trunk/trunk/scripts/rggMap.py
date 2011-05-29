@@ -146,6 +146,7 @@ class Map(object):
     def _createTiles(self):
         """Show all the tiles of this map."""
         if self.tiles != None:
+            return
             for y in xrange(0, self.mapsize[1]):
                 for x in xrange(0, self.mapsize[0]):
                     self.tiles[x+y*self.mapsize[0]].destroy()
@@ -153,6 +154,8 @@ class Map(object):
         print "deleted tiles"
         
         src = rggResource.crm.translateFile(self.tileset, rggResource.RESOURCE_IMAGE)
+        if src != self.tileset:
+            return
         self.tiles = [None]*self.mapsize[0]*self.mapsize[1]
         mainWindow.glwidget.reserveVBOSize(self.mapsize[0] * self.mapsize[1])
         
