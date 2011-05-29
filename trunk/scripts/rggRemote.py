@@ -75,8 +75,11 @@ def respondICSay(chname, message, portrait):
 
 @clientRPC
 def sendICSay(user, message, chname, portrait):
-    rggResource.crm.listen(portrait, rggResource.RESOURCE_IMAGE, rggResource.crm, None)
+    rggResource.crm.listen(portrait, rggResource.RESOURCE_IMAGE, rggResource.crm, doNothing)
     respondICSay(allusers(), chname, message, portrait)
+    
+def doNothing():
+    pass
 
 @serverRPC
 def respondEmote(username, message):
