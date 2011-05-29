@@ -506,7 +506,7 @@ class GLWidget(QGLWidget):
         if image in self.qimages:
             qimg = self.qimages[image][0]
         else:
-            qimg = QImage(qimagepath)
+            qimg = QImage(image)
         
         return qimg.size()
         
