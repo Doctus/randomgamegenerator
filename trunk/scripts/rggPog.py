@@ -44,6 +44,7 @@ class Pog(object):
     def destroy(self):
         if self._tileStore:
             self._tileStore.destroy()
+            self._tileStore = None
 
     @property
     def hidden(self):
