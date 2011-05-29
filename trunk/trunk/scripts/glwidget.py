@@ -24,8 +24,8 @@ try:
     print "Loading GLMod"
     import glmod
     mod = True
-except:
-    print "Failed!"
+except Exception as e:
+    print "Failed!", e
     pass
 
 from rggTile import *
