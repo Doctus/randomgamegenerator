@@ -78,7 +78,7 @@ def sendICSay(user, message, chname, portrait):
     rggResource.crm.listen(portrait, rggResource.RESOURCE_IMAGE, rggResource.crm, doNothing)
     respondICSay(allusers(), chname, message, portrait)
     
-def doNothing():
+def doNothing(blah, blah, blah):
     pass
 
 @serverRPC
