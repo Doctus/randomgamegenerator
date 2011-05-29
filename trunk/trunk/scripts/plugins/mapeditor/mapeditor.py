@@ -94,6 +94,8 @@ class mapEditor(QtGui.QDockWidget):
             
     def mouseReleaseResponse(self, x, y, t):
         if t == 0:
+            if self.currentMap == None:
+                return
             self.dragging = False
             if self.isVisible() and self.singlePaintingButton.isChecked():
                 rggEvent.setEaten()
@@ -104,20 +106,20 @@ class mapEditor(QtGui.QDockWidget):
                     for x in range(self.rectStart[0], rectEnd[0]+cmp(rectEnd[0], self.rectStart[0]), cmp(rectEnd[0], self.rectStart[0])):
                         if cmp(rectEnd[1], self.rectStart[1]) != 0:
                             for y in range(self.rectStart[1], rectEnd[1]+cmp(rectEnd[1], self.rectStart[1]), cmp(rectEnd[1], self.rectStart[1])):
-                                if rggViews._state.currentMap.tilePosExists((x, y)):
-                                    rggViews.sendTileUpdate(rggViews._state.currentMap.ID, (x, y), self.tilelabel.currentTile)
+                                if self.currentMap.tilePosExists((x, y)):
+                                    rggViews.sendTileUpdate(self.currentMap.ID, (x, y), self.tilelabel.currentTile)
                         else:
-                            if rggViews._state.currentMap.tilePosExists((x, self.rectStart[1])):
-                                rggViews.sendTileUpdate(rggViews._state.currentMap.ID, (x, self.rectStart[1]), self.tilelabel.currentTile)
+                            if self.currentMap.tilePosExists((x, self.rectStart[1])):
+                                rggViews.sendTileUpdate(self.currentMap.ID, (x, self.rectStart[1]), self.tilelabel.currentTile)
                 else:
                     if cmp(rectEnd[1], self.rectStart[1]) != 0:
                         for y in range(self.rectStart[1], rectEnd[1]+cmp(rectEnd[1], self.rectStart[1]), cmp(rectEnd[1], self.rectStart[1])):
-                            if rggViews._state.currentMap.tilePosExists((self.rectStart[0], y)):
-                                rggViews.sendTileUpdate(rggViews._state.currentMap.ID, (self.rectStart[0], y), self.tilelabel.currentTile)
+                            if self.currentMap.tilePosExists((self.rectStart[0], y)):
+                                rggViews.sendTileUpdate(self.currentMap.ID, (self.rectStart[0], y), self.tilelabel.currentTile)
                     else:
                         print "WHY ARE YOU USING THE RECTANGLE TOOL TO PAINT A SINGLE TILE? THE MIND REELS"
-                        if rggViews._state.currentMap.tilePosExists((self.rectStart[0], self.rectStart[1])):
-                                rggViews.sendTileUpdate(rggViews._state.currentMap.ID, (self.rectStart[0], self.rectStart[1]), self.tilelabel.currentTile)
+                        if self.currentMap.tilePosExists((self.rectStart[0], self.rectStart[1])):
+                                rggViews.sendTileUpdate(self.currentMap.ID, (self.rectStart[0], self.rectStart[1]), self.tilelabel.currentTile)
                 rggEvent.setEaten()
 
     def mapChangedResponse(self, newMap):
