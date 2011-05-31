@@ -144,8 +144,8 @@ class ICChatWidget(QtGui.QDockWidget):
             self.characters = []
         
         self.widgetLineInput.returnPressed.connect(self.processInput)
-        self.connect(self.characterAddButton, QtCore.SIGNAL('pressed()'), self.newCharacter)
-        self.connect(self.characterDeleteButton, QtCore.SIGNAL('pressed()'), self.deleteCharacter)
+        self.connect(self.characterAddButton, QtCore.SIGNAL('clicked()'), self.newCharacter)
+        self.connect(self.characterDeleteButton, QtCore.SIGNAL('clicked()'), self.deleteCharacter)
     
     def insertMessage(self, mes):
         self.scroll = (self.widgetEditor.verticalScrollBar().value() ==
@@ -243,9 +243,9 @@ class diceRoller(QtGui.QDockWidget):
         self.addmacrobutton.setToolTip(self.tr("Add a new macro via a dialog box."))
         self.removemacrobutton = QtGui.QPushButton(self.tr("Delete Macro"), mainWindow)
         self.removemacrobutton.setToolTip(self.tr("Remove the currently selected macro."))
-        self.connect(self.rollbutton, QtCore.SIGNAL('pressed()'), self.rollDice)
-        self.connect(self.addmacrobutton, QtCore.SIGNAL('pressed()'), self.summonMacro)
-        self.connect(self.removemacrobutton, QtCore.SIGNAL('pressed()'), self.removeCurrentMacro)
+        self.connect(self.rollbutton, QtCore.SIGNAL('clicked()'), self.rollDice)
+        self.connect(self.addmacrobutton, QtCore.SIGNAL('clicked()'), self.summonMacro)
+        self.connect(self.removemacrobutton, QtCore.SIGNAL('clicked()'), self.removeCurrentMacro)
         self.widget.addWidget(self.diceArea, 0, 0)
         self.widget.addWidget(self.rollbutton, 1, 0)
         self.widget.addWidget(self.addmacrobutton, 2, 0)
@@ -312,7 +312,7 @@ class pogPalette(QtGui.QDockWidget):
         self.setWidget(self.widget)
         mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self)
         
-        self.addpogbutton.pressed.connect(self.addPog)
+        self.addpogbutton.clicked.connect(self.addPog)
         self.pogArea.itemActivated.connect(self.place)
         self.addPog()
     
