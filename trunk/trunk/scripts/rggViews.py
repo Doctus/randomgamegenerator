@@ -435,7 +435,7 @@ def respondMapCreate(ID, mapDump):
     map.ID = ID
     pos = 0
     for map in getAllMaps():
-        pos += map.pixelSize[0] + 100
+        pos += map.pixelSize[0] + 25
     map.drawOffset = (pos, 0)
     _state.Maps[ID] = map
 
