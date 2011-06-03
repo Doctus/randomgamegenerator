@@ -281,15 +281,15 @@ class GLWidget(QGLWidget):
             glBindTexture(self.texext, texture)
             
             if self.npot == 3:
-                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST)
-                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
+                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
             elif self.npot == 2:
-                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST)
-                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
+                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
                 glTexParameteri(self.texext, GL_GENERATE_MIPMAP, GL_TRUE)
             else:
-                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
             glTexImage2D(self.texext, 0, GL_RGBA, img.width(), img.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imgdata);
 
