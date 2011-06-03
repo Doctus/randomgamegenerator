@@ -6,6 +6,7 @@
 
 #include <Python.h>
 #include <vector>
+#include <map>
 
 #define GL_GLEXT_PROTOTYPES 1
 
@@ -27,22 +28,35 @@
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
+using namespace std;
+
 GLenum extension = GL_TEXTURE_RECTANGLE_ARB;
 
 class VBOEntry
 {
     public:
-    unsigned int texid, offset;
+    unsigned int texid;
+    vector<GLint> offsetValues;
+
+    VBOEntry()
+    {
+        this->texid = 0;
+    }
 
     VBOEntry(unsigned int texid, unsigned int offset)
     {
         this->texid = texid;
-        this->offset = offset;
+        offsetValues.push_back(offset);
+    }
+
+    void addOffset(unsigned int offset)
+    {
+        offsetValues.push_back(offset);
     }
 };
 
 int VBO, stride;
-std::vector<std::vector<VBOEntry> > entries;
+vector<map<unsigned int, VBOEntry> > entries;
 
 static PyObject * glmod_drawTexture(PyObject *self, PyObject* args)
 {
@@ -79,7 +93,8 @@ static PyObject * glmod_drawTexture(PyObject *self, PyObject* args)
 
 static PyObject * glmod_drawVBO(PyObject *self, PyObject* args)
 {
-    int i, k, x, lastid = -1;
+    int i, j, k, x, lastid = -1;
+    
 
     glBindBuffer(GL_ARRAY_BUFFER_ARB, VBO);
     glTexCoordPointer(2, GL_FLOAT, stride, 0);
@@ -90,33 +105,21 @@ static PyObject * glmod_drawVBO(PyObject *self, PyObject* args)
 
     for(i = 0; i < entries.size(); i++)
     {
-        k = 0;
-        while(k < entries[i].size())
+        map<unsigned int, VBOEntry>::iterator it = entries[i].begin();
+        while(it != entries[i].end())
         {
-            x = k+1;
-            if(lastid != entries[i][k].texid)
+            VBOEntry* e = &((*it).second);
+            k = e->offsetValues.size();
+            glBindTexture(extension, e->texid);
+            GLint firstValues[k];
+            GLsizei countValues[k];
+            for(int j = 0; j < k; j++)
             {
-                glBindTexture(extension, entries[i][k].texid);
-                lastid = entries[i][k].texid;
+                firstValues[j] = e->offsetValues[j];
+                countValues[j] = 4;
             }
-            
-            while(lastid == entries[i][x].texid)
-            {
-                x++;
-            }
-
-            GLint firstValues[x-k];
-            GLsizei countValues[x-k];
-            
-            for(int l = 0; l <= x-k; l++)
-            {
-                firstValues[l] = entries[i][k+l].offset;
-                countValues[l] = 4;
-            }
-            
-            
-            glMultiDrawArrays(GL_QUADS, firstValues, countValues, x-k);
-            k += (x-k);
+            glMultiDrawArrays(GL_QUADS, firstValues, countValues, k);
+            it++;
         }
     }
 
@@ -138,14 +141,18 @@ static PyObject * glmod_setVBO(PyObject *self, PyObject* args)
 
     for(i = 0; i < PyTuple_Size(tuple); i++)
     {
-        entries.push_back(std::vector<VBOEntry>());
+        entries.push_back(map<unsigned int, VBOEntry>());
         layer = PyTuple_GET_ITEM(tuple, i);
         for(j = 0; j < PyTuple_Size(layer); j += 2)
         {
             texid = PyInt_AS_LONG(PyTuple_GET_ITEM(layer, j));
             offset = PyInt_AS_LONG(PyTuple_GET_ITEM(layer, j+1));
             
-            entries[i].push_back(VBOEntry(texid, offset));
+            map<unsigned int, VBOEntry>::iterator it = entries[i].find(texid);
+            if(it == entries[i].end())
+                entries[i][texid] = VBOEntry(texid, offset);
+            else
+                entries[i][texid].addOffset(offset);
         }
     }
 
@@ -161,9 +168,9 @@ static PyObject * glmod_insertVBOlayer(PyObject *self, PyObject* args)
     insertBeforeLayer = PyInt_AS_LONG(PyTuple_GET_ITEM(tuple, 0));
     
     if(insertBeforeLayer >= entries.size())
-        entries.push_back(std::vector<VBOEntry>());
+        entries.push_back(map<unsigned int, VBOEntry>());
     else
-        entries.insert(entries.begin() + insertBeforeLayer, std::vector<VBOEntry>());
+        entries.insert(entries.begin() + insertBeforeLayer, map<unsigned int, VBOEntry>());
 
     for(j = 1; j < PyTuple_Size(tuple); j += 2)
     {
@@ -171,7 +178,11 @@ static PyObject * glmod_insertVBOlayer(PyObject *self, PyObject* args)
         offset = PyInt_AS_LONG(PyTuple_GET_ITEM(tuple, j+1));
         //printf("adding %i at %i on %i\r\n", texid, offset, insertBeforeLayer);
         
-        entries[insertBeforeLayer].push_back(VBOEntry(texid, offset));
+        map<unsigned int, VBOEntry>::iterator it = entries[insertBeforeLayer].find(texid);
+        if(it == entries[insertBeforeLayer].end())
+            entries[insertBeforeLayer][texid] = VBOEntry(texid, offset);
+        else
+            entries[insertBeforeLayer][texid].addOffset(offset);
     }
 
     return PyInt_FromLong(0L);
@@ -198,7 +209,11 @@ static PyObject * glmod_setVBOlayer(PyObject *self, PyObject* args)
         texid = PyInt_AS_LONG(PyTuple_GET_ITEM(tuple, j));
         offset = PyInt_AS_LONG(PyTuple_GET_ITEM(tuple, j+1));
         
-        entries[layer].push_back(VBOEntry(texid, offset));
+        map<unsigned int, VBOEntry>::iterator it = entries[layer].find(texid);
+        if(it == entries[layer].end())
+            entries[layer][texid] = VBOEntry(texid, offset);
+        else
+            entries[layer][texid].addOffset(offset);
     }
 
     return PyInt_FromLong(0L);
@@ -223,7 +238,11 @@ static PyObject * glmod_addVBOentry(PyObject *self, PyObject* args)
         texid = PyInt_AS_LONG(PyTuple_GET_ITEM(tuple, j));
         offset = PyInt_AS_LONG(PyTuple_GET_ITEM(tuple, j+1));
         
-        entries[layer].push_back(VBOEntry(texid, offset));
+        map<unsigned int, VBOEntry>::iterator it = entries[layer].find(texid);
+        if(it == entries[layer].end())
+            entries[layer][texid] = VBOEntry(texid, offset);
+        else
+            entries[layer][texid].addOffset(offset);
     }
 
     return PyInt_FromLong(0L);
@@ -312,7 +331,7 @@ static PyObject * glmod_drawLines(PyObject *self, PyObject* args)
             double g = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 5));
             double b = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 6));
 
-		glColor3f(r, g, b);
+            glColor3f(r, g, b);
 
             glVertex2d(x, y);
             glVertex2d(w, h);
