@@ -55,8 +55,32 @@ class VBOEntry
     }
 };
 
-int VBO, stride;
+int VBO, stride, valuesSize = -1;
 vector<map<unsigned int, VBOEntry> > entries;
+GLint *firstValues;
+GLsizei *countValues;
+
+void resizeValues(int newSize)
+{
+    if(newSize <= valuesSize)
+        return;
+
+    if(valuesSize > 0)
+    {
+        delete[] firstValues;
+        delete[] countValues;
+    }
+
+    firstValues = new GLint[newSize];
+    countValues = new GLsizei[newSize];
+
+    for(int j = 0; j < newSize; j++)
+    {
+        countValues[j] = 4;
+    }
+
+    valuesSize = newSize;
+}
 
 static PyObject * glmod_drawTexture(PyObject *self, PyObject* args)
 {
@@ -111,13 +135,10 @@ static PyObject * glmod_drawVBO(PyObject *self, PyObject* args)
             VBOEntry* e = &((*it).second);
             k = e->offsetValues.size();
             glBindTexture(extension, e->texid);
-            GLint firstValues[k];
-            GLsizei countValues[k];
+
             for(int j = 0; j < k; j++)
-            {
                 firstValues[j] = e->offsetValues[j];
-                countValues[j] = 4;
-            }
+
             glMultiDrawArrays(GL_QUADS, firstValues, countValues, k);
             it++;
         }
@@ -152,7 +173,11 @@ static PyObject * glmod_setVBO(PyObject *self, PyObject* args)
             if(it == entries[i].end())
                 entries[i][texid] = VBOEntry(texid, offset);
             else
+            {
                 entries[i][texid].addOffset(offset);
+                if(entries[i][texid].offsetValues.size() >= valuesSize)
+                    resizeValues(entries[i][texid].offsetValues.size() + 5);
+            }
         }
     }
 
@@ -182,7 +207,11 @@ static PyObject * glmod_insertVBOlayer(PyObject *self, PyObject* args)
         if(it == entries[insertBeforeLayer].end())
             entries[insertBeforeLayer][texid] = VBOEntry(texid, offset);
         else
+        {
             entries[insertBeforeLayer][texid].addOffset(offset);
+            if(entries[insertBeforeLayer][texid].offsetValues.size() >= valuesSize)
+                resizeValues(entries[insertBeforeLayer][texid].offsetValues.size() + 5);
+        }
     }
 
     return PyInt_FromLong(0L);
@@ -213,7 +242,11 @@ static PyObject * glmod_setVBOlayer(PyObject *self, PyObject* args)
         if(it == entries[layer].end())
             entries[layer][texid] = VBOEntry(texid, offset);
         else
+        {
             entries[layer][texid].addOffset(offset);
+            if(entries[layer][texid].offsetValues.size() >= valuesSize)
+                resizeValues(entries[layer][texid].offsetValues.size() + 5);
+        }
     }
 
     return PyInt_FromLong(0L);
@@ -242,7 +275,11 @@ static PyObject * glmod_addVBOentry(PyObject *self, PyObject* args)
         if(it == entries[layer].end())
             entries[layer][texid] = VBOEntry(texid, offset);
         else
+        {
             entries[layer][texid].addOffset(offset);
+            if(entries[layer][texid].offsetValues.size() >= valuesSize)
+                resizeValues(entries[layer][texid].offsetValues.size() + 5);
+        }
     }
 
     return PyInt_FromLong(0L);
@@ -372,6 +409,8 @@ static PyObject * glmod_init(PyObject *self, PyObject* args)
     if(glMultiDrawArrays == NULL)
         return PyInt_FromLong(-2L); //Init went ok, but couldn't get glMultiDrawArrays
 #endif
+
+    resizeValues(4);
 
     return PyInt_FromLong(0L);
 }
