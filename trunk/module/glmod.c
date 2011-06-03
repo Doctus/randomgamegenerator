@@ -307,6 +307,13 @@ static PyObject * glmod_drawLines(PyObject *self, PyObject* args)
             double y = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 1));
             double w = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 2));
             double h = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 3));
+
+            double r = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 4));
+            double g = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 5));
+            double b = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 6));
+
+		glColor3f(r, g, b);
+
             glVertex2d(x, y);
             glVertex2d(w, h);
         }
@@ -314,6 +321,7 @@ static PyObject * glmod_drawLines(PyObject *self, PyObject* args)
     glEnd();
 
     glEnable(extension);
+    glColor3f(1.0, 1.0, 1.0);
 
     return PyInt_FromLong(0L);
 }

@@ -102,9 +102,21 @@ class menuBar(object):
         self.thicknessMenu = QtGui.QMenu("&Thickness", main)
         for x in range(1, 11):
             self.thicknessMenu.addAction(QtGui.QAction(str(x), main))
+        
+        self.colourMenu = QtGui.QMenu("&Colour", main)
+        self.colourMenu.addAction(QtGui.QAction("White", main))
+        self.colourMenu.addAction(QtGui.QAction("Red", main))
+        self.colourMenu.addAction(QtGui.QAction("Orange", main))
+        self.colourMenu.addAction(QtGui.QAction("Yellow", main))
+        self.colourMenu.addAction(QtGui.QAction("Green", main))
+        self.colourMenu.addAction(QtGui.QAction("Blue", main))
+        self.colourMenu.addAction(QtGui.QAction("Purple", main))
+        self.colourMenu.addAction(QtGui.QAction("Black", main))
+        self.colourMenu.addAction(QtGui.QAction("Custom...", main))
 
         drawMenu = QtGui.QMenu("&Draw", main)
         drawMenu.addMenu(self.thicknessMenu)
+        drawMenu.addMenu(self.colourMenu)
         
         stylesMenu = QtGui.QMenu("&Styles", main)
         for style in rggStyles.sheets.keys():
