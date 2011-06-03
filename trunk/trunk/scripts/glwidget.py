@@ -134,11 +134,11 @@ class GLWidget(QGLWidget):
     def clearSelectionCircles(self):
         self.selectionCircles.clear()
         
-    def addLine(self, thickness, x, y, w, h):
+    def addLine(self, thickness, x, y, w, h, r, g, b):
         if not thickness in self.lines:
             self.lines[thickness] = []
             
-        self.lines[thickness].append((float(x), float(y), float(w), float(h)))
+        self.lines[thickness].append((float(x), float(y), float(w), float(h), float(r), float(g), float(b)))
         
     def deleteLine(self, thickness, x, y, w, h):
         if thickness == -1:

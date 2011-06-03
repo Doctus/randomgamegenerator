@@ -72,6 +72,7 @@ class _state(object):
     nextLinePlacement = None
 
     thickness = 1
+    linecolour = [1.0, 1.0, 1.0]
     
     @staticmethod
     def initialize():
@@ -426,7 +427,7 @@ def clearUserList():
 @serverRPC
 def respondMapCreate(ID, mapDump):
     """Creates <s>or updates</s> the map with the given ID."""
-    print "map create"
+    print "map create: " + str(ID)
     existed = (ID in _state.Maps)
     if existed:
         print "ignoring map create"
@@ -668,18 +669,18 @@ def sendLockPog(user, mapID, pogID, locked):
 # DRAWING
 
 @serverRPC
-def respondLine(x, y, w, h, thickness):
-    drawLine(x, y, w, h, thickness)
+def respondLine(x, y, w, h, thickness, r, g, b):
+    drawLine(x, y, w, h, thickness, r, g, b)
     linesDict = topmap((x, y)).linesDict
     if not thickness in linesDict:
         linesDict[thickness] = []
         
-    linesDict[thickness].append((float(x), float(y), float(w), float(h)))
+    linesDict[thickness].append((float(x), float(y), float(w), float(h), float(r), float(g), float(b)))
     topmap((x, y)).linesDict = linesDict
 
 @clientRPC
-def sendLine(user, x, y, w, h, thickness):
-    respondLine(allusers(), x, y, w, h, thickness)
+def sendLine(user, x, y, w, h, thickness, r, g, b):
+    respondLine(allusers(), x, y, w, h, thickness, r, g, b)
 
 @serverRPC
 def respondDeleteLine(x, y, w, h):
@@ -694,6 +695,16 @@ def _setThickness(new):
 
 def setThickness(new):
     _setThickness(int(new.text()))
+    
+def _setLineColour(new):
+    _state.linecolour = [new[0], new[1], new[2]]
+    
+def setLineColour(menuselection):
+    if menuselection.text() == "Custom...":
+        result = QtGui.QColorDialog.getColor(QtCore.Qt.white, mainWindow)
+        _setLineColour((result.redF(), result.greenF(), result.blueF()))
+    else:
+        _setLineColour(rggSystem.COLOURS[str(menuselection.text())])
 
 def clearLines():
     rggSystem.clearLines()
@@ -800,7 +811,7 @@ def mouseMove(screenPosition, mapPosition, displacement):
             return
         if _state.mouseButton == BUTTON_LEFT:
             if _state.previousLinePlacement != None:
-                sendLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.thickness)
+                sendLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.thickness, _state.linecolour[0], _state.linecolour[1], _state.linecolour[2])
             _state.previousLinePlacement = mapPosition
     elif icon == ICON_DELETE: #deleteIcon
         if _state.mouseButton == BUTTON_LEFT:

@@ -42,6 +42,7 @@ if __name__ == '__main__':
     s.menu.joinGameAct.triggered.connect(rggViews.joinGame)
     s.menu.disconnectAct.triggered.connect(rggViews.disconnectGame)
     s.menu.thicknessMenu.triggered.connect(rggViews.setThickness)
+    s.menu.colourMenu.triggered.connect(rggViews.setLineColour)
     
     server = rggRPC.server
     client = rggRPC.client

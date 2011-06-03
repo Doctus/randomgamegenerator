@@ -56,6 +56,14 @@ LOG_DIR = 'save/logs'
 MAP_DIR = 'save/maps'
 CHAR_DIR = 'save/characters'
 SAVE_DIR = 'save'
+COLOURS = {"White":(1.0, 1.0, 1.0), 
+           "Red": (1.0, 0.0, 0.0), 
+           "Orange": (1.0, 0.5, 0.0), 
+           "Yellow": (1.0, 1.0, 0.0),
+           "Green": (0.0, 0.8, 0.2),
+           "Blue": (0.0, 0.0, 1.0),
+           "Purple": (0.76, 0.0, 1.0),
+           "Black": (0.0, 0.0, 0.0)}
 
 mainWindow = None
 
@@ -297,8 +305,8 @@ def drawSelectionCircle(x, y, splasifarcity, radius):
 def clearSelectionCircles():
     mainWindow.glwidget.clearSelectionCircles()
 
-def drawLine(x, y, w, h, thickness):
-    mainWindow.glwidget.addLine(thickness, x, y, w, h)
+def drawLine(x, y, w, h, thickness, r, g, b):
+    mainWindow.glwidget.addLine(thickness, x, y, w, h, r, g, b)
 
 def deleteLine(x, y, w, h, thickness = -1):
     mainWindow.glwidget.deleteLine(thickness, x, y, w, h)

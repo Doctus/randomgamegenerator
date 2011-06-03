@@ -53,6 +53,11 @@ Changelog:
     * Replaced the dubious plugin loading system with a different, 
       possibly more dubious system.
     * Line-drawing now has more thickness options. (Some may be buggy.)
+    * Lines can now be drawn in colour.
+    * Added a list of current users.
+    * Portrait selection now provides a list of files in the folder.
+    * Host dialog now also remembers inputs.
+    * Made certain buttons behave more normally.
 
   v0.97 "Armor won't help the heart stay sharp!"
     * Created this readme
