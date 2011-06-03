@@ -237,9 +237,9 @@ class GLWidget(QGLWidget):
 
         if qimagepath in self.qimages:
             qimg = self.qimages[qimagepath][0]
-            if self.qimages[qimagepath][2] > 0:
-                texture = self.qimages[qimagepath][1]
-                found = True
+            #if self.qimages[qimagepath][2] > 0:
+            texture = self.qimages[qimagepath][1]
+            found = True
         else:
             qimg = QImage(qimagepath)
             print "created", qimagepath
@@ -574,7 +574,12 @@ class GLWidget(QGLWidget):
         if event.key() == Qt.Key_Control:
             self.ctrl = True
         if event.key() == Qt.Key_Shift:
+            print "calculate"
+            self.calculateVBOList()
             self.shift = True
+        if event.key() == Qt.Key_Alt:
+            print "fillbuffers"
+            self.fillBuffers()
             
     def keyReleaseEvent(self, event):
         if event.key() == Qt.Key_Control:
