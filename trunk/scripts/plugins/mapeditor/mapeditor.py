@@ -65,8 +65,12 @@ class mapEditor(QtGui.QDockWidget):
                 rggViews.sendTileUpdate(map.ID, clickedtile, self.tilelabel.currentTile)
                 rggEvent.setEaten()
             elif self.isVisible() and self.rectPaintingButton.isChecked():
-                self.rectStart = ((rggSystem.cameraPosition()[0] + x) / self.tilelabel.tilex,
-                            (rggSystem.cameraPosition()[1] + y) / self.tilelabel.tiley)
+                self.rectStart = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
+                            int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
+                if not map.tilePosExists(self.rectStart):
+                    rggEvent.setEaten()
+                    self.rectStart = None
+                    return
                 rggEvent.setEaten()
         elif t == 5:
             if self.isVisible() and (self.singlePaintingButton.isChecked() or self.rectPaintingButton.isChecked()):
@@ -96,12 +100,21 @@ class mapEditor(QtGui.QDockWidget):
         if t == 0:
             if self.currentMap == None:
                 return
+            mapPosition = rggSystem.getMapPosition((x, y))
+            map = rggViews.topmap(mapPosition)
             self.dragging = False
+            if map == None:
+                return
             if self.isVisible() and self.singlePaintingButton.isChecked():
                 rggEvent.setEaten()
             elif self.isVisible() and self.rectPaintingButton.isChecked() and self.rectStart is not None:
-                rectEnd = ((rggSystem.cameraPosition()[0] + x) / self.tilelabel.tilex,
-                        (rggSystem.cameraPosition()[1] + y) / self.tilelabel.tiley)
+                rectEnd = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
+                            int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
+                if not map.tilePosExists(rectEnd):
+                    rggEvent.setEaten()
+                    self.rectStart = None
+                    self.rectEnd = None
+                    return
                 if cmp(rectEnd[0], self.rectStart[0]) != 0:
                     for x in range(self.rectStart[0], rectEnd[0]+cmp(rectEnd[0], self.rectStart[0]), cmp(rectEnd[0], self.rectStart[0])):
                         if cmp(rectEnd[1], self.rectStart[1]) != 0:
