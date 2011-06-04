@@ -237,9 +237,9 @@ class GLWidget(QGLWidget):
 
         if qimagepath in self.qimages:
             qimg = self.qimages[qimagepath][0]
-            #if self.qimages[qimagepath][2] > 0:
-            texture = self.qimages[qimagepath][1]
-            found = True
+            if self.qimages[qimagepath][2] > 0:
+                texture = self.qimages[qimagepath][1]
+                found = True
         else:
             qimg = QImage(qimagepath)
             print "created", qimagepath
