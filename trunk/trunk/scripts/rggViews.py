@@ -537,7 +537,7 @@ def respondUpdatePog(mapID, pogID, pogDump):
         if old == _state.pogHover:
             _state.pogHover.showTooltip = False
             _state.pogHover = None
-        old._tile.destroy()
+        old.destroy()
     pogMap.addPog(pog)
     drawPogCircles()
 
@@ -558,7 +558,7 @@ def respondDeletePog(mapID, pogID):
     """Deletes a pog on the client."""
     pogMap = getmap(mapID)
     if pogMap is None:
-        print "Attempt to delete pog in nonextant map: {0}".format(mapID)
+        print "Attempt to delete pog in nonexistant map: {0}".format(mapID)
         return
     if pogID in pogMap.Pogs:
         old = pogMap.Pogs[pogID]
