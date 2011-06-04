@@ -45,6 +45,7 @@ class Pog(object):
         if self._tileStore:
             self._tileStore.destroy()
             self._tileStore = None
+        rggResource.crm.destroy(self)
 
     @property
     def hidden(self):

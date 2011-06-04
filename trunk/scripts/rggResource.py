@@ -97,6 +97,10 @@ class clientResourceMapper(object):
         else:
             self._update(filename, current)
         #print "LISTEN", len(self._listeners[filename])
+
+    def destroy(self, root):
+        setattr(root, KEEP_ALIVE_FIELD, [])
+        
     
     def updateStatus(self, filename, status):
         """Responds to a status update sent from the server."""

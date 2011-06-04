@@ -34,8 +34,6 @@ class Map(object):
         self.tileset = tileset
         self.tilesize = tilesize
 
-        print "WWWUUUUTT"
-        
         self.Pogs = {}
         self.lines = []
         self.linesDict = {}
@@ -142,6 +140,7 @@ class Map(object):
         for tile in self.tiles:
             tile.destroy()
         self.tiles = None
+        rggResource.crm.destroy(self)
     
     def _createTiles(self):
         """Show all the tiles of this map."""
