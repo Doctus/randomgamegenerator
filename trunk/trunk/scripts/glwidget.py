@@ -382,13 +382,16 @@ class GLWidget(QGLWidget):
         self.qimages[image.imagepath][2] -= 1
 
         if self.qimages[image.imagepath][2] <= 0:
-            print "deleting texture...NO WE'RE NOT!", image.textureId
-            #glDeleteTextures(image.textureId)
+            print "deleting texture", image.textureId
+            glDeleteTextures(image.textureId)
+            del self.qimages[image.imagepath]
 
         self.images[image.layer].remove(image)
 
         if self.vbos:
             self.calculateVBOList(image, True)
+
+        image = None
 
     def drawImage(self, image):
         global mod
