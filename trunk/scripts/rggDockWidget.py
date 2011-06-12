@@ -135,7 +135,7 @@ class ICChatWidget(QtGui.QDockWidget):
         self.layout.addLayout(self.layoutni)
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
-        mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
+        mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self)
         
         #TODO: Store and access characters in a better fashion.
         try:
@@ -252,7 +252,8 @@ class diceRoller(QtGui.QDockWidget):
         self.widget.addWidget(self.removemacrobutton, 3, 0)
         self.realwidget.setLayout(self.widget)
         self.setWidget(self.realwidget)
-        mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self)
+        mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
+        self.close()
         self.currentMacro = -1
 
     def changeCurrentMacro(self, n):
@@ -310,7 +311,7 @@ class pogPalette(QtGui.QDockWidget):
         self.mainLayout.addWidget(self.controlArea)
         self.widget.setLayout(self.mainLayout)
         self.setWidget(self.widget)
-        mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self)
+        mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
         
         self.addpogbutton.clicked.connect(self.addPog)
         self.pogArea.itemActivated.connect(self.place)
