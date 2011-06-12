@@ -140,7 +140,7 @@ def injectMain():
 
     assert(not mainWindow)
 
-    from rggMain import *
+    from rggMain import MainWindow
     mainWindow = MainWindow()
     return mainWindow
 
@@ -235,7 +235,7 @@ def promptButtonSelection(prompt, text=[], defaultButton = 0):
 
     buttons = []
 
-    from PyQt4.QtGui import *
+    from PyQt4.QtGui import QMessageBox
     questionDialog = QMessageBox(mainWindow);
     questionDialog.setText(prompt);
 
