@@ -29,7 +29,7 @@ class mapEditor(QtGui.QDockWidget):
         self.scrollarea = QtGui.QScrollArea(mainWindow)
         self.noPaintingButton = QtGui.QRadioButton(self.tr("Stop Painting"), mainWindow)
         self.singlePaintingButton = QtGui.QRadioButton(self.tr("Single Tile Brush"), mainWindow)
-        self.singlePaintingButton.setChecked(True)
+        self.noPaintingButton.setChecked(True)
         self.rectPaintingButton = QtGui.QRadioButton(self.tr("Area (Rectangle) Brush"), mainWindow)
         self.layout.addWidget(self.scrollarea)
         self.layout.addWidget(self.noPaintingButton)
