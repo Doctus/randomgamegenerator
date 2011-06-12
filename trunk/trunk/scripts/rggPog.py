@@ -104,6 +104,10 @@ class Pog(object):
     @property
     def properties(self):
         return self._properties
+    
+    @properties.setter
+    def properties(self, properties):
+        self._properties = properties
 
     @size.setter
     def size(self, size):
