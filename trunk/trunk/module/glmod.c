@@ -1,5 +1,5 @@
 /*
- * main - starting point of FM
+ * Module for use in Oipo's Graphics Engine 2.0
  *
  * By Oipo (kingoipo@gmail.com)
  */
