@@ -26,8 +26,6 @@
     #endif
 #endif
 
-using namespace __gnu_cxx;
-
 #ifdef DEBUG
     #warning "DEBUG ENABLED, EXPECT PERFORMANCE LOSS"
     #define PyTuple_GETITEM(a,b) PyTuple_GetItem(a,b)
@@ -47,6 +45,7 @@ using namespace __gnu_cxx;
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 using namespace std;
+using namespace __gnu_cxx;
 
 GLenum extension = GL_TEXTURE_RECTANGLE_ARB;
 
