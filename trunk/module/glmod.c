@@ -6,7 +6,7 @@
 
 #include <Python.h>
 #include <vector>
-#include <map>
+#include <hash_map>
 
 #define GL_GLEXT_PROTOTYPES 1
 
@@ -23,7 +23,24 @@
         PFNGLMULTIDRAWARRAYSPROC glMultiDrawArrays = NULL;
     #else
         #include <GL/gl.h>
+        using namespace __gnu_cxx;
     #endif
+#endif
+
+#ifdef DEBUG
+    #warning "DEBUG ENABLED, EXPECT PERFORMANCE LOSS"
+    #define PyTuple_GETITEM(a,b) PyTuple_GetItem(a,b)
+    #define PyList_GETITEM(a,b) PyList_GetItem(a,b)
+    #define PyInt_ASLONG(a) PyInt_AsLong(a)
+    #define PyLong_ASLONG(a) PyLong_AsLong(a)
+    #define PyFloat_ASDOUBLE(a) PyFloat_AsDouble(a)
+#else
+    #define PyTuple_GETITEM(a,b) PyTuple_GET_ITEM(a,b)
+    #define PyList_GETITEM(a,b) PyList_GET_ITEM(a,b)
+    #define PyInt_ASLONG(a) PyInt_AS_LONG(a)
+    #define PyFloat_ASDOUBLE(a) PyFloat_AS_DOUBLE(a)
+    #define PyLong_ASLONG(a) PyLong_AsLong(a) //there is no alternative to this function
+
 #endif
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -55,8 +72,10 @@ class VBOEntry
     }
 };
 
+typedef hash_map<unsigned int, VBOEntry> dict;
+
 int VBO, stride, valuesSize = -1;
-vector<map<unsigned int, VBOEntry> > entries;
+vector<dict> entries;
 GLint *firstValues;
 GLsizei *countValues;
 
@@ -129,7 +148,7 @@ static PyObject * glmod_drawVBO(PyObject *self, PyObject* args)
 
     for(i = 0; i < entries.size(); i++)
     {
-        map<unsigned int, VBOEntry>::iterator it = entries[i].begin();
+        dict::iterator it = entries[i].begin();
         while(it != entries[i].end())
         {
             VBOEntry* e = &((*it).second);
@@ -153,7 +172,7 @@ static PyObject * glmod_drawVBO(PyObject *self, PyObject* args)
 
 static PyObject * glmod_setVBO(PyObject *self, PyObject* args)
 {
-    PyObject *tuple = PyTuple_GET_ITEM(args, 0);
+    PyObject *tuple = PyTuple_GETITEM(args, 0);
     int i, j;
     unsigned int texid, offset;
     PyObject *layer= NULL;
@@ -162,14 +181,14 @@ static PyObject * glmod_setVBO(PyObject *self, PyObject* args)
 
     for(i = 0; i < PyTuple_Size(tuple); i++)
     {
-        entries.push_back(map<unsigned int, VBOEntry>());
-        layer = PyTuple_GET_ITEM(tuple, i);
+        entries.push_back(dict());
+        layer = PyTuple_GETITEM(tuple, i);
         for(j = 0; j < PyTuple_Size(layer); j += 2)
         {
-            texid = PyInt_AS_LONG(PyTuple_GET_ITEM(layer, j));
-            offset = PyInt_AS_LONG(PyTuple_GET_ITEM(layer, j+1));
+            texid = PyInt_ASLONG(PyTuple_GETITEM(layer, j));
+            offset = PyInt_ASLONG(PyTuple_GETITEM(layer, j+1));
             
-            map<unsigned int, VBOEntry>::iterator it = entries[i].find(texid);
+            dict::iterator it = entries[i].find(texid);
             if(it == entries[i].end())
                 entries[i][texid] = VBOEntry(texid, offset);
             else
@@ -186,24 +205,24 @@ static PyObject * glmod_setVBO(PyObject *self, PyObject* args)
 
 static PyObject * glmod_insertVBOlayer(PyObject *self, PyObject* args)
 {
-    PyObject *tuple = PyTuple_GET_ITEM(args, 0);
+    PyObject *tuple = PyTuple_GETITEM(args, 0);
     int j;
     unsigned int texid, offset, insertBeforeLayer;
 
-    insertBeforeLayer = PyInt_AS_LONG(PyTuple_GET_ITEM(tuple, 0));
+    insertBeforeLayer = PyInt_ASLONG(PyTuple_GETITEM(tuple, 0));
     
     if(insertBeforeLayer >= entries.size())
-        entries.push_back(map<unsigned int, VBOEntry>());
+        entries.push_back(dict());
     else
-        entries.insert(entries.begin() + insertBeforeLayer, map<unsigned int, VBOEntry>());
+        entries.insert(entries.begin() + insertBeforeLayer, dict());
 
     for(j = 1; j < PyTuple_Size(tuple); j += 2)
     {
-        texid = PyInt_AS_LONG(PyTuple_GET_ITEM(tuple, j));
-        offset = PyInt_AS_LONG(PyTuple_GET_ITEM(tuple, j+1));
+        texid = PyInt_ASLONG(PyTuple_GETITEM(tuple, j));
+        offset = PyInt_ASLONG(PyTuple_GETITEM(tuple, j+1));
         //printf("adding %i at %i on %i\r\n", texid, offset, insertBeforeLayer);
         
-        map<unsigned int, VBOEntry>::iterator it = entries[insertBeforeLayer].find(texid);
+        dict::iterator it = entries[insertBeforeLayer].find(texid);
         if(it == entries[insertBeforeLayer].end())
             entries[insertBeforeLayer][texid] = VBOEntry(texid, offset);
         else
@@ -219,11 +238,11 @@ static PyObject * glmod_insertVBOlayer(PyObject *self, PyObject* args)
 
 static PyObject * glmod_setVBOlayer(PyObject *self, PyObject* args)
 {
-    PyObject *tuple = PyTuple_GET_ITEM(args, 0);
+    PyObject *tuple = PyTuple_GETITEM(args, 0);
     int j;
     unsigned int texid, offset, layer;
 
-    layer = PyInt_AS_LONG(PyTuple_GET_ITEM(tuple, 0));
+    layer = PyInt_ASLONG(PyTuple_GETITEM(tuple, 0));
 #ifdef DEBUG
     if(layer > entries.size())
     {
@@ -235,10 +254,10 @@ static PyObject * glmod_setVBOlayer(PyObject *self, PyObject* args)
 
     for(j = 1; j < PyTuple_Size(tuple); j += 2)
     {
-        texid = PyInt_AS_LONG(PyTuple_GET_ITEM(tuple, j));
-        offset = PyInt_AS_LONG(PyTuple_GET_ITEM(tuple, j+1));
+        texid = PyInt_ASLONG(PyTuple_GETITEM(tuple, j));
+        offset = PyInt_ASLONG(PyTuple_GETITEM(tuple, j+1));
         
-        map<unsigned int, VBOEntry>::iterator it = entries[layer].find(texid);
+        dict::iterator it = entries[layer].find(texid);
         if(it == entries[layer].end())
             entries[layer][texid] = VBOEntry(texid, offset);
         else
@@ -254,11 +273,11 @@ static PyObject * glmod_setVBOlayer(PyObject *self, PyObject* args)
 
 static PyObject * glmod_addVBOentry(PyObject *self, PyObject* args)
 {
-    PyObject *tuple = PyTuple_GET_ITEM(args, 0);
+    PyObject *tuple = PyTuple_GETITEM(args, 0);
     int j;
     unsigned int texid, offset, layer;
 
-    layer = PyInt_AS_LONG(PyTuple_GET_ITEM(tuple, 0));
+    layer = PyInt_ASLONG(PyTuple_GETITEM(tuple, 0));
 #ifdef DEBUG
     if(layer > entries.size())
     {
@@ -268,10 +287,10 @@ static PyObject * glmod_addVBOentry(PyObject *self, PyObject* args)
 #endif
     for(j = 1; j < PyTuple_Size(tuple); j += 2)
     {
-        texid = PyInt_AS_LONG(PyTuple_GET_ITEM(tuple, j));
-        offset = PyInt_AS_LONG(PyTuple_GET_ITEM(tuple, j+1));
+        texid = PyInt_ASLONG(PyTuple_GETITEM(tuple, j));
+        offset = PyInt_ASLONG(PyTuple_GETITEM(tuple, j+1));
         
-        map<unsigned int, VBOEntry>::iterator it = entries[layer].find(texid);
+        dict::iterator it = entries[layer].find(texid);
         if(it == entries[layer].end())
             entries[layer][texid] = VBOEntry(texid, offset);
         else
@@ -287,7 +306,7 @@ static PyObject * glmod_addVBOentry(PyObject *self, PyObject* args)
 
 static PyObject * glmod_drawSelectionCircles(PyObject *self, PyObject* args)
 {
-    PyObject *dict = PyTuple_GET_ITEM(args, 0);
+    PyObject *dict = PyTuple_GETITEM(args, 0);
     int i = 0; int r = 0;
 
     PyObject *key, *values, *value, *test;
@@ -296,14 +315,14 @@ static PyObject * glmod_drawSelectionCircles(PyObject *self, PyObject* args)
     while (PyDict_Next(dict, &pos, &key, &values)) {
         for(i = 0; i < PyList_Size(values); i++) 
         {
-            value = PyList_GET_ITEM(values, i);
+            value = PyList_GETITEM(values, i);
             glLineWidth(3);
             glColor3f(0.0, 1.0, 0.0);
             glDisable(extension);
             glBegin(GL_LINE_LOOP);
-            double x = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 0));
-            double y = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 1));
-		double rad = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 2));
+            double x = PyFloat_ASDOUBLE(PyTuple_GETITEM(value, 0));
+            double y = PyFloat_ASDOUBLE(PyTuple_GETITEM(value, 1));
+	        double rad = PyFloat_ASDOUBLE(PyTuple_GETITEM(value, 2));
             for (r = 0; r < 360; r = r + 3)
             {
                 glVertex2f(x + cos(r*0.01745329) * rad, y + sin(r*0.01745329) * rad);
@@ -319,7 +338,7 @@ static PyObject * glmod_drawSelectionCircles(PyObject *self, PyObject* args)
 
 static PyObject * glmod_drawLines(PyObject *self, PyObject* args)
 {
-    PyObject *dict = PyTuple_GET_ITEM(args, 0);
+    PyObject *dict = PyTuple_GETITEM(args, 0);
     int prevthickness = 0, thickness, i = 0;
     
     PyObject *key, *values, *value, *test;
@@ -329,7 +348,7 @@ static PyObject * glmod_drawLines(PyObject *self, PyObject* args)
 
     glBegin(GL_LINES);
     while (PyDict_Next(dict, &pos, &key, &values)) {
-        thickness = PyInt_AS_LONG(key);
+        thickness = PyInt_ASLONG(key);
         if(thickness != prevthickness)
         {
             glEnd();
@@ -346,27 +365,27 @@ static PyObject * glmod_drawLines(PyObject *self, PyObject* args)
 #endif
         for(i = 0; i < PyList_Size(values); i++)
         {
-            value = PyList_GET_ITEM(values, i);
+            value = PyList_GETITEM(values, i);
 #ifdef DEBUG
             if(!PyTuple_Check(value))
             {
                 printf("value not a tuple\r\n");
                 return PyInt_FromLong(0L);
             }
-            if(!PyFloat_Check(PyTuple_GET_ITEM(value, 0)))
+            if(!PyFloat_Check(PyTuple_GETITEM(value, 0)))
             {
                 printf("x not a tuple\r\n");
                 return PyInt_FromLong(0L);
             }
 #endif
-            double x = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 0));
-            double y = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 1));
-            double w = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 2));
-            double h = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 3));
+            double x = PyFloat_ASDOUBLE(PyTuple_GETITEM(value, 0));
+            double y = PyFloat_ASDOUBLE(PyTuple_GETITEM(value, 1));
+            double w = PyFloat_ASDOUBLE(PyTuple_GETITEM(value, 2));
+            double h = PyFloat_ASDOUBLE(PyTuple_GETITEM(value, 3));
 
-            double r = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 4));
-            double g = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 5));
-            double b = PyFloat_AS_DOUBLE(PyTuple_GET_ITEM(value, 6));
+            double r = PyFloat_ASDOUBLE(PyTuple_GETITEM(value, 4));
+            double g = PyFloat_ASDOUBLE(PyTuple_GETITEM(value, 5));
+            double b = PyFloat_ASDOUBLE(PyTuple_GETITEM(value, 6));
 
             glColor3f(r, g, b);
 

@@ -51,7 +51,7 @@ class GLWidget(QGLWidget):
     
     def __init__(self, parent):
         QGLWidget.__init__(self, parent)
-        self.setMinimumSize(640, 480)
+        self.setMinimumSize(320, 240)
         self.w = 640
         self.h = 480
         self.images = dict()
@@ -170,7 +170,7 @@ class GLWidget(QGLWidget):
         glLoadIdentity()
         glOrtho(0, w, h, 0, -1, 1)
         glMatrixMode(GL_MODELVIEW)
-        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST)
+        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
         self.w = w
         self.h = h
 
@@ -202,7 +202,6 @@ class GLWidget(QGLWidget):
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         glViewport(0, 0, self.width(), self.height())
         glClearColor(0.0, 0.0, 0.0, 0.0)
-        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST)
 
         initok = False
         if mod:
@@ -266,7 +265,7 @@ class GLWidget(QGLWidget):
                     qimg = qimg.scaled(w, h)
      
             img = self.convertToGLFormat(qimg)
-            texture = glGenTextures(1)
+            texture = int(glGenTextures(1))
             try:
                 imgdata = img.bits().asstring(img.numBytes())
             except:
@@ -476,7 +475,7 @@ class GLWidget(QGLWidget):
                 temp.append(img.offset)
             vbolist.append(tuple(temp))
 
-        if len(vbolist) > 2:
+        if len(vbolist) > 0:
             #print "setVBO", vbolist
             glmod.setVBO(tuple(vbolist))
 
