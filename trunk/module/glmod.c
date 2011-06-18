@@ -6,7 +6,7 @@
 
 #include <Python.h>
 #include <vector>
-#include <hash_map>
+#include <ext/hash_map>
 
 #define GL_GLEXT_PROTOTYPES 1
 
@@ -23,9 +23,10 @@
         PFNGLMULTIDRAWARRAYSPROC glMultiDrawArrays = NULL;
     #else
         #include <GL/gl.h>
-        using namespace __gnu_cxx;
     #endif
 #endif
+
+using namespace __gnu_cxx;
 
 #ifdef DEBUG
     #warning "DEBUG ENABLED, EXPECT PERFORMANCE LOSS"
