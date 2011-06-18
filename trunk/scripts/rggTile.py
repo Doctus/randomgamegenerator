@@ -32,10 +32,10 @@ class tile(object):
         self.VBOData = numpy.zeros((8, 2), 'f')
 
         if self.glwidget.texext == GL_TEXTURE_2D:
-            x = float(textureRect[0])/float(qimg.width()-1)
-            y = float(textureRect[1])/float(qimg.height()-1)
-            w = float(textureRect[2])/float(qimg.width()-1)
-            h = float(textureRect[3])/float(qimg.height()-1)
+            x = float(textureRect[0])/float(qimg.width())
+            y = float(textureRect[1])/float(qimg.height())
+            w = float(textureRect[2])/float(qimg.width())
+            h = float(textureRect[3])/float(qimg.height())
             self.textureRect = [x, y, w, h]
             
         self.setVBOData()
