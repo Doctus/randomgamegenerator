@@ -327,7 +327,7 @@ def internalAddMap(map):
     ID = createMapID(map.mapname)
     rggResource.srm.processFile(localuser(), map.tileset)
     for pogDump in map.Pogs.values():
-        rggResource.srm.processFile(localuser(), pog._src)
+        rggResource.srm.processFile(localuser(), pogDump._src)
     _state.Maps[ID] = map
     map.ID = ID
     
@@ -360,6 +360,7 @@ def loadMap():
         internalAddMap(map)
     except Exception as e:
         showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
+	print e
         return
 
 def saveMap():
@@ -410,6 +411,7 @@ def loadChars():
         _state.icwidget.load(obj)
     except Exception as e:
         showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
+	print e
         return
     
 @serverRPC
