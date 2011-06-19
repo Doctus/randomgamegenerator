@@ -360,8 +360,7 @@ def loadMap():
         internalAddMap(map)
     except Exception as e:
         showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
-	print e
-        return
+        print e
 
 def saveMap():
     """Allows the user to save a map."""

@@ -40,7 +40,10 @@ class Map(object):
         self.tileindexes = [0 for i in xrange(mapsize[0] * mapsize[1])]
         self.hidden = False
         self.tiles = None
+        self.initted = False
         self._drawOffset = drawOffset
+
+        self._createTiles()
 
         rggResource.crm.listen(tileset, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
 
@@ -145,25 +148,26 @@ class Map(object):
     
     def _createTiles(self):
         """Show all the tiles of this map."""
+        src = rggResource.crm.translateFile(self.tileset, rggResource.RESOURCE_IMAGE)
+        imgsize = mainWindow.glwidget.getImageSize(rggResource.crm.translateFile(src, rggResource.RESOURCE_IMAGE))
+
         if self.tiles != None:
-            return
             for y in xrange(0, self.mapsize[1]):
                 for x in xrange(0, self.mapsize[0]):
                     self.tiles[x+y*self.mapsize[0]].destroy()
-        
+
         print "deleted tiles"
-        
-        src = rggResource.crm.translateFile(self.tileset, rggResource.RESOURCE_IMAGE)
-        if src != self.tileset:
-            return
+
         self.tiles = [None]*self.mapsize[0]*self.mapsize[1]
         mainWindow.glwidget.reserveVBOSize(self.mapsize[0] * self.mapsize[1])
-        
+
         print "creating tiles"
 
         for y in xrange(0, self.mapsize[1]):
             for x in xrange(0, self.mapsize[0]):
-                textureRect = (0, 0, self.tilesize[0], self.tilesize[1])
+                texx = self.tileindexes[x+self.mapsize[0]*y]%(imgsize.width()/self.tilesize[0])*self.tilesize[0]
+                texy = int((self.tileindexes[x+self.mapsize[0]*y]*self.tilesize[0])/imgsize.width())*self.tilesize[1]
+                textureRect = (texx, texy, self.tilesize[0], self.tilesize[1])
                 drawRect = (x * self.tilesize[0] + self.drawOffset[0], y * self.tilesize[1] + self.drawOffset[1], self.tilesize[0], self.tilesize[1])
                 temptile = mainWindow.glwidget.createImage(src, 0, textureRect, drawRect, self.hidden)
                 self.tiles[x+y*self.mapsize[0]] = temptile
