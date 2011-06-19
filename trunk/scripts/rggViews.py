@@ -514,9 +514,12 @@ def movePogs(displacement):
     pogids = []
     mapID = 0
     for pog in selection:
+        mapID = pog.mapID
+        newmap = topmap(map(lambda p,d: p + d, pog.position, displacement))
+        if newmap is None or newmap.ID != mapID:
+            continue
         pog.displace(displacement)
         pogids.append(pog.ID)
-        mapID = pog.mapID
     sendMovementPog(mapID, pogids, displacement)
     drawPogCircles()
 
