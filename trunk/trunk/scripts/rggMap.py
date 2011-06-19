@@ -230,11 +230,11 @@ class Map(object):
         self.lines = []
         
         for item in self.linesDict.items():
-            self.lines.extend( [item[1][0], item[1][1], item[1][1], item[1][1], item[0]] )
+            self.lines.extend( [item[1][0], item[1][1], item[1][2], item[1][3], item[0], item[1][4], item[1][5], item[1][6]] )
 
     def restoreLines(self):
         for line in self.lines:
-            rggSystem.drawLine(line[0], line[1], line[2], line[3], line[4])
+            rggSystem.drawLine(line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7])
     
     def dump(self):
         """Serialize to an object valid for JSON dumping."""
@@ -267,10 +267,9 @@ class Map(object):
             loaded.ID = ID
             map.addPog(loaded, dumpmode)
 
-        lines = loadArray('Map.lines', obj.get('lines'))
-        map.lines = []
-        for line in lines:
-            map.lines.append(loadCoordinates('Map.lines[]', line))
+        for line in obj.get('lines'):
+            if line != 1:
+                map.lines.append(loadArray('Map.lines[]', line))
         
         # HACK: Looks like coordinates; saves work.
         tiles = loadCoordinates('Map.tiles', obj.get('tiles'), length=len(map.tileindexes), min=0, max=65535)
