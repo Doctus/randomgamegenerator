@@ -201,7 +201,6 @@ class Map(object):
         return ((0 <= x < self.mapsize[0]) and (0 <= y < self.mapsize[1]))
     
     def _setIndexes(self, indexes):
-        return
         if len(indexes) != len(self.tileindexes):
             return
         self.tileindexes[:] = indexes[:]
@@ -211,8 +210,8 @@ class Map(object):
         for i in xrange(len(indexes)):
             #self.tiles[i].setTile(self.tileindexes[i])
             #print self.tileindexes[i], self.tiles[i].getTile()
-            x = self.tileindexes[t]%(imgsize.width()/self.tilesize[0])*self.tilesize[0]
-            y = int((index*self.tilesize[0])/imgsize.width())*self.tilesize[1]
+            x = self.tileindexes[i]%(imgsize.width()/self.tilesize[0])*self.tilesize[0]
+            y = int((self.tileindexes[i]*self.tilesize[0])/imgsize.width())*self.tilesize[1]
             self.tiles[i].setTextureRect((x, y, self.tilesize[0], self.tilesize[1]))
     
     def findTopPog(self, position):
