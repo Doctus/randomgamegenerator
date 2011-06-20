@@ -518,12 +518,10 @@ class GLWidget(QGLWidget):
         return self.textid - 1
         
     def removeText(self, id):
-        i = 0
-        for t in self.texts:
+        for i, t in enumerate(self.texts):
             if t[0] == id:
                 self.texts.pop(i)
                 return
-            i += 1
             
     def setTextPos(self, id, pos):
         for t in self.texts:
