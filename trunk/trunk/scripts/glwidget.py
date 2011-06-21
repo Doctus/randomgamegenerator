@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 #glWidget - Takes care of drawing images, with optionally glmod to speed things up
 #
@@ -201,7 +201,7 @@ class GLWidget(QGLWidget):
             self.npot = 0
 
         if self.format().sampleBuffers():
-            print "enabling"  + self.format().samples() + "x FSAA"
+            print "enabling "  + str(self.format().samples()) + "x FSAA"
             glEnable(GL_MULTISAMPLE)
         else:
             print "FSAA not supported"
@@ -283,7 +283,7 @@ class GLWidget(QGLWidget):
                 print "requested to create", qimagepath, layer, textureRect, drawRect, hidden
                 for x in [0, 1, 2, 3]:
                     f_code = sys._getframe(x).f_code #really bad hack to get the filename and number
-                    print "Doing it wrong in" + f_code.co_filename + ":" + str(f_code.co_firstlineno)
+                    print "Doing it wrong in " + f_code.co_filename + ":" + str(f_code.co_firstlineno)
             
             print "created texture", texture
 
