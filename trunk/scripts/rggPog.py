@@ -20,7 +20,34 @@ from PyQt4 import QtGui
 import rggTile, rggResource, rggSystem, math
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
+class Sprite(object):
+    
+    '''EXAMPLE: Sprite("blah.png", (300, 300), (96, 96), (0, 1, 2, 3, 4), 50)
+                Sprite.setAnim((0, 1, 2, 1), 30)
+    '''
+    
+    def __init__(self, src, loc, framesize, initialanim, initialspeed):
+        self.frame = framesize
+        self.pos = loc
+        self.textrect = (0, 0, framesize[0], framesize[1])
+        self.drawrect = (loc[0], loc[1], framesize[0], framesize[1])
+        self.img = rggSystem.mainWindow.glwidget.createImage(src, 1, self.textrect, self.drawrect)
+        self.setAnim(initialanim, initialspeed)
+        
+    def setAnim(self, anim, speed):
+        self.currentanim = anim
+        self.currentspeed = speed
+        self.currentspot = 0
+        self.tim = QtCore.QTimer()
+        self.tim.timeout.connect(self.nextFrame)
+        self.tim.start(self.currentspeed)
+        
+    def nextFrame(self):
+        self.currentspot = (self.currentspot+1)%len(self.currentanim)
+        self.img.displaceTextureRect((self.currentanim[self.currentspot]*self.frame[0], 0))
+
 class Pog(object):
+    
     def __init__(self, position, texturedimensions, size, layer, srcfile, status, locked, properties, mapID, alph):
         self.ID = None
         self._position = position

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 #
 #Image convenience class
 #
@@ -30,6 +30,7 @@ class tile(object):
         self.createLayer = False
         self.destroyed = False
         self.VBOData = numpy.zeros((8, 2), 'f')
+        self.origtextrect = textureRect
 
         if self.glwidget.texext == GL_TEXTURE_2D:
             x = float(textureRect[0])/float(qimg.width())
@@ -133,6 +134,17 @@ class tile(object):
 
             glBindBuffer(GL_ARRAY_BUFFER_ARB, self.VBO)
             glBufferSubData(GL_ARRAY_BUFFER_ARB, int(self.offset*self.glwidget.vertByteCount/4), self.glwidget.vertByteCount, self.VBOData)
+            
+    def displaceTextureRect(self, displacement):
+        if self.glwidget.texext == GL_TEXTURE_2D:
+            x = float(self.origtextrect[0] + displacement[0])/float(self.qimg.width())
+            y = float(self.origtextrect[1] + displacement[1])/float(self.qimg.height())
+            w = float(self.origtextrect[2])/float(self.qimg.width())
+            h = float(self.origtextrect[3])/float(self.qimg.height())
+            self.textureRect = [x, y, w, h]
+        self.setVBOData()
+        glBindBuffer(GL_ARRAY_BUFFER_ARB, self.VBO)
+        glBufferSubData(GL_ARRAY_BUFFER_ARB, int(self.offset*self.glwidget.vertByteCount/4), self.glwidget.vertByteCount, self.VBOData)
 
     def getVBOData(self):
         return self.VBOData
