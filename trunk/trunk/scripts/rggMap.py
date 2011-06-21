@@ -43,7 +43,7 @@ class Map(object):
         self.initted = False
         self._drawOffset = drawOffset
 
-        self._createTiles()
+        #self._createTiles()
 
         rggResource.crm.listen(tileset, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
 
@@ -141,8 +141,7 @@ class Map(object):
     def _deleteTiles(self):
         for pog in self.Pogs.values():
             pog.destroy()
-        for tile in self.tiles:
-            tile.destroy()
+        mainWindow.glwidget.deleteImages(self.tiles)
         self.tiles = None
         rggResource.crm.destroy(self)
     
@@ -152,16 +151,12 @@ class Map(object):
         imgsize = mainWindow.glwidget.getImageSize(rggResource.crm.translateFile(src, rggResource.RESOURCE_IMAGE))
 
         if self.tiles != None:
-            for y in xrange(0, self.mapsize[1]):
-                for x in xrange(0, self.mapsize[0]):
-                    self.tiles[x+y*self.mapsize[0]].destroy()
+            mainWindow.glwidget.deleteImages(self.tiles)
 
         print "deleted tiles"
 
         self.tiles = [None]*self.mapsize[0]*self.mapsize[1]
         mainWindow.glwidget.reserveVBOSize(self.mapsize[0] * self.mapsize[1])
-
-        print "creating tiles"
 
         for y in xrange(0, self.mapsize[1]):
             for x in xrange(0, self.mapsize[0]):
@@ -209,14 +204,14 @@ class Map(object):
             return
         self.tileindexes[:] = indexes[:]
         
-        imgsize = mainWindow.glwidget.getImageSize(rggResource.crm.translateFile(self.tileset, rggResource.RESOURCE_IMAGE))
+        #imgsize = mainWindow.glwidget.getImageSize(rggResource.crm.translateFile(self.tileset, rggResource.RESOURCE_IMAGE))
         
-        for i in xrange(len(indexes)):
+        #for i in xrange(len(indexes)):
             #self.tiles[i].setTile(self.tileindexes[i])
             #print self.tileindexes[i], self.tiles[i].getTile()
-            x = self.tileindexes[i]%(imgsize.width()/self.tilesize[0])*self.tilesize[0]
-            y = int((self.tileindexes[i]*self.tilesize[0])/imgsize.width())*self.tilesize[1]
-            self.tiles[i].setTextureRect((x, y, self.tilesize[0], self.tilesize[1]))
+            #x = self.tileindexes[i]%(imgsize.width()/self.tilesize[0])*self.tilesize[0]
+            #y = int((self.tileindexes[i]*self.tilesize[0])/imgsize.width())*self.tilesize[1]
+            #self.tiles[i].setTextureRect((x, y, self.tilesize[0], self.tilesize[1]))
     
     def findTopPog(self, position):
         """Returns the top pog at a given position, or None."""
