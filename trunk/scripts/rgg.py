@@ -2,8 +2,14 @@ if __name__ == '__main__':
     from rggSystem import injectMain
     from PyQt4.QtCore import *
     from PyQt4.QtGui import *
+    from PyQt4.QtOpenGL import *
     
     app = QApplication(['RGG in Space'])
+
+    qgf = QGLFormat.defaultFormat()
+    qgf.setSampleBuffers(True)
+    QGLFormat.setDefaultFormat(qgf)
+
     main = injectMain()
     
     import rggSystem, rggRPC, rggChat, rggICChat, rggViews, rggRemote, rggEvent

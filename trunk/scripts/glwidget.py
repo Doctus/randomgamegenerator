@@ -9,6 +9,7 @@ from OpenGL.GLU import *
 from OpenGL.extensions import hasGLExtension
 from OpenGL.GL.ARB.vertex_buffer_object import *
 from OpenGL.GL.ARB.framebuffer_object import *
+from OpenGL.GL.ARB.texture_compression_rgtc import *
 from OpenGL.arrays import ArrayDatatype as ADT
 
 #Only set these when creating non-development code
@@ -51,6 +52,7 @@ class GLWidget(QGLWidget):
     
     def __init__(self, parent):
         QGLWidget.__init__(self, parent)
+
         self.setMinimumSize(320, 240)
         self.w = 640
         self.h = 480
@@ -68,6 +70,7 @@ class GLWidget(QGLWidget):
         self.qimages = {}
         self.texext = GL_TEXTURE_2D
         self.npot = 3
+        self.compress = False
         self.lines = dict()
         self.selectionCircles = dict()
         self.error = False
@@ -89,9 +92,6 @@ class GLWidget(QGLWidget):
         glPushMatrix()
         glTranslatef(self.camera[0], self.camera[1], 0)
         glScaled(self.zoom, self.zoom, 1)
-        
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
 
         if self.vbos:
             glmod.drawVBO()
@@ -182,7 +182,8 @@ class GLWidget(QGLWidget):
         Initialize GL
         '''
         global mod
-        
+        if hasGLExtension("GL_EXT_texture_compression_rgtc"):
+            self.compress = True
         if not hasGLExtension("GL_ARB_framebuffer_object"):
             print "GL_ARB_framebuffer_object not supported, switching to GL_GENERATE_MIPMAP"
             self.npot = 2
@@ -198,6 +199,12 @@ class GLWidget(QGLWidget):
             print "GL_TEXTURE_RECTANGLE_ARB not supported, switching to GL_TEXTURE_2D"
             self.texext = GL_TEXTURE_2D
             self.npot = 0
+
+        if self.format().sampleBuffers():
+            print "enabling"  + self.format().samples() + "x FSAA"
+            glEnable(GL_MULTISAMPLE)
+        else:
+            print "FSAA not supported"
 
         glEnable(self.texext)
         glEnable(GL_BLEND)
@@ -283,15 +290,19 @@ class GLWidget(QGLWidget):
             glBindTexture(self.texext, texture)
             
             if self.npot == 3:
-                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
-                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST)    #GL_LINEAR_MIPMAP_LINEAR
+                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_NEAREST)                  #GL_LINEAR
             elif self.npot == 2:
-                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
-                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST)
+                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
                 glTexParameteri(self.texext, GL_GENERATE_MIPMAP, GL_TRUE)
             else:
-                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+
+            format = GL_RGBA
+            if self.compress:
+                format = GL_COMPRESSED_RG_RGTC2
 
             glTexImage2D(self.texext, 0, GL_RGBA, img.width(), img.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imgdata);
 
@@ -394,6 +405,24 @@ class GLWidget(QGLWidget):
             self.calculateVBOList(image, True)
 
         image = None
+
+    def deleteImages(self, imageArray):
+        '''
+        Decreases the reference count of the texture of each image by one, and deletes it if nothing is using it anymore
+        '''
+
+        for image in imageArray:
+            self.qimages[image.imagepath][2] -= 1
+
+            if self.qimages[image.imagepath][2] <= 0:
+                print "deleting texture", image.textureId
+                glDeleteTextures(image.textureId)
+                del self.qimages[image.imagepath]
+
+            self.images[image.layer].remove(image)
+
+        if self.vbos:
+            self.calculateVBOList()
 
     def drawImage(self, image):
         global mod
