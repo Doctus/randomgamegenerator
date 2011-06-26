@@ -5,7 +5,7 @@
   * ~~Clean up some things that don't allow spaces so that they do.~~
   * Screen layout should be remembered in a config file.
   * ~~In-character chat characters (which should maybe be renamed - "the characters in the message from the in-character chat character") should also be saved somehow, possibly in the config file~~
-  * The way plugins work is rather jury-rigged; at least the "selecting the plugin multiple times produces multiple instances" should be fixed
+  * The way plugins work is rather jury-rigged; ~~at least the "selecting the plugin multiple times produces multiple instances" should be fixed~~
   * ~~The logs could do with some prettying-up - it's all just dumped into one big file at the moment~~
   * Maybe some sort of music or sound support (through Phonon?)
 
@@ -30,12 +30,13 @@
     * Think about which commands ought to be in the right-click menu and which in the plugin
     * Automatic resize option(s) of some kind - resize to last used size or something, maybe
   * ~~Option for separate IC/OOC chat.~~
-  * Show a green circle (or something else) around pogs if they're selected.
+  * ~~Show a green circle (or something else) around pogs if they're selected.~~
   * CG display system (pops up a box with a large picture, most likely)
   * Multiple map layers which the camera and pogs can easily switch between
   * Ability to change an existing map's tileset
   * From Kaijyuu: it would be nice if the eraser showed some indicator of the area you're erasing while in use
   * From Kaijyuu: pog placement could be made more intuitive
+  * Alert when name is being entered in OOC chat
 
 = Game Support =
   * Designate "DM" user
@@ -56,7 +57,7 @@
 = Graphics =
   * Some default tilesets would be nice.
   * Some default pogs would be nice.
-  * Animated tiles.
+  * ~~Animated tiles.~~
   * Be able to draw ~~points, lines,~~ rectangles, curves or circles, etc.
 
 = Generators =
