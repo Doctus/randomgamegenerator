@@ -228,10 +228,13 @@ class Map(object):
     def storeLines(self):
         self.lines = []
         
-        for item in self.linesDict.items():
-            self.lines.extend( [item[1][0], item[1][1], item[1][2], item[1][3], item[0], item[1][4], item[1][5], item[1][6]] )
+        for thickness, lines in self.linesDict.items():
+            for item in lines:
+                self.lines.extend( [item[0], item[1], item[2], item[3], thickness, item[4], item[5], item[6]] )
 
     def restoreLines(self):
+        for line in self.lines:
+            self.linesDict[line[4]] = [line[0], line[1], line[2], line[3], line[5], line[6], line[7]]
         for line in self.lines:
             rggSystem.drawLine(line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7])
     
@@ -266,9 +269,12 @@ class Map(object):
             loaded.ID = ID
             map.addPog(loaded, dumpmode)
 
-        for line in obj.get('lines'):
-            if line != 1:
-                map.lines.append(loadArray('Map.lines[]', line))
+        linez = obj.get('lines')
+        brk = lambda x, n, acc=[]: brk(x[n:], n, acc+[(x[:n])]) if x else acc
+        for line in brk(linez, 8):
+            map.lines.append(line)
+            
+        map.restoreLines()
         
         # HACK: Looks like coordinates; saves work.
         tiles = loadCoordinates('Map.tiles', obj.get('tiles'), length=len(map.tileindexes), min=0, max=65535)
