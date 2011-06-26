@@ -150,12 +150,13 @@ class GLWidget(QGLWidget):
         self.lines[thickness].append((float(x), float(y), float(w), float(h), float(r), float(g), float(b)))
         
     def deleteLine(self, thickness, x, y, w, h):
-        if thickness == -1:
-            for layer in self.lines:
-                for line in self.lines[layer]:
-                    if self.pointIntersectRect((line[0], line[1]), (x, y, w, h)) \
-                       and self.pointIntersectRect((line[0] + line[2], line[1] + line[3]), (x, y, w, h)):
-                        self.lines[layer].remove(line)
+        for thickness in self.lines:
+            new_list = []
+            for line in self.lines[thickness]:
+                if not self.pointIntersectRect((line[0], line[1]), (x, y, w, h)) \
+                       and not self.pointIntersectRect((line[2], line[3]), (x, y, w, h)):
+                   new_list.append(line)
+            self.lines[thickness] = new_list
                         
     def clearLines(self):
         self.lines.clear()

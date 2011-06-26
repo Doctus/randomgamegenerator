@@ -964,14 +964,12 @@ def mouseRelease(screenPosition, mapPosition, button):
             w = _state.nextLinePlacement[0]
             h = _state.nextLinePlacement[1]
             if(x > w):
-                tempw = w
-                w = x
-                x = tempw
+                x, w = w, x
             if(y > h):
-                tempy = y
-                y = h
-                h = tempy
-
+                y, h = h, y
+            
+            w -= x
+            h -= y
             #print '(x, y, w, h) (' + str(x) + ', ' + str(y) + ', ' + str(w) + ', ' + str(h) + ')' 
 
             sendDeleteLine(x, y, w, h)
