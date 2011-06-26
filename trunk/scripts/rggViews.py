@@ -308,11 +308,20 @@ def chooseMap():
     #_state.Maps[mapIDS[selectedButton]].
     
 
+@serverRPC
+def respondCloseAllMaps():
+    closeAllMaps()
+    
+@clientRPC
+def sendCloseAllMaps(user):
+    respondCloseAllMaps(allusersbut(user))    
+
 def closeAllMaps():
     clearPogSelection()
     for map in _state.Maps.values():
         map._deleteTiles()
     _state.Maps = {}
+    sendCloseAllMaps()
 
 def internalAddMap(map):
     pos = 0
