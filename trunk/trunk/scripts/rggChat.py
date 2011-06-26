@@ -135,6 +135,18 @@ roll.documentation = fake.translate('chatdoc',
         <dd>/roll d2 + d6 + 10d2</dd>
     </dl><br>
     """)
+    
+@chat('proll')
+def proll(message):
+    if not message:
+        dice = '2d6'
+    else:
+        dice = ' '.join(message.split())
+    rggViews.rollDice(dice, True)
+
+roll.documentation = fake.translate('chatdoc', 
+    """/proll: Same as /roll but private.<br>
+    """)
 
 @chat('emote', 'me')
 def emote(message):
