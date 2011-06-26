@@ -54,6 +54,8 @@ class menuBar(object):
         self.saveCharsAct = QtGui.QAction("Save IC Characters", main)
         
         self.loadCharsAct = QtGui.QAction("Load IC Characters", main)
+
+        self.gfxSettingsAct = QtGui.QAction("Configure Graphics", main)
         
         self.hostGameAct = QtGui.QAction("&Host Game", main)
         self.hostGameAct.setShortcut("Ctrl+H")
@@ -90,13 +92,18 @@ class menuBar(object):
         fileMenu.addAction(self.newMapAct)
         fileMenu.addAction(self.loadMapAct)
         fileMenu.addAction(self.saveMapAct)
+        fileMenu.addSeparator()
         fileMenu.addAction(self.closeMapAct)
+        fileMenu.addSeparator()
         fileMenu.addAction(self.saveCharsAct)
         fileMenu.addAction(self.loadCharsAct)
+        fileMenu.addSeparator()
+        fileMenu.addAction(self.gfxSettingsAct)
         
         internetMenu = QtGui.QMenu("&Internet", main)
         internetMenu.addAction(self.hostGameAct)
         internetMenu.addAction(self.joinGameAct)
+        fileMenu.addSeparator()
         internetMenu.addAction(self.disconnectAct)
 
         self.thicknessMenu = QtGui.QMenu("&Thickness", main)

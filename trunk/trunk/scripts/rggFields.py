@@ -108,6 +108,56 @@ class integerField(dialogField):
     def _getWidgetValue(self, widget):
         return int(widget.value())
 
+class floatField(dialogField):
+    """A float field with optional limits and suffix."""
+    
+    def __init__(self, name, value=None, min=None, max=None, decimals=10, suffix=None):
+        """Initializes the field.
+        
+        name -- the name of the field
+        value -- the initial value to store
+        min -- the lower limit to allow
+        max -- the upper limit to allow
+        suffix -- the units to append to the input
+        
+        """
+        super(floatField, self).__init__(name, value)
+        self.min, self.max, self.suffix, self.dec = min, max, suffix, decimals
+    
+    def _cleanValue(self, value):
+        try:
+            value = float(value)
+        except:
+            raise validationError(translate('floatField', 'You must enter a number for the {0} field.').format(self.name))
+        if self.min is None or self.min <= value:
+            if self.max is None or self.max >= value:
+                return value
+        raise validationError(
+            translate('integerField', 'You must enter a number for {0} between {1} and {2}.').
+                format(self.name,
+                    self.min or translate('floatField', 'negative infinity'),
+                    self.max or translate('floatField', 'infinity')))
+    
+    def _createWidget(self, parent):
+        widget = QtGui.QDoubleSpinBox(parent)
+        widget.setDecimals(self.dec)
+        if self.min is not None:
+            widget.setMinimum(self.min)
+        if self.max is not None:
+            widget.setMaximum(self.max)
+        if self.suffix is not None:
+            widget.setSuffix(self.suffix)
+        try:
+            if self.value is not None:
+                widget.setValue(self._cleanValue(self.value))
+        except:
+            pass
+        
+        return widget
+    
+    def _getWidgetValue(self, widget):
+        return float(widget.value())
+
 class stringField(dialogField):
     """A basic string field."""
     
