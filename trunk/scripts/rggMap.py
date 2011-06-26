@@ -233,10 +233,14 @@ class Map(object):
                 self.lines.extend( [item[0], item[1], item[2], item[3], thickness, item[4], item[5], item[6]] )
 
     def restoreLines(self):
-        for line in self.lines:
-            self.linesDict[line[4]] = [line[0], line[1], line[2], line[3], line[5], line[6], line[7]]
-        for line in self.lines:
-            rggSystem.drawLine(line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7])
+        for thickness, lines in self.linesDict.items():
+            for item in lines:
+                rggSystem.drawLine(item[0], item[1], item[2], item[3], thickness, item[4], item[5], item[6])
+            
+    def addLine(self, line):
+        if not line[4] in self.linesDict:
+            self.linesDict[line[4]] = []
+        self.linesDict[line[4]].append([line[0], line[1], line[2], line[3], line[5], line[6], line[7]])
     
     def dump(self):
         """Serialize to an object valid for JSON dumping."""
@@ -272,7 +276,7 @@ class Map(object):
         linez = obj.get('lines')
         brk = lambda x, n, acc=[]: brk(x[n:], n, acc+[(x[:n])]) if x else acc
         for line in brk(linez, 8):
-            map.lines.append(line)
+            map.addLine(line)
             
         map.restoreLines()
         
