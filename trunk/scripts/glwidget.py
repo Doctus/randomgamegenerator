@@ -69,15 +69,21 @@ class GLWidget(QGLWidget):
         self.shift = False
         self.qimages = {}
         self.texext = GL_TEXTURE_2D
-        self.npot = 3
-        self.compress = False
         self.lines = dict()
         self.selectionCircles = dict()
         self.error = False
         self.texts = []
         self.textid = 0
         self.vertByteCount = ADT.arrayByteCount(numpy.zeros((8, 2), 'f'))
-        
+
+        #settings, as used in SAVE_DIR/gfx_settings.rgs
+        self.npot = 3
+        self.anifilt = 0
+        self.compress = False
+        self.magfilter = GL_NEAREST
+        self.mipminfilter = GL_NEAREST_MIPMAP_NEAREST
+        self.minfilter = GL_NEAREST
+
         self.setFocusPolicy(Qt.StrongFocus)
         self.setMouseTracking(True) #this may be the fix for a weird problem with leaveevents
 
@@ -177,13 +183,49 @@ class GLWidget(QGLWidget):
         self.w = w
         self.h = h
 
+    #ugly conversion function :(
+    def interpretString(self, string):
+        if string == "GL_COMPRESSED_RG_RGTC2":
+            return GL_COMPRESSED_RG_RGTC2
+        if string == "GL_NEAREST":
+            return GL_NEAREST
+        if string == "GL_LINEAR":
+            return GL_LINEAR
+        if string == "GL_NEAREST_MIPMAP_NEAREST":
+            return GL_NEAREST_MIPMAP_NEAREST
+        if string == "GL_NEAREST_MIPMAP_LINEAR":
+            return GL_NEAREST_MIPMAP_LINEAR
+        if string == "GL_LINEAR_MIPMAP_NEAREST":
+            return GL_LINEAR_MIPMAP_NEAREST
+        if string == "GL_LINEAR_MIPMAP_LINEAR":
+            return GL_LINEAR_MIPMAP_LINEAR
+        return string
+
     def initializeGL(self):
         '''
         Initialize GL
         '''
         global mod
-        if hasGLExtension("GL_EXT_texture_compression_rgtc"):
-            self.compress = True
+        from rggJson import loadString, loadInteger, loadFloat, jsonload
+        from rggSystem import SAVE_DIR
+        import os
+
+        self.fieldtemp = ["GL_COMPRESSED_RG_RGTC2", 1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", "On", "On"]
+
+        try:
+            js = jsonload(os.path.join(SAVE_DIR, "gfx_settings.rgs"))
+            self.fieldtemp[0] = loadString('gfx.compress', js.get('compress'))
+            self.fieldtemp[1] = loadFloat('gfx.anifilt', js.get('anifilt'))
+            self.fieldtemp[2] = loadString('gfx.minfilter', js.get('minfilter'))
+            self.fieldtemp[3] = loadString('gfx.magfilter', js.get('magfilter'))
+            self.fieldtemp[4] = loadString('gfx.mipminfilter', js.get('mipminfilter'))
+            self.fieldtemp[5] = loadString('gfx.FSAA', js.get('FSAA'))
+            self.fieldtemp[6] = loadString('gfx.VBO', js.get('VBO'))
+        except:
+            print "no settings detected"
+            pass
+
+        #mipmap support and NPOT texture support block
         if not hasGLExtension("GL_ARB_framebuffer_object"):
             print "GL_ARB_framebuffer_object not supported, switching to GL_GENERATE_MIPMAP"
             self.npot = 2
@@ -200,11 +242,23 @@ class GLWidget(QGLWidget):
             self.texext = GL_TEXTURE_2D
             self.npot = 0
 
-        if self.format().sampleBuffers():
+        #assorted settings block
+        if hasGLExtension("GL_EXT_texture_compression_rgtc") and self.fieldtemp[0] != "None":
+            self.compress = self.interpretString(self.fieldtemp[0]) #
+            print "using " + self.fieldtemp[0] + " texture compression"
+        if hasGLExtension("GL_EXT_texture_filter_anisotropic") and self.fieldtemp[1] > 1.0:
+            self.anifilt = self.fieldtemp[1]
+            print "using " + str(self.fieldtemp[1]) + "x anisotropic texture filtering. max: " + str(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT))
+        self.minfilter = self.interpretString(self.fieldtemp[2])
+        self.magfilter = self.interpretString(self.fieldtemp[3])
+        self.mipminfilter = self.interpretString(self.fieldtemp[4])
+        if self.mipminfilter == "Off":
+            self.mipminfilter = -1
+        if self.format().sampleBuffers() and self.fieldtemp[5] == "On":
             print "enabling "  + str(self.format().samples()) + "x FSAA"
             glEnable(GL_MULTISAMPLE)
         else:
-            print "FSAA not supported"
+            print "FSAA not supported and/or disabled"
 
         glEnable(self.texext)
         glEnable(GL_BLEND)
@@ -220,12 +274,18 @@ class GLWidget(QGLWidget):
                 print "Something terrible went wrong in initializing glmod"
                 mod = False
             elif ret == -2:
-                print "using gl module without VBO support"
+                if self.fieldtemp[6] == "On":
+                    print "using gl module, VBO support requested but not available"
+                else:
+                    print "using gl module, VBO support not requested"
             else:
                 initok = True
-                print "using gl module with VBO support"
+                if self.fieldtemp[6] == "On":
+                    print "using gl module, VBO support requested and available"
+                else:
+                    print "using gl module, VBO support not requested"
 
-        if mod and initok:
+        if mod and initok and self.fieldtemp[6] == "On":
             if glInitVertexBufferObjectARB() and bool(glBindBufferARB):
                 self.vbos = True
                 print "VBO support initialised succesfully"
@@ -288,25 +348,27 @@ class GLWidget(QGLWidget):
             print "created texture", texture
 
             glBindTexture(self.texext, texture)
-            
-            if self.npot == 3:
-                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST)    #GL_LINEAR_MIPMAP_LINEAR
-                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_NEAREST)                  #GL_LINEAR
-            elif self.npot == 2:
-                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST)
-                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+
+            if self.anifilt > 1.0:
+                glTexParameterf(self.texext, GL_TEXTURE_MAX_ANISOTROPY_EXT, self.anifilt)
+            if self.npot == 3 and self.mipminfilter != -1:
+                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, self.mipminfilter)
+                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, self.magfilter)
+            elif self.npot == 2 and self.mipminfilter != -1:
+                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, self.mipminfilter)
+                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, self.magfilter)
                 glTexParameteri(self.texext, GL_GENERATE_MIPMAP, GL_TRUE)
             else:
-                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+                glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, self.minfilter)
+                glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, self.magfilter)
 
             format = GL_RGBA
             if self.compress:
-                format = GL_COMPRESSED_RG_RGTC2
+                format = self.compress
 
             glTexImage2D(self.texext, 0, GL_RGBA, img.width(), img.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imgdata);
 
-            if self.npot == 3:
+            if self.npot == 3 and self.mipminfilter != -1:
                 glEnable(GL_TEXTURE_2D)
                 glGenerateMipmap(GL_TEXTURE_2D)
             

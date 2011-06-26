@@ -22,9 +22,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 import os, os.path
 import rggMap
 from rggSystem import fake, translate, showErrorMessage, findFiles, IMAGE_EXTENSIONS, TILESET_DIR, PORTRAIT_DIR, SAVE_DIR, makePortableFilename
-from rggFields import integerField, stringField, dropDownField, validationError
+from rggFields import integerField, floatField, stringField, dropDownField, validationError
 from rggNet import ConnectionData, localHost
-from rggJson import loadObject, loadString, jsondump, jsonload
+from rggJson import *
 from PyQt4 import QtGui, QtCore
 
 class dialog(object):
@@ -483,3 +483,112 @@ class newCharacterDialog(dialog):
         return([self.cleanData['listid'], 
                 self.cleanData['charactername'], 
                 self.cleanData['portrait']])
+
+class gfxSettingsDialog(dialog):
+    """A dialog used to create a new map."""
+    
+    def __init__(self, **kwargs):
+        """Initializes the dialog data."""
+        super(gfxSettingsDialog, self).__init__()
+        self.fields = self._createFields(kwargs)
+    
+    def _createFields(self, data):
+        """Create the fields used by this dialog."""
+        self.fieldtemp = ["GL_COMPRESSED_RG_RGTC2", 1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", 1, 1]
+
+        try:
+            js = jsonload(os.path.join(SAVE_DIR, "gfx_settings.rgs"))
+            self.fieldtemp[0] = loadString('gfx.compress', js.get('compress'))
+            self.fieldtemp[1] = loadFloat('gfx.anifilt', js.get('anifilt'))
+            self.fieldtemp[2] = loadString('gfx.minfilter', js.get('minfilter'))
+            self.fieldtemp[3] = loadString('gfx.magfilter', js.get('magfilter'))
+            self.fieldtemp[4] = loadString('gfx.mipminfilter', js.get('mipminfilter'))
+            self.fieldtemp[5] = loadString('gfx.FSAA', js.get('FSAA'))
+            self.fieldtemp[6] = loadString('gfx.VBO', js.get('VBO'))
+        except:
+            print "no settings detected"
+            pass
+
+        normFilters = ["GL_NEAREST", "GL_LINEAR"]
+        mipFilters = ["Off", "GL_NEAREST_MIPMAP_NEAREST", "GL_NEAREST_MIPMAP_LINEAR", "GL_LINEAR_MIPMAP_NEAREST", "GL_LINEAR_MIPMAP_LINEAR"]
+
+        return dict(
+            compress=dropDownField(translate('gfxSettingsDialog', 'Compress'), ["None", "GL_COMPRESSED_RG_RGTC2"],
+                value=data.get('compress', self.fieldtemp[0])),
+            anifilt=floatField(translate('gfxSettingsDialog', 'Anifilt'),
+                min=1.0, max=16.0, decimals=1, value=data.get('Anifilt', self.fieldtemp[1])),
+            minfilter=dropDownField(translate('gfxSettingsDialog', 'minfilter'), normFilters,
+                value=data.get('minfilter', self.fieldtemp[2])),
+            magfilter=dropDownField(translate('gfxSettingsDialog', 'magfilter'), normFilters,
+                value=data.get('magfilter', self.fieldtemp[3])),
+            mipminfilter=dropDownField(translate('gfxSettingsDialog', 'mipminfilter'), mipFilters,
+                value=data.get('mipminfilter', self.fieldtemp[4])),
+            FSAA=dropDownField(translate('gfxSettingsDialog', 'FSAA'), ["Off", "On"],
+                value=data.get('FSAA', self.fieldtemp[5])),
+            VBO=dropDownField(translate('gfxSettingsDialog', 'VBO'), ["Off", "On"],
+                value=data.get('VBO', self.fieldtemp[6])))
+    
+    def _interpretFields(self, fields):
+        """Interpret the fields into a dictionary of clean items."""
+        return dict((key, field.clean()) for key, field in fields.items())
+    
+    def exec_(self, parent, accept):
+        """Executes this dialog as modal, ensuring OK is only hit with valid data.
+        
+        parent -- the parent object of this dialog
+        accept() -- Acceptance function;
+            return True to accept data, False to continue (you should show an error)
+        
+        returns: True if the OK button is hit and the acceptance function passes.
+        
+        """
+        
+        widget = QtGui.QDialog(parent)
+        
+        # Buttons
+        okayButton = QtGui.QPushButton(translate('gfxSettingsDialog', "Save"))
+        okayButton.setDefault(True)
+        cancelButton = QtGui.QPushButton(translate('gfxSettingsDialog', "Cancel"))
+        
+        # Add fields
+        formLayout = QtGui.QFormLayout()
+        for id in ('compress', 'anifilt', 'minfilter', 'magfilter', 'mipminfilter', 'FSAA', 'VBO'):
+            field = self.fields[id]
+            formLayout.addRow(translate('gfxSettingsDialog', '{0}: ', 'Row layout').format(field.name), field.widget(widget))
+        
+        # Add buttons
+        theLesserOrFalseBox = QtGui.QBoxLayout(0)
+        theLesserOrFalseBox.addWidget(okayButton)
+        theLesserOrFalseBox.addWidget(cancelButton)
+        
+        # Position both
+        grandBox = QtGui.QBoxLayout(2)
+        grandBox.addLayout(formLayout)
+        grandBox.addLayout(theLesserOrFalseBox)
+        
+        # Set up the widget
+        widget.setLayout(grandBox)
+        widget.setModal(True)
+        widget.setWindowTitle(translate('gfxSettingsDialog', "Configure Graphics"))
+        
+        # Allow user to specify validation
+        def okayPressed():
+            if accept():
+                widget.accept()
+        
+        # Signals
+        widget.connect(okayButton, QtCore.SIGNAL('pressed()'), okayPressed)
+        widget.connect(cancelButton, QtCore.SIGNAL('pressed()'), widget.reject)
+        
+        # Show to user
+        return (widget.exec_() == QtGui.QDialog.Accepted)
+        
+    def clean(self):
+        """Check for errors and return well-formatted data."""
+        self.cleanData = self._interpretFields(self.fields)
+        return self.cleanData
+    
+    def save(self):
+        """Make a new map and return it."""
+        assert(self.cleanData)
+        return self._interpretFields(self.fields)

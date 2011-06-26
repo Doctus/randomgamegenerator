@@ -76,6 +76,18 @@ def loadInteger(name, value, min=None, max=None):
         'Validation expected {0} to be a number between {1} and {2}, found {3}.'.
             format(name, min or 'negative infinity', max or 'infinity', value))
 
+def loadFloat(name, value, min=None, max=None):
+    try:
+        value = float(value)
+    except:
+        raise validationError('Validation expected {0} to be an float, found {1}.'.format(name, value))
+    if min is None or min <= value:
+        if max is None or max >= value:
+            return value
+    raise validationError(
+        'Validation expected {0} to be a number between {1} and {2}, found {3}.'.
+            format(name, min or 'negative infinity', max or 'infinity', value))
+
 def loadObject(name, value):
     if isinstance(value, dict):
         return value

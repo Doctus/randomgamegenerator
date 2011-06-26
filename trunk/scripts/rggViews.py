@@ -23,12 +23,8 @@ import rggNameGen, rggDice, rggMap, rggTile, rggPog, rggDockWidget, rggDialogs, 
 from rggRPC import server, client, serverRPC, clientRPC
 from rggJson import jsondump, jsonload
 from rggMenuBar import ICON_SELECT, ICON_MOVE, ICON_DRAW, ICON_DELETE
-from rggSystem import cameraPosition, setCameraPosition, mainWindow, getMapPosition
-from rggSystem import translate, showErrorMessage
-from rggSystem import showPopupMenuAt, IMAGE_FILTER
-from rggSystem import promptString, promptInteger, promptCoordinates, promptSaveFile, promptLoadFile
-from rggSystem import drawLine, deleteLine, drawSelectionCircle, clearSelectionCircles, getZoom
-from rggDialogs import newMapDialog, hostDialog, joinDialog
+from rggSystem import *
+from rggDialogs import *
 from PyQt4 import QtCore, QtGui
 
 # Button enum
@@ -412,6 +408,20 @@ def loadChars():
         showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
 	print e
         return
+
+def configureGfx():
+    """Allows the user to the opengl settings."""
+    dialog = gfxSettingsDialog()
+    
+    def accept():
+        valid = dialog.is_valid()
+        if not valid:
+            showErrorMessage(dialog.error)
+        return valid
+    
+    if dialog.exec_(mainWindow, accept):
+        settings = dialog.save()
+        jsondump(settings,  os.path.join(SAVE_DIR, "gfx_settings.rgs"))
     
 @serverRPC
 def respondUserList(list):
