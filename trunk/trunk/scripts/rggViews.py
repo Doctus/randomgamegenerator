@@ -675,12 +675,8 @@ def sendLockPog(user, mapID, pogID, locked):
 @serverRPC
 def respondLine(x, y, w, h, thickness, r, g, b):
     drawLine(x, y, w, h, thickness, r, g, b)
-    linesDict = topmap((x, y)).linesDict
-    if not thickness in linesDict:
-        linesDict[thickness] = []
-        
-    linesDict[thickness].append((float(x), float(y), float(w), float(h), float(r), float(g), float(b)))
-    topmap((x, y)).linesDict = linesDict
+    mappe = topmap((x, y))
+    mappe.addLine((float(x), float(y), float(w), float(h), thickness, float(r), float(g), float(b)))
 
 @clientRPC
 def sendLine(user, x, y, w, h, thickness, r, g, b):
