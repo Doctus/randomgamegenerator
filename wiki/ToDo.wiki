@@ -1,36 +1,21 @@
 #summary A list of things that should be added and/or have been put off due to laziness.
 
 = General =
-  * ~~Something that's already been done.~~
-  * ~~Clean up some things that don't allow spaces so that they do.~~
   * Screen layout should be remembered in a config file.
-  * ~~In-character chat characters (which should maybe be renamed - "the characters in the message from the in-character chat character") should also be saved somehow, possibly in the config file~~
-  * The way plugins work is rather jury-rigged; ~~at least the "selecting the plugin multiple times produces multiple instances" should be fixed~~
-  * ~~The logs could do with some prettying-up - it's all just dumped into one big file at the moment~~
+  * The way plugins work is rather jury-rigged.
   * Maybe some sort of music or sound support (through Phonon?)
 
 = Network =
   * Fix large image transfer somehow.
-    * ~~Maybe this gets fixed by moving the network interface to python?~~
-    * ~~Or what about using QStrings as a specific type in python?~~
   * Update protocol documentation so it's actually accurate.
   * Passworded sessions, or other method(s) for controlling who may join
 
 = Interface =
-  * ~~Some sort of pallete for pog placement.~~
-  * ~~Multiple selection of pogs.~~
-  * ~~Better tooltips.~~
-  * ~~Dice macros.~~
-  * ~~Ability to manipulate widgets better in Python. (E.g., creating new widgets with text/images/maybe buttons)~~
-  * ~~"New Map" item in file menu.~~
   * Warning in the join-game dialog that you'll lose current maps and get those the group has loaded.
   * Some sort of dialog designed for displaying information (text and/or images; maybe the same HTML subset as chat would be preferable). For stuff like, say, character sheets. Doesn't need to be editable; probably shouldn't be in fact. Might get rolled into the "widgets" thing.
   * Pog stuff:
-    * ~~Ability to assign other kinds of data (perhaps even connect to full character sheets when they're implemented), which may or may not be displayed in the tooltip~~
     * Think about which commands ought to be in the right-click menu and which in the plugin
     * Automatic resize option(s) of some kind - resize to last used size or something, maybe
-  * ~~Option for separate IC/OOC chat.~~
-  * ~~Show a green circle (or something else) around pogs if they're selected.~~
   * CG display system (pops up a box with a large picture, most likely)
   * Multiple map layers which the camera and pogs can easily switch between
   * Ability to change an existing map's tileset
@@ -57,8 +42,7 @@
 = Graphics =
   * Some default tilesets would be nice.
   * Some default pogs would be nice.
-  * ~~Animated tiles.~~
-  * Be able to draw ~~points, lines,~~ rectangles, curves or circles, etc.
+  * Be able to draw rectangles, curves or circles, etc.
 
 = Generators =
   * Add more name generators.
@@ -71,12 +55,7 @@
   * Add Cirno. (Probably as a plugin due to memory consumption.)
 
 = Bugs =
-  * Deleting pogs apparently sometimes deletes the wrong ones.
   * Files in general don't always seem to be sent.
-  * Erase works strangely in some cases, especially if there's no map (should you even be able to draw without a map?)
-  * From Kaijyuu: giving pogs extremely long names causes (potentially somewhat severe) graphical problems
-  * ~~Antistone: look into dialog closing/map movement problems~~
-  * Antistone: ~~layers for pog editing should not default to 0, and~~ negative layers would be useful if possible
-
-  * Hidden pogs appear to be causing issues with transferring
-  * post-0.97 client seems to not be able to sync maps properly
+  * Erase is still kind of broken (?)
+  * From Kaijyuu: giving pogs extremely long names causes (potentially somewhat severe) graphical problems.
+  * From Antistone: Negative pog layers would be useful if possible.
