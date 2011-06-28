@@ -42,14 +42,20 @@ class menuBar(object):
         self.newMapAct = QtGui.QAction("&New Map...", main)
         self.newMapAct.setShortcut("Ctrl+N")
         
-        self.loadMapAct = QtGui.QAction("&Load Map...", main)
-        self.loadMapAct.setShortcut("Ctrl+L")
+        self.loadMapAct = QtGui.QAction("Load Map...", main)
+        #self.loadMapAct.setShortcut("Ctrl+L")
         
-        self.saveMapAct = QtGui.QAction("&Save Map As...", main)
-        self.saveMapAct.setShortcut("Ctrl+S")
+        self.saveMapAct = QtGui.QAction("Save Map As...", main)
+        #self.saveMapAct.setShortcut("Ctrl+S")
         
         self.closeMapAct = QtGui.QAction("&Close All Maps", main)
         self.closeMapAct.setShortcut("Ctrl+Shift+W")
+        
+        self.loadSessAct = QtGui.QAction("&Load Session...", main)
+        self.loadSessAct.setShortcut("Ctrl+L")
+        
+        self.saveSessAct = QtGui.QAction("&Save Session As...", main)
+        self.saveSessAct.setShortcut("Ctrl+S")
         
         self.saveCharsAct = QtGui.QAction("Save IC Characters", main)
         
@@ -97,6 +103,9 @@ class menuBar(object):
         fileMenu.addSeparator()
         fileMenu.addAction(self.saveCharsAct)
         fileMenu.addAction(self.loadCharsAct)
+        fileMenu.addSeparator()
+        fileMenu.addAction(self.saveSessAct)
+        fileMenu.addAction(self.loadSessAct)
         fileMenu.addSeparator()
         fileMenu.addAction(self.gfxSettingsAct)
         

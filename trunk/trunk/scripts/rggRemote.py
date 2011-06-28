@@ -184,8 +184,9 @@ def serverConnect(server, username):
     user = User(username)
     rggViews.adduser(user)
     respondUserJoin(allusersbut(user), username)
-    for ID, map in allmaps():
-        rggViews.respondMapCreate(user, ID, map.dump())
+    rggViews.respondSession(user, rggViews.getSession().dump())
+    #for ID, map in allmaps():
+    #    rggViews.respondMapCreate(user, ID, map.dump())
     rggViews.respondUserList(user, getNetUserList())
 
 @serverRPC

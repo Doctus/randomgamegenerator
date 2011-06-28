@@ -48,7 +48,7 @@ class Sprite(object):
 
 class Pog(object):
     
-    def __init__(self, position, texturedimensions, size, layer, srcfile, status, locked, properties, mapID, alph):
+    def __init__(self, position, texturedimensions, size, layer, srcfile, status, locked, properties, alph):
         self.ID = None
         self._position = position
         self.texturedimensions = texturedimensions
@@ -61,7 +61,6 @@ class Pog(object):
         self._properties = properties
         self._showTooltip = False
         self.tooltipId = -1
-        self.mapID = mapID
         self.alpha = alph
         self._locked = locked #locked only works for mouse movements. This means that scripts may actually be able to move the pog.
         rggResource.crm.listen(srcfile, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
@@ -249,12 +248,11 @@ class Pog(object):
             status=self.status,
             locked=self._locked,
             properties=self.properties,
-            mapID=self.mapID,
             alpha=self.alpha)
     
     @staticmethod
     def load(obj):
-        """Deserialize a new map from a dictionary."""
+        """Deserialize a new pog from a dictionary."""
         pog = Pog(
             loadCoordinates('Pog.position', obj.get('position'), length=2),
             loadCoordinates('Pog.texturedimensions', obj.get('texturedimensions'), length=2, min=1, max=65535),
@@ -264,7 +262,6 @@ class Pog(object):
             loadInteger('Pog.status', obj.get('status')),
             loadInteger('Pog.locked', obj.get('locked')),
             loadObject('Pog.properties', obj.get('properties')),
-            loadString('Pog.mapID', obj.get('mapID')),
             loadInteger('Pog.alpha', obj.get('alpha')))
         pog.name = loadString('Pog.name', obj.get('name'), allowEmpty=True)
         return pog
