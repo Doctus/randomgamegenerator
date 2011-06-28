@@ -146,8 +146,8 @@ class newMapDialog(dialog):
                 widget.accept()
         
         # Signals
-        widget.connect(okayButton, QtCore.SIGNAL('pressed()'), okayPressed)
-        widget.connect(cancelButton, QtCore.SIGNAL('pressed()'), widget.reject)
+        widget.connect(okayButton, QtCore.SIGNAL('clicked()'), okayPressed)
+        widget.connect(cancelButton, QtCore.SIGNAL('clicked()'), widget.reject)
         
         # Show to user
         return (widget.exec_() == QtGui.QDialog.Accepted)
@@ -246,8 +246,8 @@ class hostDialog(dialog):
                 widget.accept()
         
         # Signals
-        widget.connect(okayButton, QtCore.SIGNAL('pressed()'), okayPressed)
-        widget.connect(cancelButton, QtCore.SIGNAL('pressed()'), widget.reject)
+        widget.connect(okayButton, QtCore.SIGNAL('clicked()'), okayPressed)
+        widget.connect(cancelButton, QtCore.SIGNAL('clicked()'), widget.reject)
         
         # Show to user
         return (widget.exec_() == QtGui.QDialog.Accepted)
@@ -351,8 +351,8 @@ class joinDialog(dialog):
                 widget.accept()
         
         # Signals
-        widget.connect(okayButton, QtCore.SIGNAL('pressed()'), okayPressed)
-        widget.connect(cancelButton, QtCore.SIGNAL('pressed()'), widget.reject)
+        widget.connect(okayButton, QtCore.SIGNAL('clicked()'), okayPressed)
+        widget.connect(cancelButton, QtCore.SIGNAL('clicked()'), widget.reject)
         
         # Show to user
         return (widget.exec_() == QtGui.QDialog.Accepted)
@@ -457,8 +457,8 @@ class newCharacterDialog(dialog):
                 widget.accept()
         
         # Signals
-        widget.connect(okayButton, QtCore.SIGNAL('pressed()'), okayPressed)
-        widget.connect(cancelButton, QtCore.SIGNAL('pressed()'), widget.reject)
+        widget.connect(okayButton, QtCore.SIGNAL('clicked()'), okayPressed)
+        widget.connect(cancelButton, QtCore.SIGNAL('clicked()'), widget.reject)
         
         portraits = findFiles(PORTRAIT_DIR, IMAGE_EXTENSIONS)
         portraits.sort(cmp=lambda x,y: cmp(x.lower(), y.lower()))
@@ -577,8 +577,8 @@ class gfxSettingsDialog(dialog):
                 widget.accept()
         
         # Signals
-        widget.connect(okayButton, QtCore.SIGNAL('pressed()'), okayPressed)
-        widget.connect(cancelButton, QtCore.SIGNAL('pressed()'), widget.reject)
+        widget.connect(okayButton, QtCore.SIGNAL('clicked()'), okayPressed)
+        widget.connect(cancelButton, QtCore.SIGNAL('clicked()'), widget.reject)
         
         # Show to user
         return (widget.exec_() == QtGui.QDialog.Accepted)

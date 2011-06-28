@@ -91,8 +91,6 @@ class Map(object):
             tile.setHidden(False)
     
     def _deleteTiles(self):
-        for pog in self.Pogs.values():
-            pog.destroy()
         mainWindow.glwidget.deleteImages(self.tiles)
         self.tiles = None
         rggResource.crm.destroy(self)
