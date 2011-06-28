@@ -829,7 +829,7 @@ def mousePress(screenPosition, mapPosition, button):
                     gentype = ''.join(gentype.split()).lower()
                     for selectedPog in set([pog] + list(_state.pogSelection)):
                         selectedPog.name = rggNameGen.getName(gentype)
-                        modifyPog(topmap(mapPosition), selectedPog)
+                        modifyPog(selectedPog)
                         sendPogAttributes(selectedPog.ID, selectedPog.name, selectedPog.layer, selectedPog.properties)
                 elif selected == 2:
                     prompt = translate('views', "Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.")
