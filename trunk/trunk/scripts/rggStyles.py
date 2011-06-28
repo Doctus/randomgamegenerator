@@ -23,4 +23,39 @@ standard = ''''''
 
 test = '''background: QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #eef, stop: 1 #ccf);'''
 
-sheets = {"Default":standard, "Test":test}
+celtica = '''
+*{ background-image: url(data/styles/bg_celt.png);}
+
+QLineEdit,QTextEdit,QListWidget{ background: #f3f2e5; }
+
+QLabel { background: #f3f2e5; }
+
+QPushButton { background: #e5e2c9; }
+
+QMenu {
+     background: #c8c290;
+ }
+ 
+QMenu::item:selected {
+     background: #625c2e;
+ }
+ 
+QMenu::item:pressed {
+     background: #f3f2e5;
+ }
+
+QMenuBar::item {
+     background: #c8c290;
+ }
+
+QMenuBar::item:selected {
+     background: #f3f2e5;
+ }
+
+QMenuBar::item:pressed {
+     background: #625c2e;
+ }
+
+'''
+
+sheets = {"Default":standard, "Test":test, "Celtic":celtica}
