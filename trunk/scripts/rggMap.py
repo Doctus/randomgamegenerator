@@ -18,7 +18,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 import sys
-import rggTile, rggPog, rggSystem, rggResource, random
+import rggTile, rggSystem, rggResource, random
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 from rggSystem import mainWindow
 
@@ -34,9 +34,6 @@ class Map(object):
         self.tileset = tileset
         self.tilesize = tilesize
 
-        self.Pogs = {}
-        self.lines = []
-        self.linesDict = {}
         self.tileindexes = [0 for i in xrange(mapsize[0] * mapsize[1])]
         self.hidden = False
         self.tiles = None
@@ -46,33 +43,6 @@ class Map(object):
         #self._createTiles()
 
         rggResource.crm.listen(tileset, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
-
-    def addPog(self, pog, dumpmode=False):
-        """Adds a pog to the map, assigning it a unique id."""
-        assert(pog.ID is not None)
-        import rggEvent
-        self.Pogs[pog.ID] = pog
-        if self.hidden:
-            pog._realHide(True)
-        if dumpmode: return
-        if pog.hidden:
-            pog._realHide(True)
-        rggEvent.pogUpdateEvent(pog)
-
-    def removePog(self, pog):
-        assert(pog.ID is not None)
-        import rggEvent
-        print "deleting", pog.ID
-        rggEvent.pogDeleteEvent(self.Pogs[pog.ID])
-        self.Pogs[pog.ID].destroy()
-        del self.Pogs[pog.ID]
-
-    def _findUniqueID(self, src):
-        """Get a unique id for a pog."""
-        id = src or rggSystem.findRandomAppend()
-        while id in self.Pogs:
-            id += rggSystem.findRandomAppend()
-        return id
         
     @property
     def pixelSize(self):
@@ -97,33 +67,15 @@ class Map(object):
             for t in self.tiles:
                 t.displaceDrawRect(displacement)
     
-    def hide(self, hidden=True, includeTiles=True, includePogs=True, includeLines=True):
-        """Hide or show all pogs and tiles."""
+    def hide(self, hidden=True):
+        """Hide or show all tiles."""
         if hidden == self.hidden:
             return
         self.hidden = hidden
-        if includePogs:
-            if hidden:
-                for pog in self.Pogs.values():
-                    pog._realHide(True)
-            else:
-                for pog in self.Pogs.values():
-                    if not pog.hidden:
-                        pog._realHide(False)
-        if includeTiles:
-            if hidden:
-                self._hideTiles()
-            else:
-                self._showTiles()
-        if includeLines:
-            if hidden:
-                self.storeLines()
-            else:
-                self.restoreLines()
-                
-    def refreshPogs(self):
-        for pog in self.Pogs.values():
-            pog.forceUpdate()
+        if hidden:
+            self._hideTiles()
+        else:
+            self._showTiles()
     
     def show(self):
         return self.hide(False)
@@ -203,49 +155,9 @@ class Map(object):
         if len(indexes) != len(self.tileindexes):
             return
         self.tileindexes[:] = indexes[:]
-        
-        #imgsize = mainWindow.glwidget.getImageSize(rggResource.crm.translateFile(self.tileset, rggResource.RESOURCE_IMAGE))
-        
-        #for i in xrange(len(indexes)):
-            #self.tiles[i].setTile(self.tileindexes[i])
-            #print self.tileindexes[i], self.tiles[i].getTile()
-            #x = self.tileindexes[i]%(imgsize.width()/self.tilesize[0])*self.tilesize[0]
-            #y = int((self.tileindexes[i]*self.tilesize[0])/imgsize.width())*self.tilesize[1]
-            #self.tiles[i].setTextureRect((x, y, self.tilesize[0], self.tilesize[1]))
-    
-    def findTopPog(self, position):
-        """Returns the top pog at a given position, or None."""
-        layer = -sys.maxint
-        top = None
-        for pog in self.Pogs.values():
-            if layer >= pog.layer:
-                continue
-            if pog.pointCollides(position):
-                top = pog
-                layer = top.layer
-        return top
-
-    def storeLines(self):
-        self.lines = []
-        
-        for thickness, lines in self.linesDict.items():
-            for item in lines:
-                self.lines.extend( [item[0], item[1], item[2], item[3], thickness, item[4], item[5], item[6]] )
-
-    def restoreLines(self):
-        for thickness, lines in self.linesDict.items():
-            for item in lines:
-                rggSystem.drawLine(item[0], item[1], item[2], item[3], thickness, item[4], item[5], item[6])
-            
-    def addLine(self, line):
-        if not line[4] in self.linesDict:
-            self.linesDict[line[4]] = []
-        self.linesDict[line[4]].append([line[0], line[1], line[2], line[3], line[5], line[6], line[7]])
     
     def dump(self):
         """Serialize to an object valid for JSON dumping."""
-
-        self.storeLines()
 
         return dict(
             mapname=self.mapname,
@@ -253,9 +165,7 @@ class Map(object):
             mapsize=self.mapsize,
             tileset=self.tileset,
             tilesize=self.tilesize,
-            pogs=dict([(pog.ID, pog.dump()) for pog in self.Pogs.values()]),
-            tiles=self.tileindexes,
-            lines=self.lines)
+            tiles=self.tileindexes)
     
     @staticmethod
     def load(obj, dumpmode=False):
@@ -266,19 +176,6 @@ class Map(object):
             loadCoordinates('Map.mapsize', obj.get('mapsize'), length=2, min=1, max=65535),
             loadString('Map.tileset', obj.get('tileset')),
             loadCoordinates('Map.tilesize', obj.get('tilesize'), length=2, min=1, max=65535))
-        
-        pogs = loadObject('Map.pogs', obj.get('pogs'))
-        for ID, pog in pogs.items():
-            loaded = rggPog.Pog.load(pog)
-            loaded.ID = ID
-            map.addPog(loaded, dumpmode)
-
-        linez = obj.get('lines')
-        brk = lambda x, n, acc=[]: brk(x[n:], n, acc+[(x[:n])]) if x else acc
-        for line in brk(linez, 8):
-            map.addLine(line)
-            
-        map.restoreLines()
         
         # HACK: Looks like coordinates; saves work.
         tiles = loadCoordinates('Map.tiles', obj.get('tiles'), length=len(map.tileindexes), min=0, max=65535)

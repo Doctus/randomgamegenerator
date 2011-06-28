@@ -142,7 +142,7 @@ class pogListWidget(QtGui.QListWidget):
                     else:
                         pog.hide()
                     item.setPog(pog)
-                    rggViews.sendHidePog(pog.mapID, pog.ID, pog.hidden)
+                    rggViews.sendHidePog(pog.ID, pog.hidden)
             elif selection == 2:
                 specificPog = specificItem.getPog()
                 d = resizeDialog(specificPog._tile.getW(), specificPog._tile.getH(), specificPog.size[0], specificPog.size[1])
@@ -155,7 +155,7 @@ class pogListWidget(QtGui.QListWidget):
                     pog = item.getPog()
                     pog._locked = not pog._locked
                     item.setPog(pog)
-                    rggViews.sendLockPog(pog.mapID, pog.ID, pog._locked)
+                    rggViews.sendLockPog(pog.ID, pog._locked)
             elif selection == 4:
                 specificPog = specificItem.getPog()
                 d = layerDialog(specificPog.layer)
@@ -165,7 +165,7 @@ class pogListWidget(QtGui.QListWidget):
                         pog.layer = d.box.value()
             elif selection == 5:
                 for item in items:
-                    rggViews.deletePog(item.getPog().mapID, item.getPog())
+                    rggViews.deletePog(item.getPog())
                     item.dead = True
                     self.takeItem(self.row(item))
         else:
@@ -192,12 +192,13 @@ class pogWidget(QtGui.QDockWidget):
         self.setWidget(self.listWidget)
         mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, self)
 
-        self.mapChangedResponse(None)
         self.pogSelectionChangedResponse()
+        
+        for pog in rggViews.getSession().pogs.values():
+            self.pogUpdateResponse(pog)
 
         rggEvent.addPogUpdateListener(self)
         rggEvent.addPogDeleteListener(self)
-        rggEvent.addMapChangedListener(self)
         rggEvent.addPogSelectionChangedListener(self)
         
     def pogUpdateResponse(self, pog):
@@ -223,12 +224,6 @@ class pogWidget(QtGui.QDockWidget):
                 item.setSelected(True)
             else:
                 item.setSelected(False)
-
-    def mapChangedResponse(self, newMap):
-        self.listWidget.clear()
-        for map in rggViews._state.Maps.values():
-            for pog in map.Pogs:
-                self.pogUpdateResponse(map.Pogs[pog])
 
 def hajimaru(mainwindow):
     widget = pogWidget(mainwindow)
