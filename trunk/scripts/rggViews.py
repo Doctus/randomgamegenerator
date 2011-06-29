@@ -55,6 +55,8 @@ class _state(object):
     
     session = rggSession.Session()
     
+    alert = True
+    
     pogSelection = set()
     pogHover = None
     
@@ -71,7 +73,7 @@ class _state(object):
     linecolour = [1.0, 1.0, 1.0]
     
     @staticmethod
-    def initialize():
+    def initialize(mainApp):
         _state.menu = rggMenuBar.menuBar()
         
         _state.dwidget = rggDockWidget.diceRoller(mainWindow)
@@ -82,6 +84,8 @@ class _state(object):
         _state.users = {}
         _state.localuser = User(client.username)
         _state.users[client.username] = _state.localuser
+        
+        _state.App = mainApp
         
 def drawPogCircles():
     clearSelectionCircles()
@@ -102,11 +106,20 @@ def setPogSelection(pog):
     
 def addUserToList(name, host=False):
     _state.uwidget.addUser(name, host)
+    
+def toggleAlerts(newValue=None):
+    """Toggles messages containing the user's handle causing an alert."""
+    if newValue is None:
+        _state.alert = not _state.alert
+    else:
+        _state.alert = newValue
 
 # MESSAGES
 
 def say(message):
     """Say an IC message. This documentation is a lie."""
+    if _state.alert and localhandle().lower() in message.lower():
+        _state.App.alert(mainWindow)
     _state.cwidget.insertMessage(message)
 
 def announce(message):

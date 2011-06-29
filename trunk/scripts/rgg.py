@@ -16,7 +16,7 @@ if __name__ == '__main__':
     
     # Initialize view state.
     s = rggViews._state
-    s.initialize()
+    s.initialize(app)
     
     # EVENT WIRING
     # amounts to configuration
@@ -50,6 +50,7 @@ if __name__ == '__main__':
     s.menu.hostGameAct.triggered.connect(rggViews.hostGame)
     s.menu.joinGameAct.triggered.connect(rggViews.joinGame)
     s.menu.disconnectAct.triggered.connect(rggViews.disconnectGame)
+    s.menu.toggleAlertsAct.triggered.connect(rggViews.toggleAlerts)
     s.menu.thicknessMenu.triggered.connect(rggViews.setThickness)
     s.menu.colourMenu.triggered.connect(rggViews.setLineColour)
     
