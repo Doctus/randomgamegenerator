@@ -57,16 +57,16 @@ class menuBar(object):
         self.saveSessAct = QtGui.QAction("&Save Session As...", main)
         self.saveSessAct.setShortcut("Ctrl+S")
         
-        self.saveCharsAct = QtGui.QAction("Save IC Characters", main)
+        self.saveCharsAct = QtGui.QAction("Save IC Characters As...", main)
         
-        self.loadCharsAct = QtGui.QAction("Load IC Characters", main)
+        self.loadCharsAct = QtGui.QAction("Load IC Characters...", main)
 
-        self.gfxSettingsAct = QtGui.QAction("Configure Graphics", main)
+        self.gfxSettingsAct = QtGui.QAction("Configure Graphics...", main)
         
-        self.hostGameAct = QtGui.QAction("&Host Game", main)
+        self.hostGameAct = QtGui.QAction("&Host Game...", main)
         self.hostGameAct.setShortcut("Ctrl+H")
 
-        self.joinGameAct = QtGui.QAction("&Join Game", main)
+        self.joinGameAct = QtGui.QAction("&Join Game...", main)
         self.joinGameAct.setShortcut("Ctrl+J")
         
         self.disconnectAct = QtGui.QAction("&Disconnect", main)
@@ -75,6 +75,10 @@ class menuBar(object):
         self.thicknessOneAct = QtGui.QAction("&One", main)
         self.thicknessTwoAct = QtGui.QAction("&Two", main)
         self.thicknessThreeAct = QtGui.QAction("&Three", main)
+        
+        self.toggleAlertsAct = QtGui.QAction("Chat Username Notify", main)
+        self.toggleAlertsAct.setCheckable(True)
+        self.toggleAlertsAct.setChecked(True)
         
         self.selectIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-select-icon.png"), "Select Tool", main)
         self.selectIcon.setShortcut("Ctrl+T")
@@ -106,8 +110,6 @@ class menuBar(object):
         fileMenu.addSeparator()
         fileMenu.addAction(self.saveSessAct)
         fileMenu.addAction(self.loadSessAct)
-        fileMenu.addSeparator()
-        fileMenu.addAction(self.gfxSettingsAct)
         
         internetMenu = QtGui.QMenu("&Internet", main)
         internetMenu.addAction(self.hostGameAct)
@@ -137,6 +139,10 @@ class menuBar(object):
         stylesMenu = QtGui.QMenu("&Styles", main)
         for style in rggStyles.sheets.keys():
             stylesMenu.addAction(QtGui.QAction(style, main))
+            
+        self.optionsMenu = QtGui.QMenu("&Options", main)
+        self.optionsMenu.addAction(self.toggleAlertsAct)
+        self.optionsMenu.addAction(self.gfxSettingsAct)
         
         self.pluginsMenu = QtGui.QMenu("&Plugins", main)
         
@@ -159,6 +165,7 @@ class menuBar(object):
         self.menubar.addMenu(internetMenu)
         self.menubar.addMenu(drawMenu)
         self.menubar.addMenu(stylesMenu)
+        self.menubar.addMenu(self.optionsMenu)
         self.pluginhide = self.menubar.addMenu(self.pluginsMenu)
         self.menubar.addSeparator()
         self.menubar.addAction(self.selectIcon)
