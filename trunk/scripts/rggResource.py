@@ -301,6 +301,8 @@ def _sendStatusRequest(user, fileList):
 
 def fileExists(filename):
     # TODO: Implement file existence test.
-    return True
+    if os.path.exists(filename):
+        return True
+    return False
 
     
