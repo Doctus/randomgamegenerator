@@ -114,7 +114,7 @@ class menuBar(object):
         internetMenu = QtGui.QMenu("&Internet", main)
         internetMenu.addAction(self.hostGameAct)
         internetMenu.addAction(self.joinGameAct)
-        fileMenu.addSeparator()
+        internetMenu.addSeparator()
         internetMenu.addAction(self.disconnectAct)
 
         self.thicknessMenu = QtGui.QMenu("&Thickness", main)
