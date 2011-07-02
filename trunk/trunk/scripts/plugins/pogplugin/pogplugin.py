@@ -150,6 +150,7 @@ class pogListWidget(QtGui.QListWidget):
                     for item in items:
                         pog = item.getPog()
                         pog.size = (d.wBox.value(), d.hBox.value())
+                        rggViews.sendResizePog(pog.ID, d.wBox.value(), d.hBox.value())
             elif selection == 3:
                 for item in items:
                     pog = item.getPog()
