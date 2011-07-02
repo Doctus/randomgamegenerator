@@ -7,7 +7,6 @@
 
 = Network =
   * Update protocol documentation so it's actually accurate.
-  * Passworded sessions, or other method(s) for controlling who may join
 
 = Interface =
   * Warning in the join-game dialog that you'll lose current maps and get those the group has loaded.
@@ -52,6 +51,5 @@
   * Add Cirno. (Probably as a plugin due to memory consumption.)
 
 = Bugs =
-  * Erase is still kind of broken (?)
   * From Kaijyuu: giving pogs extremely long names causes (potentially somewhat severe) graphical problems.
   * From Antistone: Negative pog layers would be useful if possible.
