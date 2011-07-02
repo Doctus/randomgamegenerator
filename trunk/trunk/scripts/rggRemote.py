@@ -78,6 +78,8 @@ def respondICSay(chname, message, portrait):
 @clientRPC
 def sendICSay(user, message, chname, portrait):
     rggResource.crm.listen(portrait, rggResource.RESOURCE_IMAGE, rggResource.crm, doNothing)
+    if len(portrait) > 1:
+        rggResource.srm.processFile(user, makePortableFilename(os.path.join(PORTRAIT_DIR, portrait)))
     respondICSay(allusers(), chname, message, portrait)
     
 def doNothing(blah, bleh, bloh):
@@ -109,6 +111,8 @@ def respondICEmote(chname, message, portrait):
 
 @clientRPC
 def sendICEmote(user, message, chname, portrait):
+    if len(portrait) > 1:
+        rggResource.srm.processFile(user, makePortableFilename(os.path.join(PORTRAIT_DIR, portrait)))
     respondICEmote(allusers(), chname, message, portrait)
 
 @serverRPC

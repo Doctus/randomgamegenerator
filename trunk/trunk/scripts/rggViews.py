@@ -313,7 +313,7 @@ def closeAllMaps():
 
 def internalAddMap(map):
     _state.session.addMap(map)
-    sendMapCreate(map.ID, map.dump())
+    sendMapCreate(map.ID, map.dump(), map.tileset)
     
 @serverRPC
 def respondSession(sess):
@@ -459,8 +459,10 @@ def respondMapCreate(ID, mapDump):
     _state.session.addDumpedMap(mapDump, ID)
 
 @clientRPC
-def sendMapCreate(user, ID, map):
+def sendMapCreate(user, ID, map, tileset):
     """Creates or updates the specified map."""
+    
+    rggResource.srm.processFile(user, tileset)
 
     respondMapCreate(allusersbut(user), ID, map)
 
