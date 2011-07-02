@@ -41,10 +41,11 @@ VALID_USERNAME = re.compile('^[\w\-]+$')
 class ConnectionData(object):
     """Data used to create a network connection."""
     
-    def __init__(self, host=None, port=6812, username=translate('net', 'Anonymous', 'default connection username')):
+    def __init__(self, host=None, port=6812, username=translate('net', 'Anonymous', 'default connection username'), passw=''):
         self.host = host or localHost()
         self.port = port
         self.username = username
+        self.password = passw
 
 class BaseClient(object):
     """Base class for local and remote clients."""
@@ -57,6 +58,7 @@ class BaseClient(object):
         self.server = None
         self.hostname = None
         self.port = None
+        self.password = None
         
         # File transfer lists
         self.sendList = set()
@@ -532,12 +534,15 @@ class JsonClient(BaseClient):
         """
     )
     
+    def setPassword(self, new):
+        self.password = new
+
     # SIGNAL RESPONSES
     
     def _socketConnected(self, socket):
         """Called when a socket is connected."""
         if socket == self.obj:
-            self.obj.sendMessage(MESSAGE_IDENTIFY, protocol=PROTOCOL_OBJECT, username=self.username)
+            self.obj.sendMessage(MESSAGE_IDENTIFY, protocol=PROTOCOL_OBJECT, username=self.username, passw=self.password)
         elif socket == self.xfer:
             self.xfer.sendMessage(MESSAGE_IDENTIFY, protocol=PROTOCOL_TRANSFER, username=self.username)
     
@@ -653,6 +658,7 @@ class JsonServer(object):
         # Banlist can be manipulated manually;
         # just add ips
         self.banlist = set()
+        self.password = None
     
     @property
     def isConnected(self):
@@ -754,6 +760,11 @@ class JsonServer(object):
         assert(self.userExists(username))
         return self.clients[self._processUsername(username)].username
     
+    def allowPassword(self, passw):
+        if passw == self.password:
+            return True
+        return False
+    
     @property
     def users(self):
         """Returns the list of usernames."""
@@ -790,6 +801,9 @@ class JsonServer(object):
             while self.userExists(username):
                 username += rggSystem.findRandomAppend()
         return unicode(username)
+    
+    def setPassword(self, new):
+        self.password = new
 
     def rename(self, oldname, newname):
         """Renames a user to the specified name.
@@ -951,7 +965,7 @@ class JsonServer(object):
             message = message.format(command=command, parms=repr(kwargs), err=e)
             self._forbidSocket(socket, message)
     
-    def _socketIdentified(self, socket, protocol, username):
+    def _socketIdentified(self, socket, protocol, username, passw = None):
         """Socket identifies itself with protocol and username."""
         if protocol not in (PROTOCOL_OBJECT, PROTOCOL_TRANSFER):
             message = "Disallowed protocol identified {protocol} ({username})"
@@ -967,6 +981,13 @@ class JsonServer(object):
             username = self._fixUsername(username)
             
             assert(not self.userExists(username))
+            
+            if self.password is not None and len(self.password) > 0:
+                if not self.allowPassword(passw):
+                    message = "Password error {protocol} ({username})"
+                    message = message.format(protocol=protocol, username=username)
+                    self._forbidSocket(socket, message)
+                    return
             
             socket.imbueName("S-OBJ")
             socket.activate()
