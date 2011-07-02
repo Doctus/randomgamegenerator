@@ -64,8 +64,7 @@ def sendSay(user, message):
 def respondICSay(chname, message, portrait):
     if len(portrait) > 1:
         portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
-        IAMTHEDOOMPHANTOM = rggResource.crm.translateFile(makePortableFilename(os.path.join(PORTRAIT_DIR, portrait)), rggResource.RESOURCE_IMAGE)
-        #^ Don't remember whether this is still needed for transfer etc.
+        rggResource.crm.listen(os.path.join(PORTRAIT_DIR, portrait), rggResource.RESOURCE_IMAGE, rggResource.crm, doNothing)
         ICSay(translate('remote', '<table><tr><td><img src="{port}" width="64" height="64"></td><td>{name}: {sayText}</td></tr></table><br />').format(
             port=portfile,                                                        
             name=linkedName(chname),
@@ -77,7 +76,6 @@ def respondICSay(chname, message, portrait):
 
 @clientRPC
 def sendICSay(user, message, chname, portrait):
-    rggResource.crm.listen(portrait, rggResource.RESOURCE_IMAGE, rggResource.crm, doNothing)
     respondICSay(allusers(), chname, message, portrait)
     
 def doNothing(blah, bleh, bloh):
