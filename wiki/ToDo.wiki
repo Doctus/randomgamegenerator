@@ -52,4 +52,3 @@
 
 = Bugs =
   * From Kaijyuu: giving pogs extremely long names causes (potentially somewhat severe) graphical problems.
-  * From Antistone: Negative pog layers would be useful if possible.
