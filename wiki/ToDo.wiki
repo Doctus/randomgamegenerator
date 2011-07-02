@@ -6,7 +6,6 @@
   * Maybe some sort of music or sound support (through Phonon?)
 
 = Network =
-  * Fix large image transfer somehow.
   * Update protocol documentation so it's actually accurate.
   * Passworded sessions, or other method(s) for controlling who may join
 
@@ -21,7 +20,6 @@
   * Ability to change an existing map's tileset
   * From Kaijyuu: it would be nice if the eraser showed some indicator of the area you're erasing while in use
   * From Kaijyuu: pog placement could be made more intuitive
-  * Alert when name is being entered in OOC chat
 
 = Game Support =
   * Designate "DM" user
@@ -55,7 +53,6 @@
   * Add Cirno. (Probably as a plugin due to memory consumption.)
 
 = Bugs =
-  * Files in general don't always seem to be sent.
   * Erase is still kind of broken (?)
   * From Kaijyuu: giving pogs extremely long names causes (potentially somewhat severe) graphical problems.
   * From Antistone: Negative pog layers would be useful if possible.
