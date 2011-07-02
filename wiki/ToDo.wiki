@@ -1,7 +1,6 @@
 #summary A list of things that should be added and/or have been put off due to laziness.
 
 = General =
-  * Screen layout should be remembered in a config file.
   * The way plugins work is rather jury-rigged.
   * Maybe some sort of music or sound support (through Phonon?)
 
@@ -36,8 +35,7 @@
     * Alternate control schemes, like using arrow keys or WASD to move a pog
 
 = Graphics =
-  * Some default tilesets would be nice.
-  * Some default pogs would be nice.
+  * More default things would be nice.
   * Be able to draw rectangles, curves or circles, etc.
 
 = Generators =
