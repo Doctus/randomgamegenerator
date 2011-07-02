@@ -55,7 +55,7 @@ class layerDialog(QtGui.QDialog):
         self.box = QtGui.QSpinBox()
         self.setWindowTitle("Set Layer")
 
-        self.box.setRange(1, 1000)
+        self.box.setRange(-150, 800)
         self.box.setValue(currl)
 
         self.okButton = QtGui.QPushButton("Ok")
@@ -159,11 +159,11 @@ class pogListWidget(QtGui.QListWidget):
                     rggViews.sendLockPog(pog.ID, pog._locked)
             elif selection == 4:
                 specificPog = specificItem.getPog()
-                d = layerDialog(specificPog.layer)
+                d = layerDialog(specificPog.layer-200)
                 if d.exec_():
                     for item in items:
                         pog = item.getPog()
-                        pog.layer = d.box.value()
+                        pog.layer = d.box.value()+200
             elif selection == 5:
                 for item in items:
                     rggViews.deletePog(item.getPog())
