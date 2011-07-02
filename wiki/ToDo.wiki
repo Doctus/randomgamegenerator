@@ -18,7 +18,6 @@
   * CG display system (pops up a box with a large picture, most likely)
   * Multiple map layers which the camera and pogs can easily switch between
   * Ability to change an existing map's tileset
-  * From Kaijyuu: it would be nice if the eraser showed some indicator of the area you're erasing while in use
   * From Kaijyuu: pog placement could be made more intuitive
 
 = Game Support =
