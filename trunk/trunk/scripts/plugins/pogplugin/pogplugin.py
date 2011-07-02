@@ -191,6 +191,7 @@ class pogWidget(QtGui.QDockWidget):
         self.setWindowTitle(self.tr("Pogs"))
         self.listWidget = pogListWidget(mainWindow)
         self.setWidget(self.listWidget)
+        self.setObjectName("Pog Plugin")
         mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, self)
 
         self.pogSelectionChangedResponse()

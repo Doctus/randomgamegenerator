@@ -87,6 +87,11 @@ class _state(object):
         
         _state.App = mainApp
         
+        try:
+            mainWindow.readGeometry()
+        except:
+            pass
+        
 def drawPogCircles():
     clearSelectionCircles()
     for pog in _state.pogSelection:

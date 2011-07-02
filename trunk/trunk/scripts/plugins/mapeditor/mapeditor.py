@@ -38,6 +38,7 @@ class mapEditor(QtGui.QDockWidget):
         self.tilelabel = None
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
+        self.setObjectName("Map Editor")
         mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, self)
 
         self.currentMap = None

@@ -19,8 +19,9 @@ class MainWindow(QMainWindow):
         Only initialize critical components(like opengl) here, use start() for anything else
         '''
         QMainWindow.__init__(self)
-        
+
         self.setWindowTitle("RandomGameGenerator")
+        self.setObjectName("MainWindow")
         try: self.setWindowIcon(QIcon(os.path.join("data", "FAD-icon.png")))
         except: pass
 
@@ -31,6 +32,21 @@ class MainWindow(QMainWindow):
         self.drawTimer = QTimer()
         self.drawTimer.timeout.connect(self.drawTimerTimeout)
         self.drawTimer.start(13)
+        
+    def readGeometry(self):
+        settings = QSettings("AttercopProductions", "RGG")
+        settings.beginGroup("MainWindow")
+        self.restoreGeometry(settings.value("geometry").toByteArray())
+        self.restoreState(settings.value("windowState").toByteArray())
+        settings.endGroup()
+        
+    def closeEvent(self, event):
+        settings = QSettings("AttercopProductions", "RGG")
+        settings.beginGroup("MainWindow")
+        settings.setValue("geometry", self.saveGeometry())
+        settings.setValue("windowState", self.saveState())
+        settings.endGroup()
+        QMainWindow.closeEvent(self, event)
 
     def drawTimerTimeout(self):
         self.glwidget.updateGL()

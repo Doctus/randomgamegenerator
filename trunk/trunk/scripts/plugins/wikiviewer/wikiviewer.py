@@ -12,6 +12,7 @@ class wikiViewer(QtGui.QDockWidget):
         self.widget = QtWebKit.QWebView(mainWindow)
         self.widget.load(QtCore.QUrl("http://momm.seiken.co.uk/wiki/TRPG:TRPG_Index"))
         self.setWidget(self.widget)
+        self.setObjectName("Wiki Viewer")
         mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, self)
  
 def hajimaru(mainwindow):
