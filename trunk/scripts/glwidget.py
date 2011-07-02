@@ -121,7 +121,11 @@ class GLWidget(QGLWidget):
                 glEnd()
 
         for text in self.texts:
-            split = text[1].split("\n")
+            _split = text[1].split("\n")
+            brk = lambda x, n, acc=[]: brk(x[n:], n, acc+[(x[:n])]) if x else acc
+            split = []
+            for item in _split:
+                split.extend(brk(item, 35))
             if len(split[0]) == 0:
                 split.pop(0)
             pos = -16 * (len(split) - 1)
