@@ -148,7 +148,7 @@ def clientConnect(client, username):
     """Occurs when the client is ready to start sending data."""
     #print "Client connected."
     rggViews.renameuser(localhandle(), username)
-    rggViews.closeAllMaps()
+    rggViews._closeAllMaps()
     say(translate('remote', "Welcome, {name}!").format(name=username))
 
 def clientDisconnect(client, errorMessage):
