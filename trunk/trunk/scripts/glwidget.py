@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 #
 #glWidget - Takes care of drawing images, with optionally glmod to speed things up
 #
@@ -71,6 +71,7 @@ class GLWidget(QGLWidget):
         self.texext = GL_TEXTURE_2D
         self.lines = dict()
         self.selectionCircles = dict()
+        self.rectangles = {1:[]}
         self.error = False
         self.texts = []
         self.textid = 0
@@ -109,6 +110,7 @@ class GLWidget(QGLWidget):
         if mod:
             glmod.drawLines(self.lines)
             glmod.drawSelectionCircles(self.selectionCircles)
+            glmod.drawRectangles(self.rectangles)
         else:
             for layer in self.lines:
                 glLineWidth(layer)
@@ -160,6 +162,12 @@ class GLWidget(QGLWidget):
                         
     def clearLines(self):
         self.lines.clear()
+        
+    def addRectangle(self, x, y, w, h, r, g, b):
+        self.rectangles[1].append((float(x), float(y), float(w), float(h), float(r), float(g), float(b)))
+        
+    def clearRectangles(self):
+        self.rectangles = {1:[]}
                     
     def pointIntersectRect(self, point, rect): 
     #point: (x, y)

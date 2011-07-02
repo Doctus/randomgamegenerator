@@ -772,8 +772,12 @@ def mouseMove(screenPosition, mapPosition, displacement):
     elif icon == ICON_DELETE: #deleteIcon
         if _state.mouseButton == BUTTON_LEFT:
             if _state.previousLinePlacement != None:
+                clearRectangles()
                 _state.nextLinePlacement = mapPosition #this is bottomRight of the square that we want to delete.
+                drawRectangle(_state.previousLinePlacement[0], _state.previousLinePlacement[1],
+                                      _state.nextLinePlacement[0], _state.nextLinePlacement[1], 0.8, 0.8, 1.0)
             else:
+                clearRectangles()
                 _state.previousLinePlacement = mapPosition #We only do this so that we have a topLeft
 
 def mousePress(screenPosition, mapPosition, button):
@@ -890,6 +894,8 @@ def mouseRelease(screenPosition, mapPosition, button):
     icon = _state.menu.selectedIcon
     if(icon == ICON_DELETE):
         if(_state.previousLinePlacement != None and _state.nextLinePlacement != None):
+            
+            clearRectangles()
 
             x = _state.previousLinePlacement[0]
             y = _state.previousLinePlacement[1]
