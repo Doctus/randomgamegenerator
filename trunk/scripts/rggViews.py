@@ -622,6 +622,16 @@ def sendLockPog(user, pogID, locked):
     """Locks or unlocks a pog on the server."""
     respondLockPog(allusers(), pogID, locked)
 
+@serverRPC
+def respondResizePog(pogID, newW, newH):
+    if pogID in _state.session.pogs.keys():
+        pog = _state.session.pogs[pogID]
+        pog.size = (newW, newH)
+    
+@clientRPC
+def sendResizePog(user, pogID, newW, newH):
+    respondResizePog(allusersbut(user), pogID, newW, newH)
+
 # DRAWING
 
 @serverRPC

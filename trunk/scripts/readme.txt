@@ -1,4 +1,4 @@
-RGG v.098 "The doom of a planet"
+RGG v.099 "Curses from all directions"
 
 http://code.google.com/p/randomgamegenerator/
 
@@ -37,6 +37,28 @@ Special Thanks:
   Everyone from MoMM and #attercop
 
 Changelog:
+
+  v0.99 "Curses from all directions"
+    * Pogs and lines are no longer limited to maps. Instead, you can
+      place them freely and save a "game session" to store all maps,
+      pogs, and lines. (Beware: saving maps does NOT save pogs and lines
+      on them now!)
+    * Fixed some graphical issues relating to tile edges.
+    * Added compressed texture support for increased drawing speed.
+    * Added graphics configuration dialog.
+    * The game window will try to get the user's attention if it's
+      not the active window and the user's name is mentioned in
+      OOC chat.
+    * Added two generators: food and artifood (artifact food).
+    * Restored /proll (private dice roll) functionality.
+    * Fixed an issue with IC chat portrait loading.
+    * Fixed several bugs relating to lines and erasing.
+    * Added a new "celtic" interface theme.
+    * Fixed a longstanding issue that was preventing file transfer
+      from working correctly in many situations.
+    * Fixed transfer of large files.
+    * Fixed issues relating to opening multiple maps.
+    * Synchronized pog resizing across the network.
 
   v0.98 "The doom of a planet"
     * "RGG in Space": Massive overhaul of underlying graphics code;

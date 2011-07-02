@@ -130,7 +130,7 @@ class mapEditor(QtGui.QDockWidget):
                             if self.currentMap.tilePosExists((self.rectStart[0], y)):
                                 rggViews.sendTileUpdate(self.currentMap.ID, (self.rectStart[0], y), self.tilelabel.currentTile)
                     else:
-                        print "WHY ARE YOU USING THE RECTANGLE TOOL TO PAINT A SINGLE TILE? THE MIND REELS"
+                        #print "WHY ARE YOU USING THE RECTANGLE TOOL TO PAINT A SINGLE TILE? THE MIND REELS"
                         if self.currentMap.tilePosExists((self.rectStart[0], self.rectStart[1])):
                                 rggViews.sendTileUpdate(self.currentMap.ID, (self.rectStart[0], self.rectStart[1]), self.tilelabel.currentTile)
                 rggEvent.setEaten()
