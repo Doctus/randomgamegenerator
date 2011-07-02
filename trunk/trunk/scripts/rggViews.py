@@ -227,6 +227,7 @@ def hostGame():
     
     if dialog.exec_(mainWindow, accept):
         connection = dialog.save()
+        server.setPassword(connection.password)
         renameuser(localhandle(), connection.username)
         if client.host(connection.port):
             say(translate('views', 'Now listening on port {port}.').format(port=connection.port))
@@ -253,6 +254,7 @@ def joinGame():
     if dialog.exec_(mainWindow, accept):
         connection = dialog.save()
         renameuser(localhandle(), connection.username)
+        client.setPassword(connection.password)
         client.join(connection.host, connection.port)
         say(translate('views', 'Connecting to {host}:{port}...').format(host=connection.host, port=connection.port))
 

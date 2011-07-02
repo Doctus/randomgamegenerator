@@ -193,7 +193,11 @@ class hostDialog(dialog):
                 value=data.get('username', self.fieldtemp[1])),
             port=integerField(
                 translate('hostDialog', 'Port'),
-                min=1, max=65535, value=data.get('port', self.fieldtemp[0])))
+                min=1, max=65535, value=data.get('port', self.fieldtemp[0])),
+            password=stringField(
+                translate('hostDialog', 'Password'),
+                value=data.get('password', ''),
+                allowEmpty=True))
     
     def _interpretFields(self, fields):
         """Interpret the fields into a dictionary of clean items."""
@@ -219,7 +223,7 @@ class hostDialog(dialog):
         
         # Add fields
         formLayout = QtGui.QFormLayout()
-        for id in ('port', 'username'):
+        for id in ('port', 'username', 'password'):
             field = self.fields[id]
             formLayout.addRow(
                 translate('hostDialog', '{0}: ', 'Row layout').format(field.name),
@@ -269,7 +273,7 @@ class hostDialog(dialog):
         except:
             pass
         return ConnectionData(localHost(), self.cleanData['port'],
-            self.cleanData['username'])
+            self.cleanData['username'], self.cleanData['password'])
     
 class joinDialog(dialog):
     """A dialog used to specify parameters to game joining."""
@@ -298,7 +302,11 @@ class joinDialog(dialog):
             host=stringField(translate('joinDialog', 'Host Name (IP)'),
                 value=data.get('host', self.fieldtemp[0])),
             port=integerField(translate('joinDialog', 'Port'),
-                min=1, max=65535, value=data.get('port', self.fieldtemp[1])))
+                min=1, max=65535, value=data.get('port', self.fieldtemp[1])),
+            password=stringField(
+                translate('joinDialog', 'Password'),
+                value=data.get('password', ''),
+                allowEmpty=True))
     
     def _interpretFields(self, fields):
         """Interpret the fields into a dictionary of clean items."""
@@ -324,7 +332,7 @@ class joinDialog(dialog):
         
         # Add fields
         formLayout = QtGui.QFormLayout()
-        for id in ('host', 'port', 'username'):
+        for id in ('host', 'port', 'username', 'password'):
             field = self.fields[id]
             formLayout.addRow(
                 translate('joinDialog', '{0}: ', 'Row layout').format(field.name),
@@ -375,7 +383,7 @@ class joinDialog(dialog):
         except:
             pass
         return ConnectionData(self.cleanData['host'], self.cleanData['port'],
-            self.cleanData['username'])
+            self.cleanData['username'], self.cleanData['password'])
     
 class newCharacterDialog(dialog):
     """A dialog used to create a new character for in-character chat."""
