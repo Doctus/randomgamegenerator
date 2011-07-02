@@ -336,6 +336,46 @@ static PyObject * glmod_drawSelectionCircles(PyObject *self, PyObject* args)
     return PyInt_FromLong(0L);
 }
 
+static PyObject * glmod_drawRectangles(PyObject *self, PyObject* args)
+{
+    PyObject *dict = PyTuple_GETITEM(args, 0);
+    int i = 0;
+
+    PyObject *key, *values, *value, *test;
+    Py_ssize_t pos = 0;
+
+    while (PyDict_Next(dict, &pos, &key, &values)) {
+        for(i = 0; i < PyList_Size(values); i++) 
+        {
+            value = PyList_GETITEM(values, i);
+
+            double x = PyFloat_ASDOUBLE(PyTuple_GETITEM(value, 0));
+            double y = PyFloat_ASDOUBLE(PyTuple_GETITEM(value, 1));
+            double w = PyFloat_ASDOUBLE(PyTuple_GETITEM(value, 2));
+            double h = PyFloat_ASDOUBLE(PyTuple_GETITEM(value, 3));
+            double r = PyFloat_ASDOUBLE(PyTuple_GETITEM(value, 4));
+            double g = PyFloat_ASDOUBLE(PyTuple_GETITEM(value, 5));
+            double b = PyFloat_ASDOUBLE(PyTuple_GETITEM(value, 6));
+
+            glLineWidth(2);
+            glColor3f(r, g, b);
+            glDisable(extension);
+            glBegin(GL_LINE_LOOP);
+
+            glVertex2d(x, y);
+            glVertex2d(w, y);
+            glVertex2d(w, h);
+            glVertex2d(x, h);
+
+            glEnd();
+            glEnable(extension);
+            glColor3f(1.0, 1.0, 1.0);
+        }
+    }
+
+    return PyInt_FromLong(0L);
+}
+
 static PyObject * glmod_drawLines(PyObject *self, PyObject* args)
 {
     PyObject *dict = PyTuple_GETITEM(args, 0);
@@ -443,6 +483,7 @@ static PyMethodDef GLModMethods[] = {
     {"addVBOentry",  glmod_addVBOentry, METH_VARARGS, "add an entry to a layer"},
     {"drawLines",  glmod_drawLines, METH_VARARGS, "draws lines from a dict"},
     {"drawSelectionCircles",  glmod_drawSelectionCircles, METH_VARARGS, "draws selection circles from a dict"},
+    {"drawRectangles",  glmod_drawRectangles, METH_VARARGS, "draws rectangles from a dict"},
     {"init",  glmod_init, METH_VARARGS, "init"},
     {"initVBO",  glmod_initVBO, METH_VARARGS, "initVBO"},
     {NULL, NULL, 0, NULL}        /* Sentinel */

@@ -304,6 +304,12 @@ def drawSelectionCircle(x, y, splasifarcity, radius):
     
 def clearSelectionCircles():
     mainWindow.glwidget.clearSelectionCircles()
+    
+def drawRectangle(x, y, w, h, r, g, b):
+    mainWindow.glwidget.addRectangle(x, y, w, h, r, g, b)
+    
+def clearRectangles():
+    mainWindow.glwidget.clearRectangles()
 
 def drawLine(x, y, w, h, thickness, r, g, b):
     mainWindow.glwidget.addLine(thickness, x, y, w, h, r, g, b)
