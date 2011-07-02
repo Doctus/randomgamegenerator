@@ -32,6 +32,10 @@ class Session(object):
         
     def _addMap(self, map):
         assert(map.ID is not None)
+        pos = 0
+        for m in self.maps.values():
+            pos += m.pixelSize[0] + 25
+        map.drawOffset = (pos, 0)
         self.maps[map.ID] = map
         
     def _addPog(self, pog):
