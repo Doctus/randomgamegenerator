@@ -64,6 +64,7 @@ class viewController(QtGui.QDockWidget):
         self.layout.setRowMinimumHeight(2, 10)
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
+        self.setObjectName("View Controller")
         mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, self)
         self.mainWindow = mainWindow
 
