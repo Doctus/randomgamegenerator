@@ -58,6 +58,7 @@ Changelog:
       from working correctly in many situations.
     * Fixed transfer of large files.
     * Fixed issues relating to opening multiple maps.
+    * Synchronized pog resizing across the network.
     * Added indicator of area being erased with eraser.
 
   v0.98 "The doom of a planet"
