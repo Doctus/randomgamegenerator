@@ -258,6 +258,7 @@ class sliderField(dialogField):
         widget.setValue(self.value)
         widget.setTickInterval(1)
         widget.setTickPosition(QtGui.QSlider.TicksAbove)
+        widget.setPageStep(1)
         widget.valueChanged.connect(self.emitEvil)
         return widget
     
