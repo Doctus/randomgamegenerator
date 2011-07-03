@@ -1,4 +1,25 @@
 from PyQt4.QtCore import *
+import rggDice
+
+class Peculiarity(object):
+    
+    def __init__(self, name, description):
+        self.name = name
+        self.description = description
+
+class Skill(object):
+    
+    def __init__(self, name, description, level, specialty):
+        self.name = name
+        self.description = description
+        self.specialty = specialty
+        self.level = level
+        
+    def getBonus(self, specialty):
+        if specialty == self.specialty:
+            return self.level + 1
+        else:
+            return self.level
 
 class FIRECharacter(object):
     
@@ -48,3 +69,12 @@ class FIRECharacter(object):
         for vice in self.stats.values():
             total += vice
         return total
+    
+    def _addSkill(self, skill):
+        self.skills[skill.name] = skill
+        
+    def addSkill(self, name, description, level, specialty):
+        self._addSkill(Skill(name, description, level, specialty))
+        
+    def getSkillBonus(self, skillname, specialty):
+        return self.skills[skillname].getBonus(specialty)

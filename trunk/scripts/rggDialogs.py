@@ -627,16 +627,12 @@ class FIRECharacterSheetDialog(dialog):
         self.totalLabel = QtGui.QLabel(parent)
         self.updateTotal()
         
-        # Add buttons
-        theLesserOrFalseBox = QtGui.QBoxLayout(0)
-        theLesserOrFalseBox.addWidget(okayButton)
-        theLesserOrFalseBox.addWidget(cancelButton)
-        
-        # Position both
-        grandBox = QtGui.QBoxLayout(2)
-        grandBox.addLayout(formLayout)
-        grandBox.addWidget(self.totalLabel)
-        grandBox.addLayout(theLesserOrFalseBox)
+        # Position layout
+        grandBox = QtGui.QGridLayout()
+        grandBox.addLayout(formLayout, 0, 0, 1, 2)
+        grandBox.addWidget(self.totalLabel, 1, 1)
+        grandBox.addWidget(okayButton, 2, 0)
+        grandBox.addWidget(cancelButton, 2, 1)
         
         # Set up the widget
         widget.setLayout(grandBox)
