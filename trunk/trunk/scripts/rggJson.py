@@ -21,7 +21,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 from rggFields import validationError
 from rggSystem import makeLocalFilename
-import json
+try:
+    import cjson as json
+except:
+    import json
 
 def jsondumps(obj):
     """Dumps the object into a string. Contains no newlines."""
