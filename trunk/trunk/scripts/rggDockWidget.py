@@ -1,8 +1,9 @@
 from PyQt4 import QtGui, QtCore
 from rggSystem import signal, findFiles, POG_DIR, LOG_DIR, IMAGE_EXTENSIONS, CHAR_DIR, makePortableFilename
-from rggDialogs import newCharacterDialog
+from rggDialogs import newCharacterDialog, FIRECharacterSheetDialog
 from rggJson import loadObject, loadString, jsondump, jsonload
 import os, os.path, time
+import rggFIRECharacter
 
 class chatLineEdit(QtGui.QLineEdit):
 
@@ -416,3 +417,71 @@ class userListWidget(QtGui.QDockWidget):
     selectGM = signal(basestring, doc=
         """Called to request GM change."""
     )
+    
+class FIRECharactersWidget(QtGui.QDockWidget):
+    """The list of FIRE characters."""
+    
+    def __init__(self, mainWindow):
+        """Initializes the FIRE character list."""
+        super(QtGui.QDockWidget, self).__init__(mainWindow)
+        self.setToolTip(self.tr("Character sheets."))
+        self.setWindowTitle(self.tr("Character Sheets"))
+        self.widget = QtGui.QWidget(mainWindow)
+        self.characterList = QtGui.QListWidget(mainWindow)
+        self.characterAddButton = QtGui.QPushButton(self.tr("Add New"), mainWindow)
+        self.characterAddButton.setToolTip(self.tr("Create a new character sheet."))
+        self.characterEditButton = QtGui.QPushButton(self.tr("Edit"), mainWindow)
+        self.characterEditButton.setToolTip(self.tr("Edit the selected character sheet."))
+        self.layout = QtGui.QGridLayout()
+        self.layout.addWidget(self.characterList, 0, 0, 1, 2)
+        self.layout.addWidget(self.characterAddButton, 1, 0)
+        self.layout.addWidget(self.characterEditButton, 1, 1)
+        self.widget.setLayout(self.layout)
+        self.setWidget(self.widget)
+        self.setObjectName("FIRE Character Widget")
+        
+        self.characters = []
+        
+        mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, self)
+        
+        self.connect(self.characterAddButton, QtCore.SIGNAL('clicked()'), self.newCharacter)
+        self.connect(self.characterEditButton, QtCore.SIGNAL('clicked()'), self.editCharacter)
+        
+    def newCharacter(self):
+        dialog = FIRECharacterSheetDialog()
+        
+        def accept():
+            valid = dialog.is_valid()
+            if not valid:
+                showErrorMessage(dialog.error)
+            return valid
+        
+        if dialog.exec_(self.parentWidget(), accept):
+            newchardat = dialog.save()
+            char = rggFIRECharacter.FIRECharacter()
+            char.initFromDump(*newchardat)
+            self.characters.append(char)
+            self.characterList.addItem(char.name)
+            if len(self.characters) == 1:
+                self.characterList.setCurrentRow(0)
+    
+    def editCharacter(self):
+        characterBeingEdited = self.characters[self.characterList.currentRow()]
+        
+        dialog = FIRECharacterSheetDialog(char=characterBeingEdited)
+        
+        def accept():
+            valid = dialog.is_valid()
+            if not valid:
+                showErrorMessage(dialog.error)
+            return valid
+        
+        if dialog.exec_(self.parentWidget(), accept, characterBeingEdited):
+            newchardat = dialog.save()
+            char = rggFIRECharacter.FIRECharacter()
+            char.initFromDump(*newchardat)
+            self.characters.pop(self.characterList.currentRow())
+            self.characterList.takeItem(self.characterList.currentRow())
+            self.characters.append(char)
+            self.characterList.addItem(char.name)
+    

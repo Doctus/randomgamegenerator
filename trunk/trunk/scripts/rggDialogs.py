@@ -20,9 +20,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
 import os, os.path
-import rggMap
+import rggMap, rggFIRECharacter
 from rggSystem import fake, translate, showErrorMessage, findFiles, IMAGE_EXTENSIONS, TILESET_DIR, PORTRAIT_DIR, SAVE_DIR, makePortableFilename
-from rggFields import integerField, floatField, stringField, dropDownField, validationError
+from rggFields import integerField, floatField, stringField, dropDownField, sliderField, validationError
 from rggNet import ConnectionData, localHost
 from rggJson import *
 from PyQt4 import QtGui, QtCore
@@ -491,6 +491,210 @@ class newCharacterDialog(dialog):
         return([self.cleanData['listid'], 
                 self.cleanData['charactername'], 
                 self.cleanData['portrait']])
+                
+class FIRECharacterSheetDialog(dialog):
+    """A dialog used to create or edit a FIRE character sheet."""
+    
+    def __init__(self, **kwargs):
+        """Initializes the dialog data."""
+        super(FIRECharacterSheetDialog, self).__init__()
+        self.fields = self._createFields(kwargs)
+    
+    def _createFields(self, data):
+        """Create the fields used by this dialog."""
+        
+        if data.has_key("char"):
+            chara = data['char']
+            return dict(charactername=stringField(
+                translate('FIRECharacterSheetDialog', 'Character Name'),
+                value=data.get('charactername', chara.name)),
+                lust=sliderField(
+                translate('FIRECharacterSheetDialog', 'Lust'),
+                chara.getStat('lust'),
+                1,
+                5),
+                gluttony=sliderField(
+                translate('FIRECharacterSheetDialog', 'Gluttony'),
+                chara.getStat('gluttony'),
+                1,
+                5),
+                greed=sliderField(
+                translate('FIRECharacterSheetDialog', 'Greed'),
+                chara.getStat('greed'),
+                1,
+                5),
+                sloth=sliderField(
+                translate('FIRECharacterSheetDialog', 'Sloth'),
+                chara.getStat('sloth'),
+                1,
+                5),
+                wrath=sliderField(
+                translate('FIRECharacterSheetDialog', 'Wrath'),
+                chara.getStat('wrath'),
+                1,
+                5),
+                envy=sliderField(
+                translate('FIRECharacterSheetDialog', 'Envy'),
+                chara.getStat('envy'),
+                1,
+                5),
+                pride=sliderField(
+                translate('FIRECharacterSheetDialog', 'Pride'),
+                chara.getStat('pride'),
+                1,
+                5))
+        
+        return dict(charactername=stringField(
+                translate('FIRECharacterSheetDialog', 'Character Name'),
+                value=data.get('charactername', translate('FIRECharacterSheetDialog', 'Temp'))),
+                lust=sliderField(
+                translate('FIRECharacterSheetDialog', 'Lust'),
+                3,
+                1,
+                5),
+                gluttony=sliderField(
+                translate('FIRECharacterSheetDialog', 'Gluttony'),
+                3,
+                1,
+                5),
+                greed=sliderField(
+                translate('FIRECharacterSheetDialog', 'Greed'),
+                3,
+                1,
+                5),
+                sloth=sliderField(
+                translate('FIRECharacterSheetDialog', 'Sloth'),
+                3,
+                1,
+                5),
+                wrath=sliderField(
+                translate('FIRECharacterSheetDialog', 'Wrath'),
+                3,
+                1,
+                5),
+                envy=sliderField(
+                translate('FIRECharacterSheetDialog', 'Envy'),
+                3,
+                1,
+                5),
+                pride=sliderField(
+                translate('FIRECharacterSheetDialog', 'Pride'),
+                3,
+                1,
+                5))
+    
+    def _interpretFields(self, fields):
+        """Interpret the fields into a dictionary of clean items."""
+        return dict((key, field.clean()) for key, field in fields.items())
+    
+    def exec_(self, parent, accept, char=None):
+        """Executes this dialog as modal, ensuring OK is only hit with valid data.
+        
+        parent -- the parent object of this dialog
+        accept() -- Acceptance function;
+            return True to accept data, False to continue (you should show an error)
+        
+        returns: True if the OK button is hit and the acceptance function passes.
+        
+        """
+        
+        if char is not None:
+            self.character = char
+        else:
+            self.character = rggFIRECharacter.FIRECharacter()
+        
+        widget = QtGui.QDialog(parent)
+        
+        # Buttons
+        okayButton = QtGui.QPushButton(translate('FIRECharacterSheetDialog', "Finish"))
+        okayButton.setDefault(True)
+        cancelButton = QtGui.QPushButton(translate('FIRECharacterSheetDialog', "Cancel"))
+        
+        # Add fields
+        formLayout = QtGui.QFormLayout()
+        for id in (['charactername']):
+            field = self.fields[id]
+            formLayout.addRow(
+                translate('FIRECharacterSheetDialog', '{0}: ', 'Row layout').format(field.name),
+                field.widget(widget))
+        for id in (['lust', 'gluttony', 'greed', 'sloth', 'wrath', 'envy', 'pride']):
+            field = self.fields[id]
+            formLayout.addRow(
+                translate('FIRECharacterSheetDialog', '{0}: ', 'Row layout').format(field.name),
+                field.widget(widget))
+            field.evil.connect(self.updateTotal)
+                
+        self.totalLabel = QtGui.QLabel(parent)
+        self.updateTotal()
+        
+        # Add buttons
+        theLesserOrFalseBox = QtGui.QBoxLayout(0)
+        theLesserOrFalseBox.addWidget(okayButton)
+        theLesserOrFalseBox.addWidget(cancelButton)
+        
+        # Position both
+        grandBox = QtGui.QBoxLayout(2)
+        grandBox.addLayout(formLayout)
+        grandBox.addWidget(self.totalLabel)
+        grandBox.addLayout(theLesserOrFalseBox)
+        
+        # Set up the widget
+        widget.setLayout(grandBox)
+        widget.setModal(True)
+        widget.setWindowTitle(translate('FIRECharacterSheetDialog', "Editing Character Sheet..."))
+        
+        # Allow user to specify validation
+        def okayPressed():
+            if accept():
+                widget.accept()
+        
+        # Signals
+        widget.connect(okayButton, QtCore.SIGNAL('clicked()'), okayPressed)
+        widget.connect(cancelButton, QtCore.SIGNAL('clicked()'), widget.reject)
+        
+        # Show to user
+        return (widget.exec_() == QtGui.QDialog.Accepted)
+    
+    def updateTotal(self):
+        total = 0
+        for id in (['lust', 'gluttony', 'greed', 'sloth', 'wrath', 'envy', 'pride']):
+            total += self.fields[id].clean()
+        self.totalLabel.setText("Total: " + str(total) + "/" + str(self.character.vice))
+        
+    def clean(self):
+        """Check for errors and return well-formatted data."""
+        self.cleanData = self._interpretFields(self.fields)
+        return self.cleanData
+    
+    def save(self):
+        """Make a new character and return it."""
+        assert(self.cleanData)
+        return([self.cleanData['charactername'],
+                self.cleanData['lust'],
+                self.cleanData['gluttony'],
+                self.cleanData['greed'],
+                self.cleanData['sloth'],
+                self.cleanData['wrath'],
+                self.cleanData['envy'],
+                self.cleanData['pride']])
+                
+    def is_valid(self):
+        """Return true if the data is valid and complete."""
+        try:
+            self.clean()
+            assert(self.cleanData is not None)
+            total = 0
+            for id in (['lust', 'gluttony', 'greed', 'sloth', 'wrath', 'envy', 'pride']):
+                total += self.fields[id].clean()
+            assert(total == self.character.vice)
+            return True
+        except validationError as e:
+            self.cleanData = None
+            if len(e.args) > 0:
+                self._error = e.args[0]
+            else:
+                # Catch-all shouldn't be seen by end-users
+                self._error = translate('dialog', "There is an error in your input.")
 
 class gfxSettingsDialog(dialog):
     """A dialog used to create a new map."""

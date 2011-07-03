@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
 from PyQt4 import QtGui, QtCore
-from rggSystem import translate, showErrorMessage
+from rggSystem import translate, showErrorMessage, signal
 
 class validationError(Exception):
     """Error which occurs during input validation."""
@@ -228,3 +228,45 @@ class dropDownField(dialogField):
     def _getWidgetValue(self, widget):
         return unicode(widget.currentText())
 
+class sliderField(dialogField):
+    """A field made up of an integer slider."""
+    
+    def __init__(self, name, value=None, min=0, max=10):
+        """Initializes the field.
+        
+        name -- the name of the field
+        value -- the initial position of the slider
+        min -- the minimum value allowed
+        max -- the maximum value allowed
+        
+        """
+        super(sliderField, self).__init__(name, value)
+        self.min = min
+        self.max = max
+    
+    def _cleanValue(self, value):
+        if value <= self.max and value >= self.min:
+            return value
+        raise validationError(translate('sliderField', 'You must enter a valid choice for the {0} field.').format(self.name))
+    
+    def _createWidget(self, parent):
+        index = -1
+        widget = QtGui.QSlider(parent)
+        widget.setOrientation(QtCore.Qt.Horizontal)
+        widget.setMinimum(self.min)
+        widget.setMaximum(self.max)
+        widget.setValue(self.value)
+        widget.setTickInterval(1)
+        widget.setTickPosition(QtGui.QSlider.TicksAbove)
+        widget.valueChanged.connect(self.emitEvil)
+        return widget
+    
+    def emitEvil(self, trash):
+        self.evil.emit()
+    
+    def _getWidgetValue(self, widget):
+        return (widget.value())
+    
+    evil = signal(doc=
+        """Ponies!"""
+    )
