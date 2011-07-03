@@ -37,6 +37,9 @@ if __name__ == '__main__':
     # pog widget
     s.pwidget.pogPlaced.connect(rggViews.placePog)
     
+    # user list widget
+    s.uwidget.selectGM.connect(rggViews.selectGM)
+    
     # menu items
     s.menu.newMapAct.triggered.connect(rggViews.newMap)
     s.menu.loadMapAct.triggered.connect(rggViews.loadMap)

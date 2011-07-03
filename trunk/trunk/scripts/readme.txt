@@ -1,4 +1,4 @@
-RGG v.099 "Curses from all directions"
+RGG v.0991 "Underground souls, rumble"
 
 http://code.google.com/p/randomgamegenerator/
 
@@ -37,6 +37,13 @@ Special Thanks:
   Everyone from MoMM and #attercop
 
 Changelog:
+
+  v0.991 "Underground souls, rumble"
+    * The game window now remembers its last arrangement.
+    * Very long text (e.g. in pog names) now tries to wrap.
+    * Allowed negative layers for pogs.
+    * Added password system to limit who can join a game.
+    * Added GM designation.
 
   v0.99 "Curses from all directions"
     * Pogs and lines are no longer limited to maps. Instead, you can

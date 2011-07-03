@@ -72,6 +72,8 @@ class _state(object):
     thickness = 1
     linecolour = [1.0, 1.0, 1.0]
     
+    GM = None
+    
     @staticmethod
     def initialize(mainApp):
         _state.menu = rggMenuBar.menuBar()
@@ -173,6 +175,28 @@ def getNetUserList():
     """Returns the user names formatted for transfer over net."""
     return _state.uwidget.getUsers()
 
+def getGM():
+    return _state.GM
+
+def changeGM(username):
+    _state.GM = username
+    _state.uwidget.setGM(username)
+    
+@serverRPC
+def respondChangeGM(username, origin):
+    if _state.GM is None or origin == _state.GM:
+        changeGM(username)
+    
+@clientRPC
+def sendChangeGM(user, username, origin):
+    respondChangeGM(allusers(), username, origin)
+    
+def selectGM(newname):
+    sendChangeGM(newname, localhandle())
+    
+def setUwidgetLocal():
+    _state.uwidget.localname = localhandle()
+
 # TODO: Name changing needs to be synched across the wire
 # The workaround is to log out and back in.
 #def changeName(user, name):
@@ -234,6 +258,8 @@ def hostGame():
         connection = dialog.save()
         server.setPassword(connection.password)
         renameuser(localhandle(), connection.username)
+        changeGM(connection.username)
+        setUwidgetLocal()
         if client.host(connection.port):
             say(translate('views', 'Now listening on port {port}.').format(port=connection.port))
             addUserToList(localhandle(), True)

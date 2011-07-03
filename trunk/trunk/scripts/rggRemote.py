@@ -149,6 +149,7 @@ def clientConnect(client, username):
     #print "Client connected."
     rggViews.renameuser(localhandle(), username)
     rggViews._closeAllMaps()
+    rggViews.setUwidgetLocal()
     say(translate('remote', "Welcome, {name}!").format(name=username))
 
 def clientDisconnect(client, errorMessage):
@@ -189,6 +190,7 @@ def serverConnect(server, username):
     rggViews.adduser(user)
     respondUserJoin(allusersbut(user), username)
     rggViews.respondSession(user, rggViews.getSession().dump())
+    rggViews.respondChangeGM(user, rggViews.getGM(), localhandle())
     #for ID, map in allmaps():
     #    rggViews.respondMapCreate(user, ID, map.dump())
     rggViews.respondUserList(user, getNetUserList())

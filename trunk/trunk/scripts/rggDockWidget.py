@@ -339,6 +339,16 @@ class pogPalette(QtGui.QDockWidget):
         """Called to request pog placement on the map."""
     )
     
+class userListList(QtGui.QListWidget):
+
+    def __init__(self, parent, ulmain):
+        QtGui.QListWidget.__init__(self)
+        self.ulmain = ulmain
+        self.itemActivated.connect(self.changeGM)
+        
+    def changeGM(self, item):
+        self.ulmain.setGMByID(self.currentRow())
+    
 class userListWidget(QtGui.QDockWidget):
     """The list of connected users."""
     
@@ -348,7 +358,7 @@ class userListWidget(QtGui.QDockWidget):
         self.setToolTip(self.tr("People presently playing."))
         self.setWindowTitle(self.tr("Connected Users"))
         self.widget = QtGui.QWidget(mainWindow)
-        self.listOfUsers = QtGui.QListWidget(mainWindow)
+        self.listOfUsers = userListList(mainWindow, self)
         self.internalList = []
         self.layout = QtGui.QGridLayout()
         self.layout.addWidget(self.listOfUsers, 0, 0)
@@ -356,6 +366,8 @@ class userListWidget(QtGui.QDockWidget):
         self.widget.setMaximumWidth(200) #Arbitrary; keeps it from taking over 1/3 of the screen
         self.setWidget(self.widget)
         self.setObjectName("User List Widget")
+        self.gmname = None
+        self.localname = None
         mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
         
     def addUser(self, name, host=False):
@@ -363,6 +375,8 @@ class userListWidget(QtGui.QDockWidget):
         nametmp = name
         if host:
             nametmp = "[Host] " + nametmp
+        if self.gmname == name:
+            nametmp = "[GM] " + nametmp
         self.listOfUsers.addItem(nametmp)
         
     def removeUser(self, name):
@@ -377,3 +391,28 @@ class userListWidget(QtGui.QDockWidget):
     def clearUserList(self):
         self.internalList = []
         self.listOfUsers.clear()
+        
+    def refreshDisplay(self):
+        self.listOfUsers.clear()
+        for item in self.internalList:
+            nametmp = item[0]
+            if item[1]:
+                nametmp = "[Host] " + nametmp
+            if self.gmname == item[0]:
+                nametmp = "[GM] " + nametmp
+            self.listOfUsers.addItem(nametmp)
+        
+    def setGM(self, new):
+        self.gmname = new
+        self.refreshDisplay()
+        
+    def setGMByID(self, ID):
+        if self.gmname != self.localname:
+            return
+        name = self.internalList[ID][0]
+        #self.setGM(name)
+        self.selectGM.emit(name)
+        
+    selectGM = signal(basestring, doc=
+        """Called to request GM change."""
+    )
