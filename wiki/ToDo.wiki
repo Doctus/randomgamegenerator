@@ -6,8 +6,10 @@
 
 = Network =
   * Update protocol documentation so it's actually accurate.
+  * Switch pogs to absolute positioning.
 
 = Interface =
+  * Make IC chat character selector jump to newest additions.
   * Warning in the join-game dialog that you'll lose current maps and get those the group has loaded.
   * Some sort of dialog designed for displaying information (text and/or images; maybe the same HTML subset as chat would be preferable). For stuff like, say, character sheets. Doesn't need to be editable; probably shouldn't be in fact. Might get rolled into the "widgets" thing.
   * Pog stuff:
@@ -19,7 +21,6 @@
   * From Kaijyuu: pog placement could be made more intuitive
 
 = Game Support =
-  * Designate "DM" user
   * Allow DM to request dice rolls from players
   * "Display Grid" option - separate from tileset size; square and hex grids (and other weird shapes if there's any evidence they've been used)
   * Option to snap pogs to grid
