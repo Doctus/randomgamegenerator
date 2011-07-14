@@ -702,7 +702,7 @@ class gfxSettingsDialog(dialog):
     
     def _createFields(self, data):
         """Create the fields used by this dialog."""
-        self.fieldtemp = ["GL_COMPRESSED_RG_RGTC2", 1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", 1, 1]
+        self.fieldtemp = ["GL_COMPRESSED_RG_RGTC2", 1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", 1, 1, "Magic"]
 
         try:
             js = jsonload(os.path.join(SAVE_DIR, "gfx_settings.rgs"))
@@ -713,6 +713,7 @@ class gfxSettingsDialog(dialog):
             self.fieldtemp[4] = loadString('gfx.mipminfilter', js.get('mipminfilter'))
             self.fieldtemp[5] = loadString('gfx.FSAA', js.get('FSAA'))
             self.fieldtemp[6] = loadString('gfx.VBO', js.get('VBO'))
+            self.fieldtemp[7] = loadString('gfx.magic', js.get('Magic'))
         except:
             print "no settings detected"
             pass
@@ -734,7 +735,9 @@ class gfxSettingsDialog(dialog):
             FSAA=dropDownField(translate('gfxSettingsDialog', 'FSAA'), ["Off", "On"],
                 value=data.get('FSAA', self.fieldtemp[5])),
             VBO=dropDownField(translate('gfxSettingsDialog', 'VBO'), ["Off", "On"],
-                value=data.get('VBO', self.fieldtemp[6])))
+                value=data.get('VBO', self.fieldtemp[6])),
+            Magic=dropDownField(translate('gfxSettingsDialog', 'Magic'), ["Magic", "More Magic"],
+                value=data.get('Magic', self.fieldtemp[7])))
     
     def _interpretFields(self, fields):
         """Interpret the fields into a dictionary of clean items."""
@@ -760,7 +763,7 @@ class gfxSettingsDialog(dialog):
         
         # Add fields
         formLayout = QtGui.QFormLayout()
-        for id in ('compress', 'anifilt', 'minfilter', 'magfilter', 'mipminfilter', 'FSAA', 'VBO'):
+        for id in ('compress', 'anifilt', 'minfilter', 'magfilter', 'mipminfilter', 'FSAA', 'VBO', 'Magic'):
             field = self.fields[id]
             formLayout.addRow(translate('gfxSettingsDialog', '{0}: ', 'Row layout').format(field.name), field.widget(widget))
         

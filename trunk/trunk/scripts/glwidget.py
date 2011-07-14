@@ -223,7 +223,7 @@ class GLWidget(QGLWidget):
         from rggSystem import SAVE_DIR
         import os
 
-        self.fieldtemp = ["GL_COMPRESSED_RG_RGTC2", 1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", "On", "On"]
+        self.fieldtemp = ["GL_COMPRESSED_RG_RGTC2", 1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", "On", "On", "Magic"]
 
         try:
             js = jsonload(os.path.join(SAVE_DIR, "gfx_settings.rgs"))
@@ -237,6 +237,15 @@ class GLWidget(QGLWidget):
         except:
             print "no settings detected"
             pass
+        
+        try:
+            self.fieldtemp[7] = loadString('gfx.magic', js.get('Magic'))
+        except:
+            pass
+        
+        if self.fieldtemp[7] == "More Magic":
+            try: glEnable(GL_MULTISAMPLE) #Supposed to fail
+            except: pass
 
         #mipmap support and NPOT texture support block
         if not hasGLExtension("GL_ARB_framebuffer_object"):
