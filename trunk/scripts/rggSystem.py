@@ -55,6 +55,7 @@ PLUGINS_DIR = 'plugins'
 LOG_DIR = 'save/logs'
 MAP_DIR = 'save/maps'
 CHAR_DIR = 'save/characters'
+MUSIC_DIR = 'data/music'
 SAVE_DIR = 'save'
 COLOURS = {"White":(1.0, 1.0, 1.0), 
            "Red": (1.0, 0.0, 0.0), 

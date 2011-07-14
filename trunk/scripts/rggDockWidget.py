@@ -1,5 +1,5 @@
-from PyQt4 import QtGui, QtCore
-from rggSystem import signal, findFiles, POG_DIR, LOG_DIR, IMAGE_EXTENSIONS, CHAR_DIR, makePortableFilename
+from PyQt4 import QtGui, QtCore, phonon
+from rggSystem import signal, findFiles, POG_DIR, LOG_DIR, IMAGE_EXTENSIONS, CHAR_DIR, MUSIC_DIR, makePortableFilename
 from rggDialogs import newCharacterDialog, FIRECharacterSheetDialog
 from rggJson import loadObject, loadString, jsondump, jsonload
 import os, os.path, time
@@ -485,3 +485,129 @@ class FIRECharactersWidget(QtGui.QDockWidget):
             self.characters.append(char)
             self.characterList.addItem(char.name)
     
+class fileItem(QtGui.QListWidgetItem):
+
+    def __init__(self, file, dir, panel):
+        QtGui.QListWidgetItem.__init__(self)
+        self.file = file
+        self.dir = dir
+        
+        self.setText(file[5:len(file)-3])
+        
+class musicListWidget(QtGui.QListWidget):
+
+    def __init__(self, panel):
+        QtGui.QListWidget.__init__(self)
+        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.panel = panel
+
+class MusPanel(QtGui.QDockWidget):
+    '''Provides controls for local music playback.'''
+
+    def __init__(self, mainWindow):
+        super(QtGui.QDockWidget, self).__init__(mainWindow)
+        
+        self.mediaobject = phonon.Phonon.MediaObject(self)
+        self.audioOutput = phonon.Phonon.AudioOutput(phonon.Phonon.MusicCategory, self)
+        phonon.Phonon.createPath(self.mediaobject, self.audioOutput)
+        
+        self.setObjectName("Music Panel")
+
+        self.next = None
+        self.contents = QtGui.QWidget(self)
+        self.musicList = musicListWidget(self)
+        self.musicList.itemActivated.connect(self.playClicked)
+        self.play = QtGui.QPushButton("Play")
+        self.stop = QtGui.QPushButton("Stop")
+        self.pause = QtGui.QPushButton("Pause")
+        self.shuffle = QtGui.QCheckBox("Shuffle")
+        
+        self.addFilesInDir(MUSIC_DIR)
+        
+        x = 0
+        grid = QtGui.QGridLayout()
+
+        grid.addWidget(self.musicList, x, 0, 1, 3)
+        x += 1
+        
+        grid.addWidget(phonon.Phonon.SeekSlider(self.mediaobject), x, 0, 1, 3)
+        x += 1
+        
+        grid.addWidget(self.play, x, 0)
+        grid.addWidget(self.stop, x, 1)
+        grid.addWidget(self.pause, x, 2)
+        x += 1
+        
+        grid.addWidget(self.shuffle, x, 0)
+        x += 1
+
+        self.contents.setLayout(grid)
+        
+        self.play.clicked.connect(self.playClicked)
+        self.stop.clicked.connect(self.stopClicked)
+        self.pause.clicked.connect(self.pauseClicked)
+        self.mediaobject.aboutToFinish.connect(self.enqueueNext)
+        self.mediaobject.currentSourceChanged.connect(self.updateList)
+        
+        self.setWindowTitle("Music Panel")
+        self.setWidget(self.contents)
+        mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, self)
+
+    def addFilesInDir(self, dir):
+        fdir = os.listdir(dir)
+        
+        for file in fdir:
+            if os.path.isdir(dir + '/' + file):
+                self.addFilesInDir(dir + '/' + file)
+
+        for file in fdir:
+            if file[-3:] == "mp3":
+                self.musicList.addItem(fileItem(file, dir, self))
+
+    def updateList(self):
+        if self.next != None:
+            self.musicList.setCurrentItem(self.next)
+        
+    def enqueueNext(self):
+        if self.shuffle.isChecked():
+            rand = self.musicList.currentRow()
+            count = self.musicList.count()
+            
+            while rand == self.musicList.currentRow() and count > 1:
+                rand = random.randint(0, count-1)
+
+            item = self.musicList.item(rand)
+            self.mediaobject.enqueue(phonon.Phonon.MediaSource(item.dir + '/' + item.file))
+        else:
+            count = self.musicList.count()
+            currentrow = self.musicList.currentRow()
+            next = 0
+            
+            if currentrow + 1 < count:
+                next = currentrow + 1
+            
+            item = self.musicList.item(next)
+            self.mediaobject.enqueue(phonon.Phonon.MediaSource(item.dir + '/' + item.file))
+            
+        self.next = item
+            
+    def playClicked(self, checked):
+        item = self.musicList.item(self.musicList.currentRow())
+        
+        if self.mediaobject.state() == phonon.Phonon.PausedState:
+            self.mediaobject.play()
+            return
+        
+        self.mediaobject.setCurrentSource(phonon.Phonon.MediaSource(item.dir + '/' + item.file))
+        
+        if self.mediaobject.state() != phonon.Phonon.PlayingState:
+            self.mediaobject.play()
+            
+    def stopClicked(self, checked):
+        self.mediaobject.stop()
+    
+    def pauseClicked(self, checked):
+        if self.mediaobject.state() == phonon.Phonon.PausedState:
+            self.mediaobject.play()
+        if self.mediaobject.state() == phonon.Phonon.PlayingState:
+            self.mediaobject.pause()
