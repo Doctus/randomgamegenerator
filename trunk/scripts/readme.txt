@@ -44,6 +44,8 @@ Changelog:
     * Allowed negative layers for pogs.
     * Added password system to limit who can join a game.
     * Added GM designation.
+    * Added music player.
+    * Added dance terms to technique generator.
 
   v0.99 "Curses from all directions"
     * Pogs and lines are no longer limited to maps. Instead, you can
