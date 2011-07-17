@@ -314,9 +314,11 @@ def _generateTechniqueName(typ='rand', elemnt='rand', moral='rand',
   martialnoun = ['fist', 'kick', 'slam', 'technique', 'style', 'way', 'grasp', 'hold', 'grapple']
   magicnoun = ['ritual', 'spell', 'hex', 'curse', 'geas', 'invocation', 'evocation', 'conjuration',
                'abjuration']
+  dancenoun = ['step', 'spin', 'walk', 'waltz', 'shuffle', 'drop', 'flare', 'spin']
   typindex = {'martial':martialnoun,
               'magic':magicnoun,
-              'rand':random.choice([martialnoun, magicnoun])}
+              'dance':dancenoun,
+              'rand':random.choice([martialnoun, magicnoun, dancenoun])}
   impressiveAdjectives = ['invulnerable', 'invincible', 'forgotten', 'ancient',
                           'forbidden', 'extraordinary', 'kaleidoscopic', 'first',
                           'vaulting', 'unrivalled', 'unlimited', 'endless',
@@ -399,6 +401,8 @@ def getTechniqueName(st):
       argCompilation[0] = 'martial'
   elif st.find("magic") != -1:
       argCompilation[0] = 'magic'
+  elif st.find("dance") != -1:
+      argCompilation[0] = 'dance'
   if st.find("fire") != -1:
       argCompilation[1] = 'fire'
   elif st.find("ice") != -1:
