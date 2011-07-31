@@ -1,0 +1,3 @@
+run "pylupdate4 translate.pro"
+Update the produced translation files
+run "lrelease-qt4 <name of translation file here>" when done. Don't commit the resulting .qm binary file, it is only for packaging in the releases.
