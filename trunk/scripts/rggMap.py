@@ -163,7 +163,8 @@ class Map(object):
             mapsize=self.mapsize,
             tileset=self.tileset,
             tilesize=self.tilesize,
-            tiles=self.tileindexes)
+            tiles=self.tileindexes,
+            drawoffset=self._drawOffset)
     
     @staticmethod
     def load(obj, dumpmode=False):
@@ -173,7 +174,8 @@ class Map(object):
             loadString('Map.authorname', obj.get('authorname')),
             loadCoordinates('Map.mapsize', obj.get('mapsize'), length=2, min=1, max=65535),
             loadString('Map.tileset', obj.get('tileset')),
-            loadCoordinates('Map.tilesize', obj.get('tilesize'), length=2, min=1, max=65535))
+            loadCoordinates('Map.tilesize', obj.get('tilesize'), length=2, min=1, max=65535),
+            loadCoordinates('Map.drawoffset', obj.get('drawoffset'), length=2))
         
         # HACK: Looks like coordinates; saves work.
         tiles = loadCoordinates('Map.tiles', obj.get('tiles'), length=len(map.tileindexes), min=0, max=65535)

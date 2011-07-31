@@ -30,13 +30,14 @@ class Session(object):
         self.lines = []
         self.linesDict = {}
         
-    def _addMap(self, map):
-        assert(map.ID is not None)
-        pos = 0
-        for m in self.maps.values():
-            pos += m.pixelSize[0] + 25
-        map.drawOffset = (pos, 0)
-        self.maps[map.ID] = map
+    def _addMap(self, mappe):
+        assert(mappe.ID is not None)
+        if mappe.drawOffset == [0, 0]:
+            pos = 0
+            for m in self.maps.values():
+                pos += m.pixelSize[0] + 25
+            mappe.drawOffset = (pos, 0)
+        self.maps[mappe.ID] = mappe
         
     def _addPog(self, pog):
         assert(pog.ID is not None)
@@ -72,18 +73,19 @@ class Session(object):
         self.pogs[pog.ID].destroy()
         del self.pogs[pog.ID]
         
-    def addMap(self, map):
-        pos = 0
-        for m in self.maps.values():
-            pos += m.pixelSize[0] + 25
-        map.drawOffset = (pos, 0)
+    def addMap(self, mappe):
+        if mappe.drawOffset == [0, 0]:
+            pos = 0
+            for m in self.maps.values():
+                pos += m.pixelSize[0] + 25
+            mappe.drawOffset = (pos, 0)
     
-        ID = self._findUniqueMapID(map.mapname)
-        map.ID = ID
+        ID = self._findUniqueMapID(mappe.mapname)
+        mappe.ID = ID
         
         #rggResource.srm.processFile(localuser(), map.tileset)
         
-        self.maps[ID] = map
+        self.maps[ID] = mappe
         
     def addDumpedMap(self, dump, ID):
         mappe = rggMap.Map.load(dump)
@@ -97,16 +99,16 @@ class Session(object):
         return self.maps[ID]
         
     def findTopMap(self, mapPosition):
-        for map in self.maps.values():
-            size = map.pixelSize
-            if mapPosition[0] >= map.drawOffset[0] and mapPosition[0] <= map.drawOffset[0] + size[0]:
-                if mapPosition[1] >= map.drawOffset[1] and mapPosition[1] <= map.drawOffset[1] + size[1]:
-                    return map
+        for mappe in self.maps.values():
+            size = mappe.pixelSize
+            if mapPosition[0] >= mappe.drawOffset[0] and mapPosition[0] <= mappe.drawOffset[0] + size[0]:
+                if mapPosition[1] >= mappe.drawOffset[1] and mapPosition[1] <= mappe.drawOffset[1] + size[1]:
+                    return mappe
         return None
     
     def closeAllMaps(self):
-        for map in self.maps.values():
-            map._deleteTiles()
+        for mappe in self.maps.values():
+            mappe._deleteTiles()
         self.maps = {}
     
     def findTopPog(self, position):
@@ -149,7 +151,7 @@ class Session(object):
 
         return dict(
             pogs=dict([(pog.ID, pog.dump()) for pog in self.pogs.values()]),
-            maps=dict([(map.ID, map.dump()) for map in self.maps.values()]),
+            maps=dict([(mappe.ID, mappe.dump()) for mappe in self.maps.values()]),
             lines=self.lines)
     
     @staticmethod
@@ -164,8 +166,8 @@ class Session(object):
             sess._addPog(loaded)
             
         maps = loadObject('Session.maps', obj.get('maps'))
-        for ID, map in maps.items():
-            loaded = rggMap.Map.load(map)
+        for ID, mappe in maps.items():
+            loaded = rggMap.Map.load(mappe)
             loaded.ID = ID
             sess._addMap(loaded)
 
