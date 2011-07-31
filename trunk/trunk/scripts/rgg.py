@@ -1,10 +1,33 @@
 if __name__ == '__main__':
-    from rggSystem import injectMain
+    from rggSystem import injectMain, SAVE_DIR
     from PyQt4.QtCore import *
     from PyQt4.QtGui import *
     from PyQt4.QtOpenGL import *
+
+    from rggJson import loadString, jsonload
+    import os
     
+    fieldtemp = ["English"]
     app = QApplication(['RGG in Space'])
+
+    try:
+        js = jsonload(os.path.join(SAVE_DIR, "lang_settings.rgs"))
+        fieldtemp[0] = loadString('lang.language', js.get('language'))
+    except:
+        print "no language settings detected"
+        pass
+
+    if fieldtemp[0] != "English":
+        transfile = ""
+        if fieldtemp[0] == "Japanese":
+            transfile = "rgg_py_ja"
+        if fieldtemp[0] == "Dutch":
+            transfile = "rgg_py_nl"
+
+        trans = QTranslator()
+        if not trans.load(transfile):
+            print transfile + "not found"
+        app.installTranslator(trans)
 
     qgf = QGLFormat.defaultFormat()
     qgf.setSampleBuffers(True)
@@ -56,6 +79,7 @@ if __name__ == '__main__':
     s.menu.toggleAlertsAct.triggered.connect(rggViews.toggleAlerts)
     s.menu.thicknessMenu.triggered.connect(rggViews.setThickness)
     s.menu.colourMenu.triggered.connect(rggViews.setLineColour)
+    s.menu.langMenu.triggered.connect(rggViews.setLanguage)
     
     server = rggRPC.server
     client = rggRPC.client

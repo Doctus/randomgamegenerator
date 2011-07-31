@@ -95,7 +95,7 @@ class menuBar(object):
         self.deleteIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-eraser-icon.png"), "Delete Tool", main)
         self.deleteIcon.setShortcut("Ctrl+R")
         self.deleteIcon.setToolTip("Delete Tool (Ctrl+R)")
-        
+
         # MENUS
         
         fileMenu = QtGui.QMenu("&File", main)
@@ -111,7 +111,7 @@ class menuBar(object):
         fileMenu.addAction(self.saveSessAct)
         fileMenu.addAction(self.loadSessAct)
         
-        internetMenu = QtGui.QMenu("&Internet", main)
+        internetMenu = QtGui.QMenu(translate("menubar", "&Internet"), main)
         internetMenu.addAction(self.hostGameAct)
         internetMenu.addAction(self.joinGameAct)
         internetMenu.addSeparator()
@@ -139,6 +139,11 @@ class menuBar(object):
         stylesMenu = QtGui.QMenu("&Styles", main)
         for style in rggStyles.sheets.keys():
             stylesMenu.addAction(QtGui.QAction(style, main))
+
+        self.langMenu = QtGui.QMenu(translate("menubar", "&Language"), main)
+        self.langMenu.addAction(QtGui.QAction(translate("menubar", "Dutch"), main))
+        self.langMenu.addAction(QtGui.QAction(translate("menubar", "English"), main))
+        self.langMenu.addAction(QtGui.QAction(translate("menubar", "Japanese"), main))
             
         self.optionsMenu = QtGui.QMenu("&Options", main)
         self.optionsMenu.addAction(self.toggleAlertsAct)
@@ -166,6 +171,7 @@ class menuBar(object):
         self.menubar.addMenu(drawMenu)
         self.menubar.addMenu(stylesMenu)
         self.menubar.addMenu(self.optionsMenu)
+        self.menubar.addMenu(self.langMenu)
         self.pluginhide = self.menubar.addMenu(self.pluginsMenu)
         self.menubar.addSeparator()
         self.menubar.addAction(self.selectIcon)

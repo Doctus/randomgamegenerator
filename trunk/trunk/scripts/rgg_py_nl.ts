@@ -1,53 +1,210 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1">
 <context>
-    <name>characterSheet</name>
+    <name>FIRECharacterSheetDialog</name>
     <message>
-        <location filename="rggDockWidget.py" line="185"/>
-        <source>Character Sheet</source>
+        <location filename="rggDialogs.py" line="547"/>
+        <source>Character Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="547"/>
+        <source>Lust</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="547"/>
+        <source>Gluttony</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="547"/>
+        <source>Greed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="547"/>
+        <source>Sloth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="547"/>
+        <source>Wrath</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="547"/>
+        <source>Envy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="547"/>
+        <source>Pride</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="547"/>
+        <source>Temp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="609"/>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="611"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="622"/>
+        <source>{0}: </source>
+        <comment>Row layout</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="640"/>
+        <source>Editing Character Sheet...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FIRECharactersWidget</name>
+    <message>
+        <location filename="rggDockWidget.py" line="427"/>
+        <source>Character sheets.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="428"/>
+        <source>Character Sheets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="431"/>
+        <source>Add New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="432"/>
+        <source>Create a new character sheet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="433"/>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="434"/>
+        <source>Edit the selected character sheet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ICChatWidget</name>
+    <message>
+        <location filename="rggDockWidget.py" line="116"/>
+        <source>A widget for in-character chat.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="117"/>
+        <source>IC Chat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="120"/>
+        <source>Type text here and press Enter or Return to transmit it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="125"/>
+        <source>Select the character to be displayed as the speaker of entered text.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="126"/>
+        <source>Add New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="127"/>
+        <source>Add a new in-character chat character via a dialog box.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="128"/>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="129"/>
+        <source>Delete the currently selected in-character chat character.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>chat</name>
     <message>
-        <location filename="rggChat.py" line="30"/>
+        <location filename="rggChat.py" line="29"/>
         <source>No documentation found.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggChat.py" line="72"/>
+        <location filename="rggChat.py" line="70"/>
         <source>Syntax: /randomname NAMETYPE. Caps and spaces are ignored. Some valid arguments are JAPANESEFEMALEFULL and DwArF M aLe</source>
         <translation type="unfinished">BLAH BLAH BLAH</translation>
     </message>
     <message>
-        <location filename="rggChat.py" line="149"/>
+        <location filename="rggChat.py" line="154"/>
         <source>Syntax: /me DOES ACTION. Displays &apos;[HANDLE] DOES ACTION&apos; in italic font.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggChat.py" line="169"/>
+        <location filename="rggChat.py" line="173"/>
         <source>Syntax: /whisper HANDLE MESSAGE. Sends a message only to the specified user. Spaces MUST be correct. Handle may be caps-sensitive.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggChat.py" line="244"/>
-        <source>Please type &amp;#38;#60; if you wish to include &amp;#60; in your message.</source>
+        <location filename="rggChat.py" line="179"/>
+        <source>mutters something.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggChat.py" line="181"/>
+        <source>What do you want to tell {target}?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggChat.py" line="255"/>
+        <source>Please type &amp;#60; if you wish to include &lt; in your message.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>chatWidget</name>
     <message>
-        <location filename="rggDockWidget.py" line="37"/>
-        <source>Chat</source>
+        <location filename="rggDockWidget.py" line="41"/>
+        <source>A widget for out-of-character chat and system messages.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="42"/>
+        <source>OOC Chat / System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="45"/>
+        <source>Type text here and press Enter or Return to transmit it.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>chatdoc</name>
     <message>
-        <location filename="rggChat.py" line="66"/>
+        <location filename="rggChat.py" line="59"/>
         <source>/say: Say a chat message. You do not need to write this as a command.&lt;dl&gt;
     &lt;dt&gt;Example:&lt;/dt&gt;
         &lt;dd&gt;Hello there!&lt;/dd&gt;
@@ -57,7 +214,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggChat.py" line="87"/>
+        <location filename="rggChat.py" line="77"/>
         <source>/randomname: Generate a random name.&lt;dl&gt;
     &lt;dt&gt;Syntax:&lt;/dt&gt;
         &lt;dd&gt;/randomname NAMETYPE. Caps and spaces are ignored.&lt;/dd&gt;
@@ -70,7 +227,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggChat.py" line="106"/>
+        <location filename="rggChat.py" line="92"/>
         <source>/techniquename: Generate a technique name.&lt;dl&gt;
     &lt;dt&gt;Alternate spelling:&lt;/dt&gt;
         &lt;dd&gt;/techname&lt;/dd&gt;
@@ -87,24 +244,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggChat.py" line="125"/>
-        <source>/techniquename: Generate a technique name.&lt;dl&gt;
-    &lt;dt&gt;Alternate spelling:&lt;/dt&gt;
-        &lt;dd&gt;/techname&lt;/dd&gt;
-    
-    &lt;dt&gt;Syntax:&lt;/dt&gt;
-        &lt;dd&gt;/techniquename&lt;/dd&gt;
-        &lt;dd&gt;/techniquename arguments...&lt;/dd&gt;
-    
-    &lt;dt&gt;Examples:&lt;/dt&gt;
-        &lt;dd&gt;/techniquename&lt;/dd&gt;
-        &lt;dd&gt;/techniquename ...&lt;/dd&gt;
-    &lt;/dl&gt;&lt;br&gt;
-    </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="rggChat.py" line="145"/>
+        <location filename="rggChat.py" line="127"/>
         <source>/roll: Roll the dice. The dice can be in the form of macros or
     like 3d8, for 3 dice with 8 sides. You can also add dice.
     Specify no dice to roll 2d6.&lt;dl&gt;
@@ -118,7 +258,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggChat.py" line="164"/>
+        <location filename="rggChat.py" line="159"/>
         <source>Display an emote in italics.&lt;dl&gt;
     &lt;dt&gt;Alternate spelling:&lt;/dt&gt;
         &lt;dd&gt;/techname&lt;/dd&gt;
@@ -131,7 +271,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggChat.py" line="187"/>
+        <location filename="rggChat.py" line="185"/>
         <source>/whisper: Whisper a message to another user.&lt;dl&gt;
     &lt;dt&gt;Alternate spellings:&lt;/dt&gt;
         &lt;dd&gt;/w, /tell, /t, /message, /msg&lt;/dd&gt;
@@ -146,14 +286,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggChat.py" line="196"/>
+        <location filename="rggChat.py" line="202"/>
         <source>/addmacro: Create a new dice macro.
     &lt;br&gt;
     </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggChat.py" line="217"/>
+        <location filename="rggChat.py" line="211"/>
         <source>camera: Display the current camera location.&lt;dl&gt;
     &lt;dt&gt;Alternate spelling:&lt;/dt&gt;
         &lt;dd&gt;/cam&lt;/dd&gt;
@@ -162,7 +302,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggChat.py" line="227"/>
+        <location filename="rggChat.py" line="232"/>
         <source>/placepog: Place a pog.
     
     &lt;br&gt;
@@ -170,7 +310,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggChat.py" line="237"/>
+        <location filename="rggChat.py" line="242"/>
         <source>/newmap: Create a new map.
     
     &lt;br&gt;
@@ -178,27 +318,50 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggChat.py" line="261"/>
+        <location filename="rggChat.py" line="272"/>
         <source>Invalid command.</source>
         <comment>Unknown chat command name.</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggChat.py" line="269"/>
+        <location filename="rggChat.py" line="276"/>
         <source>Command Help:&lt;br&gt;Typing ordinary text and pressing &apos;enter&apos; will display to all players. Other commands may be invoked with &apos;/&apos; plus the name of the command plus any arguments.&lt;dl&gt;&lt;dt&gt;Commands&lt;/dt&gt;&lt;dd&gt;{commandList}&lt;/dd&gt;&lt;/dl&gt;&lt;br&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggChat.py" line="272"/>
+        <location filename="rggChat.py" line="276"/>
         <source>&lt;/dd&gt;&lt;dd&gt;</source>
         <comment>Goes inbetween the commands in the commandList.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggChat.py" line="111"/>
+        <source>/advice: Generate some random, probably nonsensical advice.&lt;dl&gt;
+
+    &lt;dt&gt;Syntax:&lt;/dt&gt;
+        &lt;dd&gt;/advice&lt;/dd&gt;
+    &lt;/dl&gt;&lt;br&gt;
+    </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggChat.py" line="147"/>
+        <source>/proll: Same as /roll but private.&lt;br&gt;
+    </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggChat.py" line="223"/>
+        <source>/swapmap: Load a new map.
+    &lt;br&gt;
+    </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>dialog</name>
     <message>
-        <location filename="rggDialogs.py" line="61"/>
+        <location filename="rggDialogs.py" line="693"/>
         <source>There is an error in your input.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -206,38 +369,135 @@
 <context>
     <name>diceRoller</name>
     <message>
-        <location filename="rggDockWidget.py" line="68"/>
+        <location filename="rggDockWidget.py" line="233"/>
         <source>Dice</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDockWidget.py" line="79"/>
+        <location filename="rggDockWidget.py" line="243"/>
         <source>Roll</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDockWidget.py" line="80"/>
+        <location filename="rggDockWidget.py" line="245"/>
         <source>Add Macro</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDockWidget.py" line="81"/>
+        <location filename="rggDockWidget.py" line="247"/>
         <source>Delete Macro</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="244"/>
+        <source>Roll dice according to the selected macro.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="246"/>
+        <source>Add a new macro via a dialog box.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="248"/>
+        <source>Remove the currently selected macro.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>dropDownField</name>
     <message>
-        <location filename="rggFields.py" line="163"/>
+        <location filename="rggFields.py" line="215"/>
         <source>You must enter a valid choice for the {0} field.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>floatField</name>
+    <message>
+        <location filename="rggFields.py" line="131"/>
+        <source>You must enter a number for the {0} field.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggFields.py" line="135"/>
+        <source>negative infinity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggFields.py" line="135"/>
+        <source>infinity</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>gfxSettingsDialog</name>
+    <message>
+        <location filename="rggDialogs.py" line="724"/>
+        <source>Compress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="724"/>
+        <source>Anifilt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="724"/>
+        <source>minfilter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="724"/>
+        <source>magfilter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="724"/>
+        <source>mipminfilter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="724"/>
+        <source>FSAA</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="724"/>
+        <source>VBO</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="724"/>
+        <source>Magic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="760"/>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="762"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="768"/>
+        <source>{0}: </source>
+        <comment>Row layout</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="783"/>
+        <source>Configure Graphics</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>hostDialog</name>
     <message>
-        <location filename="rggDialogs.py" line="180"/>
+        <location filename="rggDialogs.py" line="190"/>
         <source>Username</source>
         <translation type="unfinished"></translation>
     </message>
@@ -247,51 +507,56 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="183"/>
+        <location filename="rggDialogs.py" line="190"/>
         <source>Port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="204"/>
+        <location filename="rggDialogs.py" line="220"/>
         <source>Host</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="206"/>
+        <location filename="rggDialogs.py" line="222"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="213"/>
+        <location filename="rggDialogs.py" line="228"/>
         <source>{0}: </source>
         <comment>Row layout</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="229"/>
+        <location filename="rggDialogs.py" line="245"/>
         <source>Host Game</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="190"/>
+        <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>integerField</name>
     <message>
-        <location filename="rggFields.py" line="81"/>
+        <location filename="rggFields.py" line="82"/>
         <source>You must enter a number for the {0} field.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggFields.py" line="86"/>
+        <location filename="rggFields.py" line="135"/>
         <source>You must enter a number for {0} between {1} and {2}.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggFields.py" line="88"/>
+        <location filename="rggFields.py" line="86"/>
         <source>negative infinity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggFields.py" line="89"/>
+        <location filename="rggFields.py" line="86"/>
         <source>infinity</source>
         <translation type="unfinished"></translation>
     </message>
@@ -299,61 +564,128 @@
 <context>
     <name>joinDialog</name>
     <message>
-        <location filename="rggDialogs.py" line="266"/>
+        <location filename="rggDialogs.py" line="299"/>
         <source>Username</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="267"/>
+        <location filename="rggDialogs.py" line="289"/>
         <source>Anonymous</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="268"/>
-        <source>Host Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="rggDialogs.py" line="270"/>
+        <location filename="rggDialogs.py" line="299"/>
         <source>Port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="291"/>
+        <location filename="rggDialogs.py" line="329"/>
         <source>Join</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="293"/>
+        <location filename="rggDialogs.py" line="331"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="300"/>
+        <location filename="rggDialogs.py" line="337"/>
         <source>{0}: </source>
         <comment>Row layout</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="316"/>
+        <location filename="rggDialogs.py" line="354"/>
         <source>Join Game</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="299"/>
+        <source>Host Name (IP)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="299"/>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>menubar</name>
+    <message>
+        <location filename="rggMenuBar.py" line="114"/>
+        <source>&amp;Internet</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>newCharacterDialog</name>
+    <message>
+        <location filename="rggDialogs.py" line="399"/>
+        <source>List ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="399"/>
+        <source>New Character</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="399"/>
+        <source>Character Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="399"/>
+        <source>Portrait</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="399"/>
+        <source>default_portrait_1.png</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="428"/>
+        <source>Create</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="430"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="437"/>
+        <source>{0}: </source>
+        <comment>Row layout</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="460"/>
+        <source>Create Character</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDialogs.py" line="399"/>
+        <source> </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>newMapDialog</name>
     <message>
-        <location filename="rggDialogs.py" line="79"/>
+        <location filename="rggDialogs.py" line="81"/>
         <source>Cannot create a map when no tilesets are available.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="82"/>
+        <location filename="rggDialogs.py" line="84"/>
         <source>Map Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="83"/>
+        <location filename="rggDialogs.py" line="84"/>
         <source>Generic Map</source>
         <translation type="unfinished"></translation>
     </message>
@@ -363,53 +695,53 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="85"/>
+        <location filename="rggDialogs.py" line="84"/>
         <source>Anonymous</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="86"/>
+        <location filename="rggDialogs.py" line="84"/>
         <source>Tileset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="88"/>
+        <location filename="rggDialogs.py" line="84"/>
         <source>Map Width</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="90"/>
+        <location filename="rggDialogs.py" line="84"/>
         <source>Map Height</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="92"/>
+        <location filename="rggDialogs.py" line="84"/>
         <source>Per-Tile Width</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="94"/>
+        <location filename="rggDialogs.py" line="84"/>
         <source>Per-Tile Height</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="115"/>
+        <location filename="rggDialogs.py" line="118"/>
         <source>Create Map</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="117"/>
+        <location filename="rggDialogs.py" line="120"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="123"/>
+        <location filename="rggDialogs.py" line="126"/>
         <source>{0}: </source>
         <comment>Row layout</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDialogs.py" line="138"/>
+        <location filename="rggDialogs.py" line="141"/>
         <source>New Map</source>
         <translation type="unfinished"></translation>
     </message>
@@ -417,20 +749,41 @@
 <context>
     <name>pogPalette</name>
     <message>
-        <location filename="rggDockWidget.py" line="147"/>
+        <location filename="rggDockWidget.py" line="304"/>
         <source>Pog Palette</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggDockWidget.py" line="154"/>
+        <location filename="rggDockWidget.py" line="310"/>
         <source>Update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="303"/>
+        <source>Double-click on a pog, then click once in the game window to place it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="311"/>
+        <source>Re-scan for newly added image files in the pog folder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>self.menubar</name>
+</context>
+<context>
+    <name>sliderField</name>
+    <message>
+        <location filename="rggFields.py" line="250"/>
+        <source>You must enter a valid choice for the {0} field.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>stringField</name>
     <message>
-        <location filename="rggFields.py" line="130"/>
+        <location filename="rggFields.py" line="181"/>
         <source>You must enter text into the {0} field.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -438,142 +791,215 @@
 <context>
     <name>system</name>
     <message>
-        <location filename="rggSystem.py" line="64"/>
+        <location filename="rggSystem.py" line="148"/>
         <source>Error</source>
         <comment>default error prompt title</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggSystem.py" line="82"/>
+        <location filename="rggSystem.py" line="186"/>
         <source>Input</source>
         <comment>default string prompt title</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggSystem.py" line="88"/>
+        <location filename="rggSystem.py" line="192"/>
         <source>Input</source>
         <comment>default integer prompt title</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggSystem.py" line="95"/>
+        <location filename="rggSystem.py" line="199"/>
         <source>Input</source>
         <comment>default coordinate prompt title</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggSystem.py" line="124"/>
+        <location filename="rggSystem.py" line="49"/>
         <source>Images ({imageList})</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>userListWidget</name>
     <message>
-        <location filename="rggSystem.py" line="146"/>
-        <source>&lt;a href=&quot;/tell {name}&quot; title=&quot;{name}&quot;&gt;{name}&lt;/a&gt;</source>
+        <location filename="rggDockWidget.py" line="359"/>
+        <source>People presently playing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggDockWidget.py" line="360"/>
+        <source>Connected Users</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>views</name>
     <message>
-        <location filename="rggViews.py" line="150"/>
-        <source>{name}: {sayText}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="rggViews.py" line="156"/>
-        <source>&lt;i&gt;{name} {emote}&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="rggViews.py" line="182"/>
+        <location filename="rggViews.py" line="713"/>
         <source>Invalid dice roll. See /roll documentation for help.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="184"/>
+        <location filename="rggViews.py" line="716"/>
         <source>{name} rolls {roll}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="192"/>
+        <location filename="rggViews.py" line="728"/>
         <source>What dice should be rolled?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="196"/>
+        <location filename="rggViews.py" line="732"/>
         <source>What should the macro be called?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="201"/>
+        <location filename="rggViews.py" line="737"/>
         <source>Malformed dice macro. Formatting help is available in &quot;/roll&quot; command.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="222"/>
+        <location filename="rggViews.py" line="758"/>
         <source>x: {0}
 y: {1}</source>
         <comment>formats camera reporting.</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="315"/>
+        <location filename="rggViews.py" line="876"/>
         <source>Set name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="316"/>
+        <location filename="rggViews.py" line="876"/>
         <source>Generate name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="317"/>
+        <location filename="rggViews.py" line="876"/>
         <source>Set Layer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="319"/>
+        <location filename="rggViews.py" line="883"/>
         <source>Enter a name for this pog.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="326"/>
+        <location filename="rggViews.py" line="889"/>
         <source>Enter a generator command. See /randomname for syntax. Multi-pog compatible.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="335"/>
+        <location filename="rggViews.py" line="899"/>
         <source>Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="350"/>
-        <source>Create Pog (Temp Command)</source>
+        <location filename="rggViews.py" line="142"/>
+        <source>&lt;a href=&quot;/tell {name}&quot; title=&quot;{name}&quot;&gt;{name}&lt;/a&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="346"/>
-        <source>Begin Tile Pasting (Temp Command)</source>
+        <location filename="rggViews.py" line="276"/>
+        <source>You are already in a game.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="351"/>
-        <source>Cease Tile Pasting (Temp Command)</source>
+        <location filename="rggViews.py" line="266"/>
+        <source>Now listening on port {port}.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="353"/>
-        <source>Load Pog</source>
+        <location filename="rggViews.py" line="270"/>
+        <source>Unable to access network; perhaps the port is in use?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="356"/>
-        <source>What is the width of the image?</source>
+        <location filename="rggViews.py" line="292"/>
+        <source>Connecting to {host}:{port}...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="357"/>
-        <source>What is the height of the image?</source>
+        <location filename="rggViews.py" line="306"/>
+        <source>You are not connected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggViews.py" line="310"/>
+        <source>Disconnected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggViews.py" line="330"/>
+        <source>This function is deprecated. Use the view controller.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggViews.py" line="377"/>
+        <source>Open Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggViews.py" line="402"/>
+        <source>Random Game Map files (*.rgm)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggViews.py" line="456"/>
+        <source>Unable to read {0}.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggViews.py" line="402"/>
+        <source>Save Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggViews.py" line="412"/>
+        <source>Open Game Session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggViews.py" line="427"/>
+        <source>Random Game files (*.rgg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggViews.py" line="427"/>
+        <source>Save Game Session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggViews.py" line="437"/>
+        <source>Save Characters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggViews.py" line="447"/>
+        <source>Random Game Character files (*.rgc)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggViews.py" line="447"/>
+        <source>Open Characters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggViews.py" line="876"/>
+        <source>Add/Edit Property</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggViews.py" line="907"/>
+        <source>Enter a name for the property (like &quot;Level&quot; or &quot;HP&quot;).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggViews.py" line="909"/>
+        <source>Enter a value for the property.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
