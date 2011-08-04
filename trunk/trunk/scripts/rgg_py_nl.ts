@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS>
+<TS version="2.0" language="nl_NL">
 <context>
     <name>FIRECharacterSheetDialog</name>
     <message>
@@ -617,6 +618,141 @@
         <source>&amp;Internet</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="rggMenuBar.py" line="42"/>
+        <source>&amp;New Map...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="45"/>
+        <source>Load Map...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="48"/>
+        <source>Save Map As...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="51"/>
+        <source>&amp;Close All Maps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="54"/>
+        <source>&amp;Load Session...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="57"/>
+        <source>&amp;Save Session As...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="60"/>
+        <source>Save IC Characters As...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="62"/>
+        <source>Load IC Characters...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="64"/>
+        <source>Configure Graphics...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="66"/>
+        <source>&amp;Host Game...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="69"/>
+        <source>&amp;Join Game...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="72"/>
+        <source>&amp;Disconnect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="75"/>
+        <source>&amp;One</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="76"/>
+        <source>&amp;Two</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="77"/>
+        <source>&amp;Three</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="79"/>
+        <source>Chat Username Notify</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="101"/>
+        <source>&amp;File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="120"/>
+        <source>&amp;Thickness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="124"/>
+        <source>&amp;Colour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="136"/>
+        <source>&amp;Draw</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="140"/>
+        <source>&amp;Styles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="144"/>
+        <source>&amp;Language</source>
+        <translation>Taa&amp;l</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="145"/>
+        <source>Dutch</source>
+        <translation>Nederlands</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="148"/>
+        <source>English</source>
+        <translation>Engels (English)</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="151"/>
+        <source>Japanese</source>
+        <translation>Japans （日本語）</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="155"/>
+        <source>&amp;Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="159"/>
+        <source>&amp;Plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>newCharacterDialog</name>
@@ -770,9 +906,6 @@
     </message>
 </context>
 <context>
-    <name>self.menubar</name>
-</context>
-<context>
     <name>sliderField</name>
     <message>
         <location filename="rggFields.py" line="250"/>
@@ -836,64 +969,64 @@
 <context>
     <name>views</name>
     <message>
-        <location filename="rggViews.py" line="713"/>
+        <location filename="rggViews.py" line="716"/>
         <source>Invalid dice roll. See /roll documentation for help.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="716"/>
+        <location filename="rggViews.py" line="719"/>
         <source>{name} rolls {roll}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="728"/>
+        <location filename="rggViews.py" line="731"/>
         <source>What dice should be rolled?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="732"/>
+        <location filename="rggViews.py" line="735"/>
         <source>What should the macro be called?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="737"/>
+        <location filename="rggViews.py" line="740"/>
         <source>Malformed dice macro. Formatting help is available in &quot;/roll&quot; command.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="758"/>
+        <location filename="rggViews.py" line="761"/>
         <source>x: {0}
 y: {1}</source>
         <comment>formats camera reporting.</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="876"/>
+        <location filename="rggViews.py" line="879"/>
         <source>Set name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="876"/>
+        <location filename="rggViews.py" line="879"/>
         <source>Generate name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="876"/>
+        <location filename="rggViews.py" line="879"/>
         <source>Set Layer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="883"/>
+        <location filename="rggViews.py" line="886"/>
         <source>Enter a name for this pog.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="889"/>
+        <location filename="rggViews.py" line="892"/>
         <source>Enter a generator command. See /randomname for syntax. Multi-pog compatible.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="899"/>
+        <location filename="rggViews.py" line="902"/>
         <source>Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -988,17 +1121,17 @@ y: {1}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="876"/>
+        <location filename="rggViews.py" line="879"/>
         <source>Add/Edit Property</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="907"/>
+        <location filename="rggViews.py" line="910"/>
         <source>Enter a name for the property (like &quot;Level&quot; or &quot;HP&quot;).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="909"/>
+        <location filename="rggViews.py" line="912"/>
         <source>Enter a value for the property.</source>
         <translation type="unfinished"></translation>
     </message>

@@ -39,44 +39,44 @@ class menuBar(object):
         
         # ACTIONS
         
-        self.newMapAct = QtGui.QAction("&New Map...", main)
+        self.newMapAct = QtGui.QAction(translate("menubar", "&New Map..."), main)
         self.newMapAct.setShortcut("Ctrl+N")
         
-        self.loadMapAct = QtGui.QAction("Load Map...", main)
+        self.loadMapAct = QtGui.QAction(translate("menubar", "Load Map..."), main)
         #self.loadMapAct.setShortcut("Ctrl+L")
         
-        self.saveMapAct = QtGui.QAction("Save Map As...", main)
+        self.saveMapAct = QtGui.QAction(translate("menubar", "Save Map As..."), main)
         #self.saveMapAct.setShortcut("Ctrl+S")
         
-        self.closeMapAct = QtGui.QAction("&Close All Maps", main)
+        self.closeMapAct = QtGui.QAction(translate("menubar", "&Close All Maps"), main)
         self.closeMapAct.setShortcut("Ctrl+Shift+W")
         
-        self.loadSessAct = QtGui.QAction("&Load Session...", main)
+        self.loadSessAct = QtGui.QAction(translate("menubar", "&Load Session..."), main)
         self.loadSessAct.setShortcut("Ctrl+L")
         
-        self.saveSessAct = QtGui.QAction("&Save Session As...", main)
+        self.saveSessAct = QtGui.QAction(translate("menubar", "&Save Session As..."), main)
         self.saveSessAct.setShortcut("Ctrl+S")
         
-        self.saveCharsAct = QtGui.QAction("Save IC Characters As...", main)
+        self.saveCharsAct = QtGui.QAction(translate("menubar", "Save IC Characters As..."), main)
         
-        self.loadCharsAct = QtGui.QAction("Load IC Characters...", main)
+        self.loadCharsAct = QtGui.QAction(translate("menubar", "Load IC Characters..."), main)
 
-        self.gfxSettingsAct = QtGui.QAction("Configure Graphics...", main)
+        self.gfxSettingsAct = QtGui.QAction(translate("menubar", "Configure Graphics..."), main)
         
-        self.hostGameAct = QtGui.QAction("&Host Game...", main)
+        self.hostGameAct = QtGui.QAction(translate("menubar", "&Host Game..."), main)
         self.hostGameAct.setShortcut("Ctrl+H")
 
-        self.joinGameAct = QtGui.QAction("&Join Game...", main)
+        self.joinGameAct = QtGui.QAction(translate("menubar", "&Join Game..."), main)
         self.joinGameAct.setShortcut("Ctrl+J")
         
-        self.disconnectAct = QtGui.QAction("&Disconnect", main)
+        self.disconnectAct = QtGui.QAction(translate("menubar", "&Disconnect"), main)
         self.disconnectAct.setShortcut("Ctrl+D")
 
-        self.thicknessOneAct = QtGui.QAction("&One", main)
-        self.thicknessTwoAct = QtGui.QAction("&Two", main)
-        self.thicknessThreeAct = QtGui.QAction("&Three", main)
+        self.thicknessOneAct = QtGui.QAction(translate("menubar", "&One"), main)
+        self.thicknessTwoAct = QtGui.QAction(translate("menubar", "&Two"), main)
+        self.thicknessThreeAct = QtGui.QAction(translate("menubar", "&Three"), main)
         
-        self.toggleAlertsAct = QtGui.QAction("Chat Username Notify", main)
+        self.toggleAlertsAct = QtGui.QAction(translate("menubar", "Chat Username Notify"), main)
         self.toggleAlertsAct.setCheckable(True)
         self.toggleAlertsAct.setChecked(True)
         
@@ -98,7 +98,7 @@ class menuBar(object):
 
         # MENUS
         
-        fileMenu = QtGui.QMenu("&File", main)
+        fileMenu = QtGui.QMenu(translate("menubar", "&File"), main)
         fileMenu.addAction(self.newMapAct)
         fileMenu.addAction(self.loadMapAct)
         fileMenu.addAction(self.saveMapAct)
@@ -117,11 +117,12 @@ class menuBar(object):
         internetMenu.addSeparator()
         internetMenu.addAction(self.disconnectAct)
 
-        self.thicknessMenu = QtGui.QMenu("&Thickness", main)
+        self.thicknessMenu = QtGui.QMenu(translate("menubar", "&Thickness"), main)
         for x in range(1, 11):
             self.thicknessMenu.addAction(QtGui.QAction(str(x), main))
         
-        self.colourMenu = QtGui.QMenu("&Colour", main)
+        self.colourMenu = QtGui.QMenu(translate("menubar", "&Colour"), main)
+        #Don't translate colour names yet
         self.colourMenu.addAction(QtGui.QAction("White", main))
         self.colourMenu.addAction(QtGui.QAction("Red", main))
         self.colourMenu.addAction(QtGui.QAction("Orange", main))
@@ -132,24 +133,30 @@ class menuBar(object):
         self.colourMenu.addAction(QtGui.QAction("Black", main))
         self.colourMenu.addAction(QtGui.QAction("Custom...", main))
 
-        drawMenu = QtGui.QMenu("&Draw", main)
+        drawMenu = QtGui.QMenu(translate("menubar", "&Draw"), main)
         drawMenu.addMenu(self.thicknessMenu)
         drawMenu.addMenu(self.colourMenu)
         
-        stylesMenu = QtGui.QMenu("&Styles", main)
+        stylesMenu = QtGui.QMenu(translate("menubar", "&Styles"), main)
         for style in rggStyles.sheets.keys():
             stylesMenu.addAction(QtGui.QAction(style, main))
 
         self.langMenu = QtGui.QMenu(translate("menubar", "&Language"), main)
-        self.langMenu.addAction(QtGui.QAction(translate("menubar", "Dutch"), main))
-        self.langMenu.addAction(QtGui.QAction(translate("menubar", "English"), main))
-        self.langMenu.addAction(QtGui.QAction(translate("menubar", "Japanese"), main))
+        ned = QtGui.QAction(translate("menubar", "Dutch"), main)
+        ned.setIconText("Dutch")
+        self.langMenu.addAction(ned)
+        eng = QtGui.QAction(translate("menubar", "English"), main)
+        eng.setIconText("English")
+        self.langMenu.addAction(eng)
+        nhn = QtGui.QAction(translate("menubar", "Japanese"), main)
+        nhn.setIconText("Japanese")
+        self.langMenu.addAction(nhn)
             
-        self.optionsMenu = QtGui.QMenu("&Options", main)
+        self.optionsMenu = QtGui.QMenu(translate("menubar", "&Options"), main)
         self.optionsMenu.addAction(self.toggleAlertsAct)
         self.optionsMenu.addAction(self.gfxSettingsAct)
         
-        self.pluginsMenu = QtGui.QMenu("&Plugins", main)
+        self.pluginsMenu = QtGui.QMenu(translate("menubar", "&Plugins"), main)
         
         self.pluginsModules = []
         self.plugins = {}
