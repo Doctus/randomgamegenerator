@@ -472,7 +472,7 @@ def configureGfx():
         jsondump(settings,  os.path.join(SAVE_DIR, "gfx_settings.rgs"))
 
 def setLanguage(new):
-    jsondump(dict(language=str(new.text())), os.path.join(SAVE_DIR, "lang_settings.rgs"))
+    jsondump(dict(language=str(new.iconText())), os.path.join(SAVE_DIR, "lang_settings.rgs"))
     
 @serverRPC
 def respondUserList(list):

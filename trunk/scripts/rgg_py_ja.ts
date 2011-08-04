@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS>
+<TS version="2.0" language="ja_JP">
 <context>
     <name>@default</name>
     <message>
-        <location filename="" line="31850684"/>
         <source>Dice</source>
         <translation type="obsolete">サイコロ</translation>
     </message>
     <message>
-        <location filename="" line="31850684"/>
         <source>Add Macro</source>
         <translation type="obsolete">サイコロマクロを作る</translation>
     </message>
     <message>
-        <location filename="" line="31850684"/>
         <source>Delete Macro</source>
         <translation type="obsolete">サイコロマクロを消す</translation>
     </message>
@@ -23,7 +21,7 @@
     <message>
         <location filename="rggDialogs.py" line="547"/>
         <source>Character Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">キャラクターの名前</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="547"/>
@@ -102,7 +100,7 @@
     <message>
         <location filename="rggDockWidget.py" line="431"/>
         <source>Add New</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">新しいキャラクター</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="432"/>
@@ -130,7 +128,7 @@
     <message>
         <location filename="rggDockWidget.py" line="117"/>
         <source>IC Chat</source>
-        <translation type="unfinished"></translation>
+        <translation>キャラクターチャット</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="120"/>
@@ -145,7 +143,7 @@
     <message>
         <location filename="rggDockWidget.py" line="126"/>
         <source>Add New</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいキャラクター</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="127"/>
@@ -155,7 +153,7 @@
     <message>
         <location filename="rggDockWidget.py" line="128"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>消す</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="129"/>
@@ -166,7 +164,7 @@
 <context>
     <name>QtCore.QObject</name>
     <message>
-        <location filename="" line="31850684"/>
+        <location filename="rggDockWidget.py" line="31850684"/>
         <source>Dice</source>
         <translation type="obsolete">サイコロ</translation>
     </message>
@@ -174,12 +172,12 @@
 <context>
     <name>c</name>
     <message>
-        <location filename="" line="31850684"/>
+        <location filename="rggDockWidget.py" line="31850684"/>
         <source> rolls </source>
         <translation type="obsolete">は</translation>
     </message>
     <message>
-        <location filename="" line="31850684"/>
+        <location filename="rggDockWidget.py" line="31850684"/>
         <source>Please type &amp;#38;#60; if you wish to include &amp;#60; in your message.</source>
         <translation type="obsolete">OBSOLETE STRING</translation>
     </message>
@@ -187,7 +185,7 @@
 <context>
     <name>characterSheet</name>
     <message>
-        <location filename="" line="31850684"/>
+        <location filename="rggDockWidget.py" line="31850684"/>
         <source>Character Sheet</source>
         <translation type="obsolete">キャラクターシート</translation>
     </message>
@@ -215,7 +213,7 @@
         <translation>Syntax: /whisper HANDLE MESSAGE. Sends a message only to the specified user. Spaces MUST be correct. Handle may be caps-sensitive.</translation>
     </message>
     <message>
-        <location filename="" line="31850684"/>
+        <location filename="rggChat.py" line="31850684"/>
         <source>Please type &amp;#38;#60; if you wish to include &amp;#60; in your message.</source>
         <translation type="obsolete">Please type &amp;#38;#60; if you wish to include &amp;#60; in your message.</translation>
     </message>
@@ -227,7 +225,7 @@
     <message>
         <location filename="rggChat.py" line="181"/>
         <source>What do you want to tell {target}?</source>
-        <translation type="unfinished"></translation>
+        <translation>何と囁きますか。</translation>
     </message>
     <message>
         <location filename="rggChat.py" line="255"/>
@@ -238,7 +236,7 @@
 <context>
     <name>chatWidget</name>
     <message>
-        <location filename="" line="31850684"/>
+        <location filename="rggChat.py" line="31850684"/>
         <source>Chat</source>
         <translation type="obsolete">チャット</translation>
     </message>
@@ -250,7 +248,7 @@
     <message>
         <location filename="rggDockWidget.py" line="42"/>
         <source>OOC Chat / System</source>
-        <translation type="unfinished"></translation>
+        <translation>システムとプレーヤーチャット</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="45"/>
@@ -492,12 +490,12 @@
     <message>
         <location filename="rggDialogs.py" line="724"/>
         <source>Compress</source>
-        <translation type="unfinished"></translation>
+        <translation>圧縮</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="724"/>
         <source>Anifilt</source>
-        <translation type="unfinished"></translation>
+        <translation>異方性フィルタリング</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="724"/>
@@ -527,7 +525,7 @@
     <message>
         <location filename="rggDialogs.py" line="724"/>
         <source>Magic</source>
-        <translation type="unfinished"></translation>
+        <translation>魔法</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="760"/>
@@ -537,7 +535,7 @@
     <message>
         <location filename="rggDialogs.py" line="762"/>
         <source>Cancel</source>
-        <translation type="unfinished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="768"/>
@@ -592,7 +590,7 @@
     <message>
         <location filename="rggDialogs.py" line="190"/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワード</translation>
     </message>
 </context>
 <context>
@@ -631,7 +629,7 @@
         <translation>名無し</translation>
     </message>
     <message>
-        <location filename="" line="31850684"/>
+        <location filename="rggDialogs.py" line="31850684"/>
         <source>Host Name</source>
         <translation type="obsolete">ホスト</translation>
     </message>
@@ -669,13 +667,13 @@
     <message>
         <location filename="rggDialogs.py" line="299"/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワード</translation>
     </message>
 </context>
 <context>
     <name>mainWindow</name>
     <message>
-        <location filename="" line="31850684"/>
+        <location filename="rggDialogs.py" line="31850684"/>
         <source>Dice</source>
         <translation type="obsolete">サイコロ</translation>
     </message>
@@ -685,7 +683,142 @@
     <message>
         <location filename="rggMenuBar.py" line="114"/>
         <source>&amp;Internet</source>
-        <translation>&amp;Interunettu</translation>
+        <translation>インターネット (&amp;I)</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="42"/>
+        <source>&amp;New Map...</source>
+        <translation>新しいマップ(&amp;N)</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="45"/>
+        <source>Load Map...</source>
+        <translation>マップを読込する</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="48"/>
+        <source>Save Map As...</source>
+        <translation>マップを新規保管する</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="51"/>
+        <source>&amp;Close All Maps</source>
+        <translation>マップを全部殺す(&amp;C)</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="54"/>
+        <source>&amp;Load Session...</source>
+        <translation>セッションを読込する (&amp;L)</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="57"/>
+        <source>&amp;Save Session As...</source>
+        <translation>セッションを新規保管する (&amp;S)</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="60"/>
+        <source>Save IC Characters As...</source>
+        <translation>キャラクターを全部新規保管する</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="62"/>
+        <source>Load IC Characters...</source>
+        <translation>キャラクターを読込する</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="64"/>
+        <source>Configure Graphics...</source>
+        <translation>グラフィックコンフィグ</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="66"/>
+        <source>&amp;Host Game...</source>
+        <translation>ゲームの亭主になる</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="69"/>
+        <source>&amp;Join Game...</source>
+        <translation>ゲームの賓客になる</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="72"/>
+        <source>&amp;Disconnect</source>
+        <translation>コネクションを斬る</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="75"/>
+        <source>&amp;One</source>
+        <translation>１</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="76"/>
+        <source>&amp;Two</source>
+        <translation>２</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="77"/>
+        <source>&amp;Three</source>
+        <translation>３</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="79"/>
+        <source>Chat Username Notify</source>
+        <translation>ユーザ名ワーニング</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="101"/>
+        <source>&amp;File</source>
+        <translation>ファイル</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="120"/>
+        <source>&amp;Thickness</source>
+        <translation>厚さ</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="124"/>
+        <source>&amp;Colour</source>
+        <translation>色</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="136"/>
+        <source>&amp;Draw</source>
+        <translation>描く</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="140"/>
+        <source>&amp;Styles</source>
+        <translation>スタイル</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="144"/>
+        <source>&amp;Language</source>
+        <translation>言語</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="145"/>
+        <source>Dutch</source>
+        <translation>オランダ語 (Nederlands)</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="148"/>
+        <source>English</source>
+        <translation>英語 (English)</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="151"/>
+        <source>Japanese</source>
+        <translation>日本語</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="155"/>
+        <source>&amp;Options</source>
+        <translation>オプション</translation>
+    </message>
+    <message>
+        <location filename="rggMenuBar.py" line="159"/>
+        <source>&amp;Plugins</source>
+        <translation>プラグイン</translation>
     </message>
 </context>
 <context>
@@ -698,12 +831,12 @@
     <message>
         <location filename="rggDialogs.py" line="399"/>
         <source>New Character</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいキャラクター</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="399"/>
         <source>Character Name</source>
-        <translation type="unfinished"></translation>
+        <translation>キャラクターの名前</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="399"/>
@@ -723,7 +856,7 @@
     <message>
         <location filename="rggDialogs.py" line="430"/>
         <source>Cancel</source>
-        <translation type="unfinished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="437"/>
@@ -887,7 +1020,7 @@
         <translation>イメージ ({imageList})</translation>
     </message>
     <message>
-        <location filename="" line="31850684"/>
+        <location filename="rggSystem.py" line="31850684"/>
         <source>&lt;a href=&quot;/tell {name}&quot; title=&quot;{name}&quot;&gt;{name}&lt;/a&gt;</source>
         <translation type="obsolete">&lt;a href=&quot;/tell {name}&quot; title=&quot;{name}&quot;&gt;{name}&lt;/a&gt;</translation>
     </message>
@@ -902,80 +1035,80 @@
     <message>
         <location filename="rggDockWidget.py" line="360"/>
         <source>Connected Users</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザ</translation>
     </message>
 </context>
 <context>
     <name>views</name>
     <message>
-        <location filename="" line="31850684"/>
+        <location filename="rggDockWidget.py" line="31850684"/>
         <source>{name}: {sayText}</source>
         <translation type="obsolete">{name}: {sayText}</translation>
     </message>
     <message>
-        <location filename="" line="31850684"/>
+        <location filename="rggDockWidget.py" line="31850684"/>
         <source>&lt;i&gt;{name} {emote}&lt;/i&gt;</source>
         <translation type="obsolete">&lt;i&gt;{name} {emote}&lt;/i&gt;</translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="713"/>
+        <location filename="rggViews.py" line="716"/>
         <source>Invalid dice roll. See /roll documentation for help.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="716"/>
+        <location filename="rggViews.py" line="719"/>
         <source>{name} rolls {roll}</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="728"/>
+        <location filename="rggViews.py" line="731"/>
         <source>What dice should be rolled?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="732"/>
+        <location filename="rggViews.py" line="735"/>
         <source>What should the macro be called?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="737"/>
+        <location filename="rggViews.py" line="740"/>
         <source>Malformed dice macro. Formatting help is available in &quot;/roll&quot; command.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="758"/>
+        <location filename="rggViews.py" line="761"/>
         <source>x: {0}
 y: {1}</source>
         <comment>formats camera reporting.</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="876"/>
+        <location filename="rggViews.py" line="879"/>
         <source>Set name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="876"/>
+        <location filename="rggViews.py" line="879"/>
         <source>Generate name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="876"/>
+        <location filename="rggViews.py" line="879"/>
         <source>Set Layer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="883"/>
+        <location filename="rggViews.py" line="886"/>
         <source>Enter a name for this pog.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="889"/>
+        <location filename="rggViews.py" line="892"/>
         <source>Enter a generator command. See /randomname for syntax. Multi-pog compatible.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="899"/>
+        <location filename="rggViews.py" line="902"/>
         <source>Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.</source>
         <translation></translation>
     </message>
@@ -987,7 +1120,7 @@ y: {1}</source>
     <message>
         <location filename="rggViews.py" line="276"/>
         <source>You are already in a game.</source>
-        <translation type="unfinished"></translation>
+        <translation>もうゲームにいます。</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="266"/>
@@ -1070,17 +1203,17 @@ y: {1}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="876"/>
+        <location filename="rggViews.py" line="879"/>
         <source>Add/Edit Property</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="907"/>
+        <location filename="rggViews.py" line="910"/>
         <source>Enter a name for the property (like &quot;Level&quot; or &quot;HP&quot;).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rggViews.py" line="909"/>
+        <location filename="rggViews.py" line="912"/>
         <source>Enter a value for the property.</source>
         <translation type="unfinished"></translation>
     </message>
