@@ -6,7 +6,7 @@
     <message>
         <location filename="rggDialogs.py" line="547"/>
         <source>Character Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Karakter Naam</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="547"/>
@@ -56,7 +56,7 @@
     <message>
         <location filename="rggDialogs.py" line="611"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleer</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="622"/>
@@ -75,32 +75,32 @@
     <message>
         <location filename="rggDockWidget.py" line="427"/>
         <source>Character sheets.</source>
-        <translation type="unfinished"></translation>
+        <translation>Karakter Sheet.</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="428"/>
         <source>Character Sheets</source>
-        <translation type="unfinished"></translation>
+        <translation>Karakter Sheet</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="431"/>
         <source>Add New</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg Nieuwe Toe</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="432"/>
         <source>Create a new character sheet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Creëer Een Nieuw Karakter Sheet.</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="433"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Wijzig</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="434"/>
         <source>Edit the selected character sheet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wijzig Geselecteerde Karakter Sheet.</translation>
     </message>
 </context>
 <context>
@@ -108,42 +108,42 @@
     <message>
         <location filename="rggDockWidget.py" line="116"/>
         <source>A widget for in-character chat.</source>
-        <translation type="unfinished"></translation>
+        <translation>Een Widget voor rollenspel chat.</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="117"/>
         <source>IC Chat</source>
-        <translation type="unfinished"></translation>
+        <translation>IC Chat</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="120"/>
         <source>Type text here and press Enter or Return to transmit it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ text hier en gebruik enter om het te versturen.</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="125"/>
         <source>Select the character to be displayed as the speaker of entered text.</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer de karakter om te gebruiken als spreker voor de text.</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="126"/>
         <source>Add New</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg Nieuwe Toe</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="127"/>
         <source>Add a new in-character chat character via a dialog box.</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg een nieuwe rollenspel chat karakter toe m.b.v. een dialog.</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="128"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="129"/>
         <source>Delete the currently selected in-character chat character.</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder het huidig geselecteerde rollenspel chat karakter.</translation>
     </message>
 </context>
 <context>
@@ -151,37 +151,37 @@
     <message>
         <location filename="rggChat.py" line="29"/>
         <source>No documentation found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen documentatie gevonden.</translation>
     </message>
     <message>
         <location filename="rggChat.py" line="70"/>
         <source>Syntax: /randomname NAMETYPE. Caps and spaces are ignored. Some valid arguments are JAPANESEFEMALEFULL and DwArF M aLe</source>
-        <translation type="unfinished">BLAH BLAH BLAH</translation>
+        <translation>Syntax: /randomname NAAMTYPE. Hoofdletters en spaties worden genegeerd. Enige voorbeelden zijn JAPANESEMALEFULL en DwArF M aLe</translation>
     </message>
     <message>
         <location filename="rggChat.py" line="154"/>
         <source>Syntax: /me DOES ACTION. Displays &apos;[HANDLE] DOES ACTION&apos; in italic font.</source>
-        <translation type="unfinished"></translation>
+        <translation>/me doet actie. Toont &apos;[nicknaam] doet actie&apos; in cursief.</translation>
     </message>
     <message>
         <location filename="rggChat.py" line="173"/>
         <source>Syntax: /whisper HANDLE MESSAGE. Sends a message only to the specified user. Spaces MUST be correct. Handle may be caps-sensitive.</source>
-        <translation type="unfinished"></translation>
+        <translation>/whisper nicknaam bericht. Verstuurt een bericht naar de opgegeven nicknaam. Spaties moeten correct zijn en hoofdlettergevoelig.</translation>
     </message>
     <message>
         <location filename="rggChat.py" line="179"/>
         <source>mutters something.</source>
-        <translation type="unfinished"></translation>
+        <translation>mompelt iets.</translation>
     </message>
     <message>
         <location filename="rggChat.py" line="181"/>
         <source>What do you want to tell {target}?</source>
-        <translation type="unfinished"></translation>
+        <translation>Wat wil je zeggen?</translation>
     </message>
     <message>
         <location filename="rggChat.py" line="255"/>
         <source>Please type &amp;#60; if you wish to include &lt; in your message.</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ &amp;#60; als je &amp;lt; in je bericht wilt zetten.</translation>
     </message>
 </context>
 <context>
@@ -189,17 +189,17 @@
     <message>
         <location filename="rggDockWidget.py" line="41"/>
         <source>A widget for out-of-character chat and system messages.</source>
-        <translation type="unfinished"></translation>
+        <translation>Een widget voor Out-of-Character chat en systeem berichten.</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="42"/>
         <source>OOC Chat / System</source>
-        <translation type="unfinished"></translation>
+        <translation>Out of Character Chat / Systeem</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="45"/>
         <source>Type text here and press Enter or Return to transmit it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ text hier en gebruik enter om het te versturen.</translation>
     </message>
 </context>
 <context>
@@ -364,7 +364,7 @@
     <message>
         <location filename="rggDialogs.py" line="693"/>
         <source>There is an error in your input.</source>
-        <translation type="unfinished"></translation>
+        <translation>Er zit een fout in je input.</translation>
     </message>
 </context>
 <context>
@@ -372,37 +372,37 @@
     <message>
         <location filename="rggDockWidget.py" line="233"/>
         <source>Dice</source>
-        <translation type="unfinished"></translation>
+        <translation>Dobbelstenen</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="243"/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation>Rollen</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="245"/>
         <source>Add Macro</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg macro toe</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="247"/>
         <source>Delete Macro</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder macro</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="244"/>
         <source>Roll dice according to the selected macro.</source>
-        <translation type="unfinished"></translation>
+        <translation>Werp dobbelstenen volgens de geselecteerde macro.</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="246"/>
         <source>Add a new macro via a dialog box.</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg een nieuwe macro toe m.b.v. een dialog.</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="248"/>
         <source>Remove the currently selected macro.</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder de geselecteerde macro.</translation>
     </message>
 </context>
 <context>
@@ -410,7 +410,7 @@
     <message>
         <location filename="rggFields.py" line="215"/>
         <source>You must enter a valid choice for the {0} field.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -418,17 +418,17 @@
     <message>
         <location filename="rggFields.py" line="131"/>
         <source>You must enter a number for the {0} field.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="rggFields.py" line="135"/>
         <source>negative infinity</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="rggFields.py" line="135"/>
         <source>infinity</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -476,12 +476,12 @@
     <message>
         <location filename="rggDialogs.py" line="760"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Opslaan</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="762"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleer</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="768"/>
@@ -492,7 +492,7 @@
     <message>
         <location filename="rggDialogs.py" line="783"/>
         <source>Configure Graphics</source>
-        <translation type="unfinished"></translation>
+        <translation>Configureer Grafische Opties</translation>
     </message>
 </context>
 <context>
@@ -500,27 +500,27 @@
     <message>
         <location filename="rggDialogs.py" line="190"/>
         <source>Username</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicknaam</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="181"/>
         <source>Anonymous</source>
-        <translation type="unfinished"></translation>
+        <translation>Anoniem</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="190"/>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Poort</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="220"/>
         <source>Host</source>
-        <translation type="unfinished"></translation>
+        <translation>Host</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="222"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleer</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="228"/>
@@ -531,12 +531,12 @@
     <message>
         <location filename="rggDialogs.py" line="245"/>
         <source>Host Game</source>
-        <translation type="unfinished"></translation>
+        <translation>Host Spel</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="190"/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Wachtwoord</translation>
     </message>
 </context>
 <context>
@@ -567,27 +567,27 @@
     <message>
         <location filename="rggDialogs.py" line="299"/>
         <source>Username</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruikersnaam</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="289"/>
         <source>Anonymous</source>
-        <translation type="unfinished"></translation>
+        <translation>Anoniem</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="299"/>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Poort</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="329"/>
         <source>Join</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="331"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleer</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="337"/>
@@ -608,7 +608,7 @@
     <message>
         <location filename="rggDialogs.py" line="299"/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Wachtwoord</translation>
     </message>
 </context>
 <context>
@@ -621,47 +621,47 @@
     <message>
         <location filename="rggMenuBar.py" line="42"/>
         <source>&amp;New Map...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Nieuwe Map...</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="45"/>
         <source>Load Map...</source>
-        <translation type="unfinished"></translation>
+        <translation>Laad Map...</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="48"/>
         <source>Save Map As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sla Map Op Als...</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="51"/>
         <source>&amp;Close All Maps</source>
-        <translation type="unfinished"></translation>
+        <translation>Sluit Alle Mappen (&amp;C)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="54"/>
         <source>&amp;Load Session...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Laad Sessie...</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="57"/>
         <source>&amp;Save Session As...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Sla Sessie Op Als...</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="60"/>
         <source>Save IC Characters As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sla Rollenspel Karakters Op...</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="62"/>
         <source>Load IC Characters...</source>
-        <translation type="unfinished"></translation>
+        <translation>Laad Rollenspel Karakters...</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="64"/>
         <source>Configure Graphics...</source>
-        <translation type="unfinished"></translation>
+        <translation>Configureer Grafische Opties</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="66"/>
@@ -681,47 +681,47 @@
     <message>
         <location filename="rggMenuBar.py" line="75"/>
         <source>&amp;One</source>
-        <translation type="unfinished"></translation>
+        <translation>Een (&amp;O)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="76"/>
         <source>&amp;Two</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Twee</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="77"/>
         <source>&amp;Three</source>
-        <translation type="unfinished"></translation>
+        <translation>Drie</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="79"/>
         <source>Chat Username Notify</source>
-        <translation type="unfinished"></translation>
+        <translation>Notificatie Nicknaam</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="101"/>
         <source>&amp;File</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestand (&amp;F)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="120"/>
         <source>&amp;Thickness</source>
-        <translation type="unfinished"></translation>
+        <translation>Dikte (&amp;T)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="124"/>
         <source>&amp;Colour</source>
-        <translation type="unfinished"></translation>
+        <translation>Kleur (&amp;C)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="136"/>
         <source>&amp;Draw</source>
-        <translation type="unfinished"></translation>
+        <translation>Teken (&amp;D)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="140"/>
         <source>&amp;Styles</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Stylen</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="144"/>
@@ -746,12 +746,12 @@
     <message>
         <location filename="rggMenuBar.py" line="155"/>
         <source>&amp;Options</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Opties</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="159"/>
         <source>&amp;Plugins</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Plugins</translation>
     </message>
 </context>
 <context>
@@ -764,17 +764,17 @@
     <message>
         <location filename="rggDialogs.py" line="399"/>
         <source>New Character</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuw Karakter</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="399"/>
         <source>Character Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Karakter Naam</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="399"/>
         <source>Portrait</source>
-        <translation type="unfinished"></translation>
+        <translation>Portret</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="399"/>
@@ -784,12 +784,12 @@
     <message>
         <location filename="rggDialogs.py" line="428"/>
         <source>Create</source>
-        <translation type="unfinished"></translation>
+        <translation>Creëer</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="430"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleer</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="437"/>
@@ -800,7 +800,7 @@
     <message>
         <location filename="rggDialogs.py" line="460"/>
         <source>Create Character</source>
-        <translation type="unfinished"></translation>
+        <translation>Creëer Karakter</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="399"/>
@@ -813,62 +813,62 @@
     <message>
         <location filename="rggDialogs.py" line="81"/>
         <source>Cannot create a map when no tilesets are available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan geen map maken als er geen tilesets aanwezig zijn.</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="84"/>
         <source>Map Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Map Naam</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="84"/>
         <source>Generic Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Generieke Map</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="84"/>
         <source>Author Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Naam Auteur</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="84"/>
         <source>Anonymous</source>
-        <translation type="unfinished"></translation>
+        <translation>Anoniem</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="84"/>
         <source>Tileset</source>
-        <translation type="unfinished"></translation>
+        <translation>Tileset</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="84"/>
         <source>Map Width</source>
-        <translation type="unfinished"></translation>
+        <translation>Map Breedte</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="84"/>
         <source>Map Height</source>
-        <translation type="unfinished"></translation>
+        <translation>Map Hoogte</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="84"/>
         <source>Per-Tile Width</source>
-        <translation type="unfinished"></translation>
+        <translation>Tile Breedte</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="84"/>
         <source>Per-Tile Height</source>
-        <translation type="unfinished"></translation>
+        <translation>Tile Hoogte</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="118"/>
         <source>Create Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Creëer Map</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="120"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleer</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="126"/>
@@ -879,7 +879,7 @@
     <message>
         <location filename="rggDialogs.py" line="141"/>
         <source>New Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuwe Map</translation>
     </message>
 </context>
 <context>
@@ -897,12 +897,12 @@
     <message>
         <location filename="rggDockWidget.py" line="303"/>
         <source>Double-click on a pog, then click once in the game window to place it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dubbel-klik op een Pog, klik dan eenmaal in het spel venster om een Pog te plaatsen.</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="311"/>
         <source>Re-scan for newly added image files in the pog folder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ververs de lijst voor nieuw geplaatste plaatjes in de directory.</translation>
     </message>
 </context>
 <context>
@@ -927,7 +927,7 @@
         <location filename="rggSystem.py" line="148"/>
         <source>Error</source>
         <comment>default error prompt title</comment>
-        <translation type="unfinished"></translation>
+        <translation>Foutmelding</translation>
     </message>
     <message>
         <location filename="rggSystem.py" line="186"/>
@@ -958,12 +958,12 @@
     <message>
         <location filename="rggDockWidget.py" line="359"/>
         <source>People presently playing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mensen die op het moment aan het spelen zijn</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="360"/>
         <source>Connected Users</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbonden gebruikers</translation>
     </message>
 </context>
 <context>
@@ -981,12 +981,12 @@
     <message>
         <location filename="rggViews.py" line="731"/>
         <source>What dice should be rolled?</source>
-        <translation type="unfinished"></translation>
+        <translation>Welke dobbelstenen moeten geworpen worden?</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="735"/>
         <source>What should the macro be called?</source>
-        <translation type="unfinished"></translation>
+        <translation>Wat moet de naam van de macro zijn?</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="740"/>
@@ -1003,22 +1003,22 @@ y: {1}</source>
     <message>
         <location filename="rggViews.py" line="879"/>
         <source>Set name</source>
-        <translation type="unfinished"></translation>
+        <translation>Stel naam in</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="879"/>
         <source>Generate name</source>
-        <translation type="unfinished"></translation>
+        <translation>Genereer naam</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="879"/>
         <source>Set Layer</source>
-        <translation type="unfinished"></translation>
+        <translation>Stel laag in</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="886"/>
         <source>Enter a name for this pog.</source>
-        <translation type="unfinished"></translation>
+        <translation>Voer een naam in voor deze Pog.</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="892"/>
@@ -1038,7 +1038,7 @@ y: {1}</source>
     <message>
         <location filename="rggViews.py" line="276"/>
         <source>You are already in a game.</source>
-        <translation type="unfinished"></translation>
+        <translation>Je zit al in een spel.</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="266"/>
@@ -1058,7 +1058,7 @@ y: {1}</source>
     <message>
         <location filename="rggViews.py" line="306"/>
         <source>You are not connected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Je bent niet verbonden.</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="310"/>
@@ -1088,12 +1088,12 @@ y: {1}</source>
     <message>
         <location filename="rggViews.py" line="402"/>
         <source>Save Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Sla Map Op</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="412"/>
         <source>Open Game Session</source>
-        <translation type="unfinished"></translation>
+        <translation>Open Game Sessie</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="427"/>
@@ -1103,12 +1103,12 @@ y: {1}</source>
     <message>
         <location filename="rggViews.py" line="427"/>
         <source>Save Game Session</source>
-        <translation type="unfinished"></translation>
+        <translation>Sla Game Sessie Op</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="437"/>
         <source>Save Characters</source>
-        <translation type="unfinished"></translation>
+        <translation>Sla Karakters Op</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="447"/>
@@ -1118,22 +1118,22 @@ y: {1}</source>
     <message>
         <location filename="rggViews.py" line="447"/>
         <source>Open Characters</source>
-        <translation type="unfinished"></translation>
+        <translation>Laad Karakters</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="879"/>
         <source>Add/Edit Property</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg toe of wijzig een eigenschap</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="910"/>
         <source>Enter a name for the property (like &quot;Level&quot; or &quot;HP&quot;).</source>
-        <translation type="unfinished"></translation>
+        <translation>Voer een naam in voor de eigenschap.</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="912"/>
         <source>Enter a value for the property.</source>
-        <translation type="unfinished"></translation>
+        <translation>Voer een waarde in voor de eigenschap.</translation>
     </message>
 </context>
 </TS>
