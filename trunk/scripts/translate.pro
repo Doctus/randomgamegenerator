@@ -2,7 +2,8 @@
 # Project created by QtCreator 2009-08-23T21:35:59
 # -------------------------------------------------
 TRANSLATIONS = rgg_py_nl.ts \
-               rgg_py_ja.ts
+               rgg_py_ja.ts \
+               rgg_py_de.ts
 SOURCES += rggDockWidget.py \
     rggDice.py \
     rggMenuBar.py \

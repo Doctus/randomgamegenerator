@@ -151,6 +151,9 @@ class menuBar(object):
         nhn = QtGui.QAction(translate("menubar", "Japanese"), main)
         nhn.setIconText("Japanese")
         self.langMenu.addAction(nhn)
+        deu = QtGui.QAction(translate("menubar", "German"), main)
+        deu.setIconText("German")
+        self.langMenu.addAction(deu)
             
         self.optionsMenu = QtGui.QMenu(translate("menubar", "&Options"), main)
         self.optionsMenu.addAction(self.toggleAlertsAct)

@@ -23,6 +23,8 @@ if __name__ == '__main__':
             transfile = "rgg_py_ja"
         if fieldtemp[0] == "Dutch":
             transfile = "rgg_py_nl"
+        if fieldtemp[0] == "German":
+            transfile = "rgg_py_de"
 
         trans = QTranslator()
         if not trans.load(transfile):
