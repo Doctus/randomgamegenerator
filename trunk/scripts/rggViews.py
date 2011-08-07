@@ -900,11 +900,11 @@ def mousePress(screenPosition, mapPosition, button):
                         sendPogAttributes(selectedPog.ID, selectedPog.name, selectedPog.layer, selectedPog.properties)
                 elif selected == 2:
                     prompt = translate('views', "Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.")
-                    newlayer = promptInteger(prompt, min=0, max=65535, default=pog.layer)
+                    newlayer = promptInteger(prompt, min=-150, max=800, default=(pog.layer-200))
                     if newlayer is None:
                         return
                     for selectedPog in set([pog] + list(_state.pogSelection)):
-                        selectedPog.layer = newlayer
+                        selectedPog.layer = newlayer+200
                         sendPogAttributes(pog.ID, pog.name, pog.layer, pog.properties)
                 elif selected == 3:
                     prompt = translate('views', 'Enter a name for the property (like "Level" or "HP").')
