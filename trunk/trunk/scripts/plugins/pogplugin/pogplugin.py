@@ -164,6 +164,7 @@ class pogListWidget(QtGui.QListWidget):
                     for item in items:
                         pog = item.getPog()
                         pog.layer = d.box.value()+200
+                        rggViews.sendPogAttributes(pog.ID, pog.name, pog.layer, pog.properties)
             elif selection == 5:
                 for item in items:
                     rggViews.deletePog(item.getPog())
