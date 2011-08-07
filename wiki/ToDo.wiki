@@ -50,4 +50,4 @@
   * Add Cirno. (Probably as a plugin due to memory consumption.)
 
 = Bugs =
-  * Currently fixed, allegedly.
+  * Odd things happen if pogs are moved too quickly after being placed ("setX" bug)
