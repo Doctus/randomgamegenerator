@@ -183,8 +183,11 @@ def showPopupMenuAtAbs(position, choices):
 
     return selectedAction.id
 
-def promptString(prompt, title=translate('system', "Input", 'default string prompt title')):
-    text, ok = QtGui.QInputDialog.getText(mainWindow, title, prompt)
+def promptString(prompt, title=translate('system', "Input", 'default string prompt title'), inittext=None):
+    if inittext is not None:
+        text, ok = QtGui.QInputDialog.getText(mainWindow, title, prompt, text=inittext)
+    else:
+        text, ok = QtGui.QInputDialog.getText(mainWindow, title, prompt)
     if not ok:
         return None
     return unicode(text)

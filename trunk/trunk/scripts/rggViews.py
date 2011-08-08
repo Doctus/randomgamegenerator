@@ -883,7 +883,7 @@ def mousePress(screenPosition, mapPosition, button):
                         translate('views', 'Set Layer'),
                         translate('views', 'Add/Edit Property')])
                 if selected == 0:
-                    name = promptString(translate('views', "Enter a name for this pog."))
+                    name = promptString(translate('views', "Enter a name for this pog."), inittext = pog.name)
                     if name is None:
                         return
                     pog.name = name
