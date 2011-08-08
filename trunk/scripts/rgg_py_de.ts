@@ -1,61 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0">
+<!DOCTYPE TS>
+<TS version="2.0" language="de_DE">
 <context>
     <name>FIRECharacterSheetDialog</name>
     <message>
         <location filename="rggDialogs.py" line="547"/>
         <source>Character Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Name des Charakteres</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="547"/>
         <source>Lust</source>
-        <translation type="unfinished"></translation>
+        <translation>Genusssucht</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="547"/>
         <source>Gluttony</source>
-        <translation type="unfinished"></translation>
+        <translation>Völlerei</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="547"/>
         <source>Greed</source>
-        <translation type="unfinished"></translation>
+        <translation>Geiz</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="547"/>
         <source>Sloth</source>
-        <translation type="unfinished"></translation>
+        <translation>Faulheit</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="547"/>
         <source>Wrath</source>
-        <translation type="unfinished"></translation>
+        <translation>Zorn</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="547"/>
         <source>Envy</source>
-        <translation type="unfinished"></translation>
+        <translation>Neid</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="547"/>
         <source>Pride</source>
-        <translation type="unfinished"></translation>
+        <translation>Hochmut</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="547"/>
         <source>Temp</source>
-        <translation type="unfinished"></translation>
+        <translation>Doktor Allwissend</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="609"/>
         <source>Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="611"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="622"/>
@@ -74,32 +75,32 @@
     <message>
         <location filename="rggDockWidget.py" line="427"/>
         <source>Character sheets.</source>
-        <translation type="unfinished"></translation>
+        <translation>Charakterhefte.</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="428"/>
         <source>Character Sheets</source>
-        <translation type="unfinished"></translation>
+        <translation>Charakterhefte</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="431"/>
         <source>Add New</source>
-        <translation type="unfinished"></translation>
+        <translation>Neues erstellen</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="432"/>
         <source>Create a new character sheet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Neues Charakterheft erstellen.</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="433"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Bearbeiten</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="434"/>
         <source>Edit the selected character sheet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausgewählte Charakterheft bearbeiten.</translation>
     </message>
 </context>
 <context>
@@ -142,7 +143,7 @@
     <message>
         <location filename="rggDockWidget.py" line="129"/>
         <source>Delete the currently selected in-character chat character.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausgewähltes Makro löschen.</translation>
     </message>
 </context>
 <context>
@@ -363,7 +364,7 @@
     <message>
         <location filename="rggDialogs.py" line="693"/>
         <source>There is an error in your input.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ein Fehler wurde in ihrem Fehler gefunden.</translation>
     </message>
 </context>
 <context>
@@ -371,12 +372,12 @@
     <message>
         <location filename="rggDockWidget.py" line="233"/>
         <source>Dice</source>
-        <translation type="unfinished"></translation>
+        <translation>Würfel</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="243"/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation>Würfeln</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="244"/>
@@ -386,7 +387,7 @@
     <message>
         <location filename="rggDockWidget.py" line="245"/>
         <source>Add Macro</source>
-        <translation type="unfinished"></translation>
+        <translation>Neues Makro erstellen</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="246"/>
@@ -396,12 +397,12 @@
     <message>
         <location filename="rggDockWidget.py" line="247"/>
         <source>Delete Macro</source>
-        <translation type="unfinished"></translation>
+        <translation>Makro löschen</translation>
     </message>
     <message>
         <location filename="rggDockWidget.py" line="248"/>
         <source>Remove the currently selected macro.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausgewähltes Makro entfernen.</translation>
     </message>
 </context>
 <context>
@@ -499,7 +500,7 @@
     <message>
         <location filename="rggDialogs.py" line="181"/>
         <source>Anonymous</source>
-        <translation type="unfinished"></translation>
+        <translation>Namelos</translation>
     </message>
     <message>
         <location filename="rggDialogs.py" line="190"/>
@@ -535,7 +536,7 @@
     <message>
         <location filename="rggDialogs.py" line="245"/>
         <source>Host Game</source>
-        <translation type="unfinished"></translation>
+        <translation>Spiel hosten</translation>
     </message>
 </context>
 <context>
@@ -615,32 +616,32 @@
     <message>
         <location filename="rggMenuBar.py" line="42"/>
         <source>&amp;New Map...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Neuer Spieltisch...</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="45"/>
         <source>Load Map...</source>
-        <translation type="unfinished"></translation>
+        <translation>Spieltisch laden...</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="48"/>
         <source>Save Map As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichern unter...</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="51"/>
         <source>&amp;Close All Maps</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Spieltische schließen (&amp;C)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="54"/>
         <source>&amp;Load Session...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sitzung &amp;laden...</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="57"/>
         <source>&amp;Save Session As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sitzung &amp;speichern...</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="60"/>
@@ -660,92 +661,92 @@
     <message>
         <location filename="rggMenuBar.py" line="66"/>
         <source>&amp;Host Game...</source>
-        <translation type="unfinished"></translation>
+        <translation>Spiel &amp;hosten...</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="69"/>
         <source>&amp;Join Game...</source>
-        <translation type="unfinished"></translation>
+        <translation>In Spiel eintreten (&amp;J)...</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="72"/>
         <source>&amp;Disconnect</source>
-        <translation type="unfinished"></translation>
+        <translation>Unterbrechen (&amp;D)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="75"/>
         <source>&amp;One</source>
-        <translation type="unfinished"></translation>
+        <translation>Ein (&amp;O)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="76"/>
         <source>&amp;Two</source>
-        <translation type="unfinished"></translation>
+        <translation>Zwei (&amp;T)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="77"/>
         <source>&amp;Three</source>
-        <translation type="unfinished"></translation>
+        <translation>Drei (&amp;T)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="79"/>
         <source>Chat Username Notify</source>
-        <translation type="unfinished"></translation>
+        <translation>Usernamenutzung-Warnung</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="101"/>
         <source>&amp;File</source>
-        <translation type="unfinished"></translation>
+        <translation>Datei(&amp;F)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="114"/>
         <source>&amp;Internet</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Internet</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="120"/>
         <source>&amp;Thickness</source>
-        <translation type="unfinished"></translation>
+        <translation>Größe(&amp;T)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="124"/>
         <source>&amp;Colour</source>
-        <translation type="unfinished"></translation>
+        <translation>Farbe(&amp;C)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="136"/>
         <source>&amp;Draw</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeichnen (&amp;D)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="140"/>
         <source>&amp;Styles</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestaltung (&amp;S)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="144"/>
         <source>&amp;Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprache(&amp;L)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="145"/>
         <source>Dutch</source>
-        <translation type="unfinished"></translation>
+        <translation>Niederländisch (Nederlands)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="148"/>
         <source>English</source>
-        <translation type="unfinished"></translation>
+        <translation>Englisch (English)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="151"/>
         <source>Japanese</source>
-        <translation type="unfinished"></translation>
+        <translation>Japanische (日本語)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="155"/>
         <source>&amp;Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Einstellungen(&amp;O)</translation>
     </message>
     <message>
         <location filename="rggMenuBar.py" line="159"/>
@@ -878,7 +879,7 @@
     <message>
         <location filename="rggDialogs.py" line="141"/>
         <source>New Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Neuer Spieltisch</translation>
     </message>
 </context>
 <context>
@@ -1010,7 +1011,7 @@
     <message>
         <location filename="rggViews.py" line="377"/>
         <source>Open Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Spieltisch öffnen</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="402"/>
@@ -1025,12 +1026,12 @@
     <message>
         <location filename="rggViews.py" line="402"/>
         <source>Save Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Spieltisch speichern</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="412"/>
         <source>Open Game Session</source>
-        <translation type="unfinished"></translation>
+        <translation>Sitzung öffnen</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="427"/>
@@ -1045,7 +1046,7 @@
     <message>
         <location filename="rggViews.py" line="437"/>
         <source>Save Characters</source>
-        <translation type="unfinished"></translation>
+        <translation>Charaktere speichern</translation>
     </message>
     <message>
         <location filename="rggViews.py" line="447"/>
