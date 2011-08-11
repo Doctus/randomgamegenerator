@@ -38,6 +38,7 @@
 = Graphics =
   * More default things would be nice.
   * Be able to draw rectangles, curves or circles, etc.
+  * Be able to add text.
 
 = Generators =
   * Add more name generators.
