@@ -19,6 +19,7 @@
   * Multiple map layers which the camera and pogs can easily switch between
   * Ability to change an existing map's tileset
   * From Kaijyuu: pog placement could be made more intuitive
+  * Optional timestamps on OOC chat
 
 = Game Support =
   * Allow DM to request dice rolls from players
@@ -51,4 +52,4 @@
   * Add Cirno. (Probably as a plugin due to memory consumption.)
 
 = Bugs =
-  * Odd things happen if pogs are moved too quickly after being placed ("setX" bug)
+  * ???
