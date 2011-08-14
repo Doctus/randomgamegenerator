@@ -209,6 +209,13 @@ class BaseClient(object):
             return
         
         self._updateSendReceive()
+        
+    def preemptivelyOpenTransferSocket(self):
+        if not self.ready:
+            return
+        if not self.xfer:
+            self._openXfer()
+            return
     
     def allowSend(client, filename, size, checksum):
         """Replacable hook for determining which files should be sent."""

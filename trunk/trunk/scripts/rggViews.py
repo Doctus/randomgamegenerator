@@ -550,10 +550,12 @@ def movePogs(displacement):
     """Moves pogs by a specified displacement."""
     selection = _state.pogSelection.copy()
     pogids = []
+    poglocs = []
     for pog in selection:
         pog.displace(displacement)
         pogids.append(pog.ID)
-    sendMovementPog(pogids, displacement)
+        poglocs.append(pog.position)
+    sendAbsoluteMovementPog(pogids, poglocs)
     drawPogCircles()
 
 @serverRPC
@@ -613,6 +615,18 @@ def respondMovementPog(pogids, displacement):
 def sendMovementPog(user, pogids, displacement):
     """Creates or updates a pog on the server."""
     respondMovementPog(allusersbut(user), pogids, displacement)
+
+@serverRPC
+def respondAbsoluteMovementPog(pogids, newloc):
+    for i, pogID in enumerate(pogids):
+        if pogID in _state.session.pogs.keys():
+            pog = _state.session.pogs[pogID]
+            pog.move(newloc[i])
+    drawPogCircles()
+    
+@clientRPC
+def sendAbsoluteMovementPog(user, pogids, newloc):
+    respondAbsoluteMovementPog(allusersbut(user), pogids, newloc)
 
 @serverRPC
 def respondHidePog(pogID, hidden):
