@@ -107,8 +107,9 @@ class Pog(object):
         self._position = position
         if not self.hidden:
             x, y = position
-            self._tile.setX(x)
-            self._tile.setY(y)
+            if self._tile:
+                self._tile.setX(x)
+                self._tile.setY(y)
             if self._showTooltip:
                 from rggSystem import mainWindow
                 mainWindow.glwidget.setTextPos(self.tooltipId, position)
@@ -148,6 +149,12 @@ class Pog(object):
             from rggSystem import mainWindow
             mainWindow.glwidget.removeText(self.tooltipId)
             self.tooltipId = mainWindow.glwidget.addText(self.tooltipText(), self._position)
+            
+    def move(self, newloc):
+        if self._locked:
+            return self.position
+        self.position = (newloc[0], newloc[1])
+        return self.position
     
     def displace(self, displacement):
         if self._locked:

@@ -151,6 +151,7 @@ def clientConnect(client, username):
     rggViews._closeAllMaps()
     rggViews.setUwidgetLocal()
     say(translate('remote', "Welcome, {name}!").format(name=username))
+    rggRPC.client.preemptivelyOpenTransferSocket()
 
 def clientDisconnect(client, errorMessage):
     """Occurs when the client connection disconnects without being told to.
