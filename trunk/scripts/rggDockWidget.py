@@ -1,5 +1,5 @@
 from PyQt4 import QtGui, QtCore, phonon
-from rggSystem import signal, findFiles, POG_DIR, LOG_DIR, IMAGE_EXTENSIONS, CHAR_DIR, MUSIC_DIR, makePortableFilename
+from rggSystem import signal, findFiles, POG_DIR, LOG_DIR, IMAGE_EXTENSIONS, CHAR_DIR, MUSIC_DIR, SAVE_DIR, makePortableFilename
 from rggDialogs import newCharacterDialog, FIRECharacterSheetDialog
 from rggJson import loadObject, loadString, jsondump, jsonload
 import os, os.path, time
@@ -52,14 +52,39 @@ class chatWidget(QtGui.QDockWidget):
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
         self.setObjectName("Chat Widget")
+        self.timestamp = False
+        self.timestampformat = "[%H:%M:%S]"
+
+        try:
+            js = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
+        except:
+            pass
+        try:
+            self.toggleTimestamp(loadString('chatWidget.timestamp', js.get('timestamp')))
+        except:
+            pass
+        try:
+            self.timestampformat = loadString('chatWidget.timestampformat', js.get('timestampformat'))
+        except:
+            pass
+        
         mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
         
         self.widgetLineInput.returnPressed.connect(self.processInput)
+
+    def toggleTimestamp(self, newsetting):
+        if newsetting == "On":
+            self.timestamp = True
+        else:
+            self.timestamp = False
     
     def insertMessage(self, mes):
         self.scroll = (self.widgetEditor.verticalScrollBar().value() ==
                    self.widgetEditor.verticalScrollBar().maximum())
-        self.widgetEditor.append(mes)
+        if self.timestamp:
+            self.widgetEditor.append(" ".join((time.strftime(self.timestampformat, time.localtime()), mes)))
+        else:
+            self.widgetEditor.append(mes)
         if self.scroll:
             self.widgetEditor.verticalScrollBar().setValue(self.widgetEditor.verticalScrollBar().maximum())
         try:

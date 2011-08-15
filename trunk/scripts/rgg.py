@@ -79,6 +79,8 @@ if __name__ == '__main__':
     s.menu.joinGameAct.triggered.connect(rggViews.joinGame)
     s.menu.disconnectAct.triggered.connect(rggViews.disconnectGame)
     s.menu.toggleAlertsAct.triggered.connect(rggViews.toggleAlerts)
+    s.menu.toggleTimestampsAct.triggered.connect(rggViews.toggleTimestamps)
+    s.menu.setTimestampFormatAct.triggered.connect(rggViews.promptTimestampFormat)
     s.menu.thicknessMenu.triggered.connect(rggViews.setThickness)
     s.menu.colourMenu.triggered.connect(rggViews.setLineColour)
     s.menu.langMenu.triggered.connect(rggViews.setLanguage)

@@ -20,7 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
 from PyQt4 import QtGui, QtCore
-from rggSystem import translate, mainWindow
+from rggSystem import translate, mainWindow, SAVE_DIR
+from rggJson import loadString, jsonload
 import sys, os, rggStyles
 
 ICON_SELECT = 0
@@ -79,6 +80,19 @@ class menuBar(object):
         self.toggleAlertsAct = QtGui.QAction(translate("menubar", "Chat Username Notify"), main)
         self.toggleAlertsAct.setCheckable(True)
         self.toggleAlertsAct.setChecked(True)
+
+        self.toggleTimestampsAct = QtGui.QAction(translate("menubar", "OOC Chat Timestamps"), main)
+        self.toggleTimestampsAct.setCheckable(True)
+        self.toggleTimestampsAct.setChecked(False)
+
+        try:
+            js = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
+            if loadString('chatWidget.timestamp', js.get('timestamp')) == "On":
+                self.toggleTimestampsAct.setChecked(True)
+        except:
+            pass
+
+        self.setTimestampFormatAct = QtGui.QAction(translate("menubar", "Set Timestamp Format..."), main)
         
         self.selectIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-select-icon.png"), "Select Tool", main)
         self.selectIcon.setShortcut("Ctrl+T")
@@ -157,6 +171,8 @@ class menuBar(object):
             
         self.optionsMenu = QtGui.QMenu(translate("menubar", "&Options"), main)
         self.optionsMenu.addAction(self.toggleAlertsAct)
+        self.optionsMenu.addAction(self.toggleTimestampsAct)
+        self.optionsMenu.addAction(self.setTimestampFormatAct)
         self.optionsMenu.addAction(self.gfxSettingsAct)
         
         self.pluginsMenu = QtGui.QMenu(translate("menubar", "&Plugins"), main)
