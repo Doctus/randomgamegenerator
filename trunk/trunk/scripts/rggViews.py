@@ -123,6 +123,39 @@ def toggleAlerts(newValue=None):
     else:
         _state.alert = newValue
 
+def toggleTimestamps(newValue=None):
+    if newValue is None:
+        _state.cwidget.timestamp = not _state.cwidget.timestamp
+    else:
+        _state.cwidget.timestamp = newValue
+    currentstuff = {}
+    try:
+        currentstuff = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
+    except:
+        pass
+    if _state.cwidget.timestamp:
+        currentstuff['timestamp'] = "On"
+    else:
+        currentstuff['timestamp'] = "Off"
+    jsondump(currentstuff, os.path.join(SAVE_DIR, "ui_settings.rgs"))
+
+def setTimestampFormat(newFormat):
+    _state.cwidget.timestampformat = newFormat
+    currentstuff = {}
+    try:
+        currentstuff = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
+    except:
+        pass
+    currentstuff['timestampformat'] = newFormat
+    jsondump(currentstuff, os.path.join(SAVE_DIR, "ui_settings.rgs"))
+
+def promptTimestampFormat():
+    prompt = translate("views", "Please enter a new timestamp format; the default is [%H:%M:%S]")
+    newFormat = promptString(prompt, inittext = _state.cwidget.timestampformat)
+    if newFormat is None:
+        return
+    setTimestampFormat(newFormat)
+
 # MESSAGES
 
 def say(message):
