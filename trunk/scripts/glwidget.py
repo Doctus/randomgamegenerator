@@ -77,6 +77,15 @@ class GLWidget(QGLWidget):
         self.textid = 0
         self.vertByteCount = ADT.arrayByteCount(numpy.zeros((8, 2), 'f'))
 
+        import os, random
+        dirs = os.listdir("data")
+        logos = []
+        for f in dirs:
+            if not "logo" in f:
+                continue
+            logos.append(f)
+        self.logo = [True, 2.5, os.path.join("data", logos[random.randint(0, len(logos)-1)])]
+
         #settings, as used in SAVE_DIR/gfx_settings.rgs
         self.npot = 3
         self.anifilt = 0
@@ -99,6 +108,17 @@ class GLWidget(QGLWidget):
         glPushMatrix()
         glTranslatef(self.camera[0], self.camera[1], 0)
         glScaled(self.zoom, self.zoom, 1)
+
+        if self.logo[0]:
+            if self.logo[2] != None:
+                self.logo.append(self.createImage(self.logo[2], 1, [0, 0, -1, -1], [0, 0, self.w, self.h]))
+                self.logo[2] = None
+            glColor4f(1.0, 1.0, 1.0, min(self.logo[1], 1.0))
+            self.logo[1] -= 0.004
+            if self.logo[1] <= 0.001:
+                self.logo[0] = False
+                self.logo[3].destroy()
+                self.logo[3] = None
 
         if self.vbos:
             glmod.drawVBO()
@@ -136,8 +156,6 @@ class GLWidget(QGLWidget):
                 self.renderText(float(text[2][0]), float(text[2][1])+pos, 0, t)
                 pos += 16
 
-        glScaled(1/self.zoom, 1/self.zoom, 1)
-        glTranslatef(-self.camera[0], -self.camera[1], 0)
         glPopMatrix()
         
     def addSelectionCircle(self, splasifarcity, x, y, radius):
@@ -195,6 +213,9 @@ class GLWidget(QGLWidget):
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
         self.w = w
         self.h = h
+
+        if self.logo[0] and len(self.logo) == 4:
+            self.logo[3].setDrawRect([0, 0, w, h])
 
     #ugly conversion function :(
     def interpretString(self, string):
