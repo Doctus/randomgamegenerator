@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 #glWidget - Takes care of drawing images, with optionally glmod to speed things up
 #
@@ -78,15 +78,22 @@ class GLWidget(QGLWidget):
         self.texts = []
         self.textid = 0
         self.vertByteCount = ADT.arrayByteCount(numpy.zeros((8, 2), 'f'))
+        self.logoon = "Off"
 
-        import os
-        dirs = os.listdir("data")
-        logos = []
-        for f in dirs:
-            if not "logo" in f:
-                continue
-            logos.append(f)
-        self.logo = [True, 4.00, os.path.join("data", logos[random.randint(0, len(logos)-1)]), random.randint(0, 3)]
+        try:
+            js = jsonload(os.path.join(SAVE_DIR, "gfx_settings.rgs"))
+            self.logoon = loadString('gfx.splash', js.get('splash'))
+            if self.logoon == "On":
+                import os
+                dirs = os.listdir("data")
+                logos = []
+                for f in dirs:
+                    if not "logo" in f:
+                        continue
+                    logos.append(f)
+                self.logo = [True, 4.00, os.path.join("data", logos[random.randint(0, len(logos)-1)]), random.randint(0, 3)]
+        except:
+            pass
 
         #settings, as used in SAVE_DIR/gfx_settings.rgs
         self.npot = 3
@@ -111,32 +118,33 @@ class GLWidget(QGLWidget):
         glTranslatef(self.camera[0], self.camera[1], 0)
         glScaled(self.zoom, self.zoom, 1)
 
-        if self.logo[0]:
-            if self.logo[2] != None:
-                self.logo.append(self.createImage(self.logo[2], 1, [0, 0, -1, -1], [0, 0, self.w, self.h]))
-                self.logo[2] = None
-            if self.logo[3] == 0:
-                glColor4f(1.0, 1.0, 1.0, 1.0)
-            elif self.logo[3] == 1:
-                glColor4f(1.0, 1.0, 1.0, min(self.logo[1], 1.0))
-            elif self.logo[3] == 2:
-                glColor4f(0.0, 1.0, 1.0, min(self.logo[1], 1.0))
-            else:
-                glMatrixMode(GL_PROJECTION)
-                glLoadIdentity()
-                glOrtho(0, self.w, 0, self.h, -1, 1)
-                glMatrixMode(GL_MODELVIEW)
-                glColor4f(1.0, 1.0, 1.0, 1.0)
-            self.logo[1] -= 0.05
-            if self.logo[1] <= 0.001:
-                self.logo[0] = False
-                self.logo[4].destroy()
-                self.logo = [False, None]
-                glMatrixMode(GL_PROJECTION)
-                glLoadIdentity()
-                glOrtho(0, self.w, self.h, 0, -1, 1)
-                glMatrixMode(GL_MODELVIEW)
-                glColor4f(1.0, 1.0, 1.0, 1.0)
+        if self.logoon == "On":
+            if self.logo[0]:
+                if self.logo[2] != None:
+                    self.logo.append(self.createImage(self.logo[2], 1, [0, 0, -1, -1], [0, 0, self.w, self.h]))
+                    self.logo[2] = None
+                if self.logo[3] == 0:
+                    glColor4f(1.0, 1.0, 1.0, 1.0)
+                elif self.logo[3] == 1:
+                    glColor4f(1.0, 1.0, 1.0, min(self.logo[1], 1.0))
+                elif self.logo[3] == 2:
+                    glColor4f(0.0, 1.0, 1.0, min(self.logo[1], 1.0))
+                else:
+                    glMatrixMode(GL_PROJECTION)
+                    glLoadIdentity()
+                    glOrtho(0, self.w, 0, self.h, -1, 1)
+                    glMatrixMode(GL_MODELVIEW)
+                    glColor4f(1.0, 1.0, 1.0, 1.0)
+                self.logo[1] -= 0.05
+                if self.logo[1] <= 0.001:
+                    self.logo[0] = False
+                    self.logo[4].destroy()
+                    self.logo = [False, None]
+                    glMatrixMode(GL_PROJECTION)
+                    glLoadIdentity()
+                    glOrtho(0, self.w, self.h, 0, -1, 1)
+                    glMatrixMode(GL_MODELVIEW)
+                    glColor4f(1.0, 1.0, 1.0, 1.0)
 
         if self.vbos:
             glmod.drawVBO()
@@ -232,8 +240,9 @@ class GLWidget(QGLWidget):
         self.w = w
         self.h = h
 
-        if self.logo[0] and len(self.logo) == 5:
-            self.logo[4].setDrawRect([0, 0, w, h])
+        if self.logoon == "On":
+            if self.logo[0] and len(self.logo) == 5:
+                self.logo[4].setDrawRect([0, 0, w, h])
 
     #ugly conversion function :(
     def interpretString(self, string):
