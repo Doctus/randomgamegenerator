@@ -136,6 +136,7 @@ class GLWidget(QGLWidget):
                 glLoadIdentity()
                 glOrtho(0, self.w, self.h, 0, -1, 1)
                 glMatrixMode(GL_MODELVIEW)
+                glColor4f(1.0, 1.0, 1.0, 1.0)
 
         if self.vbos:
             glmod.drawVBO()
