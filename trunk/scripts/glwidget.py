@@ -84,7 +84,7 @@ class GLWidget(QGLWidget):
             if not "logo" in f:
                 continue
             logos.append(f)
-        self.logo = [True, 2.5, os.path.join("data", logos[random.randint(0, len(logos)-1)])]
+        self.logo = [True, 4.00, os.path.join("data", logos[random.randint(0, len(logos)-1)])]
 
         #settings, as used in SAVE_DIR/gfx_settings.rgs
         self.npot = 3
@@ -113,8 +113,8 @@ class GLWidget(QGLWidget):
             if self.logo[2] != None:
                 self.logo.append(self.createImage(self.logo[2], 1, [0, 0, -1, -1], [0, 0, self.w, self.h]))
                 self.logo[2] = None
-            glColor4f(1.0, 1.0, 1.0, min(self.logo[1], 1.0))
-            self.logo[1] -= 0.004
+            glColor4f(1.0, 1.0, 1.0, 1.0)
+            self.logo[1] -= 0.05
             if self.logo[1] <= 0.001:
                 self.logo[0] = False
                 self.logo[3].destroy()
