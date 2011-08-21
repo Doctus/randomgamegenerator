@@ -702,7 +702,7 @@ class gfxSettingsDialog(dialog):
     
     def _createFields(self, data):
         """Create the fields used by this dialog."""
-        self.fieldtemp = ["GL_COMPRESSED_RG_RGTC2", 1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", 1, 1, "Magic"]
+        self.fieldtemp = ["GL_COMPRESSED_RG_RGTC2", 1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", 1, 1, "Magic", "Off"]
 
         try:
             js = jsonload(os.path.join(SAVE_DIR, "gfx_settings.rgs"))
@@ -716,6 +716,11 @@ class gfxSettingsDialog(dialog):
             self.fieldtemp[7] = loadString('gfx.magic', js.get('Magic'))
         except:
             print "no settings detected"
+            pass
+
+        try:
+            self.fieldtemp[8] = loadString('gfx.splash', js.get('Splash'))
+        except:
             pass
 
         normFilters = ["GL_NEAREST", "GL_LINEAR"]
@@ -737,7 +742,9 @@ class gfxSettingsDialog(dialog):
             VBO=dropDownField(translate('gfxSettingsDialog', 'VBO'), ["Off", "On"],
                 value=data.get('VBO', self.fieldtemp[6])),
             Magic=dropDownField(translate('gfxSettingsDialog', 'Magic'), ["Magic", "More Magic"],
-                value=data.get('Magic', self.fieldtemp[7])))
+                value=data.get('Magic', self.fieldtemp[7])),
+            Splash=dropDownField(translate('gfxSettingsDialog', 'Splash'), ["Off", "On"],
+                value=data.get('Splash', self.fieldtemp[8])))
     
     def _interpretFields(self, fields):
         """Interpret the fields into a dictionary of clean items."""
@@ -763,7 +770,7 @@ class gfxSettingsDialog(dialog):
         
         # Add fields
         formLayout = QtGui.QFormLayout()
-        for id in ('compress', 'anifilt', 'minfilter', 'magfilter', 'mipminfilter', 'FSAA', 'VBO', 'Magic'):
+        for id in ('compress', 'anifilt', 'minfilter', 'magfilter', 'mipminfilter', 'FSAA', 'VBO', 'Magic', 'Splash'):
             field = self.fields[id]
             formLayout.addRow(translate('gfxSettingsDialog', '{0}: ', 'Row layout').format(field.name), field.widget(widget))
         

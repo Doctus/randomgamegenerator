@@ -81,10 +81,12 @@ class GLWidget(QGLWidget):
         self.logoon = "Off"
 
         try:
+            from rggSystem import SAVE_DIR
+            from rggJson import loadString, jsonload
+            import os
             js = jsonload(os.path.join(SAVE_DIR, "gfx_settings.rgs"))
-            self.logoon = loadString('gfx.splash', js.get('splash'))
+            self.logoon = loadString('gfx.splash', js.get('Splash'))
             if self.logoon == "On":
-                import os
                 dirs = os.listdir("data")
                 logos = []
                 for f in dirs:
