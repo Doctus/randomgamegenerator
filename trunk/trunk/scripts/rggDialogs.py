@@ -220,6 +220,9 @@ class hostDialog(dialog):
         okayButton = QtGui.QPushButton(translate('hostDialog', "Host"))
         okayButton.setDefault(True)
         cancelButton = QtGui.QPushButton(translate('hostDialog', "Cancel"))
+        checkIPButton = QtGui.QPushButton(translate('hostDialog', "Check IP"))
+        self.checkIPLabel = QtGui.QLineEdit()
+        self.checkIPLabel.setReadOnly(True)
         
         # Add fields
         formLayout = QtGui.QFormLayout()
@@ -229,15 +232,13 @@ class hostDialog(dialog):
                 translate('hostDialog', '{0}: ', 'Row layout').format(field.name),
                 field.widget(widget))
         
-        # Add buttons
-        theLesserOrFalseBox = QtGui.QBoxLayout(0)
-        theLesserOrFalseBox.addWidget(okayButton)
-        theLesserOrFalseBox.addWidget(cancelButton)
-        
-        # Position both
-        grandBox = QtGui.QBoxLayout(2)
-        grandBox.addLayout(formLayout)
-        grandBox.addLayout(theLesserOrFalseBox)
+        # Set up layout
+        grandBox = QtGui.QGridLayout()
+        grandBox.addLayout(formLayout, 0, 0, 1, 2)
+        grandBox.addWidget(checkIPButton, 1, 0)
+        grandBox.addWidget(self.checkIPLabel, 1, 1)
+        grandBox.addWidget(okayButton, 2, 0)
+        grandBox.addWidget(cancelButton, 2, 1)
         
         # Set up the widget
         widget.setLayout(grandBox)
@@ -252,9 +253,15 @@ class hostDialog(dialog):
         # Signals
         widget.connect(okayButton, QtCore.SIGNAL('clicked()'), okayPressed)
         widget.connect(cancelButton, QtCore.SIGNAL('clicked()'), widget.reject)
+        widget.connect(checkIPButton, QtCore.SIGNAL('clicked()'), self.checkIP)
         
         # Show to user
         return (widget.exec_() == QtGui.QDialog.Accepted)
+
+    def checkIP(self):
+        import urllib2
+        ip = str(urllib2.urlopen('http://whatismyip.org').read())
+        self.checkIPLabel.setText(ip)
     
     def dump(self):
         return dict(username=self.cleanData['username'],
