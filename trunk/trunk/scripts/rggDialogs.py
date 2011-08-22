@@ -223,6 +223,8 @@ class hostDialog(dialog):
         checkIPButton = QtGui.QPushButton(translate('hostDialog', "Check IP"))
         self.checkIPLabel = QtGui.QLineEdit()
         self.checkIPLabel.setReadOnly(True)
+        self.wordIPLabel = QtGui.QLineEdit()
+        self.wordIPLabel.setReadOnly(True)
         
         # Add fields
         formLayout = QtGui.QFormLayout()
@@ -237,8 +239,9 @@ class hostDialog(dialog):
         grandBox.addLayout(formLayout, 0, 0, 1, 2)
         grandBox.addWidget(checkIPButton, 1, 0)
         grandBox.addWidget(self.checkIPLabel, 1, 1)
-        grandBox.addWidget(okayButton, 2, 0)
-        grandBox.addWidget(cancelButton, 2, 1)
+        grandBox.addWidget(self.wordIPLabel, 2, 0, 1, 2)
+        grandBox.addWidget(okayButton, 3, 0)
+        grandBox.addWidget(cancelButton, 3, 1)
         
         # Set up the widget
         widget.setLayout(grandBox)
@@ -261,7 +264,15 @@ class hostDialog(dialog):
     def checkIP(self):
         import urllib2
         ip = str(urllib2.urlopen('http://whatismyip.org').read())
+        
+        with open("2of12inf.txt", "r") as f:
+            dat = f.readlines()
+            ipdat = ip.split(".")
+            vals = ((int(ipdat[0])*256+int(ipdat[1])),(int(ipdat[2])*256+int(ipdat[3])))
+            wordresult = " ".join((dat[vals[0]][:-1], dat[vals[1]][:-1]))
+            
         self.checkIPLabel.setText(ip)
+        self.wordIPLabel.setText(wordresult)
     
     def dump(self):
         return dict(username=self.cleanData['username'],
@@ -375,6 +386,13 @@ class joinDialog(dialog):
     def clean(self):
         """Check for errors and return well-formatted data."""
         self.cleanData = self._interpretFields(self.fields)
+        if len(self.cleanData['host'].split()) == 2:
+            with open("2of12inf.txt", "r") as f:
+                inp = self.cleanData['host'].split()
+                dat = f.readlines()
+                wordindex = [dat.index(inp[0]+"\n"), dat.index(inp[1]+"\n")]
+                ipextract = unicode(".".join((str(wordindex[0]//256), str(wordindex[0]%256), str(wordindex[1]//256), str(wordindex[1]%256))))
+                self.cleanData['host'] = ipextract
         return self.cleanData
     
     def dump(self):
