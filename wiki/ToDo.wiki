@@ -20,6 +20,7 @@
   * Ability to change an existing map's tileset
   * From Kaijyuu: pog placement could be made more intuitive
   * Optional timestamps on OOC chat
+  * Add zoom that isn't dependent on mousewheel
 
 = Game Support =
   * Allow DM to request dice rolls from players
