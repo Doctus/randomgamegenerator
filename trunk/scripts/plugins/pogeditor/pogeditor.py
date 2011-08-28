@@ -1,7 +1,7 @@
 from PyQt4 import QtCore, QtGui
 from PIL import Image as im
 from PIL import ImageQt as imqt
-from rggSystem import promptSaveFile, promptLoadFile, promptInteger, POG_DIR
+from rggSystem import promptSaveFile, promptLoadFile, promptInteger, promptCoordinates, POG_DIR
 import cStringIO
 
 class pogEditorWidget(QtGui.QDockWidget):
@@ -25,8 +25,8 @@ class pogEditorWidget(QtGui.QDockWidget):
         self.connect(self.resetButton, QtCore.SIGNAL('clicked()'), self.resetImage)
         self.borderButton = QtGui.QPushButton("Add Pog Border", mainWindow)
         self.connect(self.borderButton, QtCore.SIGNAL('clicked()'), self.addPogBorder)
-        self.resizeButton = QtGui.QPushButton("Resize to 64x64", mainWindow)
-        self.connect(self.resizeButton, QtCore.SIGNAL('clicked()'), self.debugResize64)
+        self.resizeButton = QtGui.QPushButton("Resize...", mainWindow)
+        self.connect(self.resizeButton, QtCore.SIGNAL('clicked()'), self.debugResize)
         self.cropButton = QtGui.QPushButton("Crop...", mainWindow)
         self.connect(self.cropButton, QtCore.SIGNAL('clicked()'), self.debugCropPrompt)
 
@@ -76,6 +76,8 @@ class pogEditorWidget(QtGui.QDockWidget):
     def poggifyImage(self, image):
         if image.size == (64, 64):
             overlay = im.open("data/pog_circle_64.png")
+        elif image.size == (128, 128):
+            overlay = im.open("data/pog_circle_128.png")
         else:
             raise NotImplementedError("Cannot create pogs of size " + str(image.size))
         
@@ -135,8 +137,10 @@ class pogEditorWidget(QtGui.QDockWidget):
 
     #TODO: Implement better editing functionality than these debug functions
 
-    def debugResize64(self):
-        self.editedImage = self.resizeImage(self.editedImage, (64, 64))
+    def debugResize(self):
+        size = promptCoordinates("Please enter desired image width.", "Please enter desired image height.", 
+                                 "Resize", 1, 4096)
+        self.editedImage = self.resizeImage(self.editedImage, size)
         self.update()
 
     def debugCropPrompt(self):
