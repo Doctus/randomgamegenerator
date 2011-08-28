@@ -124,6 +124,7 @@ class pogEditorWidget(QtGui.QDockWidget):
 
     def displayImage(self, image):
         converted = imqt.ImageQt(image)
+        converted = converted.copy()
         converted = QtGui.QPixmap.fromImage(converted)
         label = QtGui.QLabel()
         label.setPixmap(converted)
