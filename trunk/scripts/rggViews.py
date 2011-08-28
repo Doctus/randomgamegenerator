@@ -506,6 +506,9 @@ def configureGfx():
 
 def setLanguage(new):
     jsondump(dict(language=str(new.iconText())), os.path.join(SAVE_DIR, "lang_settings.rgs"))
+    #This should ideally be translated into the newly selected language, but I have no idea how to accomplish that.
+    info = QtGui.QMessageBox(QtGui.QMessageBox.Information, "Language Changed", "".join(('Your new language setting "', str(new.iconText()), '" will take effect the next time you start RGG.')), QtGui.QMessageBox.Ok)
+    info.exec_()
     
 @serverRPC
 def respondUserList(list):

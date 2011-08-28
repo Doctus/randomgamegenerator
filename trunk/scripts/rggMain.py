@@ -22,7 +22,7 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("RandomGameGenerator")
         self.setObjectName("MainWindow")
-        try: self.setWindowIcon(QIcon(os.path.join("data", "FAD-icon.png")))
+        try: self.setWindowIcon(QIcon(os.path.join("data", "rgglogo2.png")))
         except: pass
 
         self.glwidget = GLWidget(self)
