@@ -2,11 +2,9 @@
 
 = General =
   * The way plugins work is rather jury-rigged.
-  * Maybe some sort of music or sound support (through Phonon?)
 
 = Network =
   * Update protocol documentation so it's actually accurate.
-  * Switch pogs to absolute positioning.
 
 = Interface =
   * Make IC chat character selector jump to newest additions.
@@ -19,7 +17,6 @@
   * Multiple map layers which the camera and pogs can easily switch between
   * Ability to change an existing map's tileset
   * From Kaijyuu: pog placement could be made more intuitive
-  * Optional timestamps on OOC chat
   * Add zoom that isn't dependent on mousewheel
 
 = Game Support =
