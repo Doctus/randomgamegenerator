@@ -4,6 +4,22 @@ from PIL import ImageQt as imqt
 from rggSystem import promptSaveFile, promptLoadFile, promptInteger, promptCoordinates, POG_DIR
 import cStringIO
 
+class pogEditScrollArea(QtGui.QScrollArea):
+    
+    def __init__(self, mainWindow, parentt):
+        super(QtGui.QScrollArea, self).__init__(mainWindow)
+        self.first = None
+        self.parentt = parentt
+        
+    def mousePressEvent(self, event):
+        if self.first is None:
+            self.first = (event.x()+self.horizontalScrollBar().value(), event.y()+self.verticalScrollBar().value())
+        
+    def mouseReleaseEvent(self, event):
+        if self.first is not None:
+            self.parentt.externalCrop(self.first, (event.x()+self.horizontalScrollBar().value(), event.y()+self.verticalScrollBar().value()))
+            self.first = None
+
 class pogEditorWidget(QtGui.QDockWidget):
 
     def __init__(self, mainWindow):
@@ -15,7 +31,7 @@ class pogEditorWidget(QtGui.QDockWidget):
         self.currentImage = None
         self.editedImage = None
 
-        self.scrollarea = QtGui.QScrollArea()
+        self.scrollarea = pogEditScrollArea(mainWindow, self)
 
         self.openButton = QtGui.QPushButton("Open File", mainWindow)
         self.connect(self.openButton, QtCore.SIGNAL('clicked()'), self.promptOpenFile)
@@ -103,6 +119,12 @@ class pogEditorWidget(QtGui.QDockWidget):
 
     def cropImage(self, image, bounds):
         return image.crop(bounds)
+        
+    def externalCrop(self, boundA, boundB):
+        bounds = (min(boundA[0], boundB[0]), min(boundA[1], boundB[1]),
+                         max(boundA[0], boundB[0]), max(boundA[1], boundB[1]))
+        self.editedImage = self.cropImage(self.editedImage, bounds)
+        self.update()
 
     def resetImage(self):
         self.editedImage = self.currentImage
