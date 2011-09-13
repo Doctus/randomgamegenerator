@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 #Image convenience class
 #
@@ -33,10 +33,10 @@ class tile(object):
         self.origtextrect = textureRect
 
         if self.glwidget.texext == GL_TEXTURE_2D:
-            x = float(textureRect[0])/float(qimg.width())
-            y = float(textureRect[1])/float(qimg.height())
-            w = float(textureRect[2])/float(qimg.width())
-            h = float(textureRect[3])/float(qimg.height())
+            x = textureRect[0]/qimg.width()
+            y = textureRect[1]/qimg.height()
+            w = textureRect[2]/qimg.width()
+            h = textureRect[3]/qimg.height()
             self.textureRect = [x, y, w, h]
             
         self.setVBOData()
