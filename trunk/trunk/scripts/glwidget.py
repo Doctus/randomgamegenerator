@@ -433,6 +433,10 @@ class GLWidget(QGLWidget):
             else:
                 glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, self.minfilter)
                 glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, self.magfilter)
+            
+            glTexParameteri(self.texext, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+            glTexParameteri(self.texext, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE)
+            glTexParameteri(self.texext, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
 
             format = GL_RGBA
             if self.compress:
