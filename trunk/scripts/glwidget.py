@@ -743,18 +743,26 @@ class GLWidget(QGLWidget):
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Control:
             self.ctrl = True
-        if event.key() == Qt.Key_Shift:
+        elif event.key() == Qt.Key_Shift:
             print "calculate"
             self.calculateVBOList()
             self.shift = True
-        if event.key() == Qt.Key_Alt:
+        elif event.key() == Qt.Key_Alt:
             print "fillbuffers"
             self.fillBuffers()
+        elif event.key() == Qt.Key_Plus or event.key() == Qt.Key_Equal:
+            self.zoom += 0.15
+            if self.zoom > 4:
+                self.zoom = 4
+        elif event.key() == Qt.Key_Minus:
+            self.zoom -= 0.15
+            if self.zoom < 0.30:
+                self.zoom = 0.30
             
     def keyReleaseEvent(self, event):
         if event.key() == Qt.Key_Control:
             self.ctrl = False
-        if event.key() == Qt.Key_Shift:
+        elif event.key() == Qt.Key_Shift:
             self.shift = False
 
     def wheelEvent(self, mouse):
