@@ -205,6 +205,7 @@ class ICChatWidget(QtGui.QDockWidget):
             self.characterSelector.addItem(newchar.id)
             self.characters.append(newchar)
             jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
+            self.characterSelector.setCurrentIndex(self.characterSelector.count()-1)
             
     def _newChar(self, char):
         self.characterSelector.addItem(char.id)
