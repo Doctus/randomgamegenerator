@@ -758,6 +758,14 @@ class GLWidget(QGLWidget):
             self.zoom -= 0.15
             if self.zoom < 0.30:
                 self.zoom = 0.30
+        elif event.key() == Qt.Key_Up:
+            self.camera[1] += (50 * self.zoom)
+        elif event.key() == Qt.Key_Down:
+            self.camera[1] -= (50 * self.zoom)
+        elif event.key() == Qt.Key_Left:
+            self.camera[0] += (50 * self.zoom)
+        elif event.key() == Qt.Key_Right:
+            self.camera[0] -= (50 * self.zoom)
             
     def keyReleaseEvent(self, event):
         if event.key() == Qt.Key_Control:
