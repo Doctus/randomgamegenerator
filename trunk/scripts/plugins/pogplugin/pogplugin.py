@@ -129,10 +129,10 @@ class pogListWidget(QtGui.QListWidget):
             selection = rggSystem.showPopupMenuAtAbs([x, y], ['Center', hide, 'Resize', lock, 'Change Layer', 'Delete'])
             if selection == 0:
                 camsiz = rggSystem.cameraSize()
-                camzoom = float(1)/rggSystem.getZoom()
+                camzoom = rggSystem.getZoom()
                 pospog = specificItem.getPog().position
                 cammod = [(-camsiz[0]/2)+specificItem.getPog()._tile.getW()/2, (-camsiz[1]/2)+specificItem.getPog()._tile.getH()/2]
-                newpos = (-(pospog[0] + cammod[0]), -(pospog[1] + cammod[1]))
+                newpos = (-(pospog[0]*camzoom + cammod[0]), -(pospog[1]*camzoom + cammod[1]))
                 rggSystem.setCameraPosition(newpos)
             elif selection == 1:
                 for item in items:
