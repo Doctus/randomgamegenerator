@@ -1,4 +1,4 @@
-RGG v.0991 "Underground souls, rumble"
+RGG v.0992 "Share lives with all things in nature"
 
 http://code.google.com/p/randomgamegenerator/
 
@@ -37,6 +37,24 @@ Special Thanks:
   Everyone from MoMM and #attercop
 
 Changelog:
+
+  v0.992 "Share lives with all things in nature"
+    * Fixed an issue with map placement when loading sessions.
+    * Added language-switching capability.
+    * Added language support for Dutch, German, and Japanese.
+    * Fixed an issue with setting pog layers.
+    * Made pog naming dialog default to pog's current name if
+      it has one.
+    * Improved transfer socket initialization.
+    * Added a Pog Editor plugin through which images can be
+      easily edited and saved as pogs.
+    * Added several features to assist hosting.
+    * Reduced texture "bleed" on tile edges.
+    * Added backup controls for zoom and pan in the map window.
+    * The IC chat widget now scrolls automatically to a new character.
+    * Fixed center-on-pog command.
+    * Fixed an issue involving layers and deleting pogs.
+    * Added timestamps in OOC chat (can be toggled off).
 
   v0.991 "Underground souls, rumble"
     * The game window now remembers its last arrangement.
