@@ -31,6 +31,9 @@ Coded by:
 
 Art by:
   Garrick (earthisthering@gmail.com)
+  Some portraits from:
+     http://www5f.biglobe.ne.jp/~itazu/etolier/index.html
+     Thank you!
 
 Special Thanks:
   Kaijyuu and Antistone for suggestions and testing
