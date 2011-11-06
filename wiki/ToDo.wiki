@@ -5,6 +5,7 @@
 
 = Network =
   * Update protocol documentation so it's actually accurate.
+  * Downloads should go to a temporary folder and be copied when (and if) they're complete.
 
 = Interface =
   * Make IC chat character selector jump to newest additions.
