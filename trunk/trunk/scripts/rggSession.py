@@ -172,7 +172,7 @@ class Session(object):
             sess._addMap(loaded)
 
         linez = obj.get('lines')
-        brk = lambda x, n, acc=[]: brk(x[n:], n, acc+[(x[:n])]) if x else acc
+        brk = lambda x,y: [x[i:i+y] for i in range(0,len(x),y)]
         for line in brk(linez, 8):
             sess.addLine(line)
             
