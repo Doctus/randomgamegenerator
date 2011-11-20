@@ -180,6 +180,7 @@ class Map(object):
         # HACK: Looks like coordinates; saves work.
         tiles = loadCoordinates('Map.tiles', obj.get('tiles'), length=len(map.tileindexes), min=0, max=65535)
         map._setIndexes(tiles)
+        map._createTiles()
         return map
         
     def __unicode__(self):

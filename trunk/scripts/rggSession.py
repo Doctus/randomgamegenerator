@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 import rggTile, rggPog, rggMap, rggSystem, rggResource, random, sys
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
-from rggSystem import mainWindow
+from rggSystem import mainWindow, clearLines
 
 class Session(object):
     
@@ -143,6 +143,18 @@ class Session(object):
         if not line[4] in self.linesDict:
             self.linesDict[line[4]] = []
         self.linesDict[line[4]].append([line[0], line[1], line[2], line[3], line[5], line[6], line[7]])
+        
+    def clear(self):
+        """Clear all session data to prepare for loading a new one."""
+        for map in self.maps.values():
+            map._deleteTiles()
+        for pog in self.pogs.values():
+            pog.destroy()
+        clearLines()
+        self.maps = {}
+        self.pogs = {}
+        self.lines = []
+        self.linesDict = {}
     
     def dump(self):
         """Serialize to an object valid for JSON dumping."""
