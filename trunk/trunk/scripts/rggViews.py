@@ -385,6 +385,8 @@ def internalAddMap(map):
     
 @serverRPC
 def respondSession(sess):
+    if _state.session is not None:
+        _state.session.clear()
     _state.session = rggSession.Session.load(sess)
     
 @clientRPC
@@ -448,6 +450,8 @@ def loadSession():
     if not filename:
         return
     try:
+        if _state.session is not None:
+            _state.session.clear()
         obj = jsonload(filename)
         sess = rggSession.Session.load(obj)
         _state.session = sess
