@@ -1,4 +1,4 @@
-RGG v.0992 "Share lives with all things in nature"
+RGG v.0992b "Share lives with all things in nature"
 
 http://code.google.com/p/randomgamegenerator/
 
@@ -40,6 +40,12 @@ Special Thanks:
   Everyone from MoMM and #attercop
 
 Changelog:
+  v0.992b "Share lives with all things in nature"
+    * Fixed some critical bugs with session and map loading.
+    * Added a number of default portraits.
+    * Added relationship generator.
+    * Expanded space tiles slightly.
+    * Fixed some issues relating to incorrectly transferred files.
 
   v0.992 "Share lives with all things in nature"
     * Fixed an issue with map placement when loading sessions.
