@@ -496,7 +496,7 @@ class newCharacterDialog(dialog):
         portraits = findFiles(PORTRAIT_DIR, IMAGE_EXTENSIONS)
         portraits.sort(cmp=lambda x,y: cmp(x.lower(), y.lower()))
         for greatJustice in portraits:
-            icon = QtGui.QIcon(QtGui.QIcon(os.path.join(PORTRAIT_DIR, greatJustice)).pixmap(QtCore.QSize(32, 32)))
+            icon = QtGui.QIcon(os.path.join(PORTRAIT_DIR, greatJustice))
             self.portraitArea.addItem(QtGui.QListWidgetItem(icon, greatJustice))
         
         # Show to user
