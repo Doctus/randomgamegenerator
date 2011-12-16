@@ -40,6 +40,13 @@ Special Thanks:
   Everyone from MoMM and #attercop
 
 Changelog:
+  v0.993 "Shiny crystal light, energize"
+    * Removed music from repository
+    * Made pog palette update itself automagically
+
+  v0.992c "Share lives with all things in nature"
+    * Fixed a packaging error in the Windows binary release.
+
   v0.992b "Share lives with all things in nature"
     * Fixed some critical bugs with session and map loading.
     * Added a number of default portraits.
