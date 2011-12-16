@@ -353,9 +353,6 @@ class pogPalette(QtGui.QDockWidget):
         for greatJustice in self.pogs:
             icon = QtGui.QIcon(QtGui.QIcon(os.path.join(POG_DIR, greatJustice)).pixmap(QtCore.QSize(32, 32)))
             self.pogArea.addItem(QtGui.QListWidgetItem(icon, greatJustice))
-            
-    def testo(self, stri):
-        print stri
     
     def place(self, pog):
         """Place a pog on the map."""
