@@ -189,6 +189,8 @@ class menuBar(object):
                 self.plugins[unicode(self.pluginsModules[-1].title())] = folder
             except:
                 pass
+                
+        self.windowMenu = QtGui.QMenu(translate("menubar", "Window"), main)
         
         # MENUBAR
 
@@ -199,6 +201,7 @@ class menuBar(object):
         self.menubar.addMenu(self.optionsMenu)
         self.menubar.addMenu(self.langMenu)
         self.pluginhide = self.menubar.addMenu(self.pluginsMenu)
+        self.menubar.addMenu(self.windowMenu)
         self.menubar.addSeparator()
         self.menubar.addAction(self.selectIcon)
         self.menubar.addAction(self.moveIcon)
@@ -215,6 +218,8 @@ class menuBar(object):
         
         stylesMenu.triggered.connect(self.changeStyle)
         self.pluginsMenu.triggered.connect(self.loadPlugin)
+        
+        self.windowMenu.aboutToShow.connect(self.updateWidgetMenu)
         
     def resetIcons(self):
         self.selectIcon.setIcon(QtGui.QIcon("./data/FAD-select-icon.png"))
@@ -251,3 +256,8 @@ class menuBar(object):
     
     def changeStyle(self, act):
         mainWindow.setStyleSheet(rggStyles.sheets[unicode(act.text())])
+        
+    def updateWidgetMenu(self):
+        self.windowMenu.clear()
+        for action in mainWindow.createPopupMenu().actions():
+            self.windowMenu.addAction(action)
