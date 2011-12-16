@@ -30,6 +30,8 @@ class pogEditorWidget(QtGui.QDockWidget):
 
         self.currentImage = None
         self.editedImage = None
+        
+        self.validBorderSizes = [(64, 64), (128, 128)]
 
         self.scrollarea = pogEditScrollArea(mainWindow, self)
 
@@ -153,6 +155,10 @@ class pogEditorWidget(QtGui.QDockWidget):
         label = QtGui.QLabel()
         label.setPixmap(converted)
         self.scrollarea.setWidget(label)
+        if (converted.height(), converted.width()) not in self.validBorderSizes:
+            self.borderButton.setEnabled(False)
+        else:
+            self.borderButton.setEnabled(True)
 
     def update(self):
         self.displayImage(self.editedImage)
