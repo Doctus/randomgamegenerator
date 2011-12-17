@@ -32,6 +32,7 @@ except Exception as e:
     pass
 
 from rggTile import *
+from rggSystem import POG_DIR, promptSaveFile
 
 def nextPowerOfTwo(val):
     val -= 1
@@ -79,6 +80,8 @@ class GLWidget(QGLWidget):
         self.textid = 0
         self.vertByteCount = ADT.arrayByteCount(numpy.zeros((8, 2), 'f'))
         self.logoon = "Off"
+        
+        self.setAcceptDrops(True)
 
         try:
             from rggSystem import SAVE_DIR
@@ -808,3 +811,16 @@ class GLWidget(QGLWidget):
     def leaveEvent(self, event):
         self.ctrl = False
         self.shift = False
+        
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasImage():
+            event.acceptProposedAction()
+
+    def dropEvent(self, event):
+        if event.mimeData().hasImage():
+            dat = event.mimeData().imageData()
+            img = QImage(dat)
+            filename = promptSaveFile('Save Pog', 'Pog files (*.png)', POG_DIR)
+            if filename is not None:
+                img.save(filename, "PNG")
+            event.acceptProposedAction()
