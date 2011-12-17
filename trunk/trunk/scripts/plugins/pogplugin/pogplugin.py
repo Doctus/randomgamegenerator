@@ -1,7 +1,8 @@
 from PyQt4 import QtCore, QtGui
 import rggEvent, rggViews, rggPog, rggSystem
+from rggSystem import translate
 
-class resizeDialog(QtGui.QDialog):
+'''class resizeDialog(QtGui.QDialog):
 
     def __init__(self, origx, origy, currw, currh):
         QtGui.QDialog.__init__(self)
@@ -45,9 +46,9 @@ class resizeDialog(QtGui.QDialog):
         self.done(1)
 
     def cancelPressed(self, checked):
-        self.done(0)
+        self.done(0)'''
 
-class layerDialog(QtGui.QDialog):
+'''class layerDialog(QtGui.QDialog):
 
     def __init__(self, currl):
         QtGui.QDialog.__init__(self)
@@ -75,7 +76,7 @@ class layerDialog(QtGui.QDialog):
         self.done(1)
 
     def cancelPressed(self, checked):
-        self.done(0)
+        self.done(0)'''
 
 class pogItem(QtGui.QListWidgetItem):
 
@@ -100,9 +101,10 @@ class pogItem(QtGui.QListWidgetItem):
 
 class pogListWidget(QtGui.QListWidget):
 
-    def __init__(self, parent):
+    def __init__(self, parent, pogwidget):
         QtGui.QListWidget.__init__(self)
         self.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
+        self.pogwidget = pogwidget
 
     def mousePressEvent(self, event): #listwidget generated events
         pos = event.globalPos()
@@ -112,6 +114,9 @@ class pogListWidget(QtGui.QListWidget):
         if specificItem not in self.selectedItems():
             self.setItemSelected(specificItem, True)
         items = self.selectedItems()
+        self.pogs = []
+        for item in items:
+            self.pogs.append(item.getPog())
         event.accept()
 
         if items is None or specificItem is None:
@@ -126,51 +131,19 @@ class pogListWidget(QtGui.QListWidget):
             if specificItem.getPog()._locked:
                 lock = 'Unlock'
 
-            selection = rggSystem.showPopupMenuAtAbs([x, y], ['Center', hide, 'Resize', lock, 'Change Layer', 'Delete'])
-            if selection == 0:
-                camsiz = rggSystem.cameraSize()
-                camzoom = rggSystem.getZoom()
-                pospog = specificItem.getPog().position
-                cammod = [(-camsiz[0]/2)+specificItem.getPog()._tile.getW()/2, (-camsiz[1]/2)+specificItem.getPog()._tile.getH()/2]
-                newpos = (-(pospog[0]*camzoom + cammod[0]), -(pospog[1]*camzoom + cammod[1]))
-                rggSystem.setCameraPosition(newpos)
-            elif selection == 1:
-                for item in items:
-                    pog = item.getPog()
-                    if pog.hidden:
-                        pog.show()
-                    else:
-                        pog.hide()
-                    item.setPog(pog)
-                    rggViews.sendHidePog(pog.ID, pog.hidden)
-            elif selection == 2:
-                specificPog = specificItem.getPog()
-                d = resizeDialog(specificPog._tile.getW(), specificPog._tile.getH(), specificPog.size[0], specificPog.size[1])
-                if d.exec_():
-                    for item in items:
-                        pog = item.getPog()
-                        pog.size = (d.wBox.value(), d.hBox.value())
-                        rggViews.sendResizePog(pog.ID, d.wBox.value(), d.hBox.value())
-            elif selection == 3:
-                for item in items:
-                    pog = item.getPog()
-                    pog._locked = not pog._locked
-                    item.setPog(pog)
-                    rggViews.sendLockPog(pog.ID, pog._locked)
-            elif selection == 4:
-                specificPog = specificItem.getPog()
-                d = layerDialog(specificPog.layer-200)
-                if d.exec_():
-                    for item in items:
-                        pog = item.getPog()
-                        pog.layer = d.box.value()+200
-                        rggViews.sendPogAttributes(pog.ID, pog.name, pog.layer, pog.properties)
-            elif selection == 5:
-                for item in items:
-                    rggViews.deletePog(item.getPog())
-                    item.dead = True
-                    self.takeItem(self.row(item))
+            selection = rggSystem.showPopupMenuAtAbs([x, y], [translate('views', 'Center on pog'),
+                        translate('views', 'Set name'),
+                        translate('views', 'Generate name'),
+                        translate('views', 'Set layer'),
+                        translate('views', 'Add/edit property'),
+                        translate('views', 'Resize'),
+                        translate('views', hide),
+                        translate('views', lock),
+                        translate('views', 'Delete')])
+            rggViews.processPogRightclick(selection, self.pogs)
+            self.pogwidget.refresh()
         else:
+            self.pogwidget.refresh()
             super(QtGui.QListWidget, self).mousePressEvent(event)
 
     def selectionChanged(self, selected, deselected):
@@ -190,7 +163,7 @@ class pogWidget(QtGui.QDockWidget):
         super(QtGui.QDockWidget, self).__init__(mainWindow)
 
         self.setWindowTitle(self.tr("Pogs"))
-        self.listWidget = pogListWidget(mainWindow)
+        self.listWidget = pogListWidget(mainWindow, self)
         self.setWidget(self.listWidget)
         self.setObjectName("Pog Plugin")
         mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, self)
@@ -203,6 +176,11 @@ class pogWidget(QtGui.QDockWidget):
         rggEvent.addPogUpdateListener(self)
         rggEvent.addPogDeleteListener(self)
         rggEvent.addPogSelectionChangedListener(self)
+        
+    def refresh(self):
+        self.listWidget.clear()
+        for pog in rggViews.getSession().pogs.values():
+            self.pogUpdateResponse(pog)
         
     def pogUpdateResponse(self, pog):
         for x in xrange(self.listWidget.count()):

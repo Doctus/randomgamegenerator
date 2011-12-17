@@ -814,6 +814,83 @@ def reportCamera():
     """Reports the current camera coordinates."""
     say(translate('views', 'x: {0}\ny: {1}', 'formats camera reporting.').format(*cameraPosition()))
 
+def renamePog(pog, name):
+    pog.name = name
+    sendPogAttributes(pog.ID, pog.name, pog.layer, pog.properties)
+    
+def processPogRightclick(selection, pogs):
+    #0 CENTER
+    #1 SET NAME
+    #2 GEN NAME
+    #3 SET LAYER
+    #4 SET PROPERTY
+    #5 RESIZE
+    #6 HIDE
+    #7 LOCK
+    #8 DELETE
+    mainpog = pogs[0]
+    if selection == 0:
+        camsiz = cameraSize()
+        camzoom = getZoom()
+        pospog = mainpog.position
+        cammod = [(-camsiz[0]/2)+mainpog._tile.getW()/2, (-camsiz[1]/2)+mainpog._tile.getH()/2]
+        newpos = (-(pospog[0]*camzoom + cammod[0]), -(pospog[1]*camzoom + cammod[1]))
+        setCameraPosition(newpos)
+    elif selection == 1:
+        name = promptString(translate('views', "Enter a name for this pog."), inittext = mainpog.name)
+        if name is None:
+            return
+        for pog in pogs:
+            renamePog(pog, name)
+    elif selection == 2:
+        prompt = translate('views', "Enter a generator command. See /randomname for syntax. Multi-pog compatible.")
+        gentype = promptString(prompt)
+        if gentype is None:
+            return
+        gentype = ''.join(gentype.split()).lower()
+        for pog in pogs:
+            renamePog(pog, rggNameGen.getName(gentype))
+    elif selection == 3:
+        prompt = translate('views', "Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.")
+        newlayer = promptInteger(prompt, min=-150, max=800, default=(mainpog.layer-200))
+        if newlayer is None:
+            return
+        for pog in pogs:
+            pog.layer = newlayer+200
+            sendPogAttributes(pog.ID, pog.name, pog.layer, pog.properties)
+    elif selection == 4:
+        prompt = translate('views', 'Enter a name for the property (like "Level" or "HP").')
+        key = promptString(prompt)
+        prompt2 = translate('views', 'Enter a value for the property.')
+        value = promptString(prompt2)
+        if key is None or value is None:
+            return
+        for pog in pogs:
+            pog.editProperty(key, value)
+            sendPogAttributes(pog.ID, pog.name, pog.layer, pog.properties)
+    elif selection == 5:
+        d = rggDialogs.resizeDialog(mainpog._tile.getW(), mainpog._tile.getH(), mainpog.size[0], mainpog.size[1])
+        if d.exec_():
+            for pog in pogs:
+                pog.size = (d.wBox.value(), d.hBox.value())
+                sendResizePog(pog.ID, d.wBox.value(), d.hBox.value())
+                drawPogCircles()
+    elif selection == 6:
+        for pog in pogs:
+            if pog.hidden:
+                pog.show()
+            else:
+                pog.hide()
+            sendHidePog(pog.ID, pog.hidden)
+            clearPogSelection()
+            drawPogCircles()
+    elif selection == 7:
+        for pog in pogs:
+            pog._locked = not pog._locked
+            sendLockPog(pog.ID, pog._locked)
+    elif selection == 8:
+        for pog in pogs:
+            deletePog(pog)
 
 # MOUSE ACTIONS
 
@@ -930,45 +1007,22 @@ def mousePress(screenPosition, mapPosition, button):
             pog = _state.session.findTopPog(mapPosition)
             if pog is not None:
                 _state.mouseButton = None
+                if pog.hidden: hidebutton = "Show"
+                else: hidebutton = "Hide"
+                if pog._locked: lockbutton = "Unlock"
+                else: lockbutton = "Lock"
                 selected = showPopupMenuAt(
                     (screenPosition[0], screenPosition[1]),
-                    [translate('views', 'Set name'),
+                    [translate('views', 'Center on pog'),
+                        translate('views', 'Set name'),
                         translate('views', 'Generate name'),
-                        translate('views', 'Set Layer'),
-                        translate('views', 'Add/Edit Property')])
-                if selected == 0:
-                    name = promptString(translate('views', "Enter a name for this pog."), inittext = pog.name)
-                    if name is None:
-                        return
-                    pog.name = name
-                    sendPogAttributes(pog.ID, pog.name, pog.layer, pog.properties)
-                elif selected == 1:
-                    prompt = translate('views', "Enter a generator command. See /randomname for syntax. Multi-pog compatible.")
-                    gentype = promptString(prompt)
-                    if gentype is None:
-                        return
-                    gentype = ''.join(gentype.split()).lower()
-                    for selectedPog in set([pog] + list(_state.pogSelection)):
-                        selectedPog.name = rggNameGen.getName(gentype)
-                        modifyPog(selectedPog)
-                        sendPogAttributes(selectedPog.ID, selectedPog.name, selectedPog.layer, selectedPog.properties)
-                elif selected == 2:
-                    prompt = translate('views', "Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.")
-                    newlayer = promptInteger(prompt, min=-150, max=800, default=(pog.layer-200))
-                    if newlayer is None:
-                        return
-                    for selectedPog in set([pog] + list(_state.pogSelection)):
-                        selectedPog.layer = newlayer+200
-                        sendPogAttributes(pog.ID, pog.name, pog.layer, pog.properties)
-                elif selected == 3:
-                    prompt = translate('views', 'Enter a name for the property (like "Level" or "HP").')
-                    key = promptString(prompt)
-                    prompt2 = translate('views', 'Enter a value for the property.')
-                    value = promptString(prompt2)
-                    if key is None or value is None:
-                        return
-                    pog.editProperty(key, value)
-                    sendPogAttributes(pog.ID, pog.name, pog.layer, pog.properties)
+                        translate('views', 'Set layer'),
+                        translate('views', 'Add/edit property'),
+                        translate('views', 'Resize'),
+                        translate('views', hidebutton),
+                        translate('views', lockbutton),
+                        translate('views', 'Delete')])
+                processPogRightclick(selected, list(set([pog] + list(_state.pogSelection))))
             else:
                 pass
     elif icon == ICON_DRAW:

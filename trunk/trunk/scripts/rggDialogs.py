@@ -65,6 +65,52 @@ class dialog(object):
         """Utilize validated data to make changes."""
         raise NotImplementedError()
 
+class resizeDialog(QtGui.QDialog):
+
+    def __init__(self, origx, origy, currw, currh):
+        QtGui.QDialog.__init__(self)
+        self.owlabel = QtGui.QLabel("Current Width:")
+        self.ohlabel = QtGui.QLabel("Current Height:")
+        self.owlabel2 = QtGui.QLabel(str(origx))
+        self.ohlabel2 = QtGui.QLabel(str(origy))
+        self.setWindowTitle("Resize Pog")
+
+        self.wlabel = QtGui.QLabel("New Width:")
+        self.hlabel = QtGui.QLabel("New Height:")
+
+        self.wBox = QtGui.QSpinBox()
+        self.hBox = QtGui.QSpinBox()
+        self.wBox.setRange(1, 1000)
+        self.hBox.setRange(1, 1000)
+        self.wBox.setValue(currw)
+        self.hBox.setValue(currh)
+
+        self.okButton = QtGui.QPushButton("Ok")
+        self.cancelButton = QtGui.QPushButton("Cancel")
+
+        self.okButton.clicked.connect(self.okPressed)
+        self.cancelButton.clicked.connect(self.cancelPressed)
+
+        self.layout = QtGui.QGridLayout()
+        self.layout.addWidget(self.owlabel, 0, 0)
+        self.layout.addWidget(self.ohlabel, 1, 0)
+        self.layout.addWidget(self.owlabel2, 0, 1)
+        self.layout.addWidget(self.ohlabel2, 1, 1)
+
+        self.layout.addWidget(self.wlabel, 2, 0)
+        self.layout.addWidget(self.hlabel, 3, 0)
+        self.layout.addWidget(self.wBox, 2, 1)
+        self.layout.addWidget(self.hBox, 3, 1)
+        self.layout.addWidget(self.okButton, 4, 0)
+        self.layout.addWidget(self.cancelButton, 4, 1)
+        self.setLayout(self.layout)
+
+    def okPressed(self, checked):
+        self.done(1)
+
+    def cancelPressed(self, checked):
+        self.done(0)        
+        
 class newMapDialog(dialog):
     """A dialog used to create a new map."""
     
