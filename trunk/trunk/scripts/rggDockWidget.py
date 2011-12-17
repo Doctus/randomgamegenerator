@@ -1,5 +1,5 @@
 from PyQt4 import QtGui, QtCore, phonon
-from rggSystem import signal, findFiles, POG_DIR, LOG_DIR, IMAGE_EXTENSIONS, CHAR_DIR, MUSIC_DIR, SAVE_DIR, makePortableFilename
+from rggSystem import signal, findFiles, POG_DIR, PORTRAIT_DIR, LOG_DIR, IMAGE_EXTENSIONS, CHAR_DIR, MUSIC_DIR, SAVE_DIR, makePortableFilename, promptSaveFile
 from rggDialogs import newCharacterDialog, FIRECharacterSheetDialog
 from rggJson import loadObject, loadString, jsondump, jsonload
 import os, os.path, time
@@ -163,6 +163,9 @@ class ICChatWidget(QtGui.QDockWidget):
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
         self.setObjectName("IC Chat Widget")
+        
+        self.setAcceptDrops(True)
+        
         mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self)
         
         #TODO: Store and access characters in a better fashion.
@@ -189,6 +192,19 @@ class ICChatWidget(QtGui.QDockWidget):
                 self.logfile.close()
         except:
             pass
+            
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasImage():
+            event.acceptProposedAction()
+
+    def dropEvent(self, event):
+        if event.mimeData().hasImage():
+            dat = event.mimeData().imageData()
+            img = QtGui.QImage(dat)
+            filename = promptSaveFile('Save Portrait', 'Portrait files (*.png)', PORTRAIT_DIR)
+            if filename is not None:
+                img.save(filename, "PNG")
+            event.acceptProposedAction()
             
     def newCharacter(self):
         dialog = newCharacterDialog()

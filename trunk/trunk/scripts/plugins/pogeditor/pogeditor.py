@@ -1,7 +1,7 @@
 from PyQt4 import QtCore, QtGui
 from PIL import Image as im
 from PIL import ImageQt as imqt
-from rggSystem import promptSaveFile, promptLoadFile, promptInteger, promptCoordinates, POG_DIR
+from rggSystem import promptSaveFile, promptLoadFile, promptInteger, promptCoordinates, POG_DIR, PORTRAIT_DIR
 import cStringIO
 
 class pogEditScrollArea(QtGui.QScrollArea):
@@ -39,23 +39,25 @@ class pogEditorWidget(QtGui.QDockWidget):
         self.connect(self.openButton, QtCore.SIGNAL('clicked()'), self.promptOpenFile)
         self.saveButton = QtGui.QPushButton("Save Pog", mainWindow)
         self.connect(self.saveButton, QtCore.SIGNAL('clicked()'), self.promptSaveFile)
+        self.savePortraitButton = QtGui.QPushButton("Save Portrait", mainWindow)
+        self.connect(self.savePortraitButton, QtCore.SIGNAL('clicked()'), self.promptSavePortrait)
         self.resetButton = QtGui.QPushButton("Reset Changes", mainWindow)
         self.connect(self.resetButton, QtCore.SIGNAL('clicked()'), self.resetImage)
         self.borderButton = QtGui.QPushButton("Add Pog Border", mainWindow)
         self.connect(self.borderButton, QtCore.SIGNAL('clicked()'), self.addPogBorder)
         self.resizeButton = QtGui.QPushButton("Resize...", mainWindow)
         self.connect(self.resizeButton, QtCore.SIGNAL('clicked()'), self.debugResize)
-        self.cropButton = QtGui.QPushButton("Crop...", mainWindow)
-        self.connect(self.cropButton, QtCore.SIGNAL('clicked()'), self.debugCropPrompt)
+        #self.cropButton = QtGui.QPushButton("Crop...", mainWindow)
+        #self.connect(self.cropButton, QtCore.SIGNAL('clicked()'), self.debugCropPrompt)
 
         self.layout = QtGui.QGridLayout()
         self.layout.addWidget(self.scrollarea, 0, 0, 1, 3)
         self.layout.addWidget(self.openButton, 1, 0)
-        self.layout.addWidget(self.saveButton, 1, 1)
-        self.layout.addWidget(self.resetButton, 1, 2)
-        self.layout.addWidget(self.borderButton, 2, 0)
-        self.layout.addWidget(self.resizeButton, 2, 1)
-        self.layout.addWidget(self.cropButton, 2, 2)
+        self.layout.addWidget(self.borderButton, 1, 1)
+        self.layout.addWidget(self.resizeButton, 1, 2)
+        self.layout.addWidget(self.resetButton, 2, 0)
+        self.layout.addWidget(self.saveButton, 2, 1)
+        self.layout.addWidget(self.savePortraitButton, 2, 2)
         
         self.widget = QtGui.QWidget()
         self.widget.setLayout(self.layout)
@@ -145,6 +147,11 @@ class pogEditorWidget(QtGui.QDockWidget):
 
     def promptSaveFile(self):
         filename = promptSaveFile('Save Pog', 'Pog files (*.png)', POG_DIR)
+        if filename is not None:
+            self.saveImage(self.editedImage, filename)
+            
+    def promptSavePortrait(self):
+        filename = promptSaveFile('Save Portrait', 'Portrait files (*.png)', PORTRAIT_DIR)
         if filename is not None:
             self.saveImage(self.editedImage, filename)
 
