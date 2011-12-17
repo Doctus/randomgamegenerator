@@ -91,7 +91,7 @@ class pogItem(QtGui.QListWidgetItem):
         self.__pog = pog
         name = pog.name
         if name == None or len(name) <= 0:
-            name = "No name"
+            name = "No name (" + pog._src + ")"
         if pog._locked:
             name += " [L]"
         if pog.hidden:
