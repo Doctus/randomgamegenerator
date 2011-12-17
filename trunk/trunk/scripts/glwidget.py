@@ -20,7 +20,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.QtOpenGL import *
 
-import random
+import random, math
 
 mod = False
 try:
@@ -167,9 +167,28 @@ class GLWidget(QGLWidget):
                 glLineWidth(layer)
                 glBegin(GL_LINES)
                 for line in self.lines[layer]:
+                    glColor3f(line[4], line[5], line[6])
                     glVertex2f(line[0], line[1])
                     glVertex2f(line[2], line[3])
                 glEnd()
+            if self.selectionCircles.has_key(-1):
+                glLineWidth(3)
+                glBegin(GL_LINE_LOOP)
+                glColor3f(1.0, 1.0, 1.0)
+                for circle in self.selectionCircles[-1]:
+                    for r in range(0, 360, 3):
+                        glVertex2f(circle[0] + math.cos(r*0.01745329) * circle[2], circle[1] + math.sin(r*0.01745329) * circle[2])
+                glEnd()
+            for rectangle in self.rectangles[1]:
+                glLineWidth(2)
+                glColor3f(rectangle[4], rectangle[5], rectangle[6])
+                glBegin(GL_LINE_LOOP)
+                glVertex2d(rectangle[0], rectangle[1])
+                glVertex2d(rectangle[2], rectangle[1])
+                glVertex2d(rectangle[2], rectangle[3])
+                glVertex2d(rectangle[0], rectangle[3])
+                glEnd()
+            glColor3f(1.0, 1.0, 1.0)
 
         for text in self.texts:
             _split = text[1].split("\n")
