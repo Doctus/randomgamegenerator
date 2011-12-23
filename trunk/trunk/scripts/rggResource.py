@@ -275,19 +275,9 @@ class serverResourceMapper(object):
         # HACK: inverted import flow
         from rggViews import allusers
         _broadcastStatus(allusers(), filename, status)
-        
-    def _transfertoeverybody(self, filename):
-        # HACK: The hackiest.
-        from rggViews import allusers
-        _forcerequest(allusers(), filename)
 
 crm = clientResourceMapper(client)
 srm = serverResourceMapper(server)
-
-@serverRPC
-def _forcerequest(filename):
-    """Forces the client to request a file, whether it wants to or not."""
-    crm._request(filename)
 
 @serverRPC
 def _broadcastStatus(filename, status):

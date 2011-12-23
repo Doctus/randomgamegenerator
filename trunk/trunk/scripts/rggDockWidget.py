@@ -1,8 +1,7 @@
 from PyQt4 import QtGui, QtCore, phonon
-from rggSystem import signal, findFiles, POG_DIR, PORTRAIT_DIR, LOG_DIR, IMAGE_EXTENSIONS, CHAR_DIR, MUSIC_DIR, SAVE_DIR, FILES_DIR, makePortableFilename, promptSaveFile
+from rggSystem import signal, findFiles, POG_DIR, PORTRAIT_DIR, LOG_DIR, IMAGE_EXTENSIONS, CHAR_DIR, MUSIC_DIR, SAVE_DIR, makePortableFilename, promptSaveFile
 from rggDialogs import newCharacterDialog, FIRECharacterSheetDialog
 from rggJson import loadObject, loadString, jsondump, jsonload
-import rggResource
 import os, os.path, time
 import rggFIRECharacter
 
@@ -650,39 +649,3 @@ class MusPanel(QtGui.QDockWidget):
             self.mediaobject.play()
         if self.mediaobject.state() == phonon.Phonon.PlayingState:
             self.mediaobject.pause()
-
-class FileTransferWidget(QtGui.QDockWidget):
-    '''Provides the ability to transfer files manually to other users. Now coded with 50% more terrible kludges!'''
-
-    def __init__(self, mainWindow, uzor):
-        super(QtGui.QDockWidget, self).__init__(mainWindow)
-        
-        self.setObjectName("File Transfer")
-        
-        self.user = uzor
-        
-        self.fileList = QtGui.QListWidget(mainWindow)
-
-        self.addFilesInDir(FILES_DIR)
-        
-        self.setWidget(self.fileList)
-        
-        self.fileList.itemActivated.connect(self.transfer)
-        
-        self.setWindowTitle("File Transfer")
-        mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, self)
-        
-    def transfer(self, fil):
-        print "attempting to transfer " + str(fil.text()) + " from " + str(self.user)
-        rggResource.srm._transfertoeverybody(str(fil.text()))
-        
-    def addFilesInDir(self, dir):
-        fdir = os.listdir(dir)
-        
-        for file in fdir:
-            if os.path.isdir(dir + '/' + file) and not "." in file[0]:
-                self.addFilesInDir(dir + '/' + file)
-
-        for file in fdir:
-            if not "." in file[0]:
-                self.fileList.addItem(QtGui.QListWidgetItem(dir+"/"+file))
