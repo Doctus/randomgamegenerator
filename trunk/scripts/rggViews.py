@@ -87,7 +87,6 @@ class _state(object):
         _state.mwidget = rggDockWidget.MusPanel(mainWindow)
         _state.users = {}
         _state.localuser = User(client.username)
-        _state.twidget = rggDockWidget.FileTransferWidget(mainWindow, _state.localuser)
         _state.users[client.username] = _state.localuser
         
         _state.App = mainApp
