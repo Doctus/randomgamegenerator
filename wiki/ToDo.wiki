@@ -4,21 +4,17 @@
   * The way plugins work is rather jury-rigged.
 
 = Network =
-  * Update protocol documentation so it's actually accurate.
-  * Downloads should go to a temporary folder and be copied when (and if) they're complete.
+  * Update protocol documentation.
+  * Downloads should likely go to a temporary folder and be copied when (and if) they're complete.
 
 = Interface =
-  * Make IC chat character selector jump to newest additions.
   * Warning in the join-game dialog that you'll lose current maps and get those the group has loaded.
-  * Some sort of dialog designed for displaying information (text and/or images; maybe the same HTML subset as chat would be preferable). For stuff like, say, character sheets. Doesn't need to be editable; probably shouldn't be in fact. Might get rolled into the "widgets" thing.
-  * Pog stuff:
-    * Think about which commands ought to be in the right-click menu and which in the plugin
-    * Automatic resize option(s) of some kind - resize to last used size or something, maybe
+  * Automatic pog resize option(s) of some kind - resize to last used size or something, maybe
   * CG display system (pops up a box with a large picture, most likely)
   * Multiple map layers which the camera and pogs can easily switch between
   * Ability to change an existing map's tileset
   * From Kaijyuu: pog placement could be made more intuitive
-  * Add zoom that isn't dependent on mousewheel
+  * Dice widget should be able to save macros.
 
 = Game Support =
   * Allow DM to request dice rolls from players
@@ -36,7 +32,7 @@
     * Alternate control schemes, like using arrow keys or WASD to move a pog
 
 = Graphics =
-  * More default things would be nice.
+  * More default things would always be nice.
   * Be able to draw rectangles, curves or circles, etc.
   * Be able to add text.
 
@@ -46,6 +42,7 @@
   * Pog generator.
   * Quest/Story generator.
   * Character generator.
+  * Refactor generators.
 
 = Awesome =
   * Add Cirno. (Probably as a plugin due to memory consumption.)
