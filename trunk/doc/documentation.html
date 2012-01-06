@@ -1,0 +1,173 @@
+<!DOCTYPE HTML>
+    <html lang="en">
+        <head>
+            <title>Random Game Generator Documentation</title>
+            <meta charset="utf-8" />
+            <style>
+                body {background:white;color:black;font-family:sans-serif}
+                h2 {border-top: solid silver 1px}
+                ol ol li {list-style-type:lower-roman}
+            </style>
+        </head>
+        <body>
+            <h1>Random Game Generator Documentation</h1>
+            <section>
+                <p>Welcome to <b>Random Game Generator v1.00!</b></p>
+            </section>
+            <nav>
+            <h2>Contents</h2>
+            <ol>
+                <li><a href="#intro">Introduction</a></li>
+                <li><a href="#build">Building and installation</a></li>
+                    <ol>
+                        <li><a href="#buildwin">Windows</a></li>
+                        <li><a href="#buildmac">Mac OS</a></li>
+                        <li><a href="#buildlin">Linux</a></li>
+                    </ol>
+                 <li><a href="#start">Getting started</a></li>
+                    <ol>
+                        <li><a href="#start-chat">Chat functions</a></li>
+                        <li><a href="#start-chat">Creating characters</a></li>
+                        <li><a href="#start-map">Creating maps</a></li>
+                        <li><a href="#start-pog">Working with pogs</a></li>
+                        <li><a href="#start-draw">Drawing</a></li>
+                        <li><a href="#start-host">Hosting a game</a></li>
+                        <li><a href="#start-join">Joining a game</a></li>
+                    </ol>
+                 <li>Advanced features</li>
+                    <ol>
+                        <li>Random generators</li>
+                        <li>Music</li>
+                        <li>Pog editor</li>
+                        <li>Character sheet browser</li>
+                    </ol>
+                 <li><a href="#creit">Credits</a></li>
+              </ol>
+            </nav>
+              <section id="intro">
+              <h2>Introduction</h2>
+                <p>RGG is a whiteboad client, primarily designed to facilitate play of traditional pen-and-paper role-playing games online, although it's usable for a variety of other types of board games and similar purposes.</p>
+                <p>If you have any questions or comments, you can probably get a hold of us most easily in one of these places:<br />
+                <a href="http://www.daydreamspiral.com/forum/">Attercop Central</a><br />
+                irc.darkmyst.org#attercop</p>
+              </section>
+              
+<!--BUILDING-->
+
+              <section id="build">
+                  <h2>Getting started</h2>
+                      <p>Of course, the first step is <a href="http://code.google.com/p/randomgamegenerator/">downloading RGG</a>.
+              
+                 <section id="buildwin">
+                  <h3>Windows</h3>
+                  <p><b>RGG is available in pre-compiled packages for Windows users</b>, but if for some reason you choose to compile it yourself, follow these instructions.</p>
+                  <p>Acquire the following:</p>
+                  <ul>
+                  <!--Get version numbers...-->
+                    <li>pyQT</li>
+                    <li>Qt creator</li>
+                    <li>Python 2.6</li>
+                    <li>MSYS</li>
+                    <li>MinGW</li>
+                  </ul>
+                  <ol>
+                    <li>Open QtCreator.</li>
+                    <li>Build <code>qt4/random-game-generator-windows.pro</code> (have to clean first for some reason).</li>
+                    <li>Navigate to <code>src/Bindings</code> in MSYS.</li>
+                    <li>run <code>msys.sh</code>.</li>
+                    <li>Two files that are built are: <code>qt4/release/random-game-generator.dll</code>, and <code>src/Bindings/_bmainmod.pyd</code>. Move those to the <code>scripts</code> dir. <i>(Prebuilt ones are kept in scripts/windows. If using those, they need to be moved out to the <code>scripts</code> dir.)</i></li>
+                    <li>Run <code>rgg.py</code>.</li>
+                  </ol>
+                  </section>
+                  
+                 <section id="buildmac">
+                  <h3>Mac OS</h3>
+                    <p>Mac OS is not really supported and we have no idea how to make it work. Sorry!</p>
+                 </section>
+                 
+                 <section id="buildlin">
+                  <h3>Linux</h3>
+                    <ol>
+                        <li>Obtain the libraries listed under Windows, above. The most recent Ubuntu repository versions should work.</li>
+                        <li>Open QtCreator.</li>
+                        <li>Rebuild <code>random-game-generator.pro</code></li>
+                        <li>Go to <code>src/Bindings</code> and <code>sh compile.sh</code></li>
+                        <li>Go to <code>scripts/</code> and <code>sh start.sh</code></li>
+                    </ol>
+                 </section>
+           </section>
+
+<!--STARTING-->
+            <section id="start">
+              <h2>Getting Started</h2>
+                  <p>Now that you&rsquo;ve installed a shiny new Random Game Generator, what to do with it?<br />
+                  Of course you play games with it&hellip;but <i><b>how</b></i>?</p>
+                  
+                  <p>First, you should familiarize yourself with the chat interface.</p>
+                  
+                 <section id="start-chat">
+                      <h3>Chat functions</h3>
+                      <p>There are <b>two</b> chat windows in RGG: the <i>in</i>-character chat, and the <i>out</i>-of-character chat. You can use both at once and they're logged to the same file.</p>
+                      <p>The in-character chat is used for communication that&rsquo;s part of the game: the narration, characters talking to each other, combat, and so on. Out-of-character chat is used for things you&rsquo;re saying as <i>you</i>, outside of the game: e.g., that you need to take a break to answer the phone, or debating the rules with other players. Using either chat window is as simple as typing your message and pressing Return, but there are some slightly more complex functions most users find invaluable.</p>
+                      <p>Some of these basic chat functions include:</p>
+                        <ul>
+                        <li><code>/roll xdy</code>: rolls <i>x</i> dice with <i>y</i> sides.</li>
+                        <li><code>/proll xdy</code>, in the OOC window, will roll <i>x</i> dice with <i>y</i> sides and show the result to you alone. This is a handy tool for the GM.</li>
+                        <li><code>/me x</code> or <code>/emote x</code>: displays text as 3<sup>rd</sup> person narration, in the form of <i>[name] x</i>. (E.g., <code>/me shrugs</code> would print <i>[name] shrugs</i>.) If used in the IC chat window, the name used will be the currently selected character&rsquo;s name; OOC chat will use your username.</li>
+                        <li><code>/whisper X y</code>: sends a message with the text <i>y</i> to X and no one else.</li>
+                        </ul>
+                  </section>
+                  
+                 <section id="start-char">
+                  <h3>Creating characters</h3>
+                    <p>A game is not so interesting without characters. How to create characters to communicate in the IC chat window?</p>
+                    <ol>
+                        <li>Press the &ldquo;Add new&rdquo; button below the text entry in the IC chat window. A new window will appear.</li>
+                        <li>Fill in the appropriate fields. &ldquo;List ID&rdquo; is the name that will appear in your character selection drop-down menu (to the left of the &ldquo;Add new&rdquo; button). &ldquo;Name&rdquo; is the name that other players will see as the speaker of your character&rsquo;s lines. &ldquo;Portrait&rdquo; is the picture that will appear next to your character&rsquo;s dialogue. (If you do not want a portrait to appear, type one blank space in this box.) RGG checks the <code>portraits</code> folder for portraits &mdash; place whatever picture you want to use as a portrait in the folder before opening the new character dialogue.</li>
+                        <li>Make sure that the new character is selected in the drop-down menu, and begin typing.</li>
+                    </ol>
+                    <p>You can keep an arbitrary number of characters in the list. If you have portraits representing several emotions of the same character, you could even create multiple &quot;characters&quot; to indicate their different moods.</p>
+                  </section>  
+                    
+                 <section id="start-map">
+                  <h3>Creating maps</h3>
+                  <p>Now that your characters have been made, of course they&rsquo;ll need a world in which to go adventuring. You can create maps with the File &gt; New Map command.</p>
+                  <p>Enter the name of the map, your name, the number of tiles in each direction that you want the map to be, the tileset to use, and how many pixels large the individual tiles are in that set.</p>
+                  <p>You can create an arbitrary number of maps, too, and move pogs freely between them. However, extremely large maps or having a huge number open at once can cause problems, so be careful.</p>
+                  <p>Once your map has been created, you can edit it with the Map Editor. (Right-click on the top bar and tick the mark next to map editor.) Open the Map Editor and click on the map you want to edit. You can select the specific tile you want to place by clicking on it from the tile palette. Select whether you want to place one tile at a time or fill all tiles within an area, and place them on the map however you fancy. When you are done, make sure to press &ldquo;stop painting&ldquo;.
+                </section>  
+                  
+                  
+                    
+                 <section id="id">
+                  <h3>h3</h3>
+                  <p></p>
+                 </section>
+
+            </section>
+              
+              
+              
+              
+              
+              
+<!--CREDITS-->
+              <section id="creit">
+              <h2>Credits</h2>
+                  <p>Coded by:<br />
+                    &nbsp;Doctus (kirikayuumura.noir &#64; gmail.com)<br />
+                    &nbsp;NagelBagel (nagelbagel @ gmail.com)<br />
+                    &nbsp;Oipo (kingoipo &#64; gmail.com)</p>
+                    
+                 <p>Art by:<br />
+                    &nbsp;Garrick (earthisthering &#64; gmail.com)<br />
+                    Some portraits from
+                    <a href="http://www5f.biglobe.ne.jp/~itazu/etolier/index.html">http://www5f.biglobe.ne.jp/~itazu/etolier/index.html</a>.
+                    Thank you!</p>
+                    
+                    <p>Special Thanks:<br />
+                    &nbsp;Kaijyuu and Antistone for suggestions and testing<br />
+                    &nbsp;Everyone from MoMM and #attercop</p>
+            </section>
+        </body>
+    </html>
