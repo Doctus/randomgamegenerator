@@ -83,8 +83,6 @@ class _state(object):
         _state.cwidget = rggDockWidget.chatWidget(mainWindow)
         _state.icwidget = rggDockWidget.ICChatWidget(mainWindow)
         _state.uwidget = rggDockWidget.userListWidget(mainWindow)
-        _state.fwidget = rggDockWidget.FIRECharactersWidget(mainWindow)
-        _state.mwidget = rggDockWidget.MusPanel(mainWindow)
         _state.users = {}
         _state.localuser = User(client.username)
         _state.users[client.username] = _state.localuser
