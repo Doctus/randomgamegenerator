@@ -1,4 +1,4 @@
-RGG v.0992b "Share lives with all things in nature"
+RGG v.0993 "Shiny crystal light, energize"
 
 http://code.google.com/p/randomgamegenerator/
 
@@ -14,10 +14,10 @@ Introduction
 
   You'll probably want to place some of your own "pogs" (images) in
   the data/pogs folder for use during the game. Most file types are
-  supported, although jpg may not be under Windows. Be aware also that
-  automatic file transfer to other users is still somewhat buggy. You 
-  might need to send them your images some other way. Similarly, you can 
-  put portrait images in data/portraits - the same disclaimers apply.
+  supported, although jpg may not be under Windows. Similarly, you can 
+  put portrait images in data/portraits - the same disclaimer applies.
+  Pogs you place and portraits you use will automatically be transferred
+  to other players to whom you're connected.
 
   If you have any questions or comments, you can probably get a hold
   of us most easily in one of these places:
@@ -43,6 +43,15 @@ Changelog:
   v0.993 "Shiny crystal light, energize"
     * Removed music from repository
     * Made pog palette update itself automagically
+    * Reduced loading time of new IC chat character dialog
+    * Added a Window menu
+    * Allowed pog images to be dragged directly into the main window
+    * Likewise for portrait images and the IC Chat window
+    * Pog editor now has a "save portrait" button
+    * Pogs without a name now display their file path in the pog 
+      manager for easier identification.
+    * All functions of the pog manager and the pog right-click menu
+      are now accessible from both locations.
 
   v0.992c "Share lives with all things in nature"
     * Fixed a packaging error in the Windows binary release.
