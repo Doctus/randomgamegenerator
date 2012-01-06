@@ -65,34 +65,28 @@
                   <ul>
                   <!--Get version numbers...-->
                     <li>pyQT</li>
-                    <li>Qt creator</li>
                     <li>Python 2.6</li>
-                    <li>MSYS</li>
-                    <li>MinGW</li>
+                    <li>MSYS (optional for glmod)</li>
+                    <li>MinGW (optional for glmod)</li>
                   </ul>
                   <ol>
-                    <li>Open QtCreator.</li>
-                    <li>Build <code>qt4/random-game-generator-windows.pro</code> (have to clean first for some reason).</li>
-                    <li>Navigate to <code>src/Bindings</code> in MSYS.</li>
-                    <li>run <code>msys.sh</code>.</li>
-                    <li>Two files that are built are: <code>qt4/release/random-game-generator.dll</code>, and <code>src/Bindings/_bmainmod.pyd</code>. Move those to the <code>scripts</code> dir. <i>(Prebuilt ones are kept in scripts/windows. If using those, they need to be moved out to the <code>scripts</code> dir.)</i></li>
-                    <li>Run <code>rgg.py</code>.</li>
+                    <li>OPTIONAL OPTION 1: Move <code>glmod.pyd</code> or <code>glmod_WIN64.pyd</code> from <code>module/windoze</code> to <code>scripts</code>, renaming it to <code>glmod.pyd</code> in the latter case.</li>
+                    <li>OPTIONAL OPTION 2: Navigate to <code>trunk/module</code> in MSYS. Run <code>build-windows.sh</code>. Move resulting <code>glmod.pyd</code> to the <code>scripts</code> folder.</li>
+                    <li>Navigate to <code>scripts</code> and run <code>rgg.py</code>.</li>
                   </ol>
                   </section>
                   
                  <section id="buildmac">
-                  <h3>Mac OS</h3>
-                    <p>Mac OS is not really supported and we have no idea how to make it work. Sorry!</p>
+                  <h3>Mac OS X</h3>
+                    <p>Mac is not really supported; it's probably possible to get RGG working on it, but none of the dev team have one to test. Sorry!</p>
                  </section>
                  
                  <section id="buildlin">
                   <h3>Linux</h3>
                     <ol>
                         <li>Obtain the libraries listed under Windows, above. The most recent Ubuntu repository versions should work.</li>
-                        <li>Open QtCreator.</li>
-                        <li>Rebuild <code>random-game-generator.pro</code></li>
-                        <li>Go to <code>src/Bindings</code> and <code>sh compile.sh</code></li>
-                        <li>Go to <code>scripts/</code> and <code>sh start.sh</code></li>
+                        <li>OPTIONAL: Navigate to <code>module</code> and run <code>build.sh</code>. Move resulting file to <code>scripts</code>.</li>
+                        <li>Navigate to <code>scripts</code> and run <code>rgg.py</code>.</li>
                     </ol>
                  </section>
            </section>
