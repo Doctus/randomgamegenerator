@@ -394,6 +394,9 @@ class joinDialog(dialog):
         okayButton.setDefault(True)
         cancelButton = QtGui.QPushButton(translate('joinDialog', "Cancel"))
         
+        warningLabel1 = QtGui.QLabel(translate('joinDialog', "Warning: open maps or other session"))
+        warningLabel2 = QtGui.QLabel(translate('joinDialog', "data will be replaced upon joining."))
+        
         # Add fields
         formLayout = QtGui.QFormLayout()
         for id in ('host', 'port', 'username', 'password'):
@@ -411,6 +414,8 @@ class joinDialog(dialog):
         grandBox = QtGui.QBoxLayout(2)
         grandBox.addLayout(formLayout)
         grandBox.addLayout(theLesserOrFalseBox)
+        grandBox.addWidget(warningLabel1)
+        grandBox.addWidget(warningLabel2)
         
         # Set up the widget
         widget.setLayout(grandBox)
