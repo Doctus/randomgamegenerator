@@ -276,9 +276,12 @@ class diceRoller(QtGui.QDockWidget):
         self.realwidget = QtGui.QWidget(mainWindow) #I messed up on the initial setup and was too lazy to rename everything.
         self.widget = QtGui.QGridLayout()
         self.diceArea = QtGui.QListWidget(mainWindow)
-        self.macros = [QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), "Sample: 2d6"),
-                       QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), "Sample: 4k2"),
-                       QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), "Sample: 1dn3")]
+        try:
+            self.load(jsonload(os.path.join(SAVE_DIR, "dice.rgd")))
+        except:
+            self.macros = [QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), "Sample: 2d6"),
+                           QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), "Sample: 4k2"),
+                           QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), "Sample: 1dn3")]
         for m in self.macros:
             self.diceArea.addItem(m)
         self.diceArea.currentRowChanged.connect(self.changeCurrentMacro)
@@ -310,19 +313,42 @@ class diceRoller(QtGui.QDockWidget):
         if current is not None:
             text = unicode(current.text())
             self.rollRequested.emit(text[text.rfind(':')+1:])
+            
+    def _addMacro(self, macro):
+        self.macros.append(QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), macro))
+        self.diceArea.addItem(self.macros[len(self.macros)-1])
 
     def addMacro(self, mac, macname):
         self.macros.append(QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), macname + ': ' + mac))
         self.diceArea.addItem(self.macros[len(self.macros)-1])
+        jsondump(self.dump(), os.path.join(SAVE_DIR, "dice.rgd"))
 
     def removeCurrentMacro(self):
         if self.diceArea.item(self.currentMacro) != self.diceArea.currentItem(): #This SHOULD, probably, only occur if there are two items and the first is deleted. Probably.
             self.diceArea.takeItem(0)
             return
         self.diceArea.takeItem(self.currentMacro)
+        jsondump(self.dump(), os.path.join(SAVE_DIR, "dice.rgd"))
 
     def summonMacro(self):
         self.macroRequested.emit()
+        
+    def load(self, obj):
+         """Deserialize set of macros from a dictionary."""
+         self.macros = []
+         macroz = loadObject('diceRoller.macros', obj.get('macros'))
+         for ID, macro in macroz.items():
+             self._addMacro(macro)
+    
+    def dump(self):
+        """Serialize to an object valid for JSON dumping."""
+        
+        macroz = []
+        for i in range(0,self.diceArea.count()):
+            macroz.append(unicode(self.diceArea.item(i).text(), 'UTF-8'))
+
+        return dict(
+            macros=dict([(i, macro) for i, macro in enumerate(macroz)]))
     
     rollRequested = signal(basestring, doc=
         """Called when the roll button is hit.
