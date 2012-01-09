@@ -8,13 +8,11 @@
   * Downloads should likely go to a temporary folder and be copied when (and if) they're complete.
 
 = Interface =
-  * Warning in the join-game dialog that you'll lose current maps and get those the group has loaded.
   * Automatic pog resize option(s) of some kind - resize to last used size or something, maybe
-  * CG display system (pops up a box with a large picture, most likely)
+  * CG display system? (pops up a box with a large picture, most likely)
   * Multiple map layers which the camera and pogs can easily switch between
   * Ability to change an existing map's tileset
   * From Kaijyuu: pog placement could be made more intuitive
-  * Dice widget should be able to save macros.
 
 = Game Support =
   * Allow DM to request dice rolls from players
