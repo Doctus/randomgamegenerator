@@ -2,6 +2,7 @@
 
 = General =
   * The way plugins work is rather jury-rigged.
+  * RGG itself should display version number (at least in releases)
 
 = Network =
   * Update protocol documentation.
