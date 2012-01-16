@@ -441,7 +441,7 @@ class joinDialog(dialog):
             with open("2of12inf.txt", "r") as f:
                 inp = self.cleanData['host'].split()
                 dat = f.readlines()
-                wordindex = [dat.index(inp[0]+"\n"), dat.index(inp[1]+"\n")]
+                wordindex = [dat.index(inp[0]+"\r\n"), dat.index(inp[1]+"\r\n")]
                 ipextract = unicode(".".join((str(wordindex[0]//256), str(wordindex[0]%256), str(wordindex[1]//256), str(wordindex[1]%256))))
                 self.cleanData['host'] = ipextract
         return self.cleanData

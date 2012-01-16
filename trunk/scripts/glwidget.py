@@ -408,10 +408,10 @@ class GLWidget(QGLWidget):
             print "created", qimagepath
 
         if textureRect[2] == -1:
-            textureRect[2] = qimg.width() - 1
+            textureRect[2] = qimg.width()
 
         if textureRect[3] == -1:
-            textureRect[3] = qimg.height() - 1
+            textureRect[3] = qimg.height()
 
         if drawRect[2] == -1:
             drawRect[2] = qimg.width()
