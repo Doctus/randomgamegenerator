@@ -142,9 +142,14 @@ class tile(object):
             w = float(self.origtextrect[2])/float(self.qimg.width())
             h = float(self.origtextrect[3])/float(self.qimg.height())
             self.textureRect = [x, y, w, h]
-        self.setVBOData()
-        glBindBuffer(GL_ARRAY_BUFFER_ARB, self.VBO)
-        glBufferSubData(GL_ARRAY_BUFFER_ARB, int(self.offset*self.glwidget.vertByteCount/4), self.glwidget.vertByteCount, self.VBOData)
+        else:
+	        self.textureRect[0] += displacement[0]
+	        self.textureRect[1] += displacement[1]
+
+        if self.glwidget.vbos:
+            self.setVBOData()
+            glBindBuffer(GL_ARRAY_BUFFER_ARB, self.VBO)
+            glBufferSubData(GL_ARRAY_BUFFER_ARB, int(self.offset*self.glwidget.vertByteCount/4), self.glwidget.vertByteCount, self.VBOData)
 
     def getVBOData(self):
         return self.VBOData
