@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
 from PyQt4 import QtGui, QtCore
-from rggSystem import translate, mainWindow, SAVE_DIR
+from rggSystem import translate, mainWindow, SAVE_DIR, VERSION, DEV
 from rggJson import loadString, jsonload
 import sys, os, rggStyles
 
@@ -72,6 +72,9 @@ class menuBar(object):
         
         self.disconnectAct = QtGui.QAction(translate("menubar", "&Disconnect"), main)
         self.disconnectAct.setShortcut("Ctrl+D")
+        
+        self.aboutAct = QtGui.QAction(translate("menubar", "&About"), main)
+        self.aboutAct.setShortcut("Ctrl+A")
 
         self.thicknessOneAct = QtGui.QAction(translate("menubar", "&One"), main)
         self.thicknessTwoAct = QtGui.QAction(translate("menubar", "&Two"), main)
@@ -192,6 +195,9 @@ class menuBar(object):
                 
         self.windowMenu = QtGui.QMenu(translate("menubar", "Window"), main)
         
+        self.helpMenu = QtGui.QMenu(translate("menubar", "&Help"), main)
+        self.helpMenu.addAction(self.aboutAct)
+        
         # MENUBAR
 
         self.menubar.addMenu(fileMenu)
@@ -202,6 +208,7 @@ class menuBar(object):
         self.menubar.addMenu(self.langMenu)
         self.pluginhide = self.menubar.addMenu(self.pluginsMenu)
         self.menubar.addMenu(self.windowMenu)
+        self.menubar.addMenu(self.helpMenu)
         self.menubar.addSeparator()
         self.menubar.addAction(self.selectIcon)
         self.menubar.addAction(self.moveIcon)
@@ -220,6 +227,8 @@ class menuBar(object):
         self.pluginsMenu.triggered.connect(self.loadPlugin)
         
         self.windowMenu.aboutToShow.connect(self.updateWidgetMenu)
+        
+        self.aboutAct.triggered.connect(self.about)
         
     def resetIcons(self):
         self.selectIcon.setIcon(QtGui.QIcon("./data/FAD-select-icon.png"))
@@ -261,3 +270,14 @@ class menuBar(object):
         self.windowMenu.clear()
         for action in mainWindow.createPopupMenu().actions():
             self.windowMenu.addAction(action)
+            
+    def about(self):
+        msg = QtGui.QMessageBox()
+        if DEV:
+            aboutText = " ".join(("RGG", VERSION, "Development Version"))
+        else:
+            aboutText = " ".join(("RGG", VERSION, "Release"))
+        msg.setText(aboutText)
+        msg.setInformativeText("http://code.google.com/p/randomgamegenerator/")
+        msg.setWindowTitle("About")
+        msg.exec_()
