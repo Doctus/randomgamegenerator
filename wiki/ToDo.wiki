@@ -2,7 +2,6 @@
 
 = General =
   * The way plugins work is rather jury-rigged.
-  * RGG itself should display version number (at least in releases)
 
 = Network =
   * Update protocol documentation.
@@ -14,6 +13,7 @@
   * Multiple map layers which the camera and pogs can easily switch between
   * Ability to change an existing map's tileset
   * From Kaijyuu: pog placement could be made more intuitive
+  * Add indicator of current tile to map editor
 
 = Game Support =
   * Allow DM to request dice rolls from players
