@@ -1,4 +1,4 @@
-RGG v.0993 "Shiny crystal light, energize"
+RGG v.0993b "Shiny crystal light, energize"
 
 http://code.google.com/p/randomgamegenerator/
 
@@ -40,6 +40,14 @@ Special Thanks:
   Everyone from MoMM and #attercop
 
 Changelog:
+  v0.993b "Shiny crystal light, energize"
+    * Cleaned up some obsolete material.
+    * Added initial documentation.
+    * Added About dialog.
+    * Dice macros are now automatically saved.
+    * Fixed an OS-related issue with the IP translation system.
+    * Improved map editor.
+
   v0.993 "Shiny crystal light, energize"
     * Removed music from repository
     * Made pog palette update itself automagically
