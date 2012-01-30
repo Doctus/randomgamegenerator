@@ -47,4 +47,4 @@
   * Add Cirno. (Probably as a plugin due to memory consumption.)
 
 = Bugs =
-  * ???
+  * *Window menu crashes on Linux.*
