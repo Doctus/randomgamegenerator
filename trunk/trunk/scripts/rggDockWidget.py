@@ -373,7 +373,14 @@ class pogPalette(QtGui.QDockWidget):
         self.widget = QtGui.QWidget(mainWindow)
         self.mainLayout = QtGui.QBoxLayout(2)
         self.pogArea = QtGui.QListWidget(mainWindow)
+        self.controlArea = QtGui.QWidget(mainWindow)
+        self.controlLayout = QtGui.QBoxLayout(2)
+        self.addpogbutton = QtGui.QPushButton(self.tr("Update"), mainWindow)
+        self.addpogbutton.setToolTip(self.tr("Re-scan for newly added image files in the pog folder."))
+        self.controlLayout.addWidget(self.addpogbutton)
+        self.controlArea.setLayout(self.controlLayout)
         self.mainLayout.addWidget(self.pogArea)
+        self.mainLayout.addWidget(self.controlArea)
         self.widget.setLayout(self.mainLayout)
         self.setWidget(self.widget)
         self.setObjectName("Pog Palette")
@@ -383,6 +390,7 @@ class pogPalette(QtGui.QDockWidget):
         self.matoi.addPath(POG_DIR)
         self.matoi.directoryChanged.connect(self.addPog)
 
+        self.addpogbutton.clicked.connect(self.addPog)
         self.pogArea.itemActivated.connect(self.place)
         self.addPog()
     
