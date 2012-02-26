@@ -377,6 +377,23 @@ def closeAllMaps():
     _closeAllMaps()
     sendCloseAllMaps()
 
+@serverRPC
+def respondClearSession():
+    _clearSession()
+    
+@clientRPC
+def sendClearSession(user):
+    respondClearSession(allusersbut(user))    
+
+def _clearSession():
+    clearPogSelection()
+    _state.session.clear()
+    
+def clearSession():
+    if promptYesNo(translate('views', 'Are you sure you want to clear the current session completely for all connected players?')) == 16384:
+        _clearSession()
+        sendClearSession()  
+    
 def internalAddMap(map):
     _state.session.addMap(map)
     sendMapCreate(map.ID, map.dump(), map.tileset)

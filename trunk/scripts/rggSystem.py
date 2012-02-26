@@ -261,8 +261,15 @@ def promptButtonSelection(prompt, text=[], defaultButton = 0):
             return i
         i += 1
 
-    return -1;
+    return -1
 
+def promptYesNo(prompt):
+    from PyQt4.QtGui import QMessageBox
+    questionDialog = QMessageBox(mainWindow)
+    questionDialog.setText(prompt)
+    questionDialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+    return questionDialog.exec_()
+    
 def findFiles(dir, extensions):
     """Get the list of files with one of the given extensions."""
     files = []
