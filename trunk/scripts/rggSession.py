@@ -138,6 +138,20 @@ class Session(object):
         for thickness, lines in self.linesDict.items():
             for item in lines:
                 rggSystem.drawLine(item[0], item[1], item[2], item[3], thickness, item[4], item[5], item[6])
+                
+    def pointIntersectRect(self, point, rect):
+        if point[0] < rect[0] or point[0] > rect[0] + rect[2]: return False
+        if point[1] < rect[1] or point[1] > rect[1] + rect[3]: return False
+        return True
+                
+    def deleteLine(self, x, y, w, h):
+        for thickness, lines in self.linesDict.items():
+            dellist = []
+            for line in lines:
+                if self.pointIntersectRect((line[0], line[1]), (x, y, w, h)) or self.pointIntersectRect((line[2], line[3]), (x, y, w, h)):
+                    dellist.append(line)
+            for index in dellist:
+                lines.remove(index)
             
     def addLine(self, line):
         if not line[4] in self.linesDict:
