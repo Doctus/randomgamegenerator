@@ -59,6 +59,8 @@ class menuBar(object):
         self.saveSessAct = QtGui.QAction(translate("menubar", "&Save Session As..."), main)
         self.saveSessAct.setShortcut("Ctrl+S")
         
+        self.clearSessAct = QtGui.QAction(translate("menubar", "Clear Session"), main)
+        
         self.saveCharsAct = QtGui.QAction(translate("menubar", "Save IC Characters As..."), main)
         
         self.loadCharsAct = QtGui.QAction(translate("menubar", "Load IC Characters..."), main)
@@ -128,6 +130,7 @@ class menuBar(object):
         fileMenu.addSeparator()
         fileMenu.addAction(self.saveSessAct)
         fileMenu.addAction(self.loadSessAct)
+        fileMenu.addAction(self.clearSessAct)
         
         internetMenu = QtGui.QMenu(translate("menubar", "&Internet"), main)
         internetMenu.addAction(self.hostGameAct)
