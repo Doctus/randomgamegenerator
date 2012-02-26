@@ -735,6 +735,7 @@ def sendLine(user, x, y, w, h, thickness, r, g, b):
 
 @serverRPC
 def respondDeleteLine(x, y, w, h):
+    getSession().deleteLine(x, y, w, h)
     deleteLine(x, y, w, h)
 
 @clientRPC
