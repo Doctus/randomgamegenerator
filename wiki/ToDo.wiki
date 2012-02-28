@@ -13,7 +13,7 @@
   * Multiple map layers which the camera and pogs can easily switch between
   * Ability to change an existing map's tileset
   * From Kaijyuu: pog placement could be made more intuitive
-  * Add indicator of current tile to map editor
+  * Easier support for multiple portraits for a character
 
 = Game Support =
   * Allow DM to request dice rolls from players
