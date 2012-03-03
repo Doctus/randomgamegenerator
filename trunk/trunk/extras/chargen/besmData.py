@@ -106,10 +106,53 @@ ATTRIBUTES = {"Animal Friendship":1,
               "Water Speed [Surface]":2,
               "Water Speed [Amphibious/Diving]":3,
               "Weapon/Special Attack":4}
+              
+DEFECTS = {"Ageism":1,
+           "Attack Restriction":1,
+           "Awkward":1,
+           "Awkward Size":1,
+           "Bane":1,
+           "Cannot Talk":1,
+           "Conditional Ownership":1,
+           "Cursed":1,
+           "Diminutive":3,
+           "Easily Distracted":1,
+           "Girl/Guy Magnet":1,
+           "Hangar Queen":1,
+           "Inept Combat":1,
+           "Involuntary Physical Change":1,
+           "Magical Restrictions":1,
+           "Marked":1,
+           "Nemesis":1,
+           "Not So Fast":1,
+           "Not So Strong":1,
+           "Not So Tough":1,
+           "One Arm / No Arms":1,
+           "One-Way Transformation":1,
+           "Owned by a Megacorp":1,
+           "Phobia":1,
+           "Physically Unappealing":1,
+           "Recurring Nightmares":1,
+           "Red Tape":1,
+           "Restricted Ground Movement":1,
+           "Restricted Path":1,
+           "Sensory Impairment":1,
+           "Significant Other":1,
+           "Skeleton in the Closet":1,
+           "Special Requirement":1,
+           "Unskilled":1,
+           "Volatile":1,
+           "Vulnerability":1,
+           "Wanted":1}
 
 HEALTH_ATT = "Damn Healthy!"
 ENERGY_ATT = "Energy Bonus"
 SKILL_ATT = "Highly Skilled"
+COMBAT_ATT = "Combat Mastery"
+
+HEALTH_DEFECT = "Not So Tough"
+SKILL_DEFECT = "Unskilled"
+COMBAT_DEFECT = "Inept Combat"
 
 SKILL_COSTS = {"Cyber Punk":
     {"Acrobatics":4, 
