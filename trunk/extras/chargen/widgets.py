@@ -421,6 +421,23 @@ class CharStatsWidget(QDockWidget):
                     defectRank = int(str(self.defectScroll.item(i).text())[-1:])
                     result -= defectRank
         return result
+        
+    def getExportableData(self):
+        fields = {}
+        fields["body"] = str(self.body.currentIndex()+1)
+        fields["mind"] = str(self.mind.currentIndex()+1)
+        fields["soul"] = str(self.soul.currentIndex()+1)
+        fields["health"] = self.health.text()
+        fields["energy"] = self.energy.text()
+        fields["acv"] = self.acv.text()
+        fields["dcv"] = self.dcv.text()
+        fields["skills"] = self.getProcessedSkills()
+        fields["attributes"] = self.getProcessedAttributes()
+        fields["defects"] = self.getProcessedDefects()
+        fields["points"] = str((self.charPointsBox.currentIndex()+1)*5)
+        fields["rempoints"] = self.remainingPointsLabel.text()
+        fields["remskillpoints"] = str((20+self.getAttributeSkillEffect())-(self.getTotalSkillCosts()))
+        return fields
 
 class CharBioWidget(QDockWidget):
     
@@ -459,8 +476,94 @@ class CharBioWidget(QDockWidget):
         self.setWidget(self.widg)
         
         mainWindow.addDockWidget(Qt.LeftDockWidgetArea, self)
+        
+    def getExportableData(self):
+        fields = {}
+        fields["name"] = self.nameWidget.text()
+        fields["age"] = self.ageWidget.text()
+        fields["gender"] = self.genderWidget.text()
+        fields["origin"] = self.speciesWidget.text()
+        fields["background"] = self.backgroundWidget.toPlainText()
+        fields["appearance"] = self.appearanceWidget.toPlainText()
+        fields["personality"] = self.personalityWidget.toPlainText()
+        return fields
 
-def initWidgets(mainWindow,  mainWindowReal):
+class OhNoesALazyGlobalClass:
     
-    CharBioWidget(mainWindowReal)
-    CharStatsWidget(mainWindowReal)
+    def __init__(self):
+        pass
+        
+    def initWidgets(self, mainWindow, mainWindowReal):
+        self.bio = CharBioWidget(mainWindowReal)
+        self.stats = CharStatsWidget(mainWindowReal)
+        self.menubar = QMenuBar(mainWindowReal)
+        self.charexport = QAction("Export to Forum Code", mainWindowReal)
+        self.charexportalt = QAction("Export to something else (NYI)", mainWindowReal)
+        self.menubar.addAction(self.charexport)
+        self.menubar.addSeparator()
+        self.menubar.addAction(self.charexportalt)
+        self.charexport.triggered.connect(self.forumExport)
+        mainWindowReal.setMenuBar(self.menubar)
+        
+    def export(self):
+        fields = self.bio.getExportableData()
+        fields.update(self.stats.getExportableData())
+        return fields
+        
+    def forumExport(self):
+        fields = self.export()
+        outputTemplate = \
+"""[b]%N[/b]
+
+Age: %A
+Gender: %G
+Origin: %O
+
+Body: %Y
+Mind: %M
+Soul: %L
+
+Health: %H
+Energy: %E
+ACV: %C
+DCV: %V
+
+[u]Attributes[/u]
+%T
+
+[u]Defects[/u]
+%D
+
+[u]Skills[/u]
+%S
+
+[i]Appearance[/i]
+%R
+
+[i]Personality[/i]
+%P
+
+[i]Background[/i]
+%B"""
+        rawattributes = []
+        for att in fields["attributes"]:
+            rawattributes.append(" ".join((att[0], "level", str(att[1]))))
+        attributes = "\n".join(rawattributes)
+        rawdefects = []
+        for defect in fields["defects"]:
+            rawdefects.append(" ".join((defect[0], "level", str(defect[1]))))
+        defects = "\n".join(rawdefects)
+        rawskills = []
+        for skill in fields["skills"]:
+            rawskills.append(" ".join((skill[0], "level", str(skill[1]))))
+        skills = "\n".join(rawskills)
+        
+        output = outputTemplate.replace("%N", fields["name"]).replace("%A", fields["age"]).replace("%G", fields["gender"]).\
+        replace("%O", fields["origin"]).replace("%T", attributes).replace("%D", defects).replace("%S", skills).replace("%R", fields["appearance"]).\
+        replace("%P", fields["personality"]).replace("%B", fields["background"]).replace("%Y", fields["body"]).replace("%M", fields["mind"]).\
+        replace("%L", fields["soul"]).replace("%H", fields["health"]).replace("%E", fields["energy"]).replace("%C", fields["acv"]).replace("%V", fields["dcv"])
+        
+        with open("outputchar.txt", "w") as f:
+            f.write(output)
+
+g = OhNoesALazyGlobalClass()

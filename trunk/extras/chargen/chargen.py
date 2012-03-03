@@ -31,6 +31,6 @@ if __name__ == '__main__':
     
     app = QApplication(['BESM 2e Character Creator'])
     main = MainWindow()
-    widgets.initWidgets(main.widget,  main)
+    widgets.g.initWidgets(main.widget,  main)
     main.show()
     app.exec_()
