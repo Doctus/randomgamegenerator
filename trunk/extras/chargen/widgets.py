@@ -15,7 +15,7 @@ class AddDefectDialog(QDialog):
 
         self.buttons = []        
         for i, defect in enumerate(sorted(defectCosts.keys())):
-            self.buttons.append(QRadioButton(defect))
+            self.buttons.append(QCheckBox(defect))
             self.mainLayout.addWidget(self.buttons[-1], i, 0)
             self.mainLayout.addWidget(QLabel(str(defectCosts[defect])), i, 1, 1, 1, Qt.AlignRight)
             
@@ -36,9 +36,10 @@ class AddDefectDialog(QDialog):
         self.setLayout(self.mainnLayout)
         
     def okay(self):
+        self.selectedDefects = []
         for button in self.buttons:
             if button.isChecked():
-                self.selectedDefect = button.text()
+                self.selectedDefects.append(button.text())
         self.accept()
 
 class AddAttributeDialog(QDialog):
@@ -54,7 +55,7 @@ class AddAttributeDialog(QDialog):
 
         self.buttons = []        
         for i, att in enumerate(sorted(attCosts.keys())):
-            self.buttons.append(QRadioButton(att))
+            self.buttons.append(QCheckBox(att))
             self.mainLayout.addWidget(self.buttons[-1], i, 0)
             self.mainLayout.addWidget(QLabel(str(attCosts[att])), i, 1, 1, 1, Qt.AlignRight)
             
@@ -75,9 +76,10 @@ class AddAttributeDialog(QDialog):
         self.setLayout(self.mainnLayout)
         
     def okay(self):
+        self.selectedAttributes = []
         for button in self.buttons:
             if button.isChecked():
-                self.selectedAttribute = button.text()
+                self.selectedAttributes.append(button.text())
         self.accept()
 
 class AddSkillDialog(QDialog):
@@ -93,7 +95,7 @@ class AddSkillDialog(QDialog):
 
         self.buttons = []        
         for i, skill in enumerate(sorted(skillCosts.keys())):
-            self.buttons.append(QRadioButton(skill))
+            self.buttons.append(QCheckBox(skill))
             self.mainLayout.addWidget(self.buttons[-1], i, 0)
             self.mainLayout.addWidget(QLabel(str(skillCosts[skill])), i, 1, 1, 1, Qt.AlignRight)
             
@@ -114,9 +116,10 @@ class AddSkillDialog(QDialog):
         self.setLayout(self.mainnLayout)
         
     def okay(self):
+        self.selectedSkills = []
         for button in self.buttons:
             if button.isChecked():
-                self.selectedSkill = button.text()
+                self.selectedSkills.append(button.text())
         self.accept()
 
 class CharStatsWidget(QDockWidget):
@@ -250,8 +253,9 @@ class CharStatsWidget(QDockWidget):
                 del possibleSkills[str(self.skillsScroll.item(i).text())[0:-2]]
         dial = AddSkillDialog(self, possibleSkills)
         if dial.exec_():
-            self.skillsScroll.addItem(dial.selectedSkill + " 1")
-            self.skillsScroll.sortItems()
+            for skill in dial.selectedSkills:
+                self.skillsScroll.addItem(skill + " 1")
+                self.skillsScroll.sortItems()
         self.updatePoints()
         
     def addAttribute(self):
@@ -261,8 +265,9 @@ class CharStatsWidget(QDockWidget):
                 del possibleAttributes[str(self.attScroll.item(i).text())[0:-2]]
         dial = AddAttributeDialog(self, possibleAttributes)
         if dial.exec_():
-            self.attScroll.addItem(dial.selectedAttribute + " 1")
-            self.attScroll.sortItems()
+            for att in dial.selectedAttributes:
+                self.attScroll.addItem(att + " 1")
+                self.attScroll.sortItems()
         self.updatePoints()
         
     def addDefect(self):
@@ -272,8 +277,9 @@ class CharStatsWidget(QDockWidget):
                 del possibleDefects[str(self.defectScroll.item(i).text())[0:-2]]
         dial = AddDefectDialog(self, possibleDefects)
         if dial.exec_():
-            self.defectScroll.addItem(dial.selectedDefect + " 1")
-            self.defectScroll.sortItems()
+            for defect in dial.selectedDefects:
+                self.defectScroll.addItem(defect + " 1")
+                self.defectScroll.sortItems()
         self.updatePoints()
         
     def increaseLevel(self):
