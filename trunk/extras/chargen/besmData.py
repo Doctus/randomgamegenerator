@@ -206,7 +206,7 @@ SKILL_COSTS = {"Cyber Punk":
     "Ranged Defense":5,
     "Thrown Weapons":4,
     "Unarmed Attack":4,
-    "Unarmed Attack":4},
+    "Unarmed Defense":4},
 
 "Hotrods and Guns":
     {"Acrobatics":4, 
@@ -260,7 +260,7 @@ SKILL_COSTS = {"Cyber Punk":
     "Ranged Defense":6,
     "Thrown Weapons":4,
     "Unarmed Attack":4,
-    "Unarmed Attack":4},
+    "Unarmed Defense":4},
 
 "Martial Arts":
     {"Acrobatics":5, 
@@ -314,7 +314,7 @@ SKILL_COSTS = {"Cyber Punk":
     "Ranged Defense":4,
     "Thrown Weapons":5,
     "Unarmed Attack":6,
-    "Unarmed Attack":6},
+    "Unarmed Defense":6},
 
 "Medieval Fantasy":
     {"Acrobatics":3, 
@@ -363,7 +363,7 @@ SKILL_COSTS = {"Cyber Punk":
     "Ranged Defense":4,
     "Thrown Weapons":4,
     "Unarmed Attack":4,
-    "Unarmed Attack":4},
+    "Unarmed Defense":4},
 
 "Modern Military":
     {"Acrobatics":2, 
@@ -417,7 +417,7 @@ SKILL_COSTS = {"Cyber Punk":
     "Ranged Defense":5,
     "Thrown Weapons":4,
     "Unarmed Attack":4,
-    "Unarmed Attack":4},
+    "Unarmed Defense":4},
 
 "Occult Horror":
     {"Acrobatics":4, 
@@ -471,7 +471,7 @@ SKILL_COSTS = {"Cyber Punk":
     "Ranged Defense":5,
     "Thrown Weapons":4,
     "Unarmed Attack":5,
-    "Unarmed Attack":5},
+    "Unarmed Defense":5},
 
 "Space Opera":
     {"Acrobatics":3, 
@@ -525,7 +525,7 @@ SKILL_COSTS = {"Cyber Punk":
     "Ranged Defense":5,
     "Thrown Weapons":4,
     "Unarmed Attack":4,
-    "Unarmed Attack":4},
+    "Unarmed Defense":4},
 
 "Teenage Romance":
     {"Acrobatics":3, 
@@ -578,4 +578,4 @@ SKILL_COSTS = {"Cyber Punk":
     "Ranged Defense":4,
     "Thrown Weapons":4,
     "Unarmed Attack":5,
-    "Unarmed Attack":5}}
+    "Unarmed Defense":5}}
