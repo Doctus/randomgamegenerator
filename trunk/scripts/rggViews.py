@@ -156,6 +156,14 @@ def promptTimestampFormat():
 
 # MESSAGES
 
+def splitword(message):
+    """Split into a pair: word, rest."""
+    words = message.split(None, 1)
+    if not words:
+        return '', ''
+    rest = words[1] if len(words) > 1 else ''
+    return words[0], rest
+
 def say(message):
     """Say an IC message. This documentation is a lie."""
     if _state.alert and localhandle().lower() in message.lower():
@@ -811,9 +819,9 @@ def addMacro():
 
 # GENERATION
 
-def generateName(nametype):
+def generateName(generator, args):
     """Generates a random name of the specified type."""
-    say(rggNameGen.getName(nametype))
+    say(rggNameGen.getName(generator, args))
 
 def generateTechnique(parameters=""):
     """Generates a technique name from the specified (optional) parameters."""
@@ -863,9 +871,9 @@ def processPogRightclick(selection, pogs):
         gentype = promptString(prompt)
         if gentype is None:
             return
-        gentype = ''.join(gentype.split()).lower()
+        gentype = splitword(gentype.lower())
         for pog in pogs:
-            renamePog(pog, rggNameGen.getName(gentype))
+            renamePog(pog, rggNameGen.getName(*gentype))
     elif selection == 3:
         prompt = translate('views', "Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.")
         newlayer = promptInteger(prompt, min=-150, max=800, default=(mainpog.layer-200))
