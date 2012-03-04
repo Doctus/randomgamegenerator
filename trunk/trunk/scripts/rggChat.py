@@ -72,7 +72,7 @@ def randomname(message):
             "are ignored. Some valid arguments are "
             "JAPANESEFEMALEFULL and DwArF M aLe"))
     else:
-        rggViews.generateName(squish(message))
+        rggViews.generateName(*splitword(message.lower()))
 
 randomname.documentation = fake.translate('chatdoc', 
     """/randomname: Generate a random name.<dl>
