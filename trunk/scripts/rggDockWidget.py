@@ -255,7 +255,10 @@ class ICChatWidget(QtGui.QDockWidget):
         self.characterSelector.clear()
         
         chars = loadObject('ICChatWidget.chars', obj.get('chars'))
+        chartemp = [None]*len(chars.keys())
         for ID, char in chars.items():
+            chartemp[int(ID)] = char
+        for char in chartemp:
             loaded = ICChar.load(char)
             self._newChar(loaded)
     
