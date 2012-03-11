@@ -464,7 +464,37 @@ def saveMap():
         return
     
     jsondump(map.dump(), filename)
+
+@serverRPC
+def respondCloseSpecificMap(ID):
+    _closeSpecificMap(ID)
     
+@clientRPC
+def sendCloseSpecificMap(user, ID):
+    respondCloseSpecificMap(allusersbut(user), ID)    
+
+def _closeSpecificMap(ID):
+    _state.session.closeMap(ID)
+    
+def closeSpecificMap(ID):
+    _closeSpecificMap(ID)
+    sendCloseSpecificMap(ID)
+    
+def closeMap():
+    """Allows the user to close a map."""
+    mapNames = []
+    mapIDs = []
+    
+    for ID, map in _state.session.maps.items():
+        mapNames.append(map.mapname)
+        mapIDs.append(ID)
+
+    selectedButton = rggSystem.promptButtonSelection("Which map do you want to close?", mapNames, 0)
+    map = mapIDs[selectedButton]
+    
+    closeSpecificMap(map)
+    
+
 def loadSession():
     """Allows the user to load a new map."""
     filename = promptLoadFile(translate('views', 'Open Game Session'),

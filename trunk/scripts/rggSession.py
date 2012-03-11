@@ -30,14 +30,15 @@ class Session(object):
         self.lines = []
         self.linesDict = {}
         
+        self.maphack = 0
+        
     def _addMap(self, mappe):
         assert(mappe.ID is not None)
         if mappe.drawOffset == [0, 0]:
-            pos = 0
-            for m in self.maps.values():
-                pos += m.pixelSize[0] + 25
+            pos = self.maphack
             mappe.drawOffset = (pos, 0)
         self.maps[mappe.ID] = mappe
+        self.maphack += mappe.pixelSize[0] + 25
         
     def _addPog(self, pog):
         assert(pog.ID is not None)
@@ -75,10 +76,9 @@ class Session(object):
         
     def addMap(self, mappe):
         if mappe.drawOffset == [0, 0]:
-            pos = 0
-            for m in self.maps.values():
-                pos += m.pixelSize[0] + 25
+            pos = self.maphack
             mappe.drawOffset = (pos, 0)
+        self.maphack += mappe.pixelSize[0] + 25
     
         ID = self._findUniqueMapID(mappe.mapname)
         mappe.ID = ID
@@ -105,8 +105,13 @@ class Session(object):
                 if mapPosition[1] >= mappe.drawOffset[1] and mapPosition[1] <= mappe.drawOffset[1] + size[1]:
                     return mappe
         return None
+        
+    def closeMap(self, ID):
+        self.maps[ID]._deleteTiles()
+        del self.maps[ID]
     
     def closeAllMaps(self):
+        self.maphack = 0
         for mappe in self.maps.values():
             mappe._deleteTiles()
         self.maps = {}
@@ -178,7 +183,8 @@ class Session(object):
         return dict(
             pogs=dict([(pog.ID, pog.dump()) for pog in self.pogs.values()]),
             maps=dict([(mappe.ID, mappe.dump()) for mappe in self.maps.values()]),
-            lines=self.lines)
+            lines=self.lines,
+            maphack=self.maphack)
     
     @staticmethod
     def load(obj):
@@ -203,5 +209,11 @@ class Session(object):
             sess.addLine(line)
             
         sess.restoreLines()
+        
+        try:
+            mh = obj.get('maphack')
+            sess.maphack = int(mh)
+        except:
+            print "Loading old session - map placement may be wrong"
         
         return sess
