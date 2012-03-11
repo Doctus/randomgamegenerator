@@ -50,6 +50,8 @@ class menuBar(object):
         self.saveMapAct = QtGui.QAction(translate("menubar", "Save Map As..."), main)
         #self.saveMapAct.setShortcut("Ctrl+S")
         
+        self.closeSpecificMapAct = QtGui.QAction(translate("menubar", "Close Map"), main)
+        
         self.closeMapAct = QtGui.QAction(translate("menubar", "&Close All Maps"), main)
         self.closeMapAct.setShortcut("Ctrl+Shift+W")
         
@@ -123,6 +125,7 @@ class menuBar(object):
         fileMenu.addAction(self.loadMapAct)
         fileMenu.addAction(self.saveMapAct)
         fileMenu.addSeparator()
+        fileMenu.addAction(self.closeSpecificMapAct)
         fileMenu.addAction(self.closeMapAct)
         fileMenu.addSeparator()
         fileMenu.addAction(self.saveCharsAct)
