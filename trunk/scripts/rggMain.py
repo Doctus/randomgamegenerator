@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
 
         self.drawTimer = QTimer()
         self.drawTimer.timeout.connect(self.drawTimerTimeout)
-        self.drawTimer.start(13)
+        self.drawTimer.start(35)
         
     def readGeometry(self):
         settings = QSettings("AttercopProductions", "RGG")
