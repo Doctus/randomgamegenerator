@@ -11,6 +11,9 @@ from PyQt4.QtGui import *
 
 from glwidget import *
 
+from rggJson import loadInteger, jsonload
+from rggSystem import SAVE_DIR
+
 class MainWindow(QMainWindow):
     '''Wrapper class for...well, the game? Maybe this needs to be called the game engine then'''
 
@@ -31,7 +34,12 @@ class MainWindow(QMainWindow):
 
         self.drawTimer = QTimer()
         self.drawTimer.timeout.connect(self.drawTimerTimeout)
-        self.drawTimer.start(35)
+        try:
+            js = jsonload(os.path.join(SAVE_DIR, "init_settings.rgs"))
+            drawtimer = loadInteger('init.drawtimer', js.get('drawtimer'))
+            self.drawTimer.start(drawtimer)
+        except:
+            self.drawTimer.start(35)
         
     def readGeometry(self):
         settings = QSettings("AttercopProductions", "RGG")

@@ -69,6 +69,8 @@ class menuBar(object):
 
         self.gfxSettingsAct = QtGui.QAction(translate("menubar", "Configure Graphics..."), main)
         
+        self.drawTimerSettingsAct = QtGui.QAction(translate("menubar", "Configure FPS..."), main)
+        
         self.hostGameAct = QtGui.QAction(translate("menubar", "&Host Game..."), main)
         self.hostGameAct.setShortcut("Ctrl+H")
 
@@ -184,6 +186,7 @@ class menuBar(object):
         self.optionsMenu.addAction(self.toggleTimestampsAct)
         self.optionsMenu.addAction(self.setTimestampFormatAct)
         self.optionsMenu.addAction(self.gfxSettingsAct)
+        self.optionsMenu.addAction(self.drawTimerSettingsAct)
         
         self.pluginsMenu = QtGui.QMenu(translate("menubar", "&Plugins"), main)
         

@@ -77,6 +77,7 @@ if __name__ == '__main__':
     s.menu.saveCharsAct.triggered.connect(rggViews.saveChars)
     s.menu.loadCharsAct.triggered.connect(rggViews.loadChars)
     s.menu.gfxSettingsAct.triggered.connect(rggViews.configureGfx)
+    s.menu.drawTimerSettingsAct.triggered.connect(rggViews.configureDrawTimer)
     s.menu.hostGameAct.triggered.connect(rggViews.hostGame)
     s.menu.joinGameAct.triggered.connect(rggViews.joinGame)
     s.menu.disconnectAct.triggered.connect(rggViews.disconnectGame)
