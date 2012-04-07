@@ -547,8 +547,16 @@ def loadChars():
 	print e
         return
 
+def configureDrawTimer():
+    """Allows the user to select a drawtimer value."""
+    selectedButton = rggSystem.promptButtonSelection("How often should the GL widget (the thing with pogs and maps) refresh? Slower values will usually work better on less powerful systems. Takes effect only on program restart!", ["Much Faster", "Faster", "Normal", "Slower", "Much Slower"], 0)
+    if selectedButton != -1:
+        val = [13, 20, 35, 45, 60][selectedButton]
+        sav = dict(drawtimer=val)
+        jsondump(sav, os.path.join(SAVE_DIR, "init_settings.rgs"))
+        
 def configureGfx():
-    """Allows the user to the opengl settings."""
+    """Allows the user to change the opengl settings."""
     dialog = gfxSettingsDialog()
     
     def accept():
