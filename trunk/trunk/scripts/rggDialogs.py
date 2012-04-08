@@ -80,8 +80,8 @@ class resizeDialog(QtGui.QDialog):
 
         self.wBox = QtGui.QSpinBox()
         self.hBox = QtGui.QSpinBox()
-        self.wBox.setRange(1, 1000)
-        self.hBox.setRange(1, 1000)
+        self.wBox.setRange(1, 4096)
+        self.hBox.setRange(1, 4096)
         self.wBox.setValue(currw)
         self.hBox.setValue(currh)
 
