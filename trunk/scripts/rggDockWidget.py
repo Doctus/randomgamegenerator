@@ -378,9 +378,9 @@ class pogPalette(QtGui.QDockWidget):
         self.pogArea = QtGui.QListWidget(mainWindow)
         self.controlArea = QtGui.QWidget(mainWindow)
         self.controlLayout = QtGui.QBoxLayout(2)
-        self.addpogbutton = QtGui.QPushButton(self.tr("Update"), mainWindow)
-        self.addpogbutton.setToolTip(self.tr("Re-scan for newly added image files in the pog folder."))
-        self.controlLayout.addWidget(self.addpogbutton)
+        #self.addpogbutton = QtGui.QPushButton(self.tr("Update"), mainWindow)
+        #self.addpogbutton.setToolTip(self.tr("Re-scan for newly added image files in the pog folder."))
+        #self.controlLayout.addWidget(self.addpogbutton)
         self.controlArea.setLayout(self.controlLayout)
         self.mainLayout.addWidget(self.pogArea)
         self.mainLayout.addWidget(self.controlArea)
@@ -391,11 +391,20 @@ class pogPalette(QtGui.QDockWidget):
         
         self.matoi = QtCore.QFileSystemWatcher(self)
         self.matoi.addPath(POG_DIR)
-        self.matoi.directoryChanged.connect(self.addPog)
+        self.matoi.directoryChanged.connect(self.autoUpdate)
 
-        self.addpogbutton.clicked.connect(self.addPog)
+        #self.addpogbutton.clicked.connect(self.addPog)
         self.pogArea.itemActivated.connect(self.place)
         self.addPog()
+        
+    def autoUpdate(self):
+        self.addPog()
+        self.refreshWatcher()
+        
+    def refreshWatcher(self):
+        """Workaround for QFileSystemWatcher failing to work as expected."""
+        self.matoi.removePath(POG_DIR)
+        self.matoi.addPath(POG_DIR)
     
     def addPog(self, truth=False):
         """Add all pogs from the pog directory."""

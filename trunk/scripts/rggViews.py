@@ -1085,8 +1085,6 @@ def mousePress(screenPosition, mapPosition, button):
                         translate('views', lockbutton),
                         translate('views', 'Delete')])
                 processPogRightclick(selected, list(set([pog] + list(_state.pogSelection))))
-            else:
-                pass
     elif icon == ICON_DRAW:
         if button == BUTTON_LEFT:
             _state.previousLinePlacement = mapPosition
