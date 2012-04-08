@@ -41,10 +41,8 @@
   * Pog generator.
   * Quest/Story generator.
   * Character generator.
-  * Refactor generators.
 
 = Awesome =
   * Add Cirno. (Probably as a plugin due to memory consumption.)
 
 = Bugs =
-  * Automatic pog palette updating only works once (on Windows?)
