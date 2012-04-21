@@ -217,9 +217,9 @@ class menuBar(object):
         self.menubar.addMenu(self.optionsMenu)
         self.menubar.addMenu(self.langMenu)
         self.pluginhide = self.menubar.addMenu(self.pluginsMenu)
-        if "linux" in sys.platform and list(int(r) for r in PYQT_VERSION_STR.split(".")) < [4,  8,  0]:
+        if list(int(r) for r in PYQT_VERSION_STR.split(".")) < [4,  8,  0]:
             warning = QtGui.QMessageBox()
-            warning.setText("Your version of PyQt under Linux is incompatible with RGG's Window menu. Right-click on the menu bar to get an alternate menu.")
+            warning.setText("Your version of PyQt is incompatible with RGG's Window menu. Right-click on the menu bar to get an alternate menu.")
             warning.exec_()
         else:
             self.menubar.addMenu(self.windowMenu)
