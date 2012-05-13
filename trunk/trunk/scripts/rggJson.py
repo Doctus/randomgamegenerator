@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 from rggFields import validationError
 from rggSystem import makeLocalFilename
-import json
+import json, gzip
 
 def jsondumps(obj):
     """Dumps the object into a string. Contains no newlines."""
@@ -35,12 +35,8 @@ def jsondumps(obj):
 
 def jsondump(obj, filename):
     """Dump object to file."""
-    file = open(makeLocalFilename(filename), 'wb')
-    # compact version
-    #json.dump(obj, file, separators=(',',':'))
-    # pretty print
-    json.dump(obj, file, sort_keys=True, indent=4)
-    file.close()
+    with gzip.open(makeLocalFilename(filename), 'wb') as file:
+        json.dump(obj, file, sort_keys=True, indent=4)
 
 def jsonloads(str):
     """Loads the object from a string. May throw."""
@@ -50,9 +46,12 @@ def jsonloads(str):
 
 def jsonload(filename):
     """Loads the object from a file. May throw."""
-    file = open(makeLocalFilename(filename), 'rb')
-    obj = json.load(file)
-    file.close()
+    try:
+        with gzip.open(makeLocalFilename(filename), 'rb') as file:
+            obj = json.load(file)
+    except: #might be an old uncompressed save
+        with open(makeLocalFilename(filename), 'rb') as file:
+            obj = json.load(file)
     assert(isinstance(obj, list) or isinstance(obj, dict))
     return obj
 
