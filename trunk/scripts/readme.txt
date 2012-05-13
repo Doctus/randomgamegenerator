@@ -1,4 +1,4 @@
-RGG v.0993b "Shiny crystal light, energize"
+RGG v1.00 "Pan saw the tomb and laughed"
 
 http://code.google.com/p/randomgamegenerator/
 
@@ -40,6 +40,20 @@ Special Thanks:
   Everyone from MoMM and #attercop
 
 Changelog:
+
+  v1.00   "Pan saw the tomb and laughed"
+   Fixes
+    * Disabled Window menu for incompatible old PyQt versions
+    * Fixed erronenous retention of deleted lines in saves
+    * IC characters now retain order when loaded
+    * Removed stray dependency on Phonon
+   Features
+    * Added command to close specific maps
+    * Added command to clear current session entirely
+    * Name generators may now be added as individual script files
+    * Several new generators added
+    * Added option to change draw timer for older systems
+
   v0.993b "Shiny crystal light, energize"
     * Cleaned up some obsolete material.
     * Added initial documentation.

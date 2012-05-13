@@ -65,7 +65,7 @@ COLOURS = {"White":(1.0, 1.0, 1.0),
            "Blue": (0.0, 0.0, 1.0),
            "Purple": (0.76, 0.0, 1.0),
            "Black": (0.0, 0.0, 0.0)}
-VERSION = "0.994"
+VERSION = "1.00"
 DEV = True
 
 mainWindow = None
