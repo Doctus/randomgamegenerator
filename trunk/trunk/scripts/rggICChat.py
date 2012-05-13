@@ -64,18 +64,16 @@ sayChat.documentation = fake.translate('chatdoc',
     </dl><br>
     """)
 
-@chat('randomname')
+@chat('generate')
 def randomname(message, chname, portrait):
     if len(message) <= 0:
         ICSay(translate('chat',
-            "Syntax: /randomname NAMETYPE. Caps and spaces "
-            "are ignored. Some valid arguments are "
-            "JAPANESEFEMALEFULL and DwArF M aLe"))
+            "Syntax: /generate NAMETYPE."))
     else:
         rggViews.generateName(*splitword(message.lower()))
 
 randomname.documentation = fake.translate('chatdoc', 
-    """/randomname: Generate a random name.<dl>
+    """/randomname: THIS DOCUMENTATION IS A LIE!!<dl>
     <dt>Syntax:</dt>
         <dd>/randomname NAMETYPE. Caps and spaces are ignored.</dd>
 

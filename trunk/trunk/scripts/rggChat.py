@@ -64,55 +64,22 @@ sayChat.documentation = fake.translate('chatdoc',
     </dl><br>
     """)
 
-@chat('randomname')
+@chat('generate')
 def randomname(message):
     if len(message) <= 0:
         say(translate('chat',
-            "Syntax: /randomname NAMETYPE. Caps and spaces "
-            "are ignored. Some valid arguments are "
-            "JAPANESEFEMALEFULL and DwArF M aLe"))
+            "Syntax: /generate NAMETYPE."))
     else:
         rggViews.generateName(*splitword(message.lower()))
 
 randomname.documentation = fake.translate('chatdoc', 
-    """/randomname: Generate a random name.<dl>
+    """/randomname: This documentation is a lie!<dl>
     <dt>Syntax:</dt>
         <dd>/randomname NAMETYPE. Caps and spaces are ignored.</dd>
 
     <dt>Example:</dt>
         <dd>/randomname JAPANESEFEMALEFULL</dd>
         <dd>/randomname DwArF M aLe</dd>
-    </dl><br>
-    """)
-
-@chat('techniquename', 'techname')
-def techname(message):
-    rggViews.generateTechnique(message)
-
-techname.documentation = fake.translate('chatdoc', 
-    """/techniquename: Generate a technique name.<dl>
-    <dt>Alternate spelling:</dt>
-        <dd>/techname</dd>
-
-    <dt>Syntax:</dt>
-        <dd>/techniquename</dd>
-        <dd>/techniquename arguments...</dd>
-    
-    <dt>Examples:</dt>
-        <dd>/techniquename</dd>
-        <dd>/techniquename ...</dd>
-    </dl><br>
-    """)
-
-@chat('advice')
-def advice(message):
-    rggViews.generateAdvice()
-
-advice.documentation = fake.translate('chatdoc', 
-    """/advice: Generate some random, probably nonsensical advice.<dl>
-
-    <dt>Syntax:</dt>
-        <dd>/advice</dd>
     </dl><br>
     """)
 

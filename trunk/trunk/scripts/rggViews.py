@@ -549,7 +549,7 @@ def loadChars():
 
 def configureDrawTimer():
     """Allows the user to select a drawtimer value."""
-    selectedButton = rggSystem.promptButtonSelection("How often should the GL widget (the thing with pogs and maps) refresh? Slower values will usually work better on less powerful systems. Takes effect only on program restart!", ["Much Faster", "Faster", "Normal", "Slower", "Much Slower"], 0)
+    selectedButton = rggSystem.promptButtonSelection("How often should the GL widget (the thing with pogs and maps) refresh? Slower values may work better if you experience problems on less powerful systems. Takes effect only on program restart!", ["Much Faster", "Faster (Default)", "Medium", "Slower", "Much Slower"], 0)
     if selectedButton != -1:
         val = [13, 20, 35, 45, 60][selectedButton]
         sav = dict(drawtimer=val)
@@ -905,7 +905,7 @@ def processPogRightclick(selection, pogs):
         for pog in pogs:
             renamePog(pog, name)
     elif selection == 2:
-        prompt = translate('views', "Enter a generator command. See /randomname for syntax. Multi-pog compatible.")
+        prompt = translate('views', "Enter a generator command. See /generate for syntax. Multi-pog compatible.")
         gentype = promptString(prompt)
         if gentype is None:
             return

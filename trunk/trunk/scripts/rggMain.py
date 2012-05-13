@@ -39,7 +39,7 @@ class MainWindow(QMainWindow):
             drawtimer = loadInteger('init.drawtimer', js.get('drawtimer'))
             self.drawTimer.start(drawtimer)
         except:
-            self.drawTimer.start(35)
+            self.drawTimer.start(20)
         
     def readGeometry(self):
         settings = QSettings("AttercopProductions", "RGG")

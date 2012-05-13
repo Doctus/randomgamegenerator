@@ -219,7 +219,7 @@ class menuBar(object):
         self.pluginhide = self.menubar.addMenu(self.pluginsMenu)
         if list(int(r) for r in PYQT_VERSION_STR.split(".")) < [4,  8,  0]:
             warning = QtGui.QMessageBox()
-            warning.setText("Your version of PyQt is incompatible with RGG's Window menu. Right-click on the menu bar to get an alternate menu.")
+            warning.setText("".join(("Your version of PyQt (", PYQT_VERSION_STR, ") is incompatible with RGG's Window menu, which requires 4.8.0 or newer. Right-click on the menu bar to get an alternate menu.")))
             warning.exec_()
         else:
             self.menubar.addMenu(self.windowMenu)
