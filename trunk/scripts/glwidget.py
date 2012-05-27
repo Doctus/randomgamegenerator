@@ -154,6 +154,7 @@ class GLWidget(QGLWidget):
         if self.vbos:
             glmod.drawVBO()
         else:
+            glColor4f(1.0, 1.0, 1.0, 1.0)
             for layer in self.layers:
                 for img in self.images[layer]:
                     self.drawImage(img)
@@ -171,14 +172,15 @@ class GLWidget(QGLWidget):
                     glVertex2f(line[0], line[1])
                     glVertex2f(line[2], line[3])
                 glEnd()
+                glColor3f(1.0, 1.0, 1.0)
             if self.selectionCircles.has_key(-1):
                 glLineWidth(3)
-                glBegin(GL_LINE_LOOP)
-                glColor3f(1.0, 1.0, 1.0)
+                glColor3f(0.0, 1.0, 0.0)
                 for circle in self.selectionCircles[-1]:
+                    glBegin(GL_LINE_LOOP)
                     for r in range(0, 360, 3):
                         glVertex2f(circle[0] + math.cos(r*0.01745329) * circle[2], circle[1] + math.sin(r*0.01745329) * circle[2])
-                glEnd()
+                    glEnd()
             for rectangle in self.rectangles[1]:
                 glLineWidth(2)
                 glColor3f(rectangle[4], rectangle[5], rectangle[6])
