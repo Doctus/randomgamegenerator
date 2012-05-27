@@ -152,6 +152,7 @@ class GLWidget(QGLWidget):
                     glColor4f(1.0, 1.0, 1.0, 1.0)
 
         if self.vbos:
+            glColor4f(1.0, 1.0, 1.0, 1.0)
             glmod.drawVBO()
         else:
             glColor4f(1.0, 1.0, 1.0, 1.0)
