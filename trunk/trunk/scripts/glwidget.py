@@ -164,6 +164,7 @@ class GLWidget(QGLWidget):
             glmod.drawSelectionCircles(self.selectionCircles)
             glmod.drawRectangles(self.rectangles)
         else:
+            glDisable(self.texext)
             for layer in self.lines:
                 glLineWidth(layer)
                 glBegin(GL_LINES)
@@ -172,7 +173,6 @@ class GLWidget(QGLWidget):
                     glVertex2f(line[0], line[1])
                     glVertex2f(line[2], line[3])
                 glEnd()
-                glColor3f(1.0, 1.0, 1.0)
             if self.selectionCircles.has_key(-1):
                 glLineWidth(3)
                 glColor3f(0.0, 1.0, 0.0)
@@ -190,7 +190,7 @@ class GLWidget(QGLWidget):
                 glVertex2d(rectangle[2], rectangle[3])
                 glVertex2d(rectangle[0], rectangle[3])
                 glEnd()
-            glColor3f(1.0, 1.0, 1.0)
+            glEnable(self.texext)
 
         for text in self.texts:
             _split = text[1].split("\n")
