@@ -174,6 +174,7 @@ class Session(object):
         self.pogs = {}
         self.lines = []
         self.linesDict = {}
+        self.maphack = 0
     
     def dump(self):
         """Serialize to an object valid for JSON dumping."""
