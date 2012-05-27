@@ -193,6 +193,7 @@ class GLWidget(QGLWidget):
                 glEnd()
             glEnable(self.texext)
 
+        glColor4f(1.0, 1.0, 1.0, 1.0)
         for text in self.texts:
             _split = text[1].split("\n")
             brk = lambda x, n, acc=[]: brk(x[n:], n, acc+[(x[:n])]) if x else acc
