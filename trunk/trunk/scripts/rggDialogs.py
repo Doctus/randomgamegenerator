@@ -309,7 +309,7 @@ class hostDialog(dialog):
 
     def checkIP(self):
         import urllib2
-        ip = str(urllib2.urlopen('http://whatismyip.org').read())
+        ip = str(urllib2.urlopen('http://automation.whatismyip.com/n09230945.asp').read())
         
         with open("2of12inf.txt", "r") as f:
             dat = f.readlines()
