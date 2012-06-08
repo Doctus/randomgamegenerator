@@ -372,6 +372,7 @@ class PogFileSystemModel(QtGui.QFileSystemModel):
         self.setRootPath(POG_DIR)
         self.setNameFilters(IMAGE_NAME_FILTER)
         self.setNameFilterDisables(False)
+        self.absRoot = os.path.abspath(POG_DIR)
         
     def data(self, index, role):
         basedata = QtGui.QFileSystemModel.data(self, index, role)
@@ -400,7 +401,7 @@ class pogPalette(QtGui.QDockWidget):
         self.widget = QtGui.QWidget(mainWindow)
         self.mainLayout = QtGui.QBoxLayout(2)
         self.pogsModel = PogFileSystemModel()
-        self.ROOT_LEN = len(self.pogsModel.rootPath())+1
+        self.ROOT_LEN = len(self.pogsModel.absRoot)+1
         self.pogArea = QtGui.QTreeView(mainWindow)
         self.pogArea.setModel(self.pogsModel)
         self.pogArea.setRootIndex(self.pogsModel.index(POG_DIR))
