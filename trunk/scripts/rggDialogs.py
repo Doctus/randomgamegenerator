@@ -469,6 +469,7 @@ class PortraitFileSystemModel(QtGui.QFileSystemModel):
         self.setRootPath(PORTRAIT_DIR)
         self.setNameFilters(IMAGE_NAME_FILTER)
         self.setNameFilterDisables(False)
+        self.absRoot = os.path.abspath(PORTRAIT_DIR)
         
     def data(self, index, role):
         basedata = QtGui.QFileSystemModel.data(self, index, role)
@@ -530,7 +531,7 @@ class newCharacterDialog(dialog):
         okayButton.setDefault(True)
         cancelButton = QtGui.QPushButton(translate('newCharacterDialog', "Cancel"))
         self.portraitModel = PortraitFileSystemModel()
-        self.ROOT_LEN = len(self.portraitModel.rootPath())+1
+        self.ROOT_LEN = len(self.portraitModel.absRoot)+1
         self.portraitArea = QtGui.QTreeView(parent)
         self.portraitArea.setModel(self.portraitModel)
         self.portraitArea.setRootIndex(self.portraitModel.index(PORTRAIT_DIR))
