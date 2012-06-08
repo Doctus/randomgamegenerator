@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 import re
 import rggSystem
+import os
 from rggSocket import statefulSocket, generateChecksum, fileData
 from rggSystem import translate, mainWindow, signal, makeLocalFilename
 from PyQt4 import QtCore, QtNetwork
@@ -135,7 +136,12 @@ class BaseClient(object):
         try:
             file = QtCore.QFile(makeLocalFilename(filename))
             if not file.open(QtCore.QFile.ReadWrite):
-                return False
+                try:
+                    os.makedirs(os.path.dirname(filename))
+                except:
+                    pass
+                if not file.open(QtCore.QFile.ReadWrite):
+                    return False
             try:
                 size = file.size()
                 digest = generateChecksum(file)
