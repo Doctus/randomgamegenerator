@@ -46,6 +46,7 @@ def translate(*args):
     return unicode(QtCore.QCoreApplication.translate(*args))
 
 IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".ppm", ".xbm", ".xpm")
+IMAGE_NAME_FILTER = list(('*{ext}'.format(ext=ext) for ext in IMAGE_EXTENSIONS))
 IMAGE_FILTER = fake.translate('system', 'Images ({imageList})').format(
     imageList=','.join('*{ext}'.format(ext=ext) for ext in IMAGE_EXTENSIONS))
 TILESET_DIR = 'data/tilesets'

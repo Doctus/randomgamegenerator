@@ -1,5 +1,5 @@
 from PyQt4 import QtGui, QtCore
-from rggSystem import signal, findFiles, POG_DIR, PORTRAIT_DIR, LOG_DIR, IMAGE_EXTENSIONS, IMAGE_FILTER, CHAR_DIR, MUSIC_DIR, SAVE_DIR, makePortableFilename, promptSaveFile
+from rggSystem import signal, findFiles, POG_DIR, PORTRAIT_DIR, LOG_DIR, IMAGE_EXTENSIONS, IMAGE_NAME_FILTER, CHAR_DIR, MUSIC_DIR, SAVE_DIR, makePortableFilename, promptSaveFile
 from rggDialogs import newCharacterDialog, FIRECharacterSheetDialog
 from rggJson import loadObject, loadString, jsondump, jsonload
 import os, os.path, time
@@ -377,7 +377,7 @@ class pogPalette(QtGui.QDockWidget):
         self.mainLayout = QtGui.QBoxLayout(2)
         self.pogsModel = QtGui.QFileSystemModel()
         self.pogsModel.setRootPath(POG_DIR)
-        self.pogsModel.setNameFilters(IMAGE_FILTER)
+        self.pogsModel.setNameFilters(IMAGE_NAME_FILTER)
         self.pogsModel.setNameFilterDisables(False)
         self.ROOT_LEN = len(self.pogsModel.rootPath())+1
         self.pogArea = QtGui.QTreeView(mainWindow)
