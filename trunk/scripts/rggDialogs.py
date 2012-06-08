@@ -462,6 +462,21 @@ class joinDialog(dialog):
         return ConnectionData(self.cleanData['host'], self.cleanData['port'],
             self.cleanData['username'], self.cleanData['password'])
     
+class PortraitFileSystemModel(QtGui.QFileSystemModel):
+
+    def __init__(self):
+        super(QtGui.QFileSystemModel, self).__init__()
+        self.setRootPath(PORTRAIT_DIR)
+        self.setNameFilters(IMAGE_NAME_FILTER)
+        self.setNameFilterDisables(False)
+        
+    def data(self, index, role):
+        basedata = QtGui.QFileSystemModel.data(self, index, role)
+        if basedata.canConvert(69):
+            path = unicode(self.data(index, 0).toString())
+            return QtGui.QIcon(os.path.join(PORTRAIT_DIR, path))
+        return basedata
+    
 class newCharacterDialog(dialog):
     """A dialog used to create a new character for in-character chat."""
     
@@ -505,10 +520,7 @@ class newCharacterDialog(dialog):
         okayButton = QtGui.QPushButton(translate('newCharacterDialog', "Create"))
         okayButton.setDefault(True)
         cancelButton = QtGui.QPushButton(translate('newCharacterDialog', "Cancel"))
-        self.portraitModel = QtGui.QFileSystemModel()
-        self.portraitModel.setRootPath(PORTRAIT_DIR)
-        self.portraitModel.setNameFilters(IMAGE_NAME_FILTER)
-        self.portraitModel.setNameFilterDisables(False)
+        self.portraitModel = PortraitFileSystemModel()
         self.ROOT_LEN = len(self.portraitModel.rootPath())+1
         self.portraitArea = QtGui.QTreeView(parent)
         self.portraitArea.setModel(self.portraitModel)
