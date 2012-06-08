@@ -1,5 +1,5 @@
 from PyQt4 import QtGui, QtCore
-from rggSystem import signal, findFiles, POG_DIR, PORTRAIT_DIR, LOG_DIR, IMAGE_EXTENSIONS, CHAR_DIR, MUSIC_DIR, SAVE_DIR, makePortableFilename, promptSaveFile
+from rggSystem import signal, findFiles, POG_DIR, PORTRAIT_DIR, LOG_DIR, IMAGE_EXTENSIONS, IMAGE_FILTER, CHAR_DIR, MUSIC_DIR, SAVE_DIR, makePortableFilename, promptSaveFile
 from rggDialogs import newCharacterDialog, FIRECharacterSheetDialog
 from rggJson import loadObject, loadString, jsondump, jsonload
 import os, os.path, time
@@ -375,12 +375,19 @@ class pogPalette(QtGui.QDockWidget):
         self.setWindowTitle(self.tr("Pog Palette"))
         self.widget = QtGui.QWidget(mainWindow)
         self.mainLayout = QtGui.QBoxLayout(2)
-        self.pogArea = QtGui.QListWidget(mainWindow)
+        self.pogsModel = QtGui.QFileSystemModel()
+        self.pogsModel.setRootPath(POG_DIR)
+        self.pogsModel.setNameFilters(IMAGE_FILTER)
+        self.pogsModel.setNameFilterDisables(False)
+        self.ROOT_LEN = len(self.pogsModel.rootPath())+1
+        self.pogArea = QtGui.QTreeView(mainWindow)
+        self.pogArea.setModel(self.pogsModel)
+        self.pogArea.setRootIndex(self.pogsModel.index(POG_DIR))
+        self.pogArea.setColumnHidden(1, True)
+        self.pogArea.setColumnHidden(2, True)
+        self.pogArea.setColumnHidden(3, True)
         self.controlArea = QtGui.QWidget(mainWindow)
         self.controlLayout = QtGui.QBoxLayout(2)
-        #self.addpogbutton = QtGui.QPushButton(self.tr("Update"), mainWindow)
-        #self.addpogbutton.setToolTip(self.tr("Re-scan for newly added image files in the pog folder."))
-        #self.controlLayout.addWidget(self.addpogbutton)
         self.controlArea.setLayout(self.controlLayout)
         self.mainLayout.addWidget(self.pogArea)
         self.mainLayout.addWidget(self.controlArea)
@@ -389,36 +396,16 @@ class pogPalette(QtGui.QDockWidget):
         self.setObjectName("Pog Palette")
         mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
         
-        self.matoi = QtCore.QFileSystemWatcher(self)
-        self.matoi.addPath(POG_DIR)
-        self.matoi.directoryChanged.connect(self.autoUpdate)
+        #self.matoi = QtCore.QFileSystemWatcher(self)
+        #self.matoi.addPath(POG_DIR)
+        #self.matoi.directoryChanged.connect(self.autoUpdate)
 
-        #self.addpogbutton.clicked.connect(self.addPog)
-        self.pogArea.itemActivated.connect(self.place)
-        self.addPog()
-        
-    def autoUpdate(self):
-        self.addPog()
-        self.refreshWatcher()
-        
-    def refreshWatcher(self):
-        """Workaround for QFileSystemWatcher failing to work as expected."""
-        self.matoi.removePath(POG_DIR)
-        self.matoi.addPath(POG_DIR)
-    
-    def addPog(self, truth=False):
-        """Add all pogs from the pog directory."""
-        #TODO: Refactor into a view.
-        self.pogArea.clear()
-        self.pogs = findFiles(POG_DIR, IMAGE_EXTENSIONS)
-        self.pogs.sort(cmp=lambda x,y: cmp(x.lower(), y.lower()))
-        for greatJustice in self.pogs:
-            icon = QtGui.QIcon(QtGui.QIcon(os.path.join(POG_DIR, greatJustice)).pixmap(QtCore.QSize(32, 32)))
-            self.pogArea.addItem(QtGui.QListWidgetItem(icon, greatJustice))
+        self.pogArea.activated.connect(self.place)
     
     def place(self, pog):
         """Place a pog on the map."""
-        self.pogPlaced.emit(makePortableFilename(os.path.join(POG_DIR, unicode(pog.text()))))
+        #TODO: Find a less terrible way to work around the lack of a relative-path-getter.
+        self.pogPlaced.emit(makePortableFilename(os.path.join(POG_DIR, unicode(self.pogsModel.filePath(pog)[self.ROOT_LEN:]))))
 
     pogPlaced = signal(basestring, doc=
         """Called to request pog placement on the map."""
