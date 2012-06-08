@@ -1,4 +1,4 @@
-RGG v1.00 "Pan saw the tomb and laughed"
+RGG v1.00b "Pan saw the tomb and laughed"
 
 http://code.google.com/p/randomgamegenerator/
 
@@ -40,6 +40,13 @@ Special Thanks:
   Everyone from MoMM and #attercop
 
 Changelog:
+
+  v1.00b  "Pan saw the tomb and laughed"
+    * Fixed an error with map position after clearing a session.
+    * Fixed several sources of graphical problems.
+    * Updated IP-checking system.
+    * Savefiles will now be compressed if possible.
+    * It is now possible to use pogs and portraits in subfolders.
 
   v1.00   "Pan saw the tomb and laughed"
    Fixes
