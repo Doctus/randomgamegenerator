@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os, os.path
 import rggMap, rggFIRECharacter
-from rggSystem import fake, translate, showErrorMessage, findFiles, IMAGE_EXTENSIONS, TILESET_DIR, PORTRAIT_DIR, SAVE_DIR, makePortableFilename
+from rggSystem import fake, translate, showErrorMessage, findFiles, IMAGE_EXTENSIONS, IMAGE_FILTER, TILESET_DIR, PORTRAIT_DIR, SAVE_DIR, makePortableFilename
 from rggFields import integerField, floatField, stringField, dropDownField, sliderField, validationError
 from rggNet import ConnectionData, localHost
 from rggJson import *
@@ -505,7 +505,17 @@ class newCharacterDialog(dialog):
         okayButton = QtGui.QPushButton(translate('newCharacterDialog', "Create"))
         okayButton.setDefault(True)
         cancelButton = QtGui.QPushButton(translate('newCharacterDialog', "Cancel"))
-        self.portraitArea = QtGui.QListWidget(parent)
+        self.portraitModel = QtGui.QFileSystemModel()
+        self.portraitModel.setRootPath(PORTRAIT_DIR)
+        self.portraitModel.setNameFilters(IMAGE_FILTER)
+        self.portraitModel.setNameFilterDisables(False)
+        self.ROOT_LEN = len(self.portraitModel.rootPath())+1
+        self.portraitArea = QtGui.QTreeView(parent)
+        self.portraitArea.setModel(self.portraitModel)
+        self.portraitArea.setRootIndex(self.portraitModel.index(PORTRAIT_DIR))
+        self.portraitArea.setColumnHidden(1, True)
+        self.portraitArea.setColumnHidden(2, True)
+        self.portraitArea.setColumnHidden(3, True)
         
         # Add fields
         formLayout = QtGui.QFormLayout()
@@ -529,7 +539,7 @@ class newCharacterDialog(dialog):
         evilBox.addWidget(self.portraitArea)
         evilBox.addLayout(grandBox)
         
-        self.portraitArea.currentItemChanged.connect(self.changePort)
+        self.portraitArea.pressed.connect(self.changePort)
         
         # Set up the widget
         widget.setLayout(evilBox)
@@ -545,17 +555,17 @@ class newCharacterDialog(dialog):
         widget.connect(okayButton, QtCore.SIGNAL('clicked()'), okayPressed)
         widget.connect(cancelButton, QtCore.SIGNAL('clicked()'), widget.reject)
         
-        portraits = findFiles(PORTRAIT_DIR, IMAGE_EXTENSIONS)
-        portraits.sort(cmp=lambda x,y: cmp(x.lower(), y.lower()))
-        for greatJustice in portraits:
-            icon = QtGui.QIcon(os.path.join(PORTRAIT_DIR, greatJustice))
-            self.portraitArea.addItem(QtGui.QListWidgetItem(icon, greatJustice))
+        #portraits = findFiles(PORTRAIT_DIR, IMAGE_EXTENSIONS)
+        #portraits.sort(cmp=lambda x,y: cmp(x.lower(), y.lower()))
+        #for greatJustice in portraits:
+        #    icon = QtGui.QIcon(os.path.join(PORTRAIT_DIR, greatJustice))
+        #    self.portraitArea.addItem(QtGui.QListWidgetItem(icon, greatJustice))
         
         # Show to user
         return (widget.exec_() == QtGui.QDialog.Accepted)
     
-    def changePort(self, portrait, previous):
-        self.fields['portrait'].widgett.setText(unicode(portrait.text()))
+    def changePort(self, portrait):
+        self.fields['portrait'].widgett.setText(unicode(self.portraitModel.filePath(portrait)[self.ROOT_LEN:]))
         
     def clean(self):
         """Check for errors and return well-formatted data."""
