@@ -507,7 +507,7 @@ class newCharacterDialog(dialog):
                 value=data.get('charactername', translate('newCharacterDialog', ' '))),
             portrait=stringField(
                 translate('newCharacterDialog', 'Portrait'),
-                value=data.get('portrait', translate('newCharacterDialog', 'default_portrait_1.png'))))
+                value=data.get('portrait', translate('newCharacterDialog', ' '))))
     
     def _interpretFields(self, fields):
         """Interpret the fields into a dictionary of clean items."""
