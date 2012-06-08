@@ -365,6 +365,21 @@ class diceRoller(QtGui.QDockWidget):
         """Called when the add macro button is pressed."""
     )
 
+class PogFileSystemModel(QtGui.QFileSystemModel):
+
+    def __init__(self):
+        super(QtGui.QFileSystemModel, self).__init__()
+        self.setRootPath(POG_DIR)
+        self.setNameFilters(IMAGE_NAME_FILTER)
+        self.setNameFilterDisables(False)
+        
+    def data(self, index, role):
+        basedata = QtGui.QFileSystemModel.data(self, index, role)
+        if basedata.canConvert(69):
+            path = unicode(self.data(index, 0).toString())
+            return QtGui.QIcon(os.path.join(POG_DIR, path))
+        return basedata
+    
 class pogPalette(QtGui.QDockWidget):
     """The list of loaded pogs."""
     
@@ -375,10 +390,7 @@ class pogPalette(QtGui.QDockWidget):
         self.setWindowTitle(self.tr("Pog Palette"))
         self.widget = QtGui.QWidget(mainWindow)
         self.mainLayout = QtGui.QBoxLayout(2)
-        self.pogsModel = QtGui.QFileSystemModel()
-        self.pogsModel.setRootPath(POG_DIR)
-        self.pogsModel.setNameFilters(IMAGE_NAME_FILTER)
-        self.pogsModel.setNameFilterDisables(False)
+        self.pogsModel = PogFileSystemModel()
         self.ROOT_LEN = len(self.pogsModel.rootPath())+1
         self.pogArea = QtGui.QTreeView(mainWindow)
         self.pogArea.setModel(self.pogsModel)
