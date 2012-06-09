@@ -60,6 +60,7 @@ class GLWidget(QGLWidget):
         self.w = 640
         self.h = 480
         self.images = dict()
+        self.allimgs = []
         self.lastMousePos = [0, 0]
         self.camera = [0, 0]
         self.layers = []
@@ -487,6 +488,7 @@ class GLWidget(QGLWidget):
             image.createLayer = True
 
         self.images[layer].append(image)
+        self.allimgs.append(image)
 
         if self.vbos:
             image.VBO = self.VBO
@@ -510,10 +512,7 @@ class GLWidget(QGLWidget):
         if image == None, this function requests a new BO from the GPU with a calculated size
         if image != None, this function adds the VBO data from image to the BO in the GPU, if there is enough space.
         '''
-        size = 0
-
-        for layer in self.layers:
-            size += len(self.images[layer])
+        size = len(self.allimgs)
 
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, self.VBO)
         
@@ -528,13 +527,12 @@ class GLWidget(QGLWidget):
 
             self.offset = 0
 
-            for layer in self.layers:
-                for img in self.images[layer]:
-                    img.offset = int(float(self.offset)/self.vertByteCount*4)
-                    VBOData = img.getVBOData()
+            for img in self.allimgs:
+                img.offset = int(float(self.offset)/self.vertByteCount*4)
+                VBOData = img.getVBOData()
 
-                    glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, self.offset, self.vertByteCount, VBOData)
-                    self.offset += self.vertByteCount
+                glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, self.offset, self.vertByteCount, VBOData)
+                self.offset += self.vertByteCount
             
             self.calculateVBOList()
             
