@@ -562,6 +562,7 @@ class GLWidget(QGLWidget):
             del self.qimages[image.imagepath]
 
         self.images[image.layer].remove(image)
+        self.allimgs.remove(image)
 
         if self.vbos:
             self.calculateVBOList(image, True)
@@ -582,6 +583,7 @@ class GLWidget(QGLWidget):
                 del self.qimages[image.imagepath]
 
             self.images[image.layer].remove(image)
+            self.allimgs.remove(image)
 
         if self.vbos:
             self.calculateVBOList()
