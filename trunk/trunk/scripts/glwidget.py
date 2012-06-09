@@ -791,6 +791,8 @@ class GLWidget(QGLWidget):
             self.zoom -= 0.15
             if self.zoom < 0.30:
                 self.zoom = 0.30
+        elif event.key() == Qt.Key_0:
+            self.zoom = 1
         elif event.key() == Qt.Key_Up:
             self.camera[1] += (50 * self.zoom)
         elif event.key() == Qt.Key_Down:
