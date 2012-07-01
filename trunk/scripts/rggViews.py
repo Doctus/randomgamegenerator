@@ -86,6 +86,11 @@ class _state(object):
         _state.users = {}
         _state.localuser = User(client.username)
         _state.users[client.username] = _state.localuser
+        _state.keepalive = 4
+        
+        _state.pingTimer = QtCore.QTimer()
+        _state.pingTimer.timeout.connect(keepAlive)
+        _state.pingTimer.start(rggSystem.PING_INTERVAL_SECONDS*1000)
         
         _state.App = mainApp
         
@@ -238,6 +243,26 @@ def selectGM(newname):
 def setUwidgetLocal():
     _state.uwidget.localname = localhandle()
 
+@serverRPC    
+def respondPing():
+    _state.keepalive = 4
+    
+@clientRPC
+def sendPing(user):
+    respondPing(user)
+    
+def keepAlive():
+    _state.keepalive -= 1
+    if _state.keepalive == 1:
+        say(translate('views', '<font color="red">Warning:</font> Connection may have been lost.'))
+    if _state.keepalive == 0:
+        respondPossibleDisconnect()
+    sendPing()
+
+def respondPossibleDisconnect():
+    say(translate('views', '<font color="red">Connection appears to have been lost.</font>'))
+    disconnectGame()
+    
 # TODO: Name changing needs to be synched across the wire
 # The workaround is to log out and back in.
 #def changeName(user, name):
