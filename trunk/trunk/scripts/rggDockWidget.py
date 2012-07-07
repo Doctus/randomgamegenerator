@@ -5,6 +5,38 @@ from rggJson import loadObject, loadString, jsondump, jsonload
 import os, os.path, time
 import rggFIRECharacter
 
+class debugConsoleWidget(QtGui.QDockWidget):
+
+    def __init__(self, mainWindow):
+        super(QtGui.QDockWidget, self).__init__(mainWindow)
+        self.setToolTip(self.tr("A console that prints debug information regarding the program."))
+        self.setWindowTitle(self.tr("Debug Console"))
+        self.widgetEditor = QtGui.QTextBrowser(mainWindow)
+        self.widget = QtGui.QWidget(mainWindow)
+        self.widgetEditor.setReadOnly(True)
+        self.widgetEditor.setOpenLinks(False)
+        self.logToFileToggle = QtGui.QCheckBox(self.tr("Log to file"))
+        self.logToFileToggle.setChecked(True) #TODO: Make this setting persist
+        self.layout = QtGui.QBoxLayout(2)
+        self.layout.addWidget(self.widgetEditor)
+        self.layout.addWidget(self.logToFileToggle)
+        self.widget.setLayout(self.layout)
+        self.setWidget(self.widget)
+        self.setObjectName("Debug Console")
+        
+        self.buffer = []
+        
+        mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
+        
+    def write(self, data):
+        self.buffer.append(data)
+        if data.endswith('\n'):
+            self.widgetEditor.append(''.join(self.buffer))
+            if self.logToFileToggle.isChecked():
+                with open(os.path.join(LOG_DIR, time.strftime("%b_%d_%Y_debug.log", time.localtime())), 'a') as f:
+                    f.write(''.join(self.buffer))
+            self.buffer = []
+
 class chatLineEdit(QtGui.QLineEdit):
 
     def __init__(self, mainWindow):
