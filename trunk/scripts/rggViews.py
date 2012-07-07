@@ -18,7 +18,7 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
-import time, random, os, base64
+import time, random, os, base64, sys
 import rggNameGen, rggDice, rggMap, rggTile, rggPog, rggDockWidget, rggDialogs, rggMenuBar, rggResource, rggSystem, rggSession
 from rggRPC import server, client, serverRPC, clientRPC
 from rggJson import jsondump, jsonload
@@ -77,6 +77,10 @@ class _state(object):
     @staticmethod
     def initialize(mainApp):
         _state.menu = rggMenuBar.menuBar()
+        
+        _state.twidget = rggDockWidget.debugConsoleWidget(mainWindow)
+        sys.stdout = _state.twidget
+        sys.stderr = _state.twidget
         
         _state.dwidget = rggDockWidget.diceRoller(mainWindow)
         _state.pwidget = rggDockWidget.pogPalette(mainWindow)
