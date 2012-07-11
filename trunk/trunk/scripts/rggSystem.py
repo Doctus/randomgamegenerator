@@ -19,7 +19,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
-import sys, random
+import sys, random, math
 import os, os.path
 from PyQt4 import QtCore, QtGui
 
@@ -344,6 +344,35 @@ def getLinesOfThickness(thickness):
         pass
     return lines
 
+def drawRectangle(x, y, w, h, colour, thickness):
+    drawLine(x, y, w, y, thickness, colour[0], colour[1], colour[2])
+    drawLine(w, y, w, h, thickness, colour[0], colour[1], colour[2])
+    drawLine(w, h, x, h, thickness, colour[0], colour[1], colour[2])
+    drawLine(x, h, x, y, thickness, colour[0], colour[1], colour[2])
+
+def drawCircle(centre, edge, colour, thickness):
+    radius = math.hypot(edge[0]-centre[0], edge[1]-centre[1])
+    vert = [centre[0]+radius, centre[1], 0, 0]
+    for r in range(3, 363, 3):
+        vert[2] = centre[0]+math.cos(r*0.01745329)*radius
+        vert[3] = centre[1]+math.sin(r*0.01745329)*radius
+        drawLine(vert[0], vert[1], vert[2], vert[3], thickness, colour[0], colour[1], colour[2])
+        vert[0] = vert[2]
+        vert[1] = vert[3]
+        
+    
+def drawRegularPolygon(sides, centre, size, colour, thickness, rainbow = False):
+    vertices = []
+    for i in xrange(sides):
+        vertices.append((centre[0]+size*math.cos(2*math.pi*i/sides), centre[1]+size*math.sin(2*math.pi*i/sides)))
+    for p in xrange(sides):
+        for q in xrange(sides):
+            if sides%2 == 1 or p%(sides/2) != q%(sides/2):
+                if not rainbow:
+                    drawLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, colour[0], colour[1], colour[2])
+                else:
+                    drawLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, random.random(), random.random(), random.random())    
+    
 def setZoom(zoom):
     #_main.setZoom(zoom)
     print "unimplemented2"

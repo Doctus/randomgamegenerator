@@ -71,6 +71,7 @@ class _state(object):
 
     thickness = 1
     linecolour = [1.0, 1.0, 1.0]
+    drawmode = "Freehand"
     
     GM = None
     
@@ -1026,9 +1027,10 @@ def mouseMove(screenPosition, mapPosition, displacement):
             return mouseDrag(screenPosition, mapPosition, displacement)
     elif icon == ICON_DRAW: #drawIcon
         if _state.mouseButton == BUTTON_LEFT:
-            if _state.previousLinePlacement != None:
-                sendLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.thickness, _state.linecolour[0], _state.linecolour[1], _state.linecolour[2])
-            _state.previousLinePlacement = mapPosition
+            if _state.drawmode == "Freehand":
+                if _state.previousLinePlacement != None:
+                    sendLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.thickness, _state.linecolour[0], _state.linecolour[1], _state.linecolour[2])
+                _state.previousLinePlacement = mapPosition
     elif icon == ICON_DELETE: #deleteIcon
         if _state.mouseButton == BUTTON_LEFT:
             if _state.previousLinePlacement != None:
@@ -1117,17 +1119,33 @@ def mousePress(screenPosition, mapPosition, button):
     elif icon == ICON_DRAW:
         if button == BUTTON_LEFT:
             _state.previousLinePlacement = mapPosition
+        elif button == BUTTON_RIGHT:
+            modes = ['Freehand', 'Line', 'Circle', 'Rectangle', 'Pentagram', 'Hexagram']
+            selected = showPopupMenuAt((screenPosition[0], screenPosition[1]), modes)
+            _state.drawmode = modes[selected]
     elif icon == ICON_DELETE:
         if button == BUTTON_LEFT:
             _state.previousLinePlacement = mapPosition
-                
-
+            
 
 def mouseRelease(screenPosition, mapPosition, button):
     _state.mouseButton = None
 
     icon = _state.menu.selectedIcon
-    if(icon == ICON_DELETE):
+    if icon == ICON_DRAW:
+        if _state.drawmode == "Rectangle":
+            if _state.previousLinePlacement != None:
+                drawRectangle(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.linecolour, _state.thickness)
+        elif _state.drawmode == "Circle":
+            drawCircle(_state.previousLinePlacement, mapPosition, _state.linecolour, _state.thickness)
+        elif _state.drawmode == "Line":
+            drawLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.thickness, _state.linecolour[0], _state.linecolour[1], _state.linecolour[2])
+        elif _state.drawmode == "Pentagram" or _state.drawmode == "Hexagram":
+            if _state.previousLinePlacement != None:
+                displacement = max(abs(mapPosition[0]-_state.previousLinePlacement[0]), abs(mapPosition[1]-_state.previousLinePlacement[1]))
+                drawRegularPolygon(14-len(_state.drawmode), _state.previousLinePlacement, displacement, _state.linecolour, _state.thickness)
+        _state.previousLinePlacement = None
+    elif icon == ICON_DELETE:
         if(_state.previousLinePlacement != None and _state.nextLinePlacement != None):
             
             clearRectangles()
