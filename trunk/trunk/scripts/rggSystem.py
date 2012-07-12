@@ -344,7 +344,7 @@ def getLinesOfThickness(thickness):
         pass
     return lines
 
-def drawRectangle(x, y, w, h, colour, thickness):
+def drawRectangleMadeOfLines(x, y, w, h, colour, thickness):
     drawLine(x, y, w, y, thickness, colour[0], colour[1], colour[2])
     drawLine(w, y, w, h, thickness, colour[0], colour[1], colour[2])
     drawLine(w, h, x, h, thickness, colour[0], colour[1], colour[2])
