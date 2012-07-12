@@ -344,11 +344,18 @@ def getLinesOfThickness(thickness):
         pass
     return lines
 
+def drawSegmentedLine(x, y, w, h, thickness, r, g, b):
+    if abs(x-w)+abs(y-h) < 10: 
+        drawLine(x, y, w, h, thickness, r, g, b)
+    else:
+        drawSegmentedLine(x, y, (x+w)/2.0, (y+h)/2.0, thickness, r, g, b)
+        drawSegmentedLine((x+w)/2.0, (y+h)/2.0, w, h, thickness, r, g, b)
+    
 def drawRectangleMadeOfLines(x, y, w, h, colour, thickness):
-    drawLine(x, y, w, y, thickness, colour[0], colour[1], colour[2])
-    drawLine(w, y, w, h, thickness, colour[0], colour[1], colour[2])
-    drawLine(w, h, x, h, thickness, colour[0], colour[1], colour[2])
-    drawLine(x, h, x, y, thickness, colour[0], colour[1], colour[2])
+    drawSegmentedLine(x, y, w, y, thickness, colour[0], colour[1], colour[2])
+    drawSegmentedLine(w, y, w, h, thickness, colour[0], colour[1], colour[2])
+    drawSegmentedLine(w, h, x, h, thickness, colour[0], colour[1], colour[2])
+    drawSegmentedLine(x, h, x, y, thickness, colour[0], colour[1], colour[2])
 
 def drawCircle(centre, edge, colour, thickness):
     radius = math.hypot(edge[0]-centre[0], edge[1]-centre[1])
@@ -356,7 +363,7 @@ def drawCircle(centre, edge, colour, thickness):
     for r in range(3, 363, 3):
         vert[2] = centre[0]+math.cos(r*0.01745329)*radius
         vert[3] = centre[1]+math.sin(r*0.01745329)*radius
-        drawLine(vert[0], vert[1], vert[2], vert[3], thickness, colour[0], colour[1], colour[2])
+        drawSegmentedLine(vert[0], vert[1], vert[2], vert[3], thickness, colour[0], colour[1], colour[2])
         vert[0] = vert[2]
         vert[1] = vert[3]
         
@@ -369,9 +376,9 @@ def drawRegularPolygon(sides, centre, size, colour, thickness, rainbow = False):
         for q in xrange(sides):
             if sides%2 == 1 or p%(sides/2) != q%(sides/2):
                 if not rainbow:
-                    drawLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, colour[0], colour[1], colour[2])
+                    drawSegmentedLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, colour[0], colour[1], colour[2])
                 else:
-                    drawLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, random.random(), random.random(), random.random())    
+                    drawSegmentedLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, random.random(), random.random(), random.random())    
     
 def setZoom(zoom):
     #_main.setZoom(zoom)
