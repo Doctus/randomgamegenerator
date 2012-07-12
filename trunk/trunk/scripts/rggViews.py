@@ -1139,7 +1139,7 @@ def mouseRelease(screenPosition, mapPosition, button):
         elif _state.drawmode == "Circle":
             drawCircle(_state.previousLinePlacement, mapPosition, _state.linecolour, _state.thickness)
         elif _state.drawmode == "Line":
-            drawLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.thickness, _state.linecolour[0], _state.linecolour[1], _state.linecolour[2])
+            drawSegmentedLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.thickness, _state.linecolour[0], _state.linecolour[1], _state.linecolour[2])
         elif _state.drawmode == "Pentagram" or _state.drawmode == "Hexagram":
             if _state.previousLinePlacement != None:
                 displacement = max(abs(mapPosition[0]-_state.previousLinePlacement[0]), abs(mapPosition[1]-_state.previousLinePlacement[1]))
