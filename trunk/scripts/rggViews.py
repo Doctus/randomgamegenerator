@@ -1135,7 +1135,7 @@ def mouseRelease(screenPosition, mapPosition, button):
     if icon == ICON_DRAW:
         if _state.drawmode == "Rectangle":
             if _state.previousLinePlacement != None:
-                drawRectangle(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.linecolour, _state.thickness)
+                drawRectangleMadeOfLines(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.linecolour, _state.thickness)
         elif _state.drawmode == "Circle":
             drawCircle(_state.previousLinePlacement, mapPosition, _state.linecolour, _state.thickness)
         elif _state.drawmode == "Line":
