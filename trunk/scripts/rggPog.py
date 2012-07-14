@@ -17,7 +17,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 from PyQt4 import QtGui
-import rggTile, rggResource, rggSystem, math
+import rggTile, rggResource, rggSystem, math, os
 from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
 class Sprite(object):
@@ -228,7 +228,13 @@ class Pog(object):
         src = rggResource.crm.translateFile(self._src, rggResource.RESOURCE_IMAGE)
         textureRect = (0, 0, self.texturedimensions[0], self.texturedimensions[1])
         drawRect = (self.position[0], self.position[1], self.size[0], self.size[1])
-        return mainWindow.glwidget.createImage(src, self.layer, textureRect, drawRect)
+        try:
+            return mainWindow.glwidget.createImage(src, self.layer, textureRect, drawRect)
+        except ZeroDivisionError:
+            self._src = os.path.join("data", "invalid.png")
+            self.texturedimensions = (64, 64)
+            self._size = (64, 64)
+            return self._makeTile()
     
     def _updateSrc(self, crm, filename, translation):
         if filename == self._src and crm._status[filename] == rggResource.STATE_DONE:
