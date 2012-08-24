@@ -64,6 +64,7 @@ if __name__ == '__main__':
     
     # user list widget
     s.uwidget.selectGM.connect(rggViews.selectGM)
+    s.uwidget.kickPlayer.connect(rggViews.kick)
     
     # menu items
     s.menu.newMapAct.triggered.connect(rggViews.newMap)
@@ -97,6 +98,7 @@ if __name__ == '__main__':
     client.fileReceived.connect(rggRemote.clientFileReceive)
     server.connected.connect(rggRemote.serverConnect)
     server.disconnected.connect(rggRemote.serverDisconnect)
+    server.kicked.connect(rggRemote.serverKick)
     server.objectReceived.connect(rggRemote.serverReceive)
     server.fileReceived.connect(rggRemote.serverFileReceive)
     

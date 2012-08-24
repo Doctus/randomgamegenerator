@@ -215,6 +215,18 @@ def serverDisconnect(server, username, errorMessage):
         fake.translate('remote', '{username} has left the game. {error}'),
             username=user.username, error=errorMessage)
     respondUserRemove(allusers(), username)
+    
+def serverKick(server, username):
+    """Occurs when a client is kicked.
+    
+    username -- a username for the client
+    
+    """
+    user = rggViews.removeuser(username)
+    respondError(allusers(),
+        fake.translate('remote', '{username} was kicked by the host.'),
+            username=user.username)
+    respondUserRemove(allusers(), username)
 
 def serverReceive(server, username, data):
     """Occurs when the server receives data.
