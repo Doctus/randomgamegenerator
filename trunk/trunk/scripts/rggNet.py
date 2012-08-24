@@ -854,6 +854,7 @@ class JsonServer(object):
         assert(client != self.client)
         client.close()
         del self.clients[username]
+        self.kicked.emit(self, client.username)
     
     def _dropClient(self, username, errorMessage):
         """Disconnect a remote client."""
@@ -888,6 +889,15 @@ class JsonServer(object):
         server -- this server
         username -- the username of the client
         errorMessage -- the untranslated reason the connection failed
+        
+        """
+    )
+    
+    kicked = signal(object, basestring, doc=
+        """Called when a client is kicked from the server.
+        
+        server -- this server
+        username -- the username of the client
         
         """
     )

@@ -54,6 +54,7 @@ Changelog:
     * It is now possible to draw lines, circles, and rectangles
       in addition to freehand mode.
     * Added an automated ping system to detect connection loss.
+    * Added kick command, allowing host to disconnect users.
     * The 0 (zero) key now resets zoom level to the default.
     * Added a "debug console" to the GUI.
     * Added an Inn Name generator.

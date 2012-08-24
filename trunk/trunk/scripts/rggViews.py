@@ -378,6 +378,10 @@ def disconnectGame():
     killConnection()
     say(translate('views', "Disconnected."))
     clearUserList()
+
+def kick(username):
+    """Kicks specified user."""
+    server.kick(username)
     
 def getSession():
     return _state.session
@@ -574,8 +578,8 @@ def loadChars():
         _state.icwidget.load(obj)
     except Exception as e:
         showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
-	print e
-        return
+    print e
+    return
 
 def configureDrawTimer():
     """Allows the user to select a drawtimer value."""

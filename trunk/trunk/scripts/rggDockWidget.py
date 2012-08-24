@@ -500,6 +500,10 @@ class userListWidget(QtGui.QDockWidget):
         self.internalList.append((name, host))
         nametmp = name
         if host:
+            if name == self.localname:
+                self.kickbutton = QtGui.QPushButton(self.tr("Kick"))
+                self.layout.addWidget(self.kickbutton, 1, 0)
+                self.connect(self.kickbutton, QtCore.SIGNAL('clicked()'), self.requestKick)
             nametmp = "[Host] " + nametmp
         if self.gmname == name:
             nametmp = "[GM] " + nametmp
@@ -539,8 +543,18 @@ class userListWidget(QtGui.QDockWidget):
         #self.setGM(name)
         self.selectGM.emit(name)
         
+    def requestKick(self):
+        name = self.internalList[self.listOfUsers.currentRow()][0]
+        if name == self.localname:
+            return
+        self.kickPlayer.emit(name)
+        
     selectGM = signal(basestring, doc=
         """Called to request GM change."""
+    )
+    
+    kickPlayer = signal(basestring, doc=
+        """Called to request player kicking."""
     )
     
 class fileItem(QtGui.QListWidgetItem):
