@@ -328,6 +328,7 @@ def hostGame():
     if dialog.exec_(mainWindow, accept):
         connection = dialog.save()
         server.setPassword(connection.password)
+        updateBanlist()
         renameuser(localhandle(), connection.username)
         changeGM(connection.username)
         setUwidgetLocal()
@@ -339,6 +340,19 @@ def hostGame():
             say(translate('views', 'Unable to access network; perhaps the port is in use?'))
         
 
+def updateBanlist():
+    """Update server banlist based on banlist.rgs file."""
+    server.clearBanlist()
+    try:
+        obj = jsonload(os.path.join(SAVE_DIR, "banlist.rgs"))
+        for IP in obj["IPs"]:
+            try:
+                server.addBan(IP)
+            except:
+                pass
+    except:
+        pass
+        
 def joinGame():
     """Allows the user to join a game."""
     if client.isConnected:

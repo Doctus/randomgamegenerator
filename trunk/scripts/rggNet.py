@@ -777,6 +777,14 @@ class JsonServer(object):
         if passw == self.password:
             return True
         return False
+        
+    def addBan(self, IP):
+        """Adds the given IP to the banlist."""
+        self.banlist.add(unicode(IP))
+        
+    def clearBanlist(self):
+        """Clears all entries from the banlist."""
+        self.banlist = set()
     
     @property
     def users(self):

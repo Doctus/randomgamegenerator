@@ -65,6 +65,7 @@ if __name__ == '__main__':
     # user list widget
     s.uwidget.selectGM.connect(rggViews.selectGM)
     s.uwidget.kickPlayer.connect(rggViews.kick)
+    s.uwidget.requestBanlistUpdate.connect(rggViews.updateBanlist)
     
     # menu items
     s.menu.newMapAct.triggered.connect(rggViews.newMap)
