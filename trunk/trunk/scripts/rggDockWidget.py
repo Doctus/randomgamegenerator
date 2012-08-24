@@ -1,6 +1,6 @@
 from PyQt4 import QtGui, QtCore
 from rggSystem import signal, findFiles, POG_DIR, PORTRAIT_DIR, LOG_DIR, IMAGE_EXTENSIONS, IMAGE_NAME_FILTER, CHAR_DIR, MUSIC_DIR, SAVE_DIR, makePortableFilename, promptSaveFile
-from rggDialogs import newCharacterDialog, FIRECharacterSheetDialog
+from rggDialogs import newCharacterDialog, FIRECharacterSheetDialog, banDialog
 from rggJson import loadObject, loadString, jsondump, jsonload
 import os, os.path, time
 import rggFIRECharacter
@@ -487,7 +487,7 @@ class userListWidget(QtGui.QDockWidget):
         self.listOfUsers = userListList(mainWindow, self)
         self.internalList = []
         self.layout = QtGui.QGridLayout()
-        self.layout.addWidget(self.listOfUsers, 0, 0)
+        self.layout.addWidget(self.listOfUsers, 0, 0, 1, 2)
         self.widget.setLayout(self.layout)
         self.widget.setMaximumWidth(200) #Arbitrary; keeps it from taking over 1/3 of the screen
         self.setWidget(self.widget)
@@ -502,8 +502,13 @@ class userListWidget(QtGui.QDockWidget):
         if host:
             if name == self.localname:
                 self.kickbutton = QtGui.QPushButton(self.tr("Kick"))
+                self.kickbutton.setToolTip(self.tr("Disconnect the selected user."))
                 self.layout.addWidget(self.kickbutton, 1, 0)
                 self.connect(self.kickbutton, QtCore.SIGNAL('clicked()'), self.requestKick)
+                self.banbutton = QtGui.QPushButton(self.tr("Manage Banlist"))
+                self.banbutton.setToolTip(self.tr("View and edit a list of banned IPs."))
+                self.layout.addWidget(self.banbutton, 1, 1)
+                self.banbutton.clicked.connect(self.openBanDialog)
             nametmp = "[Host] " + nametmp
         if self.gmname == name:
             nametmp = "[GM] " + nametmp
@@ -549,12 +554,20 @@ class userListWidget(QtGui.QDockWidget):
             return
         self.kickPlayer.emit(name)
         
+    def openBanDialog(self):
+        banDialog().exec_()
+        self.requestBanlistUpdate.emit()
+        
     selectGM = signal(basestring, doc=
         """Called to request GM change."""
     )
     
     kickPlayer = signal(basestring, doc=
         """Called to request player kicking."""
+    )
+    
+    requestBanlistUpdate = signal(doc=
+        """Called to request that the banlist be updated."""
     )
     
 class fileItem(QtGui.QListWidgetItem):

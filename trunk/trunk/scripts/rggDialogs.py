@@ -109,7 +109,70 @@ class resizeDialog(QtGui.QDialog):
         self.done(1)
 
     def cancelPressed(self, checked):
-        self.done(0)        
+        self.done(0)
+
+class banDialog(QtGui.QDialog):
+    """A dialog used to manage the server banlist."""
+
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setWindowTitle("Banlist")
+        
+        self.list = QtGui.QListWidget(self)
+        for item in self.loadList():
+            self.list.addItem(QtGui.QListWidgetItem(item))
+            
+        self.inputBox = QtGui.QLineEdit(self)
+        
+        self.addButton = QtGui.QPushButton("Add")
+        self.deleteButton = QtGui.QPushButton("Delete")
+        self.okButton = QtGui.QPushButton("Ok")
+        self.cancelButton = QtGui.QPushButton("Cancel")
+        
+        self.layout = QtGui.QGridLayout()
+        self.layout.addWidget(self.list, 0, 0, 1, 2)
+        self.layout.addWidget(self.inputBox, 1, 0, 1, 2)
+        self.layout.addWidget(self.addButton, 2, 0)
+        self.layout.addWidget(self.deleteButton, 2, 1)
+        self.layout.addWidget(self.okButton, 3, 0)
+        self.layout.addWidget(self.cancelButton, 3, 1)
+
+        self.addButton.clicked.connect(self.add)
+        self.deleteButton.clicked.connect(self.delete)
+        self.okButton.clicked.connect(self.okPressed)
+        self.cancelButton.clicked.connect(self.cancelPressed)
+        
+        self.setLayout(self.layout)
+        
+    def loadList(self):
+        """Returns the currently saved bans, or a blank list if
+           file access fails for any reason."""
+        try:
+            obj = jsonload(os.path.join(SAVE_DIR, "banlist.rgs"))
+            return obj["IPs"]
+        except:
+            return []
+        
+    def saveList(self):
+        ips = []
+        for i in xrange(self.list.count()):
+            ips.append(str(self.list.item(i).text()))
+        iplist = {"IPs":ips}
+        jsondump(iplist, os.path.join(SAVE_DIR, "banlist.rgs"))
+        
+    def add(self):
+        self.list.addItem(self.inputBox.text())
+        self.inputBox.clear()
+        
+    def delete(self):
+        self.list.takeItem(self.list.currentRow())
+        
+    def okPressed(self, checked):
+        self.saveList()
+        self.done(1)
+
+    def cancelPressed(self, checked):
+        self.done(0)
         
 class newMapDialog(dialog):
     """A dialog used to create a new map."""
