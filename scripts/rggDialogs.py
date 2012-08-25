@@ -601,6 +601,7 @@ class newCharacterDialog(dialog):
         self.portraitArea.setColumnHidden(1, True)
         self.portraitArea.setColumnHidden(2, True)
         self.portraitArea.setColumnHidden(3, True)
+        self.portraitPreview = QtGui.QLabel(" ")
         
         # Add fields
         formLayout = QtGui.QFormLayout()
@@ -618,6 +619,7 @@ class newCharacterDialog(dialog):
         # Position both
         grandBox = QtGui.QBoxLayout(2)
         grandBox.addLayout(formLayout)
+        grandBox.addWidget(self.portraitPreview)
         grandBox.addLayout(theLesserOrFalseBox)
         
         evilBox = QtGui.QBoxLayout(0)
@@ -651,6 +653,9 @@ class newCharacterDialog(dialog):
     
     def changePort(self, portrait):
         self.fields['portrait'].widgett.setText(unicode(self.portraitModel.filePath(portrait)[self.ROOT_LEN:]))
+        preview = QtGui.QPixmap(self.portraitModel.filePath(portrait))
+        preview = preview.scaled(min(preview.width(), 96), min(preview.height(), 96))
+        self.portraitPreview.setPixmap(preview)
         
     def clean(self):
         """Check for errors and return well-formatted data."""
