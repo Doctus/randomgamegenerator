@@ -119,13 +119,15 @@ class Session(object):
     def findTopPog(self, position):
         """Returns the top pog at a given position, or None."""
         layer = -sys.maxint
+        locked = True
         top = None
         for pog in self.pogs.values():
-            if layer >= pog.layer:
+            if (layer >= pog.layer and not (locked and not pog._locked)) or (not locked and pog._locked):
                 continue
             if pog.pointCollides(position):
                 top = pog
                 layer = top.layer
+                locked = pog._locked
         return top
     
     def refreshPogs(self):
