@@ -58,6 +58,15 @@ def jsonload(filename):
             obj = json.load(file)
     assert(isinstance(obj, list) or isinstance(obj, dict))
     return obj
+    
+def jsonappend(obj, filename):
+    """Dump object to file. Merges with existing file if present."""
+    try:
+        dat = jsonload(filename)
+        newdat = dict(dat.items() + obj.items())
+        jsondump(newdat, filename)
+    except:
+        jsondump(obj, filename)
 
 def loadString(name, value, allowEmpty=False):
     if allowEmpty and value is None:

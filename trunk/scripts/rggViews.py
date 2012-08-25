@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 import time, random, os, base64, sys
 import rggNameGen, rggDice, rggMap, rggTile, rggPog, rggDockWidget, rggDialogs, rggMenuBar, rggResource, rggSystem, rggSession
 from rggRPC import server, client, serverRPC, clientRPC
-from rggJson import jsondump, jsonload
+from rggJson import jsondump, jsonload, jsonappend
 from rggMenuBar import ICON_SELECT, ICON_MOVE, ICON_DRAW, ICON_DELETE
 from rggSystem import *
 from rggDialogs import *
@@ -136,26 +136,14 @@ def toggleTimestamps(newValue=None):
         _state.cwidget.timestamp = not _state.cwidget.timestamp
     else:
         _state.cwidget.timestamp = newValue
-    currentstuff = {}
-    try:
-        currentstuff = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
-    except:
-        pass
     if _state.cwidget.timestamp:
-        currentstuff['timestamp'] = "On"
+        jsonappend({'timestamp':'On'}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
     else:
-        currentstuff['timestamp'] = "Off"
-    jsondump(currentstuff, os.path.join(SAVE_DIR, "ui_settings.rgs"))
+        jsonappend({'timestamp':'Off'}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
 
 def setTimestampFormat(newFormat):
     _state.cwidget.timestampformat = newFormat
-    currentstuff = {}
-    try:
-        currentstuff = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
-    except:
-        pass
-    currentstuff['timestampformat'] = newFormat
-    jsondump(currentstuff, os.path.join(SAVE_DIR, "ui_settings.rgs"))
+    jsonappend({'timestampformat':newFormat}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
 
 def promptTimestampFormat():
     prompt = translate("views", "Please enter a new timestamp format; the default is [%H:%M:%S]")
@@ -601,7 +589,7 @@ def configureDrawTimer():
     if selectedButton != -1:
         val = [13, 20, 35, 45, 60][selectedButton]
         sav = dict(drawtimer=val)
-        jsondump(sav, os.path.join(SAVE_DIR, "init_settings.rgs"))
+        jsonappend(sav, os.path.join(SAVE_DIR, "ui_settings.rgs"))
         
 def configureGfx():
     """Allows the user to change the opengl settings."""
