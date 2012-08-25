@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
         self.drawTimer = QTimer()
         self.drawTimer.timeout.connect(self.drawTimerTimeout)
         try:
-            js = jsonload(os.path.join(SAVE_DIR, "init_settings.rgs"))
+            js = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
             drawtimer = loadInteger('init.drawtimer', js.get('drawtimer'))
             self.drawTimer.start(drawtimer)
         except:

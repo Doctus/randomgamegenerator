@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import PYQT_VERSION_STR
 from rggSystem import translate, mainWindow, SAVE_DIR, VERSION, DEV
-from rggJson import loadString, jsonload
+from rggJson import loadString, jsonload, jsonappend
 import sys, os, rggStyles
 
 ICON_SELECT = 0
@@ -166,6 +166,7 @@ class menuBar(object):
         stylesMenu = QtGui.QMenu(translate("menubar", "&Styles"), main)
         for style in rggStyles.sheets.keys():
             stylesMenu.addAction(QtGui.QAction(style, main))
+        self.resetStyle()
 
         self.langMenu = QtGui.QMenu(translate("menubar", "&Language"), main)
         ned = QtGui.QAction(translate("menubar", "Dutch"), main)
@@ -278,8 +279,16 @@ class menuBar(object):
         if len(self.pluginsMenu.actions()) == 0:
             self.pluginhide.setVisible(False)
     
+    def resetStyle(self):
+        try:
+            obj = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
+            mainWindow.setStyleSheet(rggStyles.sheets[obj["style"]])
+        except:
+            mainWindow.setStyleSheet(rggStyles.sheets["Default"])
+    
     def changeStyle(self, act):
         mainWindow.setStyleSheet(rggStyles.sheets[unicode(act.text())])
+        jsonappend({'style':unicode(act.text())}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
         
     def updateWidgetMenu(self):
         self.windowMenu.clear()
