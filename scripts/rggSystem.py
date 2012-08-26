@@ -287,6 +287,11 @@ def findFiles(dir, extensions):
                 files.append(makePortableFilename(name))
     #files.sort()
     return files
+
+def checkFileExtension(filename, extension):
+    if extension not in filename:
+        return filename + extension
+    return filename
     
 def cameraPosition():
     return mainWindow.glwidget.camera
