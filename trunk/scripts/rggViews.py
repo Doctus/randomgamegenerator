@@ -491,7 +491,11 @@ def saveMap():
         mapIDs.append(ID)
 
     selectedButton = rggSystem.promptButtonSelection("Which map do you want to save?", mapNames, 0)
-    map = _state.session.maps[mapIDs[selectedButton]]
+    try:
+        map = _state.session.maps[mapIDs[selectedButton]]
+    except IndexError:
+        print "Error: no maps exist to save."
+        return
     
     filename = promptSaveFile(translate('views', 'Save Map'),
         translate('views', 'Random Game Map files (*.rgm)'),
@@ -499,7 +503,7 @@ def saveMap():
     if not filename:
         return
     
-    jsondump(map.dump(), filename)
+    jsondump(map.dump(), checkFileExtension(filename, ".rgm"))
 
 @serverRPC
 def respondCloseSpecificMap(ID):
@@ -556,7 +560,7 @@ def saveSession():
     if not filename:
         return
     
-    jsondump(_state.session.dump(), filename)
+    jsondump(_state.session.dump(), checkFileExtension(filename, ".rgg"))
 
 def saveChars():
     
@@ -566,7 +570,7 @@ def saveChars():
     if not filename:
         return
     
-    jsondump(_state.icwidget.dump(), filename)
+    jsondump(_state.icwidget.dump(), checkFileExtension(filename, ".rgc"))
     
 def loadChars():
     
