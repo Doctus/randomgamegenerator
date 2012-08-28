@@ -1109,6 +1109,8 @@ def mousePress(screenPosition, mapPosition, button):
         elif button == BUTTON_RIGHT:
             pog = _state.session.findTopPog(mapPosition)
             if pog is not None:
+                if pog not in _state.pogSelection:
+                    setPogSelection(pog)
                 _state.mouseButton = None
                 if pog.hidden: hidebutton = "Show"
                 else: hidebutton = "Hide"
