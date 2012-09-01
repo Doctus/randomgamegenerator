@@ -549,7 +549,16 @@ class PortraitFileSystemModel(QtGui.QFileSystemModel):
             if os.path.isfile(path):
                 return QtGui.QIcon(path)
         return basedata
-    
+
+class PortraitTreeView(QtGui.QTreeView):
+
+    def setParent(self, parent):
+        self.call = parent
+
+    def selectionChanged(self, selected, deselected):
+        super(QtGui.QTreeView, self).selectionChanged(selected, deselected)
+        self.call.changePort(selected)
+        
 class newCharacterDialog(dialog):
     """A dialog used to create a new character for in-character chat."""
     
@@ -595,7 +604,8 @@ class newCharacterDialog(dialog):
         cancelButton = QtGui.QPushButton(translate('newCharacterDialog', "Cancel"))
         self.portraitModel = PortraitFileSystemModel()
         self.ROOT_LEN = len(self.portraitModel.absRoot)+1
-        self.portraitArea = QtGui.QTreeView(parent)
+        self.portraitArea = PortraitTreeView(parent)
+        self.portraitArea.setParent(self)
         self.portraitArea.setModel(self.portraitModel)
         self.portraitArea.setRootIndex(self.portraitModel.index(PORTRAIT_DIR))
         self.portraitArea.setColumnHidden(1, True)
@@ -626,7 +636,7 @@ class newCharacterDialog(dialog):
         evilBox.addWidget(self.portraitArea)
         evilBox.addLayout(grandBox)
         
-        self.portraitArea.pressed.connect(self.changePort)
+        #self.portraitArea.pressed.connect(self.changePort)
         
         # Set up the widget
         widget.setLayout(evilBox)
@@ -651,9 +661,16 @@ class newCharacterDialog(dialog):
         # Show to user
         return (widget.exec_() == QtGui.QDialog.Accepted)
     
-    def changePort(self, portrait):
+    def changePort(self, selection):
+        for i in selection.indexes():
+            portrait = i
         self.fields['portrait'].widgett.setText(unicode(self.portraitModel.filePath(portrait)[self.ROOT_LEN:]))
         preview = QtGui.QPixmap(self.portraitModel.filePath(portrait))
+        if preview.isNull():
+            #Typically, this means a folder has been selected.
+            self.fields['portrait'].widgett.setText(unicode(" "))
+            self.portraitPreview.clear()
+            return
         preview = preview.scaled(min(preview.width(), 96), min(preview.height(), 96))
         self.portraitPreview.setPixmap(preview)
         
