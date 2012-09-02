@@ -455,6 +455,8 @@ class pogTree(QtGui.QTreeView):
             if not self.model().mimeData([i]): return
             
             drag.setMimeData(self.model().mimeData([i]))
+            drag.setPixmap(QtGui.QPixmap(self.model().mimeData([i]).text()))
+            drag.setHotSpot(QtCore.QPoint(0, 0))
             drag.start()
         
 class pogPalette(QtGui.QDockWidget):
