@@ -32,7 +32,7 @@ except Exception as e:
     pass
 
 from rggTile import *
-from rggSystem import POG_DIR, promptSaveFile
+from rggSystem import POG_DIR, promptSaveFile, signal
 
 def nextPowerOfTwo(val):
     val -= 1
@@ -859,6 +859,8 @@ class GLWidget(QGLWidget):
     def dragEnterEvent(self, event):
         if event.mimeData().hasImage():
             event.acceptProposedAction()
+        elif event.mimeData().hasText():
+            event.acceptProposedAction()
 
     def dropEvent(self, event):
         if event.mimeData().hasImage():
@@ -868,3 +870,9 @@ class GLWidget(QGLWidget):
             if filename is not None:
                 img.save(filename, "PNG")
             event.acceptProposedAction()
+        elif event.mimeData().hasText():
+            self.pogPlace.emit(event.pos().x(), event.pos().y(), unicode(event.mimeData().text()))
+            
+    pogPlace = signal(int, int, basestring, doc=
+        """Called to request pog placement on the map."""
+    )
