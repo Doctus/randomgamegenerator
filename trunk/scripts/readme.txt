@@ -42,19 +42,30 @@ Special Thanks:
 
 Changelog:
 
-  v1.01   "Overmuch magic"                        [DATE], 2012
+  v1.01   "Overmuch magic"                   September 2, 2012
 
    Fixes
     * Fixed an issue involving hidden images not being reuploaded
       to the GPU.
     * Invalid pogs will now produce an error icon instead of a
       ZeroDivisionError in the console.
+    * Style selection now persists when restarting the program.
+    * Non-locked pogs are now preferred over locked pogs when
+      selecting.
+    * File extensions will now be appended consistently when
+      saving on any OS.
+    * Fixed issues with right-clicking on pogs.
 
-   Features
+   Features and Changes
     * It is now possible to draw lines, circles, and rectangles
-      in addition to freehand mode.
+      in addition to freehand mode. Right-click while drawing to
+      select a new shape.
+    * The map editor is now a base widget instead of a plug-in.
+    * Pogs may now be dragged-and-dropped out of the pog palette.
+    * Added a preview when selecting portraits.
     * Added an automated ping system to detect connection loss.
     * Added kick command, allowing host to disconnect users.
+    * Added ability to ban particualr IPs from connecting.
     * The 0 (zero) key now resets zoom level to the default.
     * Added a "debug console" to the GUI.
     * Added an Inn Name generator.
@@ -102,7 +113,7 @@ Changelog:
 
   ---
 
-  v0.993 "Shiny crystal light, energize"      January 6, 2012
+  v0.993 "Shiny crystal light, energize"       January 6, 2012
     * Removed music from repository
     * Made pog palette update itself automagically
     * Reduced loading time of new IC chat character dialog
