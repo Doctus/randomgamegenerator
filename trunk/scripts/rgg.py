@@ -51,6 +51,9 @@ if __name__ == '__main__':
     main.glwidget.mousePressSignal.connect(rggEvent.mousePressEvent)
     main.glwidget.mouseReleaseSignal.connect(rggEvent.mouseReleaseEvent)
     
+    # pog drag-placement
+    main.glwidget.pogPlace.connect(rggViews.placePog)
+    
     # chat widget
     s.cwidget.chatInput.connect(rggEvent.chatInputEvent)
     s.icwidget.ICChatInput.connect(rggEvent.ICChatInputEvent)
@@ -58,9 +61,6 @@ if __name__ == '__main__':
     # dice widget
     s.dwidget.rollRequested.connect(rggViews.rollDice)
     s.dwidget.macroRequested.connect(rggViews.addMacro)
-    
-    # pog widget
-    s.pwidget.pogPlaced.connect(rggViews.placePog)
     
     # user list widget
     s.uwidget.selectGM.connect(rggViews.selectGM)

@@ -683,10 +683,21 @@ def deletePog(pog):
     assert(pog.ID)
     sendDeletePog(pog.ID)
 
-def placePog(pogpath):
+def placePog(x, y, pogpath):
     """Places a pog on the map."""
-    _state.pogPlacement = True
-    _state.pogPath = pogpath
+    infograb = QtGui.QPixmap(pogpath)
+    mapPosition = getMapPosition((x, y))
+    pog = rggPog.Pog(
+        mapPosition,
+        (infograb.width(), infograb.height()),
+        (infograb.width(), infograb.height()),
+        200,
+        pogpath,
+        0,
+        0,
+        {},
+        infograb.hasAlpha())
+    createPog(pog)
 
 def movePogs(displacement):
     """Moves pogs by a specified displacement."""

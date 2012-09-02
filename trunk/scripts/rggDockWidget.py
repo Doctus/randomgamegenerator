@@ -434,7 +434,29 @@ class PogFileSystemModel(QtGui.QFileSystemModel):
             if os.path.isfile(path):
                 return QtGui.QIcon(path)
         return basedata
-    
+        
+    def mimeData(self, indices):
+        path = QtCore.QString(makePortableFilename(os.path.join(POG_DIR, unicode(self.filePath(indices[0])[len(self.absRoot)+1:]))))
+        
+        #If there's no "." in the path, assume it's a folder.
+        if "." not in unicode(path): return None
+        
+        mime = QtCore.QMimeData()
+        mime.setText(path)
+        return mime
+
+class pogTree(QtGui.QTreeView):
+
+    def startDrag(self, event):
+        for i in self.selectedIndexes(): 
+            drag = QtGui.QDrag(self)
+            
+            #Don't drag folders.
+            if not self.model().mimeData([i]): return
+            
+            drag.setMimeData(self.model().mimeData([i]))
+            drag.start()
+        
 class pogPalette(QtGui.QDockWidget):
     """The list of loaded pogs."""
     
@@ -447,12 +469,13 @@ class pogPalette(QtGui.QDockWidget):
         self.mainLayout = QtGui.QBoxLayout(2)
         self.pogsModel = PogFileSystemModel()
         self.ROOT_LEN = len(self.pogsModel.absRoot)+1
-        self.pogArea = QtGui.QTreeView(mainWindow)
+        self.pogArea = pogTree(mainWindow)
         self.pogArea.setModel(self.pogsModel)
         self.pogArea.setRootIndex(self.pogsModel.index(POG_DIR))
         self.pogArea.setColumnHidden(1, True)
         self.pogArea.setColumnHidden(2, True)
         self.pogArea.setColumnHidden(3, True)
+        self.pogArea.setDragDropMode(QtGui.QAbstractItemView.DragDrop)
         self.controlArea = QtGui.QWidget(mainWindow)
         self.controlLayout = QtGui.QBoxLayout(2)
         self.controlArea.setLayout(self.controlLayout)
@@ -462,21 +485,6 @@ class pogPalette(QtGui.QDockWidget):
         self.setWidget(self.widget)
         self.setObjectName("Pog Palette")
         mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
-        
-        #self.matoi = QtCore.QFileSystemWatcher(self)
-        #self.matoi.addPath(POG_DIR)
-        #self.matoi.directoryChanged.connect(self.autoUpdate)
-
-        self.pogArea.activated.connect(self.place)
-    
-    def place(self, pog):
-        """Place a pog on the map."""
-        #TODO: Find a less terrible way to work around the lack of a relative-path-getter.
-        self.pogPlaced.emit(makePortableFilename(os.path.join(POG_DIR, unicode(self.pogsModel.filePath(pog)[self.ROOT_LEN:]))))
-
-    pogPlaced = signal(basestring, doc=
-        """Called to request pog placement on the map."""
-    )
     
 class userListList(QtGui.QListWidget):
 
