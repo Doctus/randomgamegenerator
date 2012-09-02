@@ -393,7 +393,13 @@ def drawRegularPolygon(sides, centre, size, colour, thickness, rainbow = False):
                     drawSegmentedLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, colour[0], colour[1], colour[2])
                 else:
                     drawSegmentedLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, random.random(), random.random(), random.random())    
+
+def addText(text, pos):
+    return mainWindow.glwidget.addText(text, pos)
     
+def removeText(ID):
+    mainWindow.glwidget.removeText(ID)
+                    
 def setZoom(zoom):
     #_main.setZoom(zoom)
     print "unimplemented2"
