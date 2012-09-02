@@ -1156,7 +1156,7 @@ def mousePress(screenPosition, mapPosition, button):
                     [translate('views', 'Add text...')])
                 if selected == 0:
                     _state.mouseButton = None
-                    name = promptString(translate('views', "Enter the text to be added to the map."), inittext = "Text")
+                    name = promptString(translate('views', "Enter the text to be added to the map. Note: it will not be visible to other players."), inittext = "Text")
                     if name is None:
                         return
                     addText(name, mapPosition)
