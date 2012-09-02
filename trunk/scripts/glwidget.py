@@ -74,6 +74,7 @@ class GLWidget(QGLWidget):
         self.qimages = {}
         self.texext = GL_TEXTURE_2D
         self.lines = dict()
+        self.previewLines = dict()
         self.selectionCircles = dict()
         self.rectangles = {1:[]}
         self.error = False
@@ -163,6 +164,7 @@ class GLWidget(QGLWidget):
 
         if mod:
             glmod.drawLines(self.lines)
+            glmod.drawLines(self.previewLines)
             glmod.drawSelectionCircles(self.selectionCircles)
             glmod.drawRectangles(self.rectangles)
         else:
@@ -171,6 +173,14 @@ class GLWidget(QGLWidget):
                 glLineWidth(layer)
                 glBegin(GL_LINES)
                 for line in self.lines[layer]:
+                    glColor3f(line[4], line[5], line[6])
+                    glVertex2f(line[0], line[1])
+                    glVertex2f(line[2], line[3])
+                glEnd()
+            for layer in self.previewLines:
+                glLineWidth(layer)
+                glBegin(GL_LINES)
+                for line in self.previewLines[layer]:
                     glColor3f(line[4], line[5], line[6])
                     glVertex2f(line[0], line[1])
                     glVertex2f(line[2], line[3])
@@ -236,9 +246,18 @@ class GLWidget(QGLWidget):
                        and not self.pointIntersectRect((line[2], line[3]), (x, y, w, h)):
                    new_list.append(line)
             self.lines[thickness] = new_list
+            
+    def addPreviewLine(self, thickness, x, y, w, h, r, g, b):
+        if not thickness in self.previewLines:
+            self.previewLines[thickness] = []
+            
+        self.previewLines[thickness].append((float(x), float(y), float(w), float(h), float(r), float(g), float(b)))
                         
     def clearLines(self):
         self.lines.clear()
+        
+    def clearPreviewLines(self):
+        self.previewLines.clear()
         
     def addRectangle(self, x, y, w, h, r, g, b):
         self.rectangles[1].append((float(x), float(y), float(w), float(h), float(r), float(g), float(b)))

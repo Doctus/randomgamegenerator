@@ -1042,6 +1042,16 @@ def mouseMove(screenPosition, mapPosition, displacement):
                 if _state.previousLinePlacement != None:
                     sendLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.thickness, _state.linecolour[0], _state.linecolour[1], _state.linecolour[2])
                 _state.previousLinePlacement = mapPosition
+            elif _state.drawmode == "Rectangle":
+                clearPreviewLines()
+                if _state.previousLinePlacement != None:
+                    drawRectangleMadeOfLines(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.linecolour, _state.thickness, True)
+            elif _state.drawmode == "Circle":
+                clearPreviewLines()
+                drawCircle(_state.previousLinePlacement, mapPosition, _state.linecolour, _state.thickness, True)
+            elif _state.drawmode == "Line":
+                clearPreviewLines()
+                drawSegmentedLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.thickness, _state.linecolour[0], _state.linecolour[1], _state.linecolour[2], True)
     elif icon == ICON_DELETE: #deleteIcon
         if _state.mouseButton == BUTTON_LEFT:
             if _state.previousLinePlacement != None:
@@ -1146,6 +1156,7 @@ def mouseRelease(screenPosition, mapPosition, button):
 
     icon = _state.menu.selectedIcon
     if icon == ICON_DRAW:
+        clearPreviewLines()
         if _state.drawmode == "Rectangle":
             if _state.previousLinePlacement != None:
                 drawRectangleMadeOfLines(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.linecolour, _state.thickness)
