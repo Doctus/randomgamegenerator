@@ -765,7 +765,7 @@ class mapEditor(QtGui.QDockWidget):
                     if cmp(rectEnd[1], self.rectStart[1]) != 0:
                         for y in range(self.rectStart[1], rectEnd[1]+cmp(rectEnd[1], self.rectStart[1]), cmp(rectEnd[1], self.rectStart[1])):
                             if self.currentMap.tilePosExists((self.rectStart[0], y)):
-                                rsendTileUpdate(self.currentMap.ID, (self.rectStart[0], y), self.tilelabel.currentTile)
+                                sendTileUpdate(self.currentMap.ID, (self.rectStart[0], y), self.tilelabel.currentTile)
                     else:
                         if self.currentMap.tilePosExists((self.rectStart[0], self.rectStart[1])):
                                 sendTileUpdate(self.currentMap.ID, (self.rectStart[0], self.rectStart[1]), self.tilelabel.currentTile)
