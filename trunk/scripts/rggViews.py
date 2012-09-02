@@ -1150,6 +1150,16 @@ def mousePress(screenPosition, mapPosition, button):
                         translate('views', lockbutton),
                         translate('views', 'Delete')])
                 processPogRightclick(selected, list(set([pog] + list(_state.pogSelection))))
+            else:
+                selected = showPopupMenuAt(
+                    (screenPosition[0], screenPosition[1]),
+                    [translate('views', 'Add text...')])
+                if selected == 0:
+                    _state.mouseButton = None
+                    name = promptString(translate('views', "Enter the text to be added to the map."), inittext = "Text")
+                    if name is None:
+                        return
+                    addText(name, mapPosition)
     elif icon == ICON_DRAW:
         if button == BUTTON_LEFT:
             _state.previousLinePlacement = mapPosition
