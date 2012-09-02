@@ -1,7 +1,7 @@
 from PyQt4 import QtGui, QtCore
 from rggSystem import signal, findFiles, POG_DIR, PORTRAIT_DIR, LOG_DIR, IMAGE_EXTENSIONS, IMAGE_NAME_FILTER, CHAR_DIR, MUSIC_DIR, SAVE_DIR, makePortableFilename, promptSaveFile
 from rggDialogs import newCharacterDialog, FIRECharacterSheetDialog, banDialog
-from rggJson import loadObject, loadString, jsondump, jsonload
+from rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
 import os, os.path, time
 import rggFIRECharacter
 
@@ -16,7 +16,14 @@ class debugConsoleWidget(QtGui.QDockWidget):
         self.widgetEditor.setReadOnly(True)
         self.widgetEditor.setOpenLinks(False)
         self.logToFileToggle = QtGui.QCheckBox(self.tr("Log to file"))
-        self.logToFileToggle.setChecked(True) #TODO: Make this setting persist
+        try:
+            if jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))["debuglog"] == "On":
+                self.logToFileToggle.setChecked(True)
+            else:
+                self.logToFileToggle.setChecked(False)
+        except:
+            self.logToFileToggle.setChecked(True)
+        self.logToFileToggle.stateChanged.connect(self.saveLogToggle)
         self.layout = QtGui.QBoxLayout(2)
         self.layout.addWidget(self.widgetEditor)
         self.layout.addWidget(self.logToFileToggle)
@@ -27,6 +34,12 @@ class debugConsoleWidget(QtGui.QDockWidget):
         self.buffer = []
         
         mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
+        
+    def saveLogToggle(self, int):
+        if int == 0:
+            jsonappend({'debuglog':'Off'}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
+        else:
+            jsonappend({'debuglog':'On'}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
         
     def write(self, data):
         self.buffer.append(data)
