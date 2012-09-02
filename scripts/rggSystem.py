@@ -337,9 +337,15 @@ def drawLine(x, y, w, h, thickness, r, g, b):
 
 def deleteLine(x, y, w, h, thickness = -1):
     mainWindow.glwidget.deleteLine(thickness, x, y, w, h)
+    
+def drawPreviewLine(x, y, w, h, thickness, r, g, b):
+    mainWindow.glwidget.addPreviewLine(thickness, x, y, w, h, r, g, b)
 
 def clearLines():
     mainWindow.glwidget.clearLines()
+    
+def clearPreviewLines():
+    mainWindow.glwidget.clearPreviewLines()
 
 def getLinesOfThickness(thickness):
     lines = dict()
@@ -349,26 +355,29 @@ def getLinesOfThickness(thickness):
         pass
     return lines
 
-def drawSegmentedLine(x, y, w, h, thickness, r, g, b):
-    if abs(x-w)+abs(y-h) < 10: 
-        drawLine(x, y, w, h, thickness, r, g, b)
+def drawSegmentedLine(x, y, w, h, thickness, r, g, b, preview=False):
+    if abs(x-w)+abs(y-h) < 10:
+        if preview:
+            drawPreviewLine(x, y, w, h, thickness, r, g, b)
+        else:
+            drawLine(x, y, w, h, thickness, r, g, b)
     else:
-        drawSegmentedLine(x, y, (x+w)/2.0, (y+h)/2.0, thickness, r, g, b)
-        drawSegmentedLine((x+w)/2.0, (y+h)/2.0, w, h, thickness, r, g, b)
+        drawSegmentedLine(x, y, (x+w)/2.0, (y+h)/2.0, thickness, r, g, b, preview)
+        drawSegmentedLine((x+w)/2.0, (y+h)/2.0, w, h, thickness, r, g, b, preview)
     
-def drawRectangleMadeOfLines(x, y, w, h, colour, thickness):
-    drawSegmentedLine(x, y, w, y, thickness, colour[0], colour[1], colour[2])
-    drawSegmentedLine(w, y, w, h, thickness, colour[0], colour[1], colour[2])
-    drawSegmentedLine(w, h, x, h, thickness, colour[0], colour[1], colour[2])
-    drawSegmentedLine(x, h, x, y, thickness, colour[0], colour[1], colour[2])
+def drawRectangleMadeOfLines(x, y, w, h, colour, thickness, preview=False):
+    drawSegmentedLine(x, y, w, y, thickness, colour[0], colour[1], colour[2], preview)
+    drawSegmentedLine(w, y, w, h, thickness, colour[0], colour[1], colour[2], preview)
+    drawSegmentedLine(w, h, x, h, thickness, colour[0], colour[1], colour[2], preview)
+    drawSegmentedLine(x, h, x, y, thickness, colour[0], colour[1], colour[2], preview)
 
-def drawCircle(centre, edge, colour, thickness):
+def drawCircle(centre, edge, colour, thickness, preview=False):
     radius = math.hypot(edge[0]-centre[0], edge[1]-centre[1])
     vert = [centre[0]+radius, centre[1], 0, 0]
     for r in range(3, 363, 3):
         vert[2] = centre[0]+math.cos(r*0.01745329)*radius
         vert[3] = centre[1]+math.sin(r*0.01745329)*radius
-        drawSegmentedLine(vert[0], vert[1], vert[2], vert[3], thickness, colour[0], colour[1], colour[2])
+        drawSegmentedLine(vert[0], vert[1], vert[2], vert[3], thickness, colour[0], colour[1], colour[2], preview)
         vert[0] = vert[2]
         vert[1] = vert[3]
         
