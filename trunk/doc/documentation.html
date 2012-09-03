@@ -11,9 +11,9 @@
         </head>
         <body>
             <h1>Random Game Generator Documentation</h1>
-            <section>
-                <p>Welcome to <b>Random Game Generator v1.00!</b></p>
-            </section>
+            <div>
+                <p>Welcome to <b>Random Game Generator v1.01!</b></p>
+            </div>
             <nav>
             <h2>Contents</h2>
             <ol>
@@ -44,28 +44,28 @@
                  <li><a href="#creit">Credits</a></li>
               </ol>
             </nav>
-              <section id="intro">
+              <div id="intro">
               <h2>Introduction</h2>
                 <p>RGG is a whiteboad client, primarily designed to facilitate play of traditional pen-and-paper role-playing games online, although it's usable for a variety of other types of board games and similar purposes.</p>
                 <p>If you have any questions or comments, you can probably get a hold of us most easily in one of these places:<br />
                 <a href="http://www.daydreamspiral.com/forum/">Attercop Central</a><br />
                 irc.darkmyst.org#attercop</p>
-              </section>
+              </div>
               
 <!--BUILDING-->
 
-              <section id="build">
+              <div id="build">
                   <h2>Getting started</h2>
                       <p>Of course, the first step is <a href="http://code.google.com/p/randomgamegenerator/">downloading RGG</a>.
               
-                 <section id="buildwin">
+                 <div id="buildwin">
                   <h3>Windows</h3>
                   <p><b>RGG is available in pre-compiled packages for Windows users</b>, but if for some reason you choose to compile it yourself, follow these instructions.</p>
                   <p>Acquire the following:</p>
                   <ul>
                   <!--Get version numbers...-->
                     <li>pyQT</li>
-                    <li>Python 2.6</li>
+                    <li>Python 2.7</li>
                     <li>MSYS (optional for glmod)</li>
                     <li>MinGW (optional for glmod)</li>
                   </ul>
@@ -74,32 +74,32 @@
                     <li>OPTIONAL OPTION 2: Navigate to <code>trunk/module</code> in MSYS. Run <code>build-windows.sh</code>. Move resulting <code>glmod.pyd</code> to the <code>scripts</code> folder.</li>
                     <li>Navigate to <code>scripts</code> and run <code>rgg.py</code>.</li>
                   </ol>
-                  </section>
+                  </div>
                   
-                 <section id="buildmac">
+                 <div id="buildmac">
                   <h3>Mac OS X</h3>
                     <p>Mac is not really supported; it's probably possible to get RGG working on it, but none of the dev team have one to test. Sorry!</p>
-                 </section>
+                 </div>
                  
-                 <section id="buildlin">
+                 <div id="buildlin">
                   <h3>Linux</h3>
                     <ol>
                         <li>Obtain the libraries listed under Windows, above. The most recent Ubuntu repository versions should work.</li>
                         <li>OPTIONAL: Navigate to <code>module</code> and run <code>build.sh</code>. Move resulting file to <code>scripts</code>.</li>
                         <li>Navigate to <code>scripts</code> and run <code>rgg.py</code>.</li>
                     </ol>
-                 </section>
-           </section>
+                 </div>
+           </div>
 
 <!--STARTING-->
-            <section id="start">
+            <div id="start">
               <h2>Getting Started</h2>
                   <p>Now that you&rsquo;ve installed a shiny new Random Game Generator, what to do with it?<br />
                   Of course you play games with it&hellip;but <i><b>how</b></i>?</p>
                   
                   <p>First, you should familiarize yourself with the chat interface.</p>
                   
-                 <section id="start-chat">
+                 <div id="start-chat">
                       <h3>Chat functions</h3>
                       <p>There are <b>two</b> chat windows in RGG: the <i>in</i>-character chat, and the <i>out</i>-of-character chat. You can use both at once and they're logged to the same file.</p>
                       <p>The in-character chat is used for communication that&rsquo;s part of the game: the narration, characters talking to each other, combat, and so on. Out-of-character chat is used for things you&rsquo;re saying as <i>you</i>, outside of the game: e.g., that you need to take a break to answer the phone, or debating the rules with other players. Using either chat window is as simple as typing your message and pressing Return, but there are some slightly more complex functions most users find invaluable.</p>
@@ -110,9 +110,9 @@
                         <li><code>/me x</code> or <code>/emote x</code>: displays text as 3<sup>rd</sup> person narration, in the form of <i>[name] x</i>. (E.g., <code>/me shrugs</code> would print <i>[name] shrugs</i>.) If used in the IC chat window, the name used will be the currently selected character&rsquo;s name; OOC chat will use your username.</li>
                         <li><code>/whisper X y</code>: sends a message with the text <i>y</i> to X and no one else.</li>
                         </ul>
-                  </section>
+                  </div>
                   
-                 <section id="start-char">
+                 <div id="start-char">
                   <h3>Creating characters</h3>
                     <p>A game is not so interesting without characters. How to create characters to communicate in the IC chat window?</p>
                     <ol>
@@ -121,24 +121,27 @@
                         <li>Make sure that the new character is selected in the drop-down menu, and begin typing.</li>
                     </ol>
                     <p>You can keep an arbitrary number of characters in the list. If you have portraits representing several emotions of the same character, you could even create multiple &quot;characters&quot; to indicate their different moods.</p>
-                  </section>  
+                  </div>  
                     
-                 <section id="start-map">
+                 <div id="start-map">
                   <h3>Creating maps</h3>
                   <p>Now that your characters have been made, of course they&rsquo;ll need a world in which to go adventuring. You can create maps with the File &gt; New Map command.</p>
                   <p>Enter the name of the map, your name, the number of tiles in each direction that you want the map to be, the tileset to use, and how many pixels large the individual tiles are in that set.</p>
                   <p>You can create an arbitrary number of maps, too, and move pogs freely between them. However, extremely large maps or having a huge number open at once can cause problems, so be careful.</p>
                   <p>Once your map has been created, you can edit it with the Map Editor. (Right-click on the top bar and tick the mark next to map editor.) Open the Map Editor and click on the map you want to edit. You can select the specific tile you want to place by clicking on it from the tile palette. Select whether you want to place one tile at a time or fill all tiles within an area, and place them on the map however you fancy. When you are done, make sure to press &ldquo;stop painting&ldquo;.
-                </section>  
+                </div>  
                   
                   
                     
-                 <section id="id">
-                  <h3>h3</h3>
-                  <p></p>
-                 </section>
+                 <div id="start-pog">
+                  <h3>Working with pogs</h3>
+                  <p>A pog is a small image representing a character that is moved around the map. They&rsquo;re essentially the digital equivalents of miniatures. You can use pretty much any image with a transparent background as a pog, so feel free to get creative. Pogs should be saved in the <code>pogs</code> directory or a subfolder in order to be read by RGG.</p>
+                  <p>To place a pog, simply drag the one you want from the pog palette onto the map. You can then remove it, resize it, or give it a name (seen by hovering over the pog with the mouse) by right-clicking on it.</p>
+                  <p>You can select multiple pogs at once by holding down <code>ctrl</code> and clicking on them. This makes it convenient to e.g. move around the entire party at once.</p>
+                  <p>If you can't think of a name for a character or just want to fool around, you can generate a random name for the pog from the right-click menu. This takes the same switches as the chat generators.</p>
+                 </div>
 
-            </section>
+            </div>
               
               
               
@@ -146,7 +149,7 @@
               
               
 <!--CREDITS-->
-              <section id="creit">
+              <div id="creit">
               <h2>Credits</h2>
                   <p>Coded by:<br />
                     &nbsp;Doctus (kirikayuumura.noir &#64; gmail.com)<br />
@@ -162,6 +165,6 @@
                     <p>Special Thanks:<br />
                     &nbsp;Kaijyuu and Antistone for suggestions and testing<br />
                     &nbsp;Everyone from MoMM and #attercop</p>
-            </section>
+            </div>
         </body>
     </html>
