@@ -21,4 +21,5 @@ def getRelationship():
     return stuff2
     
 def getName(args):
+    if args == "help": return "Generates a relationship between two people. No special arguments."
     return getRelationship()

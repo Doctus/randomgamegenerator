@@ -25,4 +25,5 @@ def _getPersonality():
     return " ".join((trait1, pattern, trait2))
     
 def getName(args):
+    if args == "help": return "Generates a brief personality description. No special arguments."
     return _getPersonality()

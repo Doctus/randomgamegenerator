@@ -27,7 +27,8 @@ def _getKoreanRandomFullName():
   return (_getKoreanSurname() + " " + _getKoreanRandomName())
 
 def getName(args):
-    if "female" in args and "full" in args:
+    if args == "help": return "Generates a Korean name. Valid arguments are 'full' or 'surname' (given-only will be assumed if neither is passed) and 'male' or 'female'."
+    elif "female" in args and "full" in args:
         return _getKoreanFemaleFullName()
     elif "male" in args and "full" in args:
         return _getKoreanMaleFullName()

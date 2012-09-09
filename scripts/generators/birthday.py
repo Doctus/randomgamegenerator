@@ -19,4 +19,5 @@ def _getBirthday():
     return stringTime
 
 def getName(args):
+    if args == "help": return "Generates a birthdate. No special arguments."
     return _getBirthday()

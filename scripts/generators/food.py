@@ -215,4 +215,5 @@ def getFood():
     return random.choice(foods)
   
 def getName(args):
+    if args == "help": return "Generates a food. No special arguments."
     return getFood()

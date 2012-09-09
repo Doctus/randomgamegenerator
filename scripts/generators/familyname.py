@@ -6,4 +6,5 @@ def _getFamilyName():
     return result
     
 def getName(args):
+    if args == "help": return "Generates a family name one might find in Anglophone countries. No special arguments."
     return _getFamilyName()

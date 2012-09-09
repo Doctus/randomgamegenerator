@@ -34,4 +34,5 @@ def getArtifood():
     return pat
     
 def getName(args):
+    if args == "help": return "Generates an artifact food name. No special arguments."
     return getArtifood()

@@ -19,4 +19,5 @@ def _generateAdvice():
     return advice
   
 def getName(args):
+    if args == "help": return "Generates a piece of vague mystical advice. No special arguments."
     return _generateAdvice()

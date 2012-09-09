@@ -180,4 +180,5 @@ def getTechniqueName(st):
                                                   argCompilation[3], argCompilation[4])
 
 def getName(args):
+    if args == "help": return "Generates a special technique name. Valid arguments are any one of 'martial' 'magic' 'dance' and/or any one of 'fire' 'ice' 'darkness' 'light' 'psionic' 'violent' and/or any one of 'good' 'neutral' 'evil' and/or any one of 'simple' 'moderate' 'complex' 'exalted' and/or 'awesome'."
     return getTechniqueName(args)

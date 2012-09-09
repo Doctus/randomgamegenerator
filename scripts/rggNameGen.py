@@ -35,8 +35,15 @@ for file in os.listdir(GENERATOR_DIR):
 
 def getName(generator, args):
     '''Return a random name by passing generator args.'''
-    if generator == "keys" or generator == "help":
+    if generator == "keys":
         return ", ".join(generators.keys())
+    elif generator == "help":
+        if not args:
+            return "Type '/generate help NAMETYPE' for more information on a specific generator. Available generators: " + ", ".join(generators.keys())
+        try:
+            return generators[args]("help")
+        except KeyError:
+            return "Key Error: no generator named " + str(args) + ". For a list of available generators, see /generate keys."
     elif generator == "kaijyuu":
         result = []
         for x in range(0, random.choice((3, 4, 5))):
@@ -45,4 +52,4 @@ def getName(generator, args):
     try:
         return generators[generator](args)
     except KeyError:
-        print "Key Error: no generator named " + str(generator)
+        return "Key Error: no generator named " + str(generator) + ". For a list of available generators, see /generate keys."

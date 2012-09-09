@@ -38,4 +38,5 @@ def _getArtifactWeaponName():
     return pat
     
 def getName(args):
+    if args == "help": return "Generates the name of a magical weapon. No special arguments."
     return _getArtifactWeaponName()

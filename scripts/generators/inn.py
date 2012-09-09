@@ -9,4 +9,5 @@ def _getInnName():
     return "".join(random.choice((("The ", colour, " ", creature), ("The ", colour, " ", job), ("The ", creature, "'s ", possession), ("The ", job, "'s ", possession), ("The ", state, " ", creature), ("The ", state, " ", job))))
     
 def getName(args):
+    if args == "help": return "Generates a name for an inn. No special arguments."
     return _getInnName()

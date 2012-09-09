@@ -83,6 +83,7 @@ def _getFrenchRandomName():
   return _getFrenchMaleName()
   
 def getName(args):
+    if args == "help": return "Generates a French name. Valid arguments are 'male' or 'female'."
     if "female" in args:
         return _getFrenchFemaleName()
     elif "male" in args:
