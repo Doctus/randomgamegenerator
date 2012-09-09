@@ -239,6 +239,9 @@ class Pog(object):
     def _updateSrc(self, crm, filename, translation):
         if filename == self._src and crm._status[filename] == rggResource.STATE_DONE:
             self._tile = self._makeTile()
+        else:
+            from rggSystem import mainWindow
+            self._tile = mainWindow.glwidget.createImage(os.path.join("data", "invalid.png"), self.layer, (0, 0, 64, 64), (self.position[0], self.position[1], 64, 64))
             
     def getSelectionCircleData(self):
         if self.alpha:
