@@ -32,6 +32,7 @@ def _getRandomDwarvenName():
     return _getDwarvenMaleName()
   
 def getName(args):
+    if args == "help": return "Generates a dwarven name. Valid arguments are 'female' or 'male'."
     if "female" in args:
         return _getDwarvenFemaleName()
     elif "male" in args:

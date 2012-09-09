@@ -7,4 +7,5 @@ def _generateGoodMG():
     return goodMac
     
 def getName(args):
+    if args == "help": return "Generates a magical-girl style item. No special arguments."
     return _generateGoodMG()

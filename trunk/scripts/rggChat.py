@@ -68,7 +68,7 @@ sayChat.documentation = fake.translate('chatdoc',
 def randomname(message):
     if len(message) <= 0:
         say(translate('chat',
-            "Syntax: /generate NAMETYPE. For a list of available generators, see /generate keys."))
+            "Syntax: /generate NAMETYPE. For a list of available generators, see /generate keys. Use /generate help NAMETYPE for more information on a generator."))
     else:
         rggViews.generateName(*splitword(message.lower()))
 

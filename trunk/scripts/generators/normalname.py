@@ -6,4 +6,5 @@ def _getNormalName():
     return result
     
 def getName(args):
+    if args == "help": return "Generates an allegedly normal name. No special arguments."
     return _getNormalName()

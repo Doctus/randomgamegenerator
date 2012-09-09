@@ -11,4 +11,5 @@ def _getEvilTitle():
   return random.choice(eps) + " of " + random.choice(evilstuff)
   
 def getName(args):
+    if args == "help": return "Generates an evil title or epithet. No special arguments."
     return _getEvilTitle()

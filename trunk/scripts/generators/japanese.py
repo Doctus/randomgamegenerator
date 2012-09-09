@@ -45,6 +45,7 @@ def _getJapaneseRandomFullName():
   return (_getJapaneseSurname() + " " + _getJapaneseRandomName())
 
 def getName(args):
+    if args == "help": return "Generates a Japanese name. Valid arguments are 'full' or 'surname' (given-only will be assumed if neither is passed) and 'male' or 'female'."
     if "female" in args and "full" in args:
         return _getJapaneseFemaleFullName()
     elif "male" in args and "full" in args:

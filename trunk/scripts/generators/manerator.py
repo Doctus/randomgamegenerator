@@ -26,4 +26,5 @@ def _getMan():
     return string
 
 def getName(args):
+    if args == "help": return "Generates a brief description of a male character. No special arguments."
     return _getMan()

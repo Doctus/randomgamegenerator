@@ -5,4 +5,5 @@ def getFlower():
     return random.choice(flower)
 
 def getName(args):
+    if args == "help": return "Generates a flower. No special arguments."
     return getFlower()

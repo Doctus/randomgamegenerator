@@ -27,4 +27,5 @@ def _getMacguffinName(genre="fantasy"):
         return _getMacguffinName("fantasy")
     
 def getName(args):
+    if args == "help": return "Generates a macguffin. Valid arguments are 'fantasy' which currently does the same thing as passing no arguments. (More genres may be added later.)"
     return _getMacguffinName(args)

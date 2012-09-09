@@ -24,4 +24,5 @@ def _getProverb():
     return result
     
 def getName(args):
+    if args == "help": return "Generates a vaguely proverb-like statement. No special arguments."
     return _getProverb()

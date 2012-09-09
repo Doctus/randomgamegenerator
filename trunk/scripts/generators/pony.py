@@ -9,4 +9,5 @@ def _getPony():
     return name1 + " " + name2
     
 def getName(args):
+    if args == "help": return "Generates a pony name. No special arguments."
     return _getPony()
