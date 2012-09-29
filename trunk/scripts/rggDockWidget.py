@@ -140,9 +140,17 @@ class chatWidget(QtGui.QDockWidget):
                 self.logfile.close()
         except:
             pass
+
+    def processTags(self, message):
+        message = message.replace("<", "&lt;").replace(">", "&gt;")
+        for validTag in ("i", "b", "u", "s"):
+            message = message.replace("".join(("[", validTag, "]")), "".join(("<", validTag, ">")))
+            message = message.replace("".join(("[", "/", validTag, "]")), "".join(("<", "/", validTag, ">")))
+        return message
     
     def processInput(self):
         self.newmes = unicode(self.widgetLineInput.text())
+        self.newmes = self.processTags(self.newmes)
         self.widgetLineInput.clear()
         self.widgetLineInput.addMessage(self.newmes)
         self.chatInput.emit(self.newmes)
@@ -278,9 +286,17 @@ class ICChatWidget(QtGui.QDockWidget):
             self.characters.pop(self.characterSelector.currentIndex())
             self.characterSelector.removeItem(self.characterSelector.currentIndex())
             jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
+
+    def processTags(self, message):
+        message = message.replace("<", "&lt;").replace(">", "&gt;")
+        for validTag in ("i", "b", "u", "s"):
+            message = message.replace("".join(("[", validTag, "]")), "".join(("<", validTag, ">")))
+            message = message.replace("".join(("[", "/", validTag, "]")), "".join(("<", "/", validTag, ">")))
+        return message
         
     def processInput(self):
         self.newmes = unicode(self.widgetLineInput.text())
+        self.newmes = self.processTags(self.newmes)
         self.widgetLineInput.clear()
         self.widgetLineInput.addMessage(self.newmes)
         self.ICChatInput.emit(self.newmes,
