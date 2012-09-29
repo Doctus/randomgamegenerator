@@ -419,8 +419,9 @@ def _closeAllMaps():
     _state.session.closeAllMaps()
     
 def closeAllMaps():
-    _closeAllMaps()
-    sendCloseAllMaps()
+    if promptYesNo(translate('views', 'Are you sure you want to close all maps for all connected players?')) == 16384:
+        _closeAllMaps()
+        sendCloseAllMaps()
 
 @serverRPC
 def respondClearSession():
