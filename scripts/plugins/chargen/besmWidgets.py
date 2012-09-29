@@ -536,7 +536,7 @@ class OhNoesALazyGlobalClass:
         replace("%P", fields["personality"]).replace("%B", fields["background"]).replace("%Y", fields["body"]).replace("%M", fields["mind"]).\
         replace("%L", fields["soul"]).replace("%H", fields["health"]).replace("%E", fields["energy"]).replace("%C", fields["acv"]).replace("%V", fields["dcv"])
         
-        filename = QFileDialog.getSaveFileName(self.mainwin, "test", os.getcwd(), outputFilter)
+        filename = unicode(QFileDialog.getSaveFileName(self.mainwin, "test", os.getcwd(), outputFilter))
         if not filename:
             return None
         
