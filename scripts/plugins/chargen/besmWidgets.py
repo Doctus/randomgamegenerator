@@ -1,7 +1,36 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import besmData
-import os
+import os, json, gzip
+
+def jsondump(obj, filename):
+    """Dump object to file."""
+    try:
+        with gzip.open(filename, 'wb') as file:
+            json.dump(obj, file, sort_keys=True, indent=4)
+    except AttributeError: #support for Python <2.7
+        with open(filename, 'wb') as file:
+            json.dump(obj, file, sort_keys=True, indent=4)
+
+def jsonload(filename):
+    """Loads the object from a file. May throw."""
+    try:
+        with gzip.open(filename, 'rb') as file:
+            obj = json.load(file)
+    except: #might be an old uncompressed save
+        with open(filename, 'rb') as file:
+            obj = json.load(file)
+    assert(isinstance(obj, list) or isinstance(obj, dict))
+    return obj
+    
+def jsonappend(obj, filename):
+    """Dump object to file. Merges with existing file if present."""
+    try:
+        dat = jsonload(filename)
+        newdat = dict(dat.items() + obj.items())
+        jsondump(newdat, filename)
+    except:
+        jsondump(obj, filename)
 
 class AddDefectDialog(QDialog):
     
@@ -431,20 +460,38 @@ class CharStatsWidget(QDockWidget):
         
     def getExportableData(self):
         fields = {}
-        fields["body"] = str(self.body.currentIndex()+1)
-        fields["mind"] = str(self.mind.currentIndex()+1)
-        fields["soul"] = str(self.soul.currentIndex()+1)
-        fields["health"] = self.health.text()
-        fields["energy"] = self.energy.text()
-        fields["acv"] = self.acv.text()
-        fields["dcv"] = self.dcv.text()
+        fields["body"] = unicode(self.body.currentIndex()+1)
+        fields["mind"] = unicode(self.mind.currentIndex()+1)
+        fields["soul"] = unicode(self.soul.currentIndex()+1)
+        fields["health"] = unicode(self.health.text())
+        fields["energy"] = unicode(self.energy.text())
+        fields["acv"] = unicode(self.acv.text())
+        fields["dcv"] = unicode(self.dcv.text())
         fields["skills"] = self.getProcessedSkills()
         fields["attributes"] = self.getProcessedAttributes()
         fields["defects"] = self.getProcessedDefects()
-        fields["points"] = str((self.charPointsBox.currentIndex()+1)*5)
-        fields["rempoints"] = self.remainingPointsLabel.text()
-        fields["remskillpoints"] = str((20+self.getAttributeSkillEffect())-(self.getTotalSkillCosts()))
+        fields["points"] = unicode((self.charPointsBox.currentIndex()+1)*5)
+        fields["rempoints"] = unicode(self.remainingPointsLabel.text())
+        fields["remskillpoints"] = unicode((20+self.getAttributeSkillEffect())-(self.getTotalSkillCosts()))
+        fields["skillcosts"] = unicode(self.skillCostsBox.currentIndex())
         return fields
+        
+    def importData(self, data):
+        self.body.setCurrentIndex(int(data["body"])-1)
+        self.mind.setCurrentIndex(int(data["mind"])-1)
+        self.soul.setCurrentIndex(int(data["soul"])-1)
+        self.skillCostsBox.setCurrentIndex(int(data["skillcosts"]))
+        self.charPointsBox.setCurrentIndex((int(data["points"])/5)-1)
+        for item in data["attributes"]:
+            self.attScroll.addItem(item[0] + " " + unicode(item[1]))
+        for item in data["defects"]:
+            self.defectScroll.addItem(item[0] + " " + unicode(item[1]))
+        for item in data["skills"]:
+            self.skillsScroll.addItem(item[0] + " " + unicode(item[1]))
+        self.attScroll.sortItems()
+        self.defectScroll.sortItems()
+        self.skillsScroll.sortItems()
+        self.updatePoints()
 
 class CharBioWidget(QDockWidget):
     
@@ -455,30 +502,19 @@ class CharBioWidget(QDockWidget):
         self.setWindowTitle("General Info")
         self.setObjectName("CharBioWidget")
         self.setFeatures(QDockWidget.NoDockWidgetFeatures)
-        
-        self.nameWidget = QLineEdit(self)
-        self.genderWidget = QLineEdit(self)
-        self.ageWidget = QLineEdit(self)
-        self.speciesWidget = QLineEdit(self)
-        self.appearanceWidget = QTextEdit(self)
-        self.personalityWidget = QTextEdit(self)
-        self.backgroundWidget = QTextEdit(self)
-        
         self.layout = QGridLayout()
-        self.layout.addWidget(QLabel("Name"), 0, 0)
-        self.layout.addWidget(self.nameWidget, 0, 1)
-        self.layout.addWidget(QLabel("Age"), 1, 0)
-        self.layout.addWidget(self.ageWidget, 1, 1)
-        self.layout.addWidget(QLabel("Gender"), 0, 2)
-        self.layout.addWidget(self.genderWidget, 0, 3)
-        self.layout.addWidget(QLabel("Origin"), 1, 2)
-        self.layout.addWidget(self.speciesWidget, 1, 3)
-        self.layout.addWidget(QLabel("Appearance"), 2, 0, 1, 2)
-        self.layout.addWidget(self.appearanceWidget, 3, 0, 1, 4)
-        self.layout.addWidget(QLabel("Personality"), 4, 0, 1, 2)
-        self.layout.addWidget(self.personalityWidget, 5, 0, 1, 4)
-        self.layout.addWidget(QLabel("Background"), 6, 0, 1, 2)
-        self.layout.addWidget(self.backgroundWidget, 7, 0, 1, 4)
+        
+        self.widgetz = {}
+        self.lineFields = ("name", "age", "gender", "origin")
+        self.editFields = ("appearance", "personality", "background")
+        for i, field in enumerate(self.lineFields):
+            self.widgetz[field] = QLineEdit(self)
+            self.layout.addWidget(QLabel(field.capitalize()), i%2, i/2*2)
+            self.layout.addWidget(self.widgetz[field], i%2, i/2*2+1)
+        for i, field in enumerate(self.editFields):
+            self.widgetz[field] = QTextEdit(self)
+            self.layout.addWidget(QLabel(field.capitalize()), len(self.lineFields)/2+i*2, 0, 1, 2)
+            self.layout.addWidget(self.widgetz[field], len(self.lineFields)/2+i*2+1, 0, 1, 4)
         self.widg.setLayout(self.layout) 
         self.setWidget(self.widg)
         
@@ -486,14 +522,15 @@ class CharBioWidget(QDockWidget):
         
     def getExportableData(self):
         fields = {}
-        fields["name"] = self.nameWidget.text()
-        fields["age"] = self.ageWidget.text()
-        fields["gender"] = self.genderWidget.text()
-        fields["origin"] = self.speciesWidget.text()
-        fields["background"] = self.backgroundWidget.toPlainText()
-        fields["appearance"] = self.appearanceWidget.toPlainText()
-        fields["personality"] = self.personalityWidget.toPlainText()
+        for field in self.lineFields:
+            fields[field] = unicode(self.widgetz[field].text())
+        for field in self.editFields:
+            fields[field] = unicode(self.widgetz[field].toPlainText())
         return fields
+        
+    def importData(self, data):
+        for field in self.lineFields+self.editFields:
+            self.widgetz[field].setText(data[field])
 
 class OhNoesALazyGlobalClass:
     
@@ -501,22 +538,45 @@ class OhNoesALazyGlobalClass:
         self.bio = CharBioWidget(mainWindowReal)
         self.stats = CharStatsWidget(mainWindowReal)
         self.menubar = QMenuBar(mainWindowReal)
-        self.charexport = QAction("Export to Forum Code", mainWindowReal)
-        self.charexportalt = QAction("Export to HTML Page", mainWindowReal)
-        self.menubar.addAction(self.charexport)
-        self.menubar.addSeparator()
-        self.menubar.addAction(self.charexportalt)
+        self.charsave = QAction("Save Character Sheet...", mainWindowReal)
+        self.charload = QAction("Load Character Sheet...", mainWindowReal)
+        self.charexport = QAction("Export to Forum Code...", mainWindowReal)
+        self.charexportalt = QAction("Export to HTML Page...", mainWindowReal)
+        self.fileMenu = QMenu("&File")
+        self.fileMenu.addAction(self.charsave)
+        self.fileMenu.addAction(self.charload)
+        self.fileMenu.addAction(self.charexport)
+        self.fileMenu.addAction(self.charexportalt)
+        self.menubar.addMenu(self.fileMenu)
         self.mainwin = mainWindow
         mainWindowReal.setMenuBar(self.menubar)
+        self.charsave.triggered.connect(self.jsonExport)
+        self.charload.triggered.connect(self.jsonImport)
         self.charexport.triggered.connect(self.forumExport)
         self.charexportalt.triggered.connect(self.htmlExport)
+        
+    def jsonImport(self):
+        filename = unicode(QFileDialog.getOpenFileName(self.mainwin, "Load Character Sheet...", os.path.join(os.getcwd(), "save", "characters"), "RGG Character Sheets (*.rcs)"))
+        if not filename:
+            return None
+        
+        data = jsonload(filename)
+        self.bio.importData(data)
+        self.stats.importData(data)
         
     def export(self):
         fields = self.bio.getExportableData()
         fields.update(self.stats.getExportableData())
         return fields
         
-    def realExport(self, outputTemplate, outputFilter, linebreaker):
+    def jsonExport(self):
+        filename = unicode(QFileDialog.getSaveFileName(self.mainwin, "Save Character Sheet As...", os.path.join(os.getcwd(), "save", "characters", "untitled.rcs"), "RGG Character Sheets (*.rcs)"))
+        if not filename:
+            return None
+        
+        jsondump(self.export(), filename)
+        
+    def realExport(self, outputTemplate, outputFilter, linebreaker, outputType=".txt"):
         fields = self.export()
         rawattributes = []
         for att in fields["attributes"]:
@@ -536,7 +596,7 @@ class OhNoesALazyGlobalClass:
         replace("%P", fields["personality"]).replace("%B", fields["background"]).replace("%Y", fields["body"]).replace("%M", fields["mind"]).\
         replace("%L", fields["soul"]).replace("%H", fields["health"]).replace("%E", fields["energy"]).replace("%C", fields["acv"]).replace("%V", fields["dcv"])
         
-        filename = unicode(QFileDialog.getSaveFileName(self.mainwin, "test", os.getcwd(), outputFilter))
+        filename = unicode(QFileDialog.getSaveFileName(self.mainwin, "Export Character Sheet As...", os.path.join(os.getcwd(), "save", "characters", "untitled"+outputType), outputFilter))
         if not filename:
             return None
         
@@ -580,7 +640,7 @@ DCV: %V</p>
 
 <p><h3>Background</h3></p>
 <p>%B</p>"""
-        self.realExport(outputTemplate, "HTML files (*.html)", "<br>")
+        self.realExport(outputTemplate, "HTML files (*.html)", "<br>",".html")
         
     def forumExport(self):
         outputTemplate = \
