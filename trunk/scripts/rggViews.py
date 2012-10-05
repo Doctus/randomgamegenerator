@@ -104,6 +104,9 @@ class _state(object):
             mainWindow.readGeometry()
         except:
             pass
+            
+        #Kind of a hack, but the GUI is not ready to display pogs at this point in execution, and I couldn't think of a convenient way to figure out when that happens.
+        _state.autoloadTimer = QtCore.QTimer.singleShot(5, autoloadSession)
         
 def drawPogCircles():
     clearSelectionCircles()
@@ -357,6 +360,7 @@ def joinGame():
         return valid
     
     if dialog.exec_(mainWindow, accept):
+        _clearSession() #Just in case...
         connection = dialog.save()
         renameuser(localhandle(), connection.username)
         client.setPassword(connection.password)
@@ -535,7 +539,17 @@ def closeMap():
     map = mapIDs[selectedButton]
     
     closeSpecificMap(map)
-    
+
+def autoloadSession():
+    try:
+        obj = jsonload(os.path.join(rggSystem.MAP_DIR, "autosave.rgg"))
+        sess = rggSession.Session.load(obj)
+        _state.session = sess
+        #Don't bother sending since we shouldn't be connected to anything yet.
+    except:
+        pass
+        
+
 
 def loadSession():
     """Allows the user to load a new map."""
@@ -563,6 +577,9 @@ def saveSession():
         return
     
     jsondump(_state.session.dump(), checkFileExtension(filename, ".rgg"))
+
+def autosaveSession():
+    jsondump(_state.session.dump(), os.path.join(rggSystem.MAP_DIR, "autosave.rgg"))
 
 def saveChars():
     
