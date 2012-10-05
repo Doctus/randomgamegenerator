@@ -865,6 +865,42 @@ def respondLine(x, y, w, h, thickness, r, g, b):
 @clientRPC
 def sendLine(user, x, y, w, h, thickness, r, g, b):
     respondLine(allusers(), x, y, w, h, thickness, r, g, b)
+    
+@serverRPC
+def respondSegmentedLine(x, y, w, h, thickness, r, g, b):
+    drawSegmentedLine(x, y, w, h, thickness, r, g, b)
+    #TODO: save in session (this is more bothersome to implement than it sounds like it would be)
+
+@clientRPC
+def sendSegmentedLine(user, x, y, w, h, thickness, r, g, b):
+    respondSegmentedLine(allusers(), x, y, w, h, thickness, r, g, b)
+    
+@serverRPC
+def respondCircle(centre, edge, colour, thickness):
+    drawCircle(centre, edge, colour, thickness)
+    #TODO: save in session (this is more bothersome to implement than it sounds like it would be)
+
+@clientRPC
+def sendCircle(user, centre, edge, colour, thickness):
+    respondCircle(allusers(), centre, edge, colour, thickness)
+    
+@serverRPC
+def respondRectangle(x, y, w, h, colour, thickness):
+    drawRectangleMadeOfLines(x, y, w, h, colour, thickness)
+    #TODO: save in session (this is more bothersome to implement than it sounds like it would be)
+
+@clientRPC
+def sendRectangle(user, x, y, w, h, colour, thickness):
+    respondRectangle(allusers(), x, y, w, h, colour, thickness)
+    
+@serverRPC
+def respondPolygon(sides, centre, edge, colour, thickness):
+    drawRegularPolygon(sides, centre, edge, colour, thickness)
+    #TODO: save in session (this is more bothersome to implement than it sounds like it would be)
+
+@clientRPC
+def sendPolygon(user, sides, centre, edge, colour, thickness):
+    respondPolygon(allusers(), sides, centre, edge, colour, thickness)
 
 @serverRPC
 def respondDeleteLine(x, y, w, h):
@@ -1188,15 +1224,15 @@ def mouseRelease(screenPosition, mapPosition, button):
         clearPreviewLines()
         if _state.drawmode == "Rectangle":
             if _state.previousLinePlacement != None:
-                drawRectangleMadeOfLines(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.linecolour, _state.thickness)
+                sendRectangle(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.linecolour, _state.thickness)
         elif _state.drawmode == "Circle":
-            drawCircle(_state.previousLinePlacement, mapPosition, _state.linecolour, _state.thickness)
+            sendCircle(_state.previousLinePlacement, mapPosition, _state.linecolour, _state.thickness)
         elif _state.drawmode == "Line":
-            drawSegmentedLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.thickness, _state.linecolour[0], _state.linecolour[1], _state.linecolour[2])
+            sendSegmentedLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.thickness, _state.linecolour[0], _state.linecolour[1], _state.linecolour[2])
         elif _state.drawmode == "Pentagram" or _state.drawmode == "Hexagram":
             if _state.previousLinePlacement != None:
                 displacement = max(abs(mapPosition[0]-_state.previousLinePlacement[0]), abs(mapPosition[1]-_state.previousLinePlacement[1]))
-                drawRegularPolygon(14-len(_state.drawmode), _state.previousLinePlacement, displacement, _state.linecolour, _state.thickness)
+                sendPolygon(14-len(_state.drawmode), _state.previousLinePlacement, displacement, _state.linecolour, _state.thickness)
         _state.previousLinePlacement = None
     elif icon == ICON_DELETE:
         if(_state.previousLinePlacement != None and _state.nextLinePlacement != None):
