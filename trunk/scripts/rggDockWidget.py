@@ -512,7 +512,7 @@ class userListList(QtGui.QListWidget):
         self.itemActivated.connect(self.changeGM)
         
     def changeGM(self, item):
-        self.ulmain.setGMByID(self.currentRow())
+        self.ulmain.provideOptions(self.currentRow())
     
 class userListWidget(QtGui.QDockWidget):
     """The list of connected users."""
@@ -580,7 +580,7 @@ class userListWidget(QtGui.QDockWidget):
         self.gmname = new
         self.refreshDisplay()
         
-    def setGMByID(self, ID):
+    def provideOptions(self, ID):
         if self.gmname != self.localname:
             return
         name = self.internalList[ID][0]
@@ -598,7 +598,8 @@ class userListWidget(QtGui.QDockWidget):
         self.requestBanlistUpdate.emit()
         
     selectGM = signal(basestring, doc=
-        """Called to request GM change."""
+        """Called to request a menu be summoned containing actions targeting the selected player.
+            Sorry for the misleading legacy name."""
     )
     
     kickPlayer = signal(basestring, doc=

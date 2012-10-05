@@ -63,7 +63,7 @@ if __name__ == '__main__':
     s.dwidget.macroRequested.connect(rggViews.addMacro)
     
     # user list widget
-    s.uwidget.selectGM.connect(rggViews.selectGM)
+    s.uwidget.selectGM.connect(rggViews.playerOptions)
     s.uwidget.kickPlayer.connect(rggViews.kick)
     s.uwidget.requestBanlistUpdate.connect(rggViews.updateBanlist)
     

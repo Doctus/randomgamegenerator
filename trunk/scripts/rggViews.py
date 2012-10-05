@@ -75,6 +75,9 @@ class _state(object):
     
     GM = None
     
+    moveMode = "free"
+    moveablePogs = []
+    
     @staticmethod
     def initialize(mainApp):
         _state.menu = rggMenuBar.menuBar()
@@ -221,6 +224,9 @@ def getNetUserList():
 def getGM():
     return _state.GM
 
+def isGM():
+    return getGM() == localhandle()
+
 def changeGM(username):
     _state.GM = username
     _state.uwidget.setGM(username)
@@ -236,6 +242,45 @@ def sendChangeGM(user, username, origin):
     
 def selectGM(newname):
     sendChangeGM(newname, localhandle())
+    
+def playerOptions(playername):
+    loc = mainWindow.mapFromGlobal(QtGui.QCursor.pos()) #This gives the wrong result on one axis most of the time, and I've no idea why.
+    selected = showPopupMenuAt(
+                    (loc.x(), loc.y()),
+                    [translate('views', 'Change movement mode'),
+                        translate('views', 'Make GM')])
+    if selected == 0:
+        sendToggleMoveMode(getuser(playername))
+    elif selected == 1:
+        selectGM(playername)
+    
+    
+@serverRPC
+def respondSetMoveMode(newMode):
+    _state.moveMode = unicode(newMode)
+    
+@clientRPC
+def sendSetMoveMode(user, target, newMode):
+    respondSetMoveMode(getuser(target), newMode)
+    
+@serverRPC
+def respondToggleMoveMode():
+    if _state.moveMode == "free":
+        _state.moveMode = "fixed"
+    else:
+        _state.moveMode = "free"
+    
+@clientRPC
+def sendToggleMoveMode(user, target):
+    respondToggleMoveMode(target)
+    
+@serverRPC
+def respondAddMoveablePog(pogID):
+    _state.moveablePogs.append(pogID)
+    
+@clientRPC
+def sendAddMoveablePog(user, target, pogID):
+    respondAddMoveablePog(getuser(target), pogID)
     
 def setUwidgetLocal():
     _state.uwidget.localname = localhandle()
@@ -719,7 +764,14 @@ def placePog(x, y, pogpath):
 
 def movePogs(displacement):
     """Moves pogs by a specified displacement."""
-    selection = _state.pogSelection.copy()
+    if _state.moveMode != "free" and not isGM():
+        selection = set()
+        for pog in _state.pogSelection:
+            if pog.ID in _state.moveablePogs:
+                selection.add(pog)
+        if not selection: return
+    else:
+        selection = _state.pogSelection.copy()
     pogids = []
     poglocs = []
     for pog in selection:
@@ -1059,6 +1111,12 @@ def processPogRightclick(selection, pogs):
     elif selection == 8:
         for pog in pogs:
             deletePog(pog)
+    elif selection == 9:
+        username = promptString(translate('views', "Enter the name of the user who may move this pog (must be exact)."), inittext = "username")
+        if username is None:
+            return
+        for pog in pogs:
+            sendAddMoveablePog(username, pog.ID)
 
 # MOUSE ACTIONS
 
@@ -1192,9 +1250,7 @@ def mousePress(screenPosition, mapPosition, button):
                 else: hidebutton = "Hide"
                 if pog._locked: lockbutton = "Unlock"
                 else: lockbutton = "Lock"
-                selected = showPopupMenuAt(
-                    (screenPosition[0], screenPosition[1]),
-                    [translate('views', 'Center on pog'),
+                options = [translate('views', 'Center on pog'),
                         translate('views', 'Set name'),
                         translate('views', 'Generate name'),
                         translate('views', 'Set layer'),
@@ -1202,7 +1258,11 @@ def mousePress(screenPosition, mapPosition, button):
                         translate('views', 'Resize'),
                         translate('views', hidebutton),
                         translate('views', lockbutton),
-                        translate('views', 'Delete')])
+                        translate('views', 'Delete')]
+                if isGM(): options.append(translate('views', 'Set as moveable for player'))
+                selected = showPopupMenuAt(
+                    (screenPosition[0], screenPosition[1]),
+                    options)
                 processPogRightclick(selected, list(set([pog] + list(_state.pogSelection))))
     elif icon == ICON_DRAW:
         if button == BUTTON_LEFT:
