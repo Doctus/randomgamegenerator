@@ -108,4 +108,5 @@ if __name__ == '__main__':
         main.show()
         app.exec_()
     finally:
+        rggViews.autosaveSession()
         client.close()
