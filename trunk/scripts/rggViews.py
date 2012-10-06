@@ -920,8 +920,9 @@ def sendLine(user, x, y, w, h, thickness, r, g, b):
     
 @serverRPC
 def respondSegmentedLine(x, y, w, h, thickness, r, g, b):
-    drawSegmentedLine(x, y, w, h, thickness, r, g, b)
-    #TODO: save in session (this is more bothersome to implement than it sounds like it would be)
+    lines = drawSegmentedLine(x, y, w, h, thickness, r, g, b)
+    for line in lines:
+        _state.session.addLine(line)
 
 @clientRPC
 def sendSegmentedLine(user, x, y, w, h, thickness, r, g, b):

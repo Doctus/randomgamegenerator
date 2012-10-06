@@ -356,14 +356,29 @@ def getLinesOfThickness(thickness):
     return lines
 
 def drawSegmentedLine(x, y, w, h, thickness, r, g, b, preview=False):
+    '''Draws a straight line, but split into small lines (length < 10), which are returned as a set.'''
     if abs(x-w)+abs(y-h) < 10:
         if preview:
             drawPreviewLine(x, y, w, h, thickness, r, g, b)
         else:
             drawLine(x, y, w, h, thickness, r, g, b)
+            return (x, y, w, h, thickness, r, g, b)
     else:
-        drawSegmentedLine(x, y, (x+w)/2.0, (y+h)/2.0, thickness, r, g, b, preview)
-        drawSegmentedLine((x+w)/2.0, (y+h)/2.0, w, h, thickness, r, g, b, preview)
+        first = drawSegmentedLine(x, y, (x+w)/2.0, (y+h)/2.0, thickness, r, g, b, preview)
+        second = drawSegmentedLine((x+w)/2.0, (y+h)/2.0, w, h, thickness, r, g, b, preview)
+        try:
+            return first | second
+        except TypeError:
+            try:
+                return first.add(second)
+            except AttributeError:
+                try:
+                    return second.add(first)
+                except AttributeError:
+                    genesis = set()
+                    genesis.add(first)
+                    genesis.add(second)
+                    return genesis
     
 def drawRectangleMadeOfLines(x, y, w, h, colour, thickness, preview=False):
     drawSegmentedLine(x, y, w, y, thickness, colour[0], colour[1], colour[2], preview)
