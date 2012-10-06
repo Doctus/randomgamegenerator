@@ -930,8 +930,9 @@ def sendSegmentedLine(user, x, y, w, h, thickness, r, g, b):
     
 @serverRPC
 def respondCircle(centre, edge, colour, thickness):
-    drawCircle(centre, edge, colour, thickness)
-    #TODO: save in session (this is more bothersome to implement than it sounds like it would be)
+    lines = drawCircle(centre, edge, colour, thickness)
+    for line in lines:
+        _state.session.addLine(line)
 
 @clientRPC
 def sendCircle(user, centre, edge, colour, thickness):
@@ -939,8 +940,9 @@ def sendCircle(user, centre, edge, colour, thickness):
     
 @serverRPC
 def respondRectangle(x, y, w, h, colour, thickness):
-    drawRectangleMadeOfLines(x, y, w, h, colour, thickness)
-    #TODO: save in session (this is more bothersome to implement than it sounds like it would be)
+    lines = drawRectangleMadeOfLines(x, y, w, h, colour, thickness)
+    for line in lines:
+        _state.session.addLine(line)
 
 @clientRPC
 def sendRectangle(user, x, y, w, h, colour, thickness):
@@ -948,8 +950,9 @@ def sendRectangle(user, x, y, w, h, colour, thickness):
     
 @serverRPC
 def respondPolygon(sides, centre, edge, colour, thickness):
-    drawRegularPolygon(sides, centre, edge, colour, thickness)
-    #TODO: save in session (this is more bothersome to implement than it sounds like it would be)
+    lines = drawRegularPolygon(sides, centre, edge, colour, thickness)
+    for line in lines:
+        _state.session.addLine(line)
 
 @clientRPC
 def sendPolygon(user, sides, centre, edge, colour, thickness):
