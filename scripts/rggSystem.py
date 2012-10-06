@@ -362,52 +362,44 @@ def drawSegmentedLine(x, y, w, h, thickness, r, g, b, preview=False):
             drawPreviewLine(x, y, w, h, thickness, r, g, b)
         else:
             drawLine(x, y, w, h, thickness, r, g, b)
-            return (x, y, w, h, thickness, r, g, b)
+        newline = set()
+        newline.add((x, y, w, h, thickness, r, g, b))
+        return newline
     else:
         first = drawSegmentedLine(x, y, (x+w)/2.0, (y+h)/2.0, thickness, r, g, b, preview)
         second = drawSegmentedLine((x+w)/2.0, (y+h)/2.0, w, h, thickness, r, g, b, preview)
-        try:
-            return first | second
-        except TypeError:
-            try:
-                return first.add(second)
-            except AttributeError:
-                try:
-                    return second.add(first)
-                except AttributeError:
-                    genesis = set()
-                    genesis.add(first)
-                    genesis.add(second)
-                    return genesis
+        return first | second
     
 def drawRectangleMadeOfLines(x, y, w, h, colour, thickness, preview=False):
-    drawSegmentedLine(x, y, w, y, thickness, colour[0], colour[1], colour[2], preview)
-    drawSegmentedLine(w, y, w, h, thickness, colour[0], colour[1], colour[2], preview)
-    drawSegmentedLine(w, h, x, h, thickness, colour[0], colour[1], colour[2], preview)
-    drawSegmentedLine(x, h, x, y, thickness, colour[0], colour[1], colour[2], preview)
+    '''Draws lines in a rectangular shape.'''
+    return drawSegmentedLine(x, y, w, y, thickness, colour[0], colour[1], colour[2], preview) | drawSegmentedLine(w, y, w, h, thickness, colour[0], colour[1], colour[2], preview) | drawSegmentedLine(w, h, x, h, thickness, colour[0], colour[1], colour[2], preview) | drawSegmentedLine(x, h, x, y, thickness, colour[0], colour[1], colour[2], preview)
 
 def drawCircle(centre, edge, colour, thickness, preview=False):
+    '''Draws lines to form an approximate circle.'''
+    lines = set()
     radius = math.hypot(edge[0]-centre[0], edge[1]-centre[1])
     vert = [centre[0]+radius, centre[1], 0, 0]
     for r in range(3, 363, 3):
         vert[2] = centre[0]+math.cos(r*0.01745329)*radius
         vert[3] = centre[1]+math.sin(r*0.01745329)*radius
-        drawSegmentedLine(vert[0], vert[1], vert[2], vert[3], thickness, colour[0], colour[1], colour[2], preview)
+        lines.update(drawSegmentedLine(vert[0], vert[1], vert[2], vert[3], thickness, colour[0], colour[1], colour[2], preview))
         vert[0] = vert[2]
         vert[1] = vert[3]
-        
+    return lines
     
 def drawRegularPolygon(sides, centre, size, colour, thickness, rainbow = False):
     vertices = []
+    lines = set()
     for i in xrange(sides):
         vertices.append((centre[0]+size*math.cos(2*math.pi*i/sides), centre[1]+size*math.sin(2*math.pi*i/sides)))
     for p in xrange(sides):
         for q in xrange(sides):
             if sides%2 == 1 or p%(sides/2) != q%(sides/2):
                 if not rainbow:
-                    drawSegmentedLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, colour[0], colour[1], colour[2])
+                    lines.update(drawSegmentedLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, colour[0], colour[1], colour[2]))
                 else:
-                    drawSegmentedLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, random.random(), random.random(), random.random())    
+                    lines.update(drawSegmentedLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, random.random(), random.random(), random.random()))
+    return lines
 
 def addText(text, pos):
     return mainWindow.glwidget.addText(text, pos)
