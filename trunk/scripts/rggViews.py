@@ -750,6 +750,7 @@ def placePog(x, y, pogpath):
     """Places a pog on the map."""
     infograb = QtGui.QPixmap(pogpath)
     mapPosition = getMapPosition((x, y))
+    assert os.path.exists(pogpath)
     pog = rggPog.Pog(
         mapPosition,
         (infograb.width(), infograb.height()),
