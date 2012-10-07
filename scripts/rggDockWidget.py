@@ -481,7 +481,7 @@ class pogPalette(QtGui.QDockWidget):
     def __init__(self, mainWindow):
         """Initializes the pog palette."""
         super(QtGui.QDockWidget, self).__init__(mainWindow)
-        self.setToolTip(self.tr("Double-click on a pog, then click once in the game window to place it."))
+        self.setToolTip(self.tr("Drag a file from this widget into the game window to place a pog."))
         self.setWindowTitle(self.tr("Pog Palette"))
         self.widget = QtGui.QWidget(mainWindow)
         self.mainLayout = QtGui.QBoxLayout(2)
