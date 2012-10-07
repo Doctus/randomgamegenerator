@@ -797,11 +797,6 @@ class GLWidget(QGLWidget):
             self.ctrl = True
         elif event.key() == Qt.Key_Shift:
             print "calculate"
-            self.calculateVBOList()
-            self.shift = True
-        elif event.key() == Qt.Key_Alt:
-            print "fillbuffers"
-            self.fillBuffers()
         elif event.key() == Qt.Key_Plus or event.key() == Qt.Key_Equal:
             self.zoom += 0.15
             if self.zoom > 4:

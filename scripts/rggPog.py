@@ -231,6 +231,7 @@ class Pog(object):
         try:
             return mainWindow.glwidget.createImage(src, self.layer, textureRect, drawRect)
         except ZeroDivisionError:
+            print "FFFUUUUU ZERO DIVISION ERROR BLOW UP WORLD ETC."
             self._src = os.path.join("data", "invalid.png")
             self.texturedimensions = (64, 64)
             self._size = (64, 64)
