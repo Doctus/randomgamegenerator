@@ -15,7 +15,7 @@ class tile(object):
     Class for storing image data, position and some opengl stuff
     '''
 
-    def __init__(self, imagepath, qimg, textureRect, drawRect, layer, hidden, dynamicity, glwidget):
+    def __init__(self, imagepath, textureRect, drawRect, layer, hidden, dynamicity, glwidget):
         self.imagepath = imagepath
         self.drawRect = drawRect
         self.textureRect = textureRect
@@ -25,7 +25,6 @@ class tile(object):
         self.offset = None
         self.VBO = None
         self._hidden = hidden
-        self.qimg = qimg
         self.glwidget = glwidget
         self.createLayer = False
         self.destroyed = False
@@ -139,10 +138,11 @@ class tile(object):
             
     def displaceTextureRect(self, displacement):
         if self.glwidget.texext == GL_TEXTURE_2D:
-            x = float(self.origtextrect[0] + displacement[0])/float(self.qimg.width())
-            y = float(self.origtextrect[1] + displacement[1])/float(self.qimg.height())
-            w = float(self.origtextrect[2])/float(self.qimg.width())
-            h = float(self.origtextrect[3])/float(self.qimg.height())
+            origsize = self.glwidget.getImageSize(self.imagepath)
+            x = float(self.origtextrect[0] + displacement[0])/float(origsize.width())
+            y = float(self.origtextrect[1] + displacement[1])/float(origsize.height())
+            w = float(self.origtextrect[2])/float(origsize.width())
+            h = float(self.origtextrect[3])/float(origsize.height())
             self.textureRect = [x, y, w, h]
         else:
 	        self.textureRect[0] += displacement[0]
