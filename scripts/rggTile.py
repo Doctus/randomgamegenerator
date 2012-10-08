@@ -33,10 +33,11 @@ class tile(object):
         self.origtextrect = textureRect
 
         if self.glwidget.texext == GL_TEXTURE_2D:
-            x = float(textureRect[0])/float(qimg.width())
-            y = float(textureRect[1])/float(qimg.height())
-            w = float(textureRect[2])/float(qimg.width())
-            h = float(textureRect[3])/float(qimg.height())
+            origsize = self.glwidget.getImageSize(self.imagepath)
+            x = float(textureRect[0])/float(origsize.width())
+            y = float(textureRect[1])/float(origsize.height())
+            w = float(textureRect[2])/float(origsize.width())
+            h = float(textureRect[3])/float(origsize.height())
             self.textureRect = [x, y, w, h]
             
         self.setVBOData()
@@ -123,10 +124,11 @@ class tile(object):
     def setTextureRect(self, textureRect):
         self.textureRect = textureRect
         if self.glwidget.texext == GL_TEXTURE_2D:
-            x = float(textureRect[0])/float(self.qimg.width())
-            y = float(textureRect[1])/float(self.qimg.height())
-            w = float(textureRect[2])/float(self.qimg.width())
-            h = float(textureRect[3])/float(self.qimg.height())
+            origsize = self.glwidget.getImageSize(self.imagepath)
+            x = float(textureRect[0])/float(origsize.width())
+            y = float(textureRect[1])/float(origsize.height())
+            w = float(textureRect[2])/float(origsize.width())
+            h = float(textureRect[3])/float(origsize.height())
             self.textureRect = [x, y, w, h]
             
         if self.glwidget.vbos:
