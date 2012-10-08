@@ -435,7 +435,7 @@ class GLWidget(QGLWidget):
         if drawRect[3] == -1:
             drawRect[3] = qimg.height()
 
-        image = tile(qimagepath, qimg, textureRect, drawRect, layer, hidden, dynamicity, self)
+        image = tile(qimagepath, textureRect, drawRect, layer, hidden, dynamicity, self)
 
         if found == False:
             img = None
