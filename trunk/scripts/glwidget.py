@@ -9,7 +9,6 @@ from OpenGL.GLU import *
 from OpenGL.extensions import hasGLExtension
 from OpenGL.GL.ARB.vertex_buffer_object import *
 from OpenGL.GL.ARB.framebuffer_object import *
-from OpenGL.GL.ARB.texture_compression_rgtc import *
 from OpenGL.arrays import ArrayDatatype as ADT
 
 #Only set these when creating non-development code
@@ -105,7 +104,6 @@ class GLWidget(QGLWidget):
         #settings, as used in SAVE_DIR/gfx_settings.rgs
         self.npot = 3
         self.anifilt = 0
-        self.compress = False
         self.magfilter = GL_NEAREST
         self.mipminfilter = GL_NEAREST_MIPMAP_NEAREST
         self.minfilter = GL_NEAREST
@@ -294,8 +292,6 @@ class GLWidget(QGLWidget):
 
     #ugly conversion function :(
     def interpretString(self, string):
-        if string == "GL_COMPRESSED_RG_RGTC2":
-            return GL_COMPRESSED_RG_RGTC2
         if string == "GL_NEAREST":
             return GL_NEAREST
         if string == "GL_LINEAR":
@@ -319,27 +315,26 @@ class GLWidget(QGLWidget):
         from rggSystem import SAVE_DIR
         import os
 
-        self.fieldtemp = ["GL_COMPRESSED_RG_RGTC2", 1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", "On", "On", "Magic"]
+        self.fieldtemp = [1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", "On", "On", "Magic"]
 
         try:
             js = jsonload(os.path.join(SAVE_DIR, "gfx_settings.rgs"))
-            self.fieldtemp[0] = loadString('gfx.compress', js.get('compress'))
-            self.fieldtemp[1] = loadFloat('gfx.anifilt', js.get('anifilt'))
-            self.fieldtemp[2] = loadString('gfx.minfilter', js.get('minfilter'))
-            self.fieldtemp[3] = loadString('gfx.magfilter', js.get('magfilter'))
-            self.fieldtemp[4] = loadString('gfx.mipminfilter', js.get('mipminfilter'))
-            self.fieldtemp[5] = loadString('gfx.FSAA', js.get('FSAA'))
-            self.fieldtemp[6] = loadString('gfx.VBO', js.get('VBO'))
+            self.fieldtemp[0] = loadFloat('gfx.anifilt', js.get('anifilt'))
+            self.fieldtemp[1] = loadString('gfx.minfilter', js.get('minfilter'))
+            self.fieldtemp[2] = loadString('gfx.magfilter', js.get('magfilter'))
+            self.fieldtemp[3] = loadString('gfx.mipminfilter', js.get('mipminfilter'))
+            self.fieldtemp[4] = loadString('gfx.FSAA', js.get('FSAA'))
+            self.fieldtemp[5] = loadString('gfx.VBO', js.get('VBO'))
         except:
             print "no settings detected"
             pass
         
         try:
-            self.fieldtemp[7] = loadString('gfx.magic', js.get('Magic'))
+            self.fieldtemp[6] = loadString('gfx.magic', js.get('Magic'))
         except:
             pass
         
-        if self.fieldtemp[7] == "More Magic":
+        if self.fieldtemp[6] == "More Magic":
             try: glEnable(GL_MULTISAMPLE) #Supposed to fail
             except: pass
 
@@ -361,18 +356,15 @@ class GLWidget(QGLWidget):
             self.npot = 0
 
         #assorted settings block
-        if hasGLExtension("GL_EXT_texture_compression_rgtc") and self.fieldtemp[0] != "None":
-            self.compress = self.interpretString(self.fieldtemp[0]) #
-            print "using " + self.fieldtemp[0] + " texture compression"
-        if hasGLExtension("GL_EXT_texture_filter_anisotropic") and self.fieldtemp[1] > 1.0:
-            self.anifilt = self.fieldtemp[1]
-            print "using " + str(self.fieldtemp[1]) + "x anisotropic texture filtering. max: " + str(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT))
-        self.minfilter = self.interpretString(self.fieldtemp[2])
-        self.magfilter = self.interpretString(self.fieldtemp[3])
-        self.mipminfilter = self.interpretString(self.fieldtemp[4])
+        if hasGLExtension("GL_EXT_texture_filter_anisotropic") and self.fieldtemp[0] > 1.0:
+            self.anifilt = self.fieldtemp[0]
+            print "using " + str(self.fieldtemp[0]) + "x anisotropic texture filtering. max: " + str(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT))
+        self.minfilter = self.interpretString(self.fieldtemp[1])
+        self.magfilter = self.interpretString(self.fieldtemp[2])
+        self.mipminfilter = self.interpretString(self.fieldtemp[3])
         if self.mipminfilter == "Off":
             self.mipminfilter = -1
-        if self.format().sampleBuffers() and self.fieldtemp[5] == "On":
+        if self.format().sampleBuffers() and self.fieldtemp[4] == "On":
             print "enabling "  + str(self.format().samples()) + "x FSAA"
             glEnable(GL_MULTISAMPLE)
         else:
@@ -392,18 +384,18 @@ class GLWidget(QGLWidget):
                 print "Something terrible went wrong in initializing glmod"
                 mod = False
             elif ret == -2:
-                if self.fieldtemp[6] == "On":
+                if self.fieldtemp[5] == "On":
                     print "using gl module, VBO support requested but not available"
                 else:
                     print "using gl module, VBO support not requested"
             else:
                 initok = True
-                if self.fieldtemp[6] == "On":
+                if self.fieldtemp[5] == "On":
                     print "using gl module, VBO support requested and available"
                 else:
                     print "using gl module, VBO support not requested"
 
-        if mod and initok and self.fieldtemp[6] == "On":
+        if mod and initok and self.fieldtemp[5] == "On":
             if glInitVertexBufferObjectARB() and bool(glBindBufferARB):
                 self.vbos = True
                 print "VBO support initialised succesfully"
@@ -446,13 +438,17 @@ class GLWidget(QGLWidget):
         image = tile(qimagepath, qimg, textureRect, drawRect, layer, hidden, dynamicity, self)
 
         if found == False:
+            img = None
             if self.npot == 0:
                 w = nextPowerOfTwo(qimg.width())
                 h = nextPowerOfTwo(qimg.height())
                 if w != qimg.width() or h != qimg.height():
-                    qimg = qimg.scaled(w, h)
-     
-            img = self.convertToGLFormat(qimg)
+                    img = self.convertToGLFormat(qimg.scaled(w, h))
+                else:
+                    img = self.convertToGLFormat(qimg)
+            else:
+                img = self.convertToGLFormat(qimg)
+
             texture = int(glGenTextures(1))
             try:
                 imgdata = img.bits().asstring(img.numBytes())
@@ -485,8 +481,6 @@ class GLWidget(QGLWidget):
             glTexParameteri(self.texext, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
 
             format = GL_RGBA
-            if self.compress:
-                format = self.compress
 
             glTexImage2D(self.texext, 0, GL_RGBA, img.width(), img.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imgdata);
 
@@ -725,13 +719,13 @@ class GLWidget(QGLWidget):
             self.calculateVBOList(image)
             
     def getImageSize(self, image):
-    
         qimg = None
+
         if image in self.qimages:
             qimg = self.qimages[image][0]
         else:
             qimg = QImage(image)
-        
+
         return qimg.size()
         
     def addText(self, text, pos):

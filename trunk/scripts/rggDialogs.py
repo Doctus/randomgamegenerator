@@ -896,24 +896,23 @@ class gfxSettingsDialog(dialog):
     
     def _createFields(self, data):
         """Create the fields used by this dialog."""
-        self.fieldtemp = ["GL_COMPRESSED_RG_RGTC2", 1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", 1, 1, "Magic", "Off"]
+        self.fieldtemp = [1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", 1, 1, "Magic", "Off"]
 
         try:
             js = jsonload(os.path.join(SAVE_DIR, "gfx_settings.rgs"))
-            self.fieldtemp[0] = loadString('gfx.compress', js.get('compress'))
-            self.fieldtemp[1] = loadFloat('gfx.anifilt', js.get('anifilt'))
-            self.fieldtemp[2] = loadString('gfx.minfilter', js.get('minfilter'))
-            self.fieldtemp[3] = loadString('gfx.magfilter', js.get('magfilter'))
-            self.fieldtemp[4] = loadString('gfx.mipminfilter', js.get('mipminfilter'))
-            self.fieldtemp[5] = loadString('gfx.FSAA', js.get('FSAA'))
-            self.fieldtemp[6] = loadString('gfx.VBO', js.get('VBO'))
-            self.fieldtemp[7] = loadString('gfx.magic', js.get('Magic'))
+            self.fieldtemp[0] = loadFloat('gfx.anifilt', js.get('anifilt'))
+            self.fieldtemp[1] = loadString('gfx.minfilter', js.get('minfilter'))
+            self.fieldtemp[2] = loadString('gfx.magfilter', js.get('magfilter'))
+            self.fieldtemp[3] = loadString('gfx.mipminfilter', js.get('mipminfilter'))
+            self.fieldtemp[4] = loadString('gfx.FSAA', js.get('FSAA'))
+            self.fieldtemp[5] = loadString('gfx.VBO', js.get('VBO'))
+            self.fieldtemp[6] = loadString('gfx.magic', js.get('Magic'))
         except:
             print "no settings detected"
             pass
 
         try:
-            self.fieldtemp[8] = loadString('gfx.splash', js.get('Splash'))
+            self.fieldtemp[7] = loadString('gfx.splash', js.get('Splash'))
         except:
             pass
 
@@ -921,24 +920,22 @@ class gfxSettingsDialog(dialog):
         mipFilters = ["Off", "GL_NEAREST_MIPMAP_NEAREST", "GL_NEAREST_MIPMAP_LINEAR", "GL_LINEAR_MIPMAP_NEAREST", "GL_LINEAR_MIPMAP_LINEAR"]
 
         return dict(
-            compress=dropDownField(translate('gfxSettingsDialog', 'Compress'), ["None", "GL_COMPRESSED_RG_RGTC2"],
-                value=data.get('compress', self.fieldtemp[0])),
             anifilt=floatField(translate('gfxSettingsDialog', 'Anifilt'),
-                min=1.0, max=16.0, decimals=1, value=data.get('Anifilt', self.fieldtemp[1])),
+                min=1.0, max=16.0, decimals=1, value=data.get('Anifilt', self.fieldtemp[0])),
             minfilter=dropDownField(translate('gfxSettingsDialog', 'minfilter'), normFilters,
-                value=data.get('minfilter', self.fieldtemp[2])),
+                value=data.get('minfilter', self.fieldtemp[1])),
             magfilter=dropDownField(translate('gfxSettingsDialog', 'magfilter'), normFilters,
-                value=data.get('magfilter', self.fieldtemp[3])),
+                value=data.get('magfilter', self.fieldtemp[2])),
             mipminfilter=dropDownField(translate('gfxSettingsDialog', 'mipminfilter'), mipFilters,
-                value=data.get('mipminfilter', self.fieldtemp[4])),
+                value=data.get('mipminfilter', self.fieldtemp[3])),
             FSAA=dropDownField(translate('gfxSettingsDialog', 'FSAA'), ["Off", "On"],
-                value=data.get('FSAA', self.fieldtemp[5])),
+                value=data.get('FSAA', self.fieldtemp[4])),
             VBO=dropDownField(translate('gfxSettingsDialog', 'VBO'), ["Off", "On"],
-                value=data.get('VBO', self.fieldtemp[6])),
+                value=data.get('VBO', self.fieldtemp[5])),
             Magic=dropDownField(translate('gfxSettingsDialog', 'Magic'), ["Magic", "More Magic"],
-                value=data.get('Magic', self.fieldtemp[7])),
+                value=data.get('Magic', self.fieldtemp[6])),
             Splash=dropDownField(translate('gfxSettingsDialog', 'Splash'), ["Off", "On"],
-                value=data.get('Splash', self.fieldtemp[8])))
+                value=data.get('Splash', self.fieldtemp[7])))
     
     def _interpretFields(self, fields):
         """Interpret the fields into a dictionary of clean items."""
@@ -964,7 +961,7 @@ class gfxSettingsDialog(dialog):
         
         # Add fields
         formLayout = QtGui.QFormLayout()
-        for id in ('compress', 'anifilt', 'minfilter', 'magfilter', 'mipminfilter', 'FSAA', 'VBO', 'Magic', 'Splash'):
+        for id in ('anifilt', 'minfilter', 'magfilter', 'mipminfilter', 'FSAA', 'VBO', 'Magic', 'Splash'):
             field = self.fields[id]
             formLayout.addRow(translate('gfxSettingsDialog', '{0}: ', 'Row layout').format(field.name), field.widget(widget))
         
