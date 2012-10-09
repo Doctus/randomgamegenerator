@@ -418,3 +418,11 @@ def getZoom():
 def getMapPosition(screenCoordinates):
     mapPosition = map(lambda p,c,d: p/d - c/d, screenCoordinates, cameraPosition(), (getZoom(), getZoom()))
     return mapPosition
+    
+def purgeEmptyFiles(rootpath):
+    '''Recursively deletes all empty files in rootpath and its subdirectories. Never deletes directories.'''
+    for (dirpath, dirnames, filenames) in os.walk(rootpath):
+        for filename in filenames:
+            path = os.path.join(dirpath, filename)
+            if os.stat(path).st_size == 0:
+                os.remove(path)

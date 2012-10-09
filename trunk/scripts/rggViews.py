@@ -97,6 +97,8 @@ class _state(object):
         _state.users[client.username] = _state.localuser
         _state.keepalive = 4
         
+        purgeEmptyImages()
+        
         _state.pingTimer = QtCore.QTimer()
         _state.pingTimer.timeout.connect(keepAlive)
         _state.pingTimer.start(rggSystem.PING_INTERVAL_SECONDS*1000)
@@ -1043,6 +1045,11 @@ def reportCamera():
 def renamePog(pog, name):
     pog.name = name
     sendPogAttributes(pog.ID, pog.name, pog.layer, pog.properties)
+    
+def purgeEmptyImages():
+    """Deletes all empty files in the pog, portrait, and tileset folders."""
+    for dir in (POG_DIR, PORTRAIT_DIR, TILESET_DIR):
+        purgeEmptyFiles(dir)
     
 def processPogRightclick(selection, pogs):
     #0 CENTER
