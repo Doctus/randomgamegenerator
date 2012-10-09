@@ -751,6 +751,7 @@ def placePog(x, y, pogpath):
     infograb = QtGui.QPixmap(pogpath)
     mapPosition = getMapPosition((x, y))
     assert os.path.exists(pogpath)
+    assert POG_DIR in pogpath
     pog = rggPog.Pog(
         mapPosition,
         (infograb.width(), infograb.height()),
@@ -1140,14 +1141,6 @@ def mouseMove(screenPosition, mapPosition, displacement):
     if icon == ICON_MOVE: # moveIcon
         if _state.mouseButton == BUTTON_LEFT:
             setCameraPosition(map(lambda c, d,  z: c + d*z, cameraPosition(), displacement, (getZoom(), getZoom())))
-        elif _state.mouseButton == BUTTON_RIGHT:
-            if topmap(mapPosition) is None:
-                return
-            drawOffset = list(topmap(mapPosition).drawOffset)
-            drawOffset[0] += displacement[0]*getZoom()
-            drawOffset[1] += displacement[1]*getZoom()
-            topmap(mapPosition).drawOffset = drawOffset
-        return
     if icon == ICON_SELECT: #selectIcon
         if _state.mouseButton is None:
             tooltipPog = _state.session.findTopPog(mapPosition)
