@@ -19,7 +19,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
-import sys, random, math
+import sys, random, math, urllib2
 import os, os.path
 from PyQt4 import QtCore, QtGui
 
@@ -418,6 +418,14 @@ def getZoom():
 def getMapPosition(screenCoordinates):
     mapPosition = map(lambda p,c,d: p/d - c/d, screenCoordinates, cameraPosition(), (getZoom(), getZoom()))
     return mapPosition
+    
+def checkVersion():
+    '''If this is a release, and a newer release is available, returns a link to that release. Otherwise returns None.'''
+    if DEV: return None
+    latest = str(urllib2.urlopen('http://www.daydreamspiral.com/rgg').read()).split()
+    if latest[0] > VERSION:
+        return latest[1]
+    return None
     
 def purgeEmptyFiles(rootpath):
     '''Recursively deletes all empty files in rootpath and its subdirectories. Never deletes directories.'''

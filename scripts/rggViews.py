@@ -105,6 +105,8 @@ class _state(object):
         
         _state.App = mainApp
         
+        
+        
         try:
             mainWindow.readGeometry()
         except:
@@ -112,6 +114,38 @@ class _state(object):
             
         #Kind of a hack, but the GUI is not ready to display pogs at this point in execution, and I couldn't think of a convenient way to figure out when that happens.
         _state.autoloadTimer = QtCore.QTimer.singleShot(5, autoloadSession)
+        
+        #Wait to check for updates so it doesn't cause noticeable startup slow-down.
+        _state.updateTimer = QtCore.QTimer.singleShot(250, checkForUpdates)
+        
+        if os.path.exists("rgg2.exe"):
+            _state.clearTimer = QtCore.QTimer.singleShot(1000, clearTempFile)
+
+def clearTempFile():
+    os.remove("rgg2.exe")        
+        
+def checkForUpdates():
+    '''Check for newer releases, and prompt player to update if one exists.'''
+    version = checkVersion()
+    if version:
+        if promptYesNo(translate('views', 'A new version of RGG is available. Do you wish to update?')) == 16384:
+            updateRGG(version)
+        
+def updateRGG(path):
+    '''Runs the external updater.'''
+    import urllib2, zipfile, subprocess
+    data = urllib2.urlopen(path).read()
+    with open("temp.zip", "wb") as f:
+        f.write(data)
+    with zipfile.ZipFile('temp.zip', 'r') as f:
+        for filepath in f.namelist():
+            if "rgg.exe" not in filepath:
+                f.extract(filepath, "..")
+        with open("rgg2.exe", "wb") as newexe:
+            newexe.write(f.open("rgg/rgg.exe").read())
+    os.remove("temp.zip")
+    subprocess.Popen("rgg2.exe", close_fds=True)
+    sys.exit()
         
 def drawPogCircles():
     clearSelectionCircles()

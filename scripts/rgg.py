@@ -5,7 +5,14 @@ if __name__ == '__main__':
     from PyQt4.QtOpenGL import *
 
     from rggJson import loadString, jsonload
-    import os
+    import os, sys, shutil, subprocess
+    
+    if os.path.exists("rgg2.exe"):
+        if "rgg2" in sys.argv[0]:
+            os.remove("rgg.exe")
+            shutil.copy("rgg2.exe", "rgg.exe")
+            subprocess.Popen("rgg.exe", close_fds=True)
+            sys.exit()
     
     fieldtemp = ["English"]
     app = QApplication(['RGG in Space'])
