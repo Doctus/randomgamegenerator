@@ -1,4 +1,4 @@
-RGG v1.01 "Overmuch magic"
+RGG v1.01b "Overmuch magic"
 
 http://code.google.com/p/randomgamegenerator/
 
@@ -41,6 +41,31 @@ Special Thanks:
   Everyone from MoMM and #attercop
 
 Changelog:
+
+v1.01b   "Overmuch magic"                     October 13, 2012
+
+   Fixes
+    * The character creator now exports correctly to unicode file 
+      paths.
+    * Lines, circles, and other shapes now synchronize properly
+      over the network.
+    * Fixed graphical issues relating to NPOT textures on older
+      systems.
+    * Added sanity checks to ensure placed pogs do not have
+      bizarre file paths.
+
+   Features and Changes
+    * To avoid some of the HTML-related errors seen in previous
+      versions, chat now uses tags like [i]this[/i] instead.
+    * The character creator can now save and load character sheets.
+    * Added autosaving and autoloading of session data.
+    * The GM may prevent players from moving pogs except those
+      he or she specifically designates on a per-player basis.
+    * RGG will now attempt to purge empty files from the pog,
+      portrait, and tileset folders on startup. (These sometimes
+      come into existence due to problems with file transfer.)
+
+  ---
 
   v1.01   "Overmuch magic"                   September 2, 2012
 
