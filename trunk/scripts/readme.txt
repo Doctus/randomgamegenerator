@@ -1,4 +1,4 @@
-RGG v1.01b "Overmuch magic"
+RGG v1.01c "Overmuch magic"
 
 http://code.google.com/p/randomgamegenerator/
 
@@ -41,6 +41,13 @@ Special Thanks:
   Everyone from MoMM and #attercop
 
 Changelog:
+
+v1.01c   "Overmuch magic"                     October 13, 2012
+
+   Features and Changes
+    * Added an automatic update system for releases.
+
+  ---
 
 v1.01b   "Overmuch magic"                     October 13, 2012
 
