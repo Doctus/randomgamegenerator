@@ -132,7 +132,7 @@ def checkForUpdates():
             updateRGG(version)
         
 def updateRGG(path):
-    '''Runs the external updater.'''
+    '''Updates RGG from a zip file downloaded from path.'''
     import urllib2, zipfile, subprocess
     data = urllib2.urlopen(path).read()
     with open("temp.zip", "wb") as f:
