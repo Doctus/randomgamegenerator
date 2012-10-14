@@ -433,7 +433,7 @@ class PogFileSystemModel(QtGui.QFileSystemModel):
         self.setRootPath(POG_DIR)
         self.setNameFilters(IMAGE_NAME_FILTER)
         self.setNameFilterDisables(False)
-        self.absRoot = os.path.abspath(POG_DIR)
+        self.absRoot = os.path.abspath(unicode(POG_DIR))
         
     def data(self, index, role):
         basedata = QtGui.QFileSystemModel.data(self, index, role)
@@ -458,7 +458,7 @@ class PogFileSystemModel(QtGui.QFileSystemModel):
         if "." not in unicode(path): return None
         
         mime = QtCore.QMimeData()
-        mime.setText(path)
+        mime.setText(unicode(path))
         return mime
 
 class pogTree(QtGui.QTreeView):
@@ -469,6 +469,8 @@ class pogTree(QtGui.QTreeView):
             
             #Don't drag folders.
             if not self.model().mimeData([i]): return
+            
+            #print self.model().mimeData([i]).text()
             
             drag.setMimeData(self.model().mimeData([i]))
             drag.setPixmap(QtGui.QPixmap(self.model().mimeData([i]).text()))
