@@ -42,13 +42,16 @@ class debugConsoleWidget(QtGui.QDockWidget):
             jsonappend({'debuglog':'On'}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
         
     def write(self, data):
-        self.buffer.append(data)
-        if data.endswith('\n'):
-            self.widgetEditor.append(''.join(self.buffer))
-            if self.logToFileToggle.isChecked():
-                with open(os.path.join(LOG_DIR, time.strftime("%b_%d_%Y_debug.log", time.localtime())), 'a') as f:
-                    f.write(''.join(self.buffer))
-            self.buffer = []
+        try:
+            self.buffer.append(data)
+            if data.endswith('\n'):
+                self.widgetEditor.append(''.join(self.buffer))
+                if self.logToFileToggle.isChecked():
+                    with open(os.path.join(LOG_DIR, time.strftime("%b_%d_%Y_debug.log", time.localtime())), 'a') as f:
+                        f.write(''.join(self.buffer))
+                self.buffer = []
+        except UnicodeEncodeError:
+            return
 
 class chatLineEdit(QtGui.QLineEdit):
 
