@@ -532,7 +532,7 @@ class PortraitFileSystemModel(QtGui.QFileSystemModel):
         self.setRootPath(PORTRAIT_DIR)
         self.setNameFilters(IMAGE_NAME_FILTER)
         self.setNameFilterDisables(False)
-        self.absRoot = os.path.abspath(PORTRAIT_DIR)
+        self.absRoot = os.path.abspath(unicode(PORTRAIT_DIR))
         
     def data(self, index, role):
         basedata = QtGui.QFileSystemModel.data(self, index, role)
@@ -664,7 +664,7 @@ class newCharacterDialog(dialog):
     def changePort(self, selection):
         for i in selection.indexes():
             portrait = i
-        self.fields['portrait'].widgett.setText(unicode(self.portraitModel.filePath(portrait)[self.ROOT_LEN:]))
+        self.fields['portrait'].widgett.setText(unicode(self.portraitModel.filePath(portrait))[self.ROOT_LEN:])
         preview = QtGui.QPixmap(self.portraitModel.filePath(portrait))
         if preview.isNull():
             #Typically, this means a folder has been selected.
