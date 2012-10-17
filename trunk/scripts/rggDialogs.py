@@ -671,7 +671,7 @@ class newCharacterDialog(dialog):
             self.fields['portrait'].widgett.setText(unicode(" "))
             self.portraitPreview.clear()
             return
-        preview = preview.scaled(min(preview.width(), 96), min(preview.height(), 96))
+        preview = preview.scaled(min(preview.width(), 64), min(preview.height(), 64))
         self.portraitPreview.setPixmap(preview)
         
     def clean(self):

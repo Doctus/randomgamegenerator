@@ -202,20 +202,20 @@ class ICChatWidget(QtGui.QDockWidget):
         self.widget = QtGui.QWidget(mainWindow)
         self.widgetEditor.setReadOnly(True)
         self.widgetEditor.setOpenLinks(False)
+        self.characterPreview = QtGui.QLabel(mainWindow)
         self.characterSelector = QtGui.QComboBox(mainWindow)
         self.characterSelector.setToolTip(self.tr("Select the character to be displayed as the speaker of entered text."))
         self.characterAddButton = QtGui.QPushButton(self.tr("Add New"), mainWindow)
         self.characterAddButton.setToolTip(self.tr("Add a new in-character chat character via a dialog box."))
         self.characterDeleteButton = QtGui.QPushButton(self.tr("Delete"), mainWindow)
         self.characterDeleteButton.setToolTip(self.tr("Delete the currently selected in-character chat character."))
-        self.layout = QtGui.QBoxLayout(2)
-        self.layoutni = QtGui.QBoxLayout(1)
-        self.layout.addWidget(self.widgetEditor)
-        self.layout.addWidget(self.widgetLineInput)
-        self.layoutni.addWidget(self.characterDeleteButton)
-        self.layoutni.addWidget(self.characterAddButton)
-        self.layoutni.addWidget(self.characterSelector)
-        self.layout.addLayout(self.layoutni)
+        self.layout = QtGui.QGridLayout()
+        self.layout.addWidget(self.widgetEditor, 0, 0, 1, 4)
+        self.layout.addWidget(self.widgetLineInput, 1, 1, 1, 3)
+        self.layout.addWidget(self.characterPreview, 1, 0, 2, 1)
+        self.layout.addWidget(self.characterDeleteButton, 2, 3, 1, 1)
+        self.layout.addWidget(self.characterAddButton, 2, 2, 1, 1)
+        self.layout.addWidget(self.characterSelector, 2, 1, 1, 1)
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
         self.setObjectName("IC Chat Widget")
@@ -233,6 +233,17 @@ class ICChatWidget(QtGui.QDockWidget):
         self.widgetLineInput.returnPressed.connect(self.processInput)
         self.connect(self.characterAddButton, QtCore.SIGNAL('clicked()'), self.newCharacter)
         self.connect(self.characterDeleteButton, QtCore.SIGNAL('clicked()'), self.deleteCharacter)
+        self.connect(self.characterSelector, QtCore.SIGNAL('currentIndexChanged(int)'), self.setCharacterPreview)
+        
+        self.setCharacterPreview()
+        
+    def setCharacterPreview(self, newIndex=-1):
+        try:
+            preview = QtGui.QPixmap(os.path.join(unicode(PORTRAIT_DIR), unicode(self.characters[self.characterSelector.currentIndex()].portrait)))
+            preview = preview.scaled(min(preview.width(), 64), min(preview.height(), 64))
+            self.characterPreview.setPixmap(preview)
+        except:
+            self.characterPreview.clear()
     
     def insertMessage(self, mes):
         self.scroll = (self.widgetEditor.verticalScrollBar().value() ==
