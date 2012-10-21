@@ -11,12 +11,21 @@ class charGen(QMainWindow):
         self.setObjectName("Character Creator")
         self.widget = QWidget(self)
         widgets.initWidgets(self.widget, self)
+        self.forbidClose = False
+        if mainWindow:
+            self.forbidClose = True
         self.show()
         
-    def closeEvent(self,  event):
+    def closeEvent(self, event):
         #Hack to prevent user from closing this sub-window without closing the main program, since it cannot currently be restored if that happens.
         #It will still close when the real main window is closed.
-        event.ignore()
+        if self.forbidClose:
+            event.ignore()
         
 def hajimaru(mainwindow):
     widget = charGen(mainwindow)
+
+if __name__ == "__main__":
+    app = QApplication(['Character Creator'])
+    main = charGen(None)
+    app.exec_()
