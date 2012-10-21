@@ -432,5 +432,8 @@ def purgeEmptyFiles(rootpath):
     for (dirpath, dirnames, filenames) in os.walk(unicode(rootpath)):
         for filename in filenames:
             path = os.path.join(dirpath, filename)
-            if os.stat(path).st_size == 0:
-                os.remove(path)
+            try:
+                if os.stat(path).st_size == 0:
+                    os.remove(path)
+            except WindowsError:
+                print "Warning: pog locale error."
