@@ -429,7 +429,7 @@ def checkVersion():
     
 def purgeEmptyFiles(rootpath):
     '''Recursively deletes all empty files in rootpath and its subdirectories. Never deletes directories.'''
-    for (dirpath, dirnames, filenames) in os.walk(rootpath):
+    for (dirpath, dirnames, filenames) in os.walk(unicode(rootpath)):
         for filename in filenames:
             path = os.path.join(dirpath, filename)
             if os.stat(path).st_size == 0:
