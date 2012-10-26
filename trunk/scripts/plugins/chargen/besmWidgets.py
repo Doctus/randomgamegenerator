@@ -174,6 +174,8 @@ class CharStatsWidget(QDockWidget):
         self.remainingPointsLabel = QLabel("1")
         self.skillPointsLabel = QLabel("Unspent SP: 20")
         
+        self.mechMode = QCheckBox("Mecha Mode")
+        
         self.body = QComboBox(self)
         self.mind = QComboBox(self)
         self.soul = QComboBox(self)
@@ -206,6 +208,7 @@ class CharStatsWidget(QDockWidget):
         self.layout.addWidget(self.skillCostsBox, 0, 3)
         self.layout.addWidget(self.remainingPointsLabelLabel, 1, 0)
         self.layout.addWidget(self.remainingPointsLabel, 1, 1)
+        self.layout.addWidget(self.mechMode, 1, 2)
         self.layout.addWidget(QLabel("Body: "), 2, 0)
         self.layout.addWidget(self.body, 2, 1)
         self.layout.addWidget(QLabel("Mind: "), 3, 0)
@@ -240,6 +243,8 @@ class CharStatsWidget(QDockWidget):
         
         for x in (self.charPointsBox, self.body, self.mind, self.soul, self.skillCostsBox):
             x.currentIndexChanged.connect(self.updatePoints)
+            
+        self.mechMode.stateChanged.connect(self.updatePoints)
         
         self.addSkillButton.clicked.connect(self.addSkill)
         self.removeSkillButton.clicked.connect(self.decreaseLevel)
@@ -253,16 +258,29 @@ class CharStatsWidget(QDockWidget):
         mainWindow.addDockWidget(Qt.RightDockWidgetArea, self)
         
     def updateDerivedValues(self):
-        baseacv = ((self.body.currentIndex()+self.mind.currentIndex()+self.soul.currentIndex()+3)//3)+self.getAttributeCombatValueEffect()
-        basedcv = baseacv - 2
-        basehealth = ((self.body.currentIndex()+self.soul.currentIndex()+2)*5)+self.getAttributeHealthEffect()
-        baseenergy = ((self.mind.currentIndex()+self.soul.currentIndex()+2)*5)+self.getAttributeEnergyEffect()
+        if not self.mechMode.isChecked():
+            baseacv = ((self.body.currentIndex()+self.mind.currentIndex()+self.soul.currentIndex()+3)//3)+self.getAttributeCombatValueEffect()
+            basedcv = baseacv - 2
+        else:
+            baseacv = 0
+            basedcv = 0
+        if not self.mechMode.isChecked():
+            basehealth = ((self.body.currentIndex()+self.soul.currentIndex()+2)*5)+self.getAttributeHealthEffect()
+        else:
+            basehealth = (40+self.getAttributeHealthEffect())
+        if not self.mechMode.isChecked():
+            baseenergy = ((self.mind.currentIndex()+self.soul.currentIndex()+2)*5)+self.getAttributeEnergyEffect()
+        else:
+            baseenergy = 0
         
         self.acv.setText(str(baseacv))
         self.dcv.setText(str(basedcv))
         self.health.setText(str(basehealth))
         self.energy.setText(str(baseenergy))
-        self.skillPointsLabel.setText("Unspent SP: " + str((20+self.getAttributeSkillEffect())-(self.getTotalSkillCosts())))
+        if not self.mechMode.isChecked():
+            self.skillPointsLabel.setText("Unspent SP: " + str((20+self.getAttributeSkillEffect())-(self.getTotalSkillCosts())))
+        else:
+            self.skillPointsLabel.setText("Unspent SP: 0")
         
     def updatePoints(self, True=False):
         if self.body.currentIndex() == 11:
@@ -271,7 +289,10 @@ class CharStatsWidget(QDockWidget):
         if self.mind.currentIndex() == 11:
             self.soul.setCurrentIndex(min(self.soul.currentIndex(), 10))
         base = (self.charPointsBox.currentIndex()+1)*5
-        result = base - (self.body.currentIndex()+self.mind.currentIndex()+self.soul.currentIndex()+3)
+        if not self.mechMode.isChecked():
+            result = base - (self.body.currentIndex()+self.mind.currentIndex()+self.soul.currentIndex()+3)
+        else:
+            result = base
         result -= self.getTotalAttributeCosts()
         self.remainingPointsLabel.setText(str(result))
         self.updateDerivedValues()
@@ -290,6 +311,8 @@ class CharStatsWidget(QDockWidget):
         
     def addAttribute(self):
         possibleAttributes = dict(besmData.ATTRIBUTES)
+        if self.mechMode.isChecked():
+            possibleAttributes.update(dict(besmData.MECH_ATTRIBUTES))
         if self.attScroll.count() >= 1:
             for i in range(0, self.attScroll.count()):
                 del possibleAttributes[str(self.attScroll.item(i).text())[0:-2]]
@@ -302,6 +325,8 @@ class CharStatsWidget(QDockWidget):
         
     def addDefect(self):
         possibleDefects = dict(besmData.DEFECTS)
+        if self.mechMode.isChecked():
+            possibleDefects.update(dict(besmData.MECH_DEFECTS))
         if self.defectScroll.count() >= 1:
             for i in range(0, self.defectScroll.count()):
                 del possibleDefects[str(self.defectScroll.item(i).text())[0:-2]]
@@ -326,7 +351,7 @@ class CharStatsWidget(QDockWidget):
         
     def increaseDefectLevel(self):
         if self.defectScroll.count() == 0: return
-        if int(str(self.defectScroll.currentItem().text())[-1:]) < 2:
+        if int(str(self.defectScroll.currentItem().text())[-1:]) < 2 or ((besmData.SIX_LEVEL_DEFECTS[0] in str(self.defectScroll.currentItem().text()) or besmData.SIX_LEVEL_DEFECTS[1] in str(self.defectScroll.currentItem().text())) and int(str(self.defectScroll.currentItem().text())[-1:]) < 6):
             self.defectScroll.currentItem().setText(self.defectScroll.currentItem().text()[0:-1] + str(int(str(self.defectScroll.currentItem().text())[-1:])+1))
         self.updatePoints()
         
@@ -382,6 +407,8 @@ class CharStatsWidget(QDockWidget):
     def getProcessedAttributes(self):
         result = []
         possibleAttributes = dict(besmData.ATTRIBUTES)
+        if self.mechMode.isChecked():
+            possibleAttributes.update(dict(besmData.MECH_ATTRIBUTES))
         if self.attScroll.count() >= 1:
             for i in range(0, self.attScroll.count()):
                 attName = str(self.attScroll.item(i).text())[0:-2]
@@ -393,6 +420,8 @@ class CharStatsWidget(QDockWidget):
     def getProcessedDefects(self):
         result = []
         possibleDefects = dict(besmData.DEFECTS)
+        if self.mechMode.isChecked():
+            possibleDefects.update(dict(besmData.MECH_DEFECTS))
         if self.defectScroll.count() >= 1:
             for i in range(0, self.defectScroll.count()):
                 defectName = str(self.defectScroll.item(i).text())[0:-2]
@@ -409,6 +438,9 @@ class CharStatsWidget(QDockWidget):
                 if attName == besmData.HEALTH_ATT:
                     attRank = int(str(self.attScroll.item(i).text())[-1:])
                     result += attRank*10
+                elif attName == besmData.MECH_HEALTH_ATT:
+                    attRank = int(str(self.attScroll.item(i).text())[-1:])
+                    result += attRank*20
         if self.defectScroll.count() >= 1:
             for i in range(0, self.defectScroll.count()):
                 defectName = str(self.defectScroll.item(i).text())[0:-2]
@@ -457,6 +489,14 @@ class CharStatsWidget(QDockWidget):
                     defectRank = int(str(self.defectScroll.item(i).text())[-1:])
                     result -= defectRank
         return result
+        
+    def hasSpecialMechAttribute(self):
+        if self.attScroll.count() >= 1:
+            for i in range(0, self.attScroll.count()):
+                attName = str(self.attScroll.item(i).text())[0:-2]
+                if attName == besmData.MECH_STAT_ATT:
+                    return True
+        return False
         
     def getExportableData(self):
         fields = {}

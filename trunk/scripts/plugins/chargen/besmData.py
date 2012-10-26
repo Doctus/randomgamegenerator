@@ -107,6 +107,22 @@ ATTRIBUTES = {"Animal Friendship":1,
               "Water Speed [Amphibious/Diving]":3,
               "Weapon/Special Attack":4}
               
+MECH_ATTRIBUTES = {"AI":2,
+                   "Extra Capacity":1,
+                   "Extra Endurance":1,
+                   "Manoeuvre Bonus":1,
+                   "Mecha Regeneration":4,
+                   "Mechanical Transformation (half-powered)":2,
+                   "Mechanical Transformation (full-powered)":4,
+                   "Merging":2,
+                   "Multiple Mecha Attacks":10,
+                   "Special Equipment":2,
+                   "Subordinate Mecha":1,
+                   "Summonable":4,
+                   "Super Transformation (half-powered)":3,
+                   "Super Transformation (full-powered)":5,
+                   "Toughness":4}
+              
 DEFECTS = {"Ageism":1,
            "Attack Restriction":1,
            "Awkward":1,
@@ -144,11 +160,25 @@ DEFECTS = {"Ageism":1,
            "Volatile":1,
            "Vulnerability":1,
            "Wanted":1}
+           
+MECH_DEFECTS = {"Crew Requirement":1,
+                "Exposed Occupants":1,
+                "Limited Endurance":1,
+                "Mutual Damage":1,
+                "Noisy":1,
+                "Poor Manoeuvrability":1,
+                "Reduced Capacity":1,
+                "Start-Up Time":1,
+                "Summoning Object":1,
+                "Wind Powered":1}
 
 HEALTH_ATT = "Damn Healthy!"
+MECH_HEALTH_ATT = "Toughness"
 ENERGY_ATT = "Energy Bonus"
 SKILL_ATT = "Highly Skilled"
 COMBAT_ATT = "Combat Mastery"
+SIX_LEVEL_DEFECTS = ("Awkward Size", "Crew Requirement")
+MECH_STAT_ATT = "AI"
 
 HEALTH_DEFECT = "Not So Tough"
 SKILL_DEFECT = "Unskilled"
