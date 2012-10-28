@@ -747,7 +747,7 @@ def sendMapCreate(user, ID, map, tileset):
 
 @serverRPC
 def respondTileUpdate(mapID, tile, newTileIndex):
-    """Creates or updates the map with the given ID."""
+    """Updates the specified map tile to a new tile index."""
     map = getmap(mapID)
     if not map:
         return
@@ -755,11 +755,29 @@ def respondTileUpdate(mapID, tile, newTileIndex):
 
 @clientRPC
 def sendTileUpdate(user, mapID, tile, newTileIndex):
-    """Creates or updates the specified map."""
+    """Updates the specified map tile to a new tile index."""
     map = getmap(mapID)
     if not map or not map.tilePosExists(tile):
         return
     respondTileUpdate(allusers(), mapID, tile, newTileIndex)
+    
+@serverRPC
+def respondMultipleTileUpdate(mapID, topLeftTile, bottomRightTile, newTileIndex):
+    """Updates multiple specified map tiles in a rectangular area."""
+    map = getmap(mapID)
+    if not map:
+        return
+    for x in xrange(topLeftTile[0], bottomRightTile[0]+1):
+        for y in xrange(topLeftTile[1], bottomRightTile[1]+1):
+            map.setTile((x, y), newTileIndex)
+
+@clientRPC
+def sendMultipleTileUpdate(user, mapID, topLeftTile, bottomRightTile, newTileIndex):
+    """Updates multiple specified map tiles in a rectangular area."""
+    map = getmap(mapID)
+    if not map or not map.tilePosExists(topLeftTile) or not map.tilePosExists(bottomRightTile):
+        return
+    respondMultipleTileUpdate(allusers(), mapID, topLeftTile, bottomRightTile, newTileIndex)
 
 def clearPogSelection():
     _state.pogSelection = set()

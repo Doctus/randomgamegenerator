@@ -766,48 +766,31 @@ class mapEditor(QtGui.QDockWidget):
             
     def mouseReleaseResponse(self, x, y, t):
         if t == 0:
-            from rggViews import topmap, sendTileUpdate
+            from rggViews import topmap, sendTileUpdate, sendMultipleTileUpdate
             from rggEvent import setEaten
             if self.currentMap == None:
                 return
             mapPosition = getMapPosition((x, y))
             map = topmap(mapPosition)
             self.dragging = False
-            if map == None:
+            if map == None or map != self.currentMap:
                 return
             if self.isVisible() and self.singlePaintingButton.isChecked():
                 setEaten()
             elif self.isVisible() and self.rectPaintingButton.isChecked() and self.rectStart is not None:
+                setEaten()
                 rectEnd = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
                             int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
                 if not map.tilePosExists(rectEnd):
-                    setEaten()
                     self.rectStart = None
                     self.rectEnd = None
                     return
-                if cmp(rectEnd[0], self.rectStart[0]) != 0:
-                    for x in range(self.rectStart[0], rectEnd[0]+cmp(rectEnd[0], self.rectStart[0]), cmp(rectEnd[0], self.rectStart[0])):
-                        if cmp(rectEnd[1], self.rectStart[1]) != 0:
-                            for y in range(self.rectStart[1], rectEnd[1]+cmp(rectEnd[1], self.rectStart[1]), cmp(rectEnd[1], self.rectStart[1])):
-                                if self.currentMap.tilePosExists((x, y)):
-                                    sendTileUpdate(self.currentMap.ID, (x, y), self.tilelabel.currentTile)
-                        else:
-                            if self.currentMap.tilePosExists((x, self.rectStart[1])):
-                                sendTileUpdate(self.currentMap.ID, (x, self.rectStart[1]), self.tilelabel.currentTile)
-                else:
-                    if cmp(rectEnd[1], self.rectStart[1]) != 0:
-                        for y in range(self.rectStart[1], rectEnd[1]+cmp(rectEnd[1], self.rectStart[1]), cmp(rectEnd[1], self.rectStart[1])):
-                            if self.currentMap.tilePosExists((self.rectStart[0], y)):
-                                sendTileUpdate(self.currentMap.ID, (self.rectStart[0], y), self.tilelabel.currentTile)
-                    else:
-                        if self.currentMap.tilePosExists((self.rectStart[0], self.rectStart[1])):
-                                sendTileUpdate(self.currentMap.ID, (self.rectStart[0], self.rectStart[1]), self.tilelabel.currentTile)
-                setEaten()
+                sendMultipleTileUpdate(self.currentMap.ID, (min(rectEnd[0], self.rectStart[0]), min(rectEnd[1], self.rectStart[1])), (max(rectEnd[0], self.rectStart[0]), max(rectEnd[1], self.rectStart[1])), self.tilelabel.currentTile)
             elif self.isVisible() and self.hollowRectPaintingButton.isChecked() and self.rectStart is not None:
                 rectEnd = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
                             int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
+                setEaten()
                 if not map.tilePosExists(rectEnd):
-                    setEaten()
                     self.rectStart = None
                     self.rectEnd = None
                     return
@@ -830,7 +813,6 @@ class mapEditor(QtGui.QDockWidget):
                     else:
                         if self.currentMap.tilePosExists((self.rectStart[0], self.rectStart[1])):
                                 sendTileUpdate(self.currentMap.ID, (self.rectStart[0], self.rectStart[1]), self.tilelabel.currentTile)
-                setEaten()
 
     def mapChangedResponse(self, newMap):
         if newMap != None:
