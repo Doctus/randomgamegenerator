@@ -296,7 +296,7 @@ class ICChatWidget(QtGui.QDockWidget):
         jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
             
     def deleteCharacter(self):
-        if self.characters is not None:
+        if len(self.characters) > 0:
             self.characters.pop(self.characterSelector.currentIndex())
             self.characterSelector.removeItem(self.characterSelector.currentIndex())
             jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
