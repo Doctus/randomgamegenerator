@@ -183,11 +183,15 @@ class menuBar(object):
         self.langMenu.addAction(deu)
             
         self.optionsMenu = QtGui.QMenu(translate("menubar", "&Options"), main)
+        self.optionsMenu.addMenu(self.langMenu)
+        self.optionsMenu.addMenu(stylesMenu)
+        self.optionsMenu.addSeparator()
         self.optionsMenu.addAction(self.toggleAlertsAct)
         self.optionsMenu.addAction(self.toggleTimestampsAct)
         self.optionsMenu.addAction(self.setTimestampFormatAct)
         self.optionsMenu.addAction(self.gfxSettingsAct)
         self.optionsMenu.addAction(self.drawTimerSettingsAct)
+        
         
         self.pluginsMenu = QtGui.QMenu(translate("menubar", "&Plugins"), main)
         
@@ -214,9 +218,7 @@ class menuBar(object):
         self.menubar.addMenu(fileMenu)
         self.menubar.addMenu(internetMenu)
         self.menubar.addMenu(drawMenu)
-        self.menubar.addMenu(stylesMenu)
         self.menubar.addMenu(self.optionsMenu)
-        self.menubar.addMenu(self.langMenu)
         self.pluginhide = self.menubar.addMenu(self.pluginsMenu)
         if list(int(r) for r in PYQT_VERSION_STR.split(".")) < [4,  8,  0]:
             warning = QtGui.QMessageBox()
