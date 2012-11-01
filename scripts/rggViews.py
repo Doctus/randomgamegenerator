@@ -1079,15 +1079,6 @@ def generateName(generator, args):
     """Generates a random name of the specified type."""
     say(rggNameGen.getName(generator, args))
 
-def generateTechnique(parameters=""):
-    """Generates a technique name from the specified (optional) parameters."""
-    say(rggNameGen.getTechniqueName(parameters))
-
-def generateAdvice():
-    """Generates random advice."""
-    say(rggNameGen.getAdvice())
-
-
 # MISC
 
 def reportCamera():

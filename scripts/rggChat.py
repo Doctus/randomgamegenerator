@@ -162,15 +162,6 @@ whisper.documentation = fake.translate('chatdoc',
     </dl><br>
     """)
 
-@chat('addmacro')
-def addmacro(message):
-    rggViews.addMacro()
-
-addmacro.documentation = fake.translate('chatdoc',
-    """/addmacro: Create a new dice macro.
-    <br>
-    """)
-
 @chat('camera', 'cam')
 def camera(message, hidden=True):
     rggViews.reportCamera()
@@ -180,36 +171,6 @@ camera.documentation = fake.translate('chatdoc',
     <dt>Alternate spelling:</dt>
         <dd>/cam</dd>
     </dl><br>
-    """)
-    
-
-@chat('swapmap')
-def swapmap(message):
-    rggViews.chooseMap()
-
-swapmap.documentation = fake.translate('chatdoc',
-    """/swapmap: Load a new map.
-    <br>
-    """)
-
-@chat('placepog', hidden=True)
-def placepog(message):
-    rggViews.placePog()
-
-placepog.documentation = fake.translate('chatdoc',
-    """/placepog: Place a pog.
-    
-    <br>
-    """)
-
-@chat('newmap')
-def newmap(message):
-    rggViews.newMap()
-
-newmap.documentation = fake.translate('chatdoc',
-    """/newmap: Create a new map.
-    
-    <br>
     """)
 
 def chat(st):
