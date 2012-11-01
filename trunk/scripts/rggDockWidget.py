@@ -118,7 +118,13 @@ class chatWidget(QtGui.QDockWidget):
         
         mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
         
+        self.widgetEditor.anchorClicked.connect(self.anchorClicked)
         self.widgetLineInput.returnPressed.connect(self.processInput)
+        
+    def anchorClicked(self, url):
+        '''If the url appears to be one of the /tell links in a player name, load it to the input.'''
+        if "/tell" in unicode(url):
+            self.widgetLineInput.setText(url.toString())
 
     def toggleTimestamp(self, newsetting):
         if newsetting == "On":
