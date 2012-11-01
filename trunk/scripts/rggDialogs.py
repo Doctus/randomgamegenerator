@@ -260,7 +260,7 @@ class respondSurveyDialog(QtGui.QDialog):
             elif value[0] == "C":
                 results = []
                 for item in value[1]:
-                    if item.checked():
+                    if item.isChecked():
                         results.append(unicode(item.text()))
                 answers[key] = "; ".join(results)
         return answers
