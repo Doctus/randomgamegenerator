@@ -105,7 +105,7 @@ class _state(object):
         
         _state.App = mainApp
         
-        
+        _state.dialogs_keepalive = []
         
         try:
             mainWindow.readGeometry()
@@ -662,6 +662,32 @@ def saveSession():
 def autosaveSession():
     jsondump(_state.session.dump(), os.path.join(rggSystem.MAP_DIR, "autosave.rgg"))
 
+@serverRPC
+def respondSurveyAnswers(surveyData, origin):
+    d = rggDialogs.surveyResultsDialog(surveyData, unicode(origin))
+    _state.dialogs_keepalive.append(d)
+    d.show()
+    
+@clientRPC
+def sendSurveyAnswers(user, target, surveyData):
+    respondSurveyAnswers(getuser(target), surveyData, unicode(user))  
+    
+@serverRPC
+def respondSurvey(surveyData, origin):
+    d = rggDialogs.respondSurveyDialog(surveyData)
+    if d.exec_():
+        sendSurveyAnswers(origin, d.getAnswers())
+    
+@clientRPC
+def sendSurvey(user, target, surveyData):
+    respondSurvey(getuser(target), surveyData, unicode(user))    
+    
+def createSurvey():
+    d = rggDialogs.createSurveyDialog()
+    if d.exec_():
+        for username in unicode(d.sendTo.text()).split():
+            sendSurvey(username, d.addedItems)
+    
 def saveChars():
     
     filename = promptSaveFile(translate('views', 'Save Characters'),

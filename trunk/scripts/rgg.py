@@ -90,6 +90,7 @@ if __name__ == '__main__':
     s.menu.hostGameAct.triggered.connect(rggViews.hostGame)
     s.menu.joinGameAct.triggered.connect(rggViews.joinGame)
     s.menu.disconnectAct.triggered.connect(rggViews.disconnectGame)
+    s.menu.createSurveyAct.triggered.connect(rggViews.createSurvey)
     s.menu.toggleAlertsAct.triggered.connect(rggViews.toggleAlerts)
     s.menu.toggleTimestampsAct.triggered.connect(rggViews.toggleTimestamps)
     s.menu.setTimestampFormatAct.triggered.connect(rggViews.promptTimestampFormat)

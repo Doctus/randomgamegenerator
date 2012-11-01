@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
 import os, os.path
-import rggMap, rggFIRECharacter
+import rggMap
 from rggSystem import fake, translate, showErrorMessage, findFiles, IMAGE_EXTENSIONS, IMAGE_NAME_FILTER, TILESET_DIR, PORTRAIT_DIR, SAVE_DIR, makePortableFilename
 from rggFields import integerField, floatField, stringField, dropDownField, sliderField, validationError
 from rggNet import ConnectionData, localHost
@@ -65,6 +65,230 @@ class dialog(object):
         """Utilize validated data to make changes."""
         raise NotImplementedError()
 
+class createSurveyDialog(QtGui.QDialog):
+    """ A dialog for creating surveys to send to other users."""
+    
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        
+        self.setWindowTitle("Create Survey")
+        
+        self.addedItems = []
+        
+        self.addbutton = QtGui.QPushButton("Add")
+        self.types = QtGui.QComboBox()
+        self.sendToLabel = QtGui.QLabel("Send to: ")
+        self.sendTo = QtGui.QLineEdit()
+        
+        self.multiChoicePromptLabel = QtGui.QLabel("Prompt: ")
+        self.multiChoicePrompt = QtGui.QLineEdit()
+        self.multiChoiceOptions = QtGui.QTextEdit()
+        self.fillInPromptLabel = QtGui.QLabel("Prompt: ")
+        self.fillInPrompt = QtGui.QLineEdit()
+        self.YesNoPromptLabel = QtGui.QLabel("Prompt: ")
+        self.YesNoPrompt = QtGui.QLineEdit()
+        self.allThatApplyPromptLabel = QtGui.QLabel("Prompt: ")
+        self.allThatApplyPrompt = QtGui.QLineEdit()
+        self.allThatApplyOptions = QtGui.QTextEdit()
+        
+        self.okButton = QtGui.QPushButton("Ok")
+        self.cancelButton = QtGui.QPushButton("Cancel")
+    
+        self.addbutton.clicked.connect(self.addNewItem)
+        self.okButton.clicked.connect(self.okPressed)
+        self.cancelButton.clicked.connect(self.cancelPressed)
+        
+        for itemtype in ("Multiple choice", "Fill-in", "Yes/no", "Check all that apply"):
+            self.types.addItem(itemtype)
+        
+        self.layoutt = QtGui.QGridLayout()
+        self.layoutt.addWidget(self.addbutton, 0, 1)
+        self.layoutt.addWidget(self.types, 0, 0)
+        self.layoutt.addWidget(self.sendToLabel, 10, 0)
+        self.layoutt.addWidget(self.sendTo, 10, 1)
+        self.layoutt.addWidget(self.okButton, 11, 0)
+        self.layoutt.addWidget(self.cancelButton, 11, 1)
+        
+        self.layoutt.addWidget(self.multiChoicePromptLabel, 1, 0)
+        self.layoutt.addWidget(self.multiChoicePrompt, 1, 1)
+        self.layoutt.addWidget(self.multiChoiceOptions, 2, 0, 1, 2)
+        self.layoutt.addWidget(self.fillInPromptLabel, 1, 0)
+        self.layoutt.addWidget(self.fillInPrompt, 1, 1)
+        self.layoutt.addWidget(self.YesNoPromptLabel, 1, 0)
+        self.layoutt.addWidget(self.YesNoPrompt, 1, 1)
+        self.layoutt.addWidget(self.allThatApplyPromptLabel, 1, 0)
+        self.layoutt.addWidget(self.allThatApplyPrompt, 1, 1)
+        self.layoutt.addWidget(self.allThatApplyOptions, 2, 0, 1, 2)
+        
+        self.setLayout(self.layoutt)
+        
+        self.types.currentIndexChanged.connect(self.displayOptions)
+        self.displayOptions()
+        
+    def displayOptions(self, nothing=True):
+        self.multiChoicePromptLabel.hide()
+        self.multiChoicePrompt.hide()
+        self.multiChoiceOptions.hide()
+        self.fillInPromptLabel.hide()
+        self.fillInPrompt.hide()
+        self.YesNoPromptLabel.hide()
+        self.YesNoPrompt.hide()
+        self.allThatApplyPromptLabel.hide()
+        self.allThatApplyPrompt.hide()
+        self.allThatApplyOptions.hide()
+        if self.types.currentText() == "Multiple choice":
+            self.multiChoicePromptLabel.show()
+            self.multiChoicePrompt.show()
+            self.multiChoiceOptions.show()
+        elif self.types.currentText() == "Fill-in":
+            self.fillInPromptLabel.show()
+            self.fillInPrompt.show()
+        elif self.types.currentText() == "Yes/no":
+            self.YesNoPromptLabel.show()
+            self.YesNoPrompt.show()
+        elif self.types.currentText() == "Check all that apply":
+            self.allThatApplyPromptLabel.show()
+            self.allThatApplyPrompt.show()
+            self.allThatApplyOptions.show()
+            
+    def addNewItem(self):
+        if self.types.currentText() == "Multiple choice":
+            self.addedItems.append({"type":"Multiple choice", "prompt":unicode(self.multiChoicePrompt.text()), "options":list(unicode(self.multiChoiceOptions.toPlainText()).split("\n"))})
+            self.multiChoicePrompt.clear()
+            self.multiChoiceOptions.clear()
+        elif self.types.currentText() == "Fill-in":
+            self.addedItems.append({"type":"Fill-in", "prompt":unicode(self.fillInPrompt.text())})
+            self.fillInPrompt.clear()
+        elif self.types.currentText() == "Yes/no":
+            self.addedItems.append({"type":"Yes/no", "prompt":unicode(self.YesNoPrompt.text())})
+            self.YesNoPrompt.clear()
+        elif self.types.currentText() == "Check all that apply":
+            self.addedItems.append({"type":"Check all that apply", "prompt":unicode(self.allThatApplyPrompt.text()), "options":list(unicode(self.allThatApplyOptions.toPlainText()).split("\n"))})
+            self.allThatApplyPrompt.clear()
+            self.allThatApplyOptions.clear()
+        
+    def okPressed(self, checked):
+        self.done(1)
+
+    def cancelPressed(self, checked):
+        self.done(0)
+        
+class respondSurveyDialog(QtGui.QDialog):
+    """A dialog containing a survey from another user."""
+    
+    def __init__(self, questions):
+        QtGui.QDialog.__init__(self)
+        
+        self.layoutt = QtGui.QGridLayout()
+        self.responseAssociation = {}
+        
+        if len(questions) < 6:
+            horiz = 2
+        elif len(questions) < 10:
+            horiz = 3
+        else:
+            horiz = 4
+        
+        for i, question in enumerate(questions):
+            if question["type"] == "Multiple choice":
+                label = QtGui.QLabel(question["prompt"])
+                options = QtGui.QButtonGroup()
+                box = QtGui.QGroupBox()
+                minilayout = QtGui.QVBoxLayout()
+                minilayout.addWidget(label)
+                for option in question["options"]:
+                    button = QtGui.QRadioButton(option)
+                    options.addButton(button)
+                    minilayout.addWidget(button)
+                box.setLayout(minilayout)
+                self.layoutt.addWidget(box, i/horiz, i%horiz)
+                self.responseAssociation[question["prompt"]] = ("M", options)
+            elif question["type"] == "Fill-in":
+                label = QtGui.QLabel(question["prompt"])
+                box = QtGui.QGroupBox()
+                minilayout = QtGui.QVBoxLayout()
+                minilayout.addWidget(label)
+                lineedit = QtGui.QLineEdit()
+                minilayout.addWidget(lineedit)
+                box.setLayout(minilayout)
+                self.layoutt.addWidget(box, i/horiz, i%horiz)
+                self.responseAssociation[question["prompt"]] = ("F", lineedit)
+            elif question["type"] == "Yes/no":
+                label = QtGui.QLabel(question["prompt"])
+                options = QtGui.QButtonGroup()
+                box = QtGui.QGroupBox()
+                minilayout = QtGui.QVBoxLayout()
+                minilayout.addWidget(label)
+                for option in ("Yes", "No"):
+                    button = QtGui.QRadioButton(option)
+                    options.addButton(button)
+                    minilayout.addWidget(button)
+                box.setLayout(minilayout)
+                self.layoutt.addWidget(box, i/horiz, i%horiz)
+                self.responseAssociation[question["prompt"]] = ("Y", options)
+            elif question["type"] == "Check all that apply":
+                label = QtGui.QLabel(question["prompt"])
+                opts = []
+                box = QtGui.QGroupBox()
+                minilayout = QtGui.QVBoxLayout()
+                minilayout.addWidget(label)
+                for option in question["options"]:
+                    button = QtGui.QCheckBox(option)
+                    opts.append(button)
+                    minilayout.addWidget(button)
+                box.setLayout(minilayout)
+                self.layoutt.addWidget(box, i/horiz, i%horiz)
+                self.responseAssociation[question["prompt"]] = ("C", opts)
+            
+        self.okButton = QtGui.QPushButton("Ok")
+        self.cancelButton = QtGui.QPushButton("Cancel")
+        
+        self.layoutt.addWidget(self.okButton, 80, 1)
+        self.layoutt.addWidget(self.cancelButton, 80, 0)
+        self.setLayout(self.layoutt)
+
+        self.okButton.clicked.connect(self.okPressed)
+        self.cancelButton.clicked.connect(self.cancelPressed)
+    
+    def getAnswers(self):
+        answers = {}
+        for key, value in self.responseAssociation.items():
+            if value[0] == "M" or value[0] == "Y":
+                answers[key] = unicode(value[1].checkedButton().text())
+            elif value[0] == "F":
+                answers[key] = unicode(value[1].text())
+            elif value[0] == "C":
+                results = []
+                for item in value[1]:
+                    if item.checked():
+                        results.append(unicode(item.text()))
+                answers[key] = "; ".join(results)
+        return answers
+    
+    def okPressed(self, checked):
+        self.done(1)
+
+    def cancelPressed(self, checked):
+        self.done(0)
+
+class surveyResultsDialog(QtGui.QDialog):
+    """A dialog containing another user's answers to a survey."""
+    
+    def __init__(self, answers, origin):
+        QtGui.QDialog.__init__(self)
+        layoutt = QtGui.QVBoxLayout()
+        self.setWindowTitle("Response from " + origin)
+        for question, answer in answers.items():
+            box = QtGui.QGroupBox()
+            minilayout = QtGui.QVBoxLayout()
+            quest = QtGui.QLabel(question)
+            minilayout.addWidget(quest)
+            ans = QtGui.QLabel(answer)
+            minilayout.addWidget(ans)
+            box.setLayout(minilayout)
+            layoutt.addWidget(box)
+        self.setLayout(layoutt)
+        
 class resizeDialog(QtGui.QDialog):
 
     def __init__(self, origx, origy, currw, currh):
@@ -685,206 +909,6 @@ class newCharacterDialog(dialog):
         return([self.cleanData['listid'], 
                 self.cleanData['charactername'], 
                 self.cleanData['portrait']])
-                
-class FIRECharacterSheetDialog(dialog):
-    """A dialog used to create or edit a FIRE character sheet."""
-    
-    def __init__(self, **kwargs):
-        """Initializes the dialog data."""
-        super(FIRECharacterSheetDialog, self).__init__()
-        self.fields = self._createFields(kwargs)
-    
-    def _createFields(self, data):
-        """Create the fields used by this dialog."""
-        
-        if data.has_key("char"):
-            chara = data['char']
-            return dict(charactername=stringField(
-                translate('FIRECharacterSheetDialog', 'Character Name'),
-                value=data.get('charactername', chara.name)),
-                lust=sliderField(
-                translate('FIRECharacterSheetDialog', 'Lust'),
-                chara.getStat('lust'),
-                1,
-                5),
-                gluttony=sliderField(
-                translate('FIRECharacterSheetDialog', 'Gluttony'),
-                chara.getStat('gluttony'),
-                1,
-                5),
-                greed=sliderField(
-                translate('FIRECharacterSheetDialog', 'Greed'),
-                chara.getStat('greed'),
-                1,
-                5),
-                sloth=sliderField(
-                translate('FIRECharacterSheetDialog', 'Sloth'),
-                chara.getStat('sloth'),
-                1,
-                5),
-                wrath=sliderField(
-                translate('FIRECharacterSheetDialog', 'Wrath'),
-                chara.getStat('wrath'),
-                1,
-                5),
-                envy=sliderField(
-                translate('FIRECharacterSheetDialog', 'Envy'),
-                chara.getStat('envy'),
-                1,
-                5),
-                pride=sliderField(
-                translate('FIRECharacterSheetDialog', 'Pride'),
-                chara.getStat('pride'),
-                1,
-                5))
-        
-        return dict(charactername=stringField(
-                translate('FIRECharacterSheetDialog', 'Character Name'),
-                value=data.get('charactername', translate('FIRECharacterSheetDialog', 'Temp'))),
-                lust=sliderField(
-                translate('FIRECharacterSheetDialog', 'Lust'),
-                3,
-                1,
-                5),
-                gluttony=sliderField(
-                translate('FIRECharacterSheetDialog', 'Gluttony'),
-                3,
-                1,
-                5),
-                greed=sliderField(
-                translate('FIRECharacterSheetDialog', 'Greed'),
-                3,
-                1,
-                5),
-                sloth=sliderField(
-                translate('FIRECharacterSheetDialog', 'Sloth'),
-                3,
-                1,
-                5),
-                wrath=sliderField(
-                translate('FIRECharacterSheetDialog', 'Wrath'),
-                3,
-                1,
-                5),
-                envy=sliderField(
-                translate('FIRECharacterSheetDialog', 'Envy'),
-                3,
-                1,
-                5),
-                pride=sliderField(
-                translate('FIRECharacterSheetDialog', 'Pride'),
-                3,
-                1,
-                5))
-    
-    def _interpretFields(self, fields):
-        """Interpret the fields into a dictionary of clean items."""
-        return dict((key, field.clean()) for key, field in fields.items())
-    
-    def exec_(self, parent, accept, char=None):
-        """Executes this dialog as modal, ensuring OK is only hit with valid data.
-        
-        parent -- the parent object of this dialog
-        accept() -- Acceptance function;
-            return True to accept data, False to continue (you should show an error)
-        
-        returns: True if the OK button is hit and the acceptance function passes.
-        
-        """
-        
-        if char is not None:
-            self.character = char
-        else:
-            self.character = rggFIRECharacter.FIRECharacter()
-        
-        widget = QtGui.QDialog(parent)
-        
-        # Buttons
-        okayButton = QtGui.QPushButton(translate('FIRECharacterSheetDialog', "Finish"))
-        okayButton.setDefault(True)
-        cancelButton = QtGui.QPushButton(translate('FIRECharacterSheetDialog', "Cancel"))
-        
-        # Add fields
-        formLayout = QtGui.QFormLayout()
-        for id in (['charactername']):
-            field = self.fields[id]
-            formLayout.addRow(
-                translate('FIRECharacterSheetDialog', '{0}: ', 'Row layout').format(field.name),
-                field.widget(widget))
-        for id in (['lust', 'gluttony', 'greed', 'sloth', 'wrath', 'envy', 'pride']):
-            field = self.fields[id]
-            formLayout.addRow(
-                translate('FIRECharacterSheetDialog', '{0}: ', 'Row layout').format(field.name),
-                field.widget(widget))
-            field.evil.connect(self.updateTotal)
-                
-        self.totalLabel = QtGui.QLabel(parent)
-        self.updateTotal()
-        
-        # Position layout
-        grandBox = QtGui.QGridLayout()
-        grandBox.addLayout(formLayout, 0, 0, 1, 2)
-        grandBox.addWidget(self.totalLabel, 1, 1)
-        grandBox.addWidget(okayButton, 2, 0)
-        grandBox.addWidget(cancelButton, 2, 1)
-        
-        # Set up the widget
-        widget.setLayout(grandBox)
-        widget.setModal(True)
-        widget.setWindowTitle(translate('FIRECharacterSheetDialog', "Editing Character Sheet..."))
-        
-        # Allow user to specify validation
-        def okayPressed():
-            if accept():
-                widget.accept()
-        
-        # Signals
-        widget.connect(okayButton, QtCore.SIGNAL('clicked()'), okayPressed)
-        widget.connect(cancelButton, QtCore.SIGNAL('clicked()'), widget.reject)
-        
-        # Show to user
-        return (widget.exec_() == QtGui.QDialog.Accepted)
-    
-    def updateTotal(self):
-        total = 0
-        for id in (['lust', 'gluttony', 'greed', 'sloth', 'wrath', 'envy', 'pride']):
-            total += self.fields[id].clean()
-        self.totalLabel.setText("Total: " + str(total) + "/" + str(self.character.vice))
-        
-    def clean(self):
-        """Check for errors and return well-formatted data."""
-        self.cleanData = self._interpretFields(self.fields)
-        return self.cleanData
-    
-    def save(self):
-        """Make a new character and return it."""
-        assert(self.cleanData)
-        return([self.cleanData['charactername'],
-                self.cleanData['lust'],
-                self.cleanData['gluttony'],
-                self.cleanData['greed'],
-                self.cleanData['sloth'],
-                self.cleanData['wrath'],
-                self.cleanData['envy'],
-                self.cleanData['pride']])
-                
-    def is_valid(self):
-        """Return true if the data is valid and complete."""
-        try:
-            self.clean()
-            assert(self.cleanData is not None)
-            total = 0
-            for id in (['lust', 'gluttony', 'greed', 'sloth', 'wrath', 'envy', 'pride']):
-                total += self.fields[id].clean()
-            assert(total == self.character.vice)
-            return True
-        except validationError as e:
-            self.cleanData = None
-            if len(e.args) > 0:
-                self._error = e.args[0]
-            else:
-                # Catch-all shouldn't be seen by end-users
-                self._error = translate('dialog', "There is an error in your input.")
 
 class gfxSettingsDialog(dialog):
     """A dialog used to create a new map."""
