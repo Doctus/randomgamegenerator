@@ -246,6 +246,8 @@ class ICChatWidget(QtGui.QDockWidget):
     def setCharacterPreview(self, newIndex=-1):
         try:
             preview = QtGui.QPixmap(os.path.join(unicode(PORTRAIT_DIR), unicode(self.characters[self.characterSelector.currentIndex()].portrait)))
+            if preview.isNull(): #Sadly, we have to check ahead, because Qt is dumb and prints an error about the scaling instead of raising one we can catch.
+                raise TypeError
             preview = preview.scaled(min(preview.width(), 64), min(preview.height(), 64))
             self.characterPreview.setPixmap(preview)
         except:
