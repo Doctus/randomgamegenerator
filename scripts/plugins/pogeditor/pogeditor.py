@@ -86,7 +86,10 @@ class pogEditorWidget(QtGui.QDockWidget):
             event.acceptProposedAction()
 
     def saveImage(self, image, filename):
-        image.save(filename, "PNG", transparency=((254, 0, 254)))
+        if ".png" not in filename: #Linux issue workaround
+            image.save(filename+'.png', "PNG", transparency=((254, 0, 254)))
+        else:
+            image.save(filename, "PNG", transparency=((254, 0, 254)))
 
     def openImage(self, path):
         image = im.open(path)
