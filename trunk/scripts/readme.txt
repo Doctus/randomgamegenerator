@@ -1,4 +1,4 @@
-RGG v1.01c "Overmuch magic"
+RGG v1.02 "Of twilight evenings and of long ago"
 
 http://code.google.com/p/randomgamegenerator/
 
@@ -41,6 +41,24 @@ Special Thanks:
   Everyone from MoMM and #attercop
 
 Changelog:
+
+v1.02  "Of twilight evenings and of long ago" November 3, 2012
+
+   Fixes
+    * Fixed several issues with unicode filepaths.
+
+   Features and Changes
+    * Added a preview of the currently selected IC portrait.
+    * Updated character creator with mech mode.
+    * Vastly improved efficiency of the map editor's
+      rectangle draw mode.
+    * Clicking a player name will now fill in the appropriate
+      command to whisper to that player.
+    * Reorganized several menus.
+    * Added the ability to prompt other players with questions
+      and receive responses.
+
+  ---
 
 v1.01c   "Overmuch magic"                     October 13, 2012
 
