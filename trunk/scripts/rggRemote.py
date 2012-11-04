@@ -116,6 +116,42 @@ def sendICEmote(user, message, chname, portrait):
     respondICEmote(allusers(), chname, message, portrait)
 
 @serverRPC
+def respondICWhisperSender(target, message, chname, portrait):
+    if len(portrait) > 1:
+        portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
+        ICSay(translate('remote', '<table><tr><td><img src="{port}" width="64" height="64"></td><td>To {name}: {message}</td></tr></table><br />').format(
+            port=portfile,                                                                      
+            name=linkedName(target),
+            message=message))
+    else:
+        ICSay(translate('remote', 'To {name}: {message}').format(                                                                    
+            name=linkedName(chname),
+            message=message))
+
+@serverRPC
+def respondICWhisperTarget(sender, message, chname, portrait):
+    if len(portrait) > 1:
+        portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
+        ICSay(translate('remote', '<table><tr><td><img src="{port}" width="64" height="64"></td><td>{name} whispers: {message}</td></tr></table><br />').format(
+            port=portfile,                                                                      
+            name=linkedName(chname),
+            message=message))
+    else:
+        ICSay(translate('remote', '{name} whispers: {message}').format(                                                                    
+            name=linkedName(chname),
+            message=message))
+
+@clientRPC
+def sendICWhisper(user, target, message, chname, portrait):
+    target = target.lower()
+    targetuser = getuser(target)
+    if not targetuser:
+        respondError(user, fake.translate('remote', '{target} does not exist.'), target=target)
+    else:
+        respondICWhisperSender(user, targetuser.username, message, chname, portrait)
+        respondICWhisperTarget(targetuser, user.username, message, chname, portrait)    
+    
+@serverRPC
 def respondWhisperSender(target, message):
     say(translate('remote', 'To {username}: {message}').format(
         username=linkedName(target),
