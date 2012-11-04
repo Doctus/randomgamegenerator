@@ -1,4 +1,4 @@
-RGG v1.02 "Of twilight evenings and of long ago"
+RGG v1.02b "Of twilight evenings and of long ago"
 
 http://code.google.com/p/randomgamegenerator/
 
@@ -41,6 +41,13 @@ Special Thanks:
   Everyone from MoMM and #attercop
 
 Changelog:
+
+v1.02b "Of twilight evenings and of long ago" November 4, 2012
+
+   Features and Changes
+    * Allowed in-character whispers.
+
+  ---
 
 v1.02  "Of twilight evenings and of long ago" November 3, 2012
 
