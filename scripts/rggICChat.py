@@ -166,7 +166,7 @@ def whisper(message, chname, portrait):
         elif not rest:
             ICSay(translate('chat', "What do you want to tell {target}?").format(target=target))
         else:
-            rggRemote.sendWhisper(target, rest)
+            rggRemote.sendICWhisper(target, rest, chname, portrait)
 
 whisper.documentation = fake.translate('chatdoc',
     """/whisper: Whisper a message to another user.<dl>
