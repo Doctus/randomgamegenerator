@@ -710,7 +710,6 @@ def loadChars():
         _state.icwidget.load(obj)
     except Exception as e:
         showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
-    print e
     return
 
 def configureDrawTimer():
