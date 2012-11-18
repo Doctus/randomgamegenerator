@@ -63,8 +63,6 @@ class Session(object):
         #rggResource.srm.processFile(localuser(), pog._src)
         import rggEvent
         self.pogs[pog.ID] = pog
-        if pog.hidden:
-            pog._realHide(True)
         rggEvent.pogUpdateEvent(pog)
     
     def removePog(self, pog):
@@ -199,6 +197,10 @@ class Session(object):
             loaded = rggPog.Pog.load(pog)
             loaded.ID = ID
             sess._addPog(loaded)
+            
+        for pog in sess.pogs.values():
+            if pog.hidden:
+                pog.hide()
             
         maps = loadObject('Session.maps', obj.get('maps'))
         for ID, mappe in maps.items():
