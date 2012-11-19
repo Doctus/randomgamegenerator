@@ -1,5 +1,7 @@
 '''
-rggSession - for the Random Game Generator project            
+rggSession - for the Random Game Generator project
+
+A class representing a savable game state of pogs, lines, and maps.
 
 By Doctus (kirikayuumura.noir@gmail.com)
 
@@ -33,6 +35,7 @@ class Session(object):
         self.maphack = 0
         
     def _addMap(self, mappe):
+        '''Adds a map that is already loaded and has an ID.'''
         assert(mappe.ID is not None)
         if mappe.drawOffset == [0, 0]:
             pos = self.maphack
@@ -41,31 +44,35 @@ class Session(object):
         self.maphack += mappe.pixelSize[0] + 25
         
     def _addPog(self, pog):
+        '''Adds a pog to the session without informing rggEvent.'''
         assert(pog.ID is not None)
         self.pogs[pog.ID] = pog
         
     def _findUniqueMapID(self, src):
-        """Get a unique id for a map."""
+        '''Get a unique id for a map.'''
         id = src or rggSystem.findRandomAppend()
         while id in self.maps.keys():
             id += rggSystem.findRandomAppend()
         return id
     
     def _findUniquePogID(self, src):
-        """Get a unique id for a pog."""
+        '''Get a unique id for a pog.'''
         id = src or rggSystem.findRandomAppend()
         while id in self.pogs.keys():
             id += rggSystem.findRandomAppend()
         return id
     
     def addPog(self, pog):
+        '''Adds a pog to the session, informing rggEvent of the addition.'''
         assert(pog.ID is not None)
         #rggResource.srm.processFile(localuser(), pog._src)
         import rggEvent
         self.pogs[pog.ID] = pog
         rggEvent.pogUpdateEvent(pog)
+        self.hideAllHiddenPogs()
     
     def removePog(self, pog):
+        '''Deletes a pog.'''
         assert(pog.ID is not None)
         import rggEvent
         rggEvent.pogDeleteEvent(self.pogs[pog.ID])
@@ -73,6 +80,7 @@ class Session(object):
         del self.pogs[pog.ID]
         
     def addMap(self, mappe):
+        '''Creates a new map and assigns it a unique ID.'''
         if mappe.drawOffset == [0, 0]:
             pos = self.maphack
             mappe.drawOffset = (pos, 0)
@@ -86,17 +94,21 @@ class Session(object):
         self.maps[ID] = mappe
         
     def addDumpedMap(self, dump, ID):
+        '''Adds a map from a JSON dump with the specified ID.'''
         mappe = rggMap.Map.load(dump)
         mappe.ID = ID
         self._addMap(mappe)
         
     def getMapExists(self, ID):
+        '''Returns whether a map with the given ID exists in this session.'''
         return ID in self.maps.keys()
         
     def getMap(self, ID):
+        '''Returns the map with a given ID.'''
         return self.maps[ID]
         
     def findTopMap(self, mapPosition):
+        '''Returns the top map at a given position, or None.'''
         for mappe in self.maps.values():
             size = mappe.pixelSize
             if mapPosition[0] >= mappe.drawOffset[0] and mapPosition[0] <= mappe.drawOffset[0] + size[0]:
@@ -105,17 +117,19 @@ class Session(object):
         return None
         
     def closeMap(self, ID):
+        '''Deletes a specified map and its tiles.'''
         self.maps[ID]._deleteTiles()
         del self.maps[ID]
     
     def closeAllMaps(self):
+        '''Deletes all maps and their tiles.'''
         self.maphack = 0
         for mappe in self.maps.values():
             mappe._deleteTiles()
         self.maps = {}
     
     def findTopPog(self, position):
-        """Returns the top pog at a given position, or None."""
+        '''Returns the top pog at a given position, or None.'''
         layer = -sys.maxint
         locked = True
         top = None
@@ -129,10 +143,12 @@ class Session(object):
         return top
     
     def refreshPogs(self):
+        '''Forcibly refreshes all pogs in the session.'''
         for pog in self.pogs.values():
             pog.forceUpdate()
     
     def storeLines(self):
+        '''Stores all lines of which the session is aware in a JSON-compatible format in self.lines'''
         self.lines = []
         
         for thickness, lines in self.linesDict.items():
@@ -140,31 +156,41 @@ class Session(object):
                 self.lines.extend( [item[0], item[1], item[2], item[3], thickness, item[4], item[5], item[6]] )
 
     def restoreLines(self):
+        '''Draws all lines of which the session is aware.'''
         for thickness, lines in self.linesDict.items():
             for item in lines:
                 rggSystem.drawLine(item[0], item[1], item[2], item[3], thickness, item[4], item[5], item[6])
                 
-    def pointIntersectRect(self, point, rect):
+    def _pointIntersectRect(self, point, rect):
+        '''Check used by deleteLine.'''
         if point[0] < rect[0] or point[0] > rect[0] + rect[2]: return False
         if point[1] < rect[1] or point[1] > rect[1] + rect[3]: return False
         return True
                 
     def deleteLine(self, x, y, w, h):
+        '''Remove all lines within the x, y, w, h rect from the session's awareness. This does not delete the lines themselves.'''
         for thickness, lines in self.linesDict.items():
             dellist = []
             for line in lines:
-                if self.pointIntersectRect((line[0], line[1]), (x, y, w, h)) or self.pointIntersectRect((line[2], line[3]), (x, y, w, h)):
+                if self._pointIntersectRect((line[0], line[1]), (x, y, w, h)) or self._pointIntersectRect((line[2], line[3]), (x, y, w, h)):
                     dellist.append(line)
             for index in dellist:
                 lines.remove(index)
             
     def addLine(self, line):
+        '''Add a line to the session's awareness from a tuple of parameters. This does not create a graphical line.'''
         if not line[4] in self.linesDict:
             self.linesDict[line[4]] = []
         self.linesDict[line[4]].append([line[0], line[1], line[2], line[3], line[5], line[6], line[7]])
         
+    def hideAllHiddenPogs(self):
+        '''Checks through all pogs to make sure the ones that should be hidden, are. Workaround for a glwidget issue.'''
+        for pog in self.pogs.values():
+            if pog.hidden:
+                pog.hide()
+        
     def clear(self):
-        """Clear all session data to prepare for loading a new one."""
+        '''Clear all session data to prepare for loading a new one.'''
         for map in self.maps.values():
             map._deleteTiles()
         for pog in self.pogs.values():
@@ -177,7 +203,7 @@ class Session(object):
         self.maphack = 0
     
     def dump(self):
-        """Serialize to an object valid for JSON dumping."""
+        '''Serialize to an object valid for JSON dumping.'''
 
         self.storeLines()
 
