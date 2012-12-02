@@ -150,6 +150,8 @@ class BaseClient(object):
                 file.close()
         except IOError:
             return False
+        if os.stat(filename).st_size == 0:
+            os.remove(filename)
         self.getList.add(filename)
         self.obj.sendMessage(MESSAGE_GET,
             filename=filedata.filename,
@@ -376,6 +378,7 @@ class BaseClient(object):
     
     def _getFile(self, socket, filename, size, checksum):
         """Responds to a file request."""
+        self.fileEvent.emit(self, filename, "Requested by client")
         self.sendList.add(fileData(QtCore.QFile(makeLocalFilename(filename)), filename, size, checksum))
         self._updatetransfer()
     
