@@ -157,6 +157,7 @@ class BaseClient(object):
             checksum=filedata.digest)
         message = "[{0}] Requested transfer of {filename} [{size} {checksum}]"
         print message.format(self.obj.context, filename=filedata.filename, size=filedata.size,checksum=filedata.digest)
+        self.fileEvent.emit(self, filename, "Requested")
         self._updatetransfer()
         return True
 
@@ -209,6 +210,7 @@ class BaseClient(object):
         if not self.ready:
             return
         if not self.getList and not self.sendList:
+            print "no send list"
             return
         if not self.xfer:
             self._openXfer()
@@ -391,6 +393,7 @@ class BaseClient(object):
         """Responds to a file request."""
         message = "[{0}] Remote refused to send {filename}"
         print message.format(socket.context, filename=filename)
+        self.fileEvent.emit(self, filename, "Remote refused to send")
         if filename in self.getList:
             self.getList.remove(filename)
             self._fileFailed(filename)
