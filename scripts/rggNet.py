@@ -187,7 +187,7 @@ class BaseClient(object):
                 socket = self.obj
                 message = "[{0}] Ignored transfer of {filename} [{size} {checksum}]"
             print message.format(socket.context, filename=filedata.filename, size=filedata.size,checksum=filedata.digest)
-        
+        if self.sentfile: self.fileEvent.emit(self, "", "EXITED SEND LOOP DUE TO SENTFILE  ("+str(len(self.sendList))+ " FILES REMAIN QUEUED)")
     
     def _updateReceive(self):
         """Updates the transfers to receive."""
