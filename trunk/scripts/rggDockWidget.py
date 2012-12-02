@@ -13,8 +13,10 @@ class transferMonitorWidget(QtGui.QDockWidget):
         self.setWindowTitle(self.tr("Transfer Monitor"))
         self.transferList = QtGui.QListWidget(mainWindow)
         self.widget = QtGui.QWidget(mainWindow)
+        self.status = QtGui.QLabel("Initializing", mainWindow)
         self.layout = QtGui.QBoxLayout(2)
         self.layout.addWidget(self.transferList)
+        self.layout.addWidget(self.status)
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
         self.setObjectName("Transfer Monitor")
@@ -25,7 +27,11 @@ class transferMonitorWidget(QtGui.QDockWidget):
         self.transferList.addItem("".join((client.username, ": ", filename, " (", reason, ")")))
         
     def processFileEvent(self, client, filename, event):
-        self.addItem(client, filename, event)
+        if len(filename) > 1:
+            self.addItem(client, filename, event)
+        else:
+            self.status.setText(event)
+            self.update()
 
 class debugConsoleWidget(QtGui.QDockWidget):
 
