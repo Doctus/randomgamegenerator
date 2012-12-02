@@ -5,6 +5,28 @@ from rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
 import os, os.path, time
 #import rggEvent
 
+class transferMonitorWidget(QtGui.QDockWidget):
+
+    def __init__(self, mainWindow):
+        super(QtGui.QDockWidget, self).__init__(mainWindow)
+        self.setToolTip(self.tr("Allows for monitoring and control of file transfers."))
+        self.setWindowTitle(self.tr("Transfer Monitor"))
+        self.transferList = QtGui.QListWidget(mainWindow)
+        self.widget = QtGui.QWidget(mainWindow)
+        self.layout = QtGui.QBoxLayout(2)
+        self.layout.addWidget(self.transferList)
+        self.widget.setLayout(self.layout)
+        self.setWidget(self.widget)
+        self.setObjectName("Transfer Monitor")
+        
+        mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
+        
+    def addItem(self, client, filename, reason):
+        self.transferList.addItem("".join((client.username, ": ", filename, " (", reason, ")")))
+        
+    def processFileEvent(self, client, filename, event):
+        self.addItem(client, filename, event)
+
 class debugConsoleWidget(QtGui.QDockWidget):
 
     def __init__(self, mainWindow):

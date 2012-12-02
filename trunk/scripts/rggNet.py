@@ -237,6 +237,7 @@ class BaseClient(object):
         try:
             # Can we open the file?
             if not fileData.file.open(QtCore.QFile.ReadOnly):
+                self.fileEvent.emit(self, filename, "SENDFILE Could not open")
                 print "SENDFILE Could not open"
                 return False
             try:
@@ -246,6 +247,7 @@ class BaseClient(object):
                 digest = generateChecksum(file)
                 if fileData.size is not None and fileData.digest is not None:
                     if size == fileData.size and digest == fileData.digest:
+                        self.fileEvent.emit(self, filename, "SENDFILE Size and digest match")
                         print "SENDFILE Size and digest match"
                         return False
                 
@@ -255,10 +257,12 @@ class BaseClient(object):
                 # User hook
                 if not self.allowSend(fileData.filename,
                         fileData.size, fileData.digest):
+                    self.fileEvent.emit(self, filename, "SENDFILE User hook")
                     print "SENDFILE User hook"
                     return False
                 
                 file = None
+                self.fileEvent.emit(self, filename, "SENDFILE Success")
                 print "SENDFILE Success"
                 return True
             finally:
@@ -274,27 +278,32 @@ class BaseClient(object):
         
         # Did we ask for the file?
         if not filename in self.getList:
+            self.fileEvent.emit(self, filename, "RECVFILE Duplicate")
             print "RECVFILE Duplicate"
             return False
         try:
             # Can we open the file?
             if not file.open(QtCore.QFile.ReadWrite):
+                self.fileEvent.emit(self, filename, "RECVFILE Could not open")
                 print "RECVFILE Could not open"
                 return False
             try:
                 # Do we already have an identical copy?
                 if file.size() == fileData.size:
                     if generateChecksum(file) == fileData.digest:
+                        self.fileEvent.emit(self, filename, "RECVFILE Size and digest match")
                         print "RECVFILE Size and digest match"
                         return False
                         
                 # User hook
                 if not self.allowReceipt(fileData.filename,
                         fileData.size, fileData.digest):
+                    self.fileEvent.emit(self, filename, "RECVFILE User hook")
                     print "RECVFILE User hook"
                     return False
                 
                 file = None
+                self.fileEvent.emit(self, filename, "RECVFILE Success")
                 print "RECVFILE Success"
                 return True
             finally:
@@ -418,6 +427,16 @@ class BaseClient(object):
     def _fileFailed(self, filename):
         """Notify that the socket did not send the specified file."""
         pass
+        
+    fileEvent = signal(object, basestring, basestring, doc=
+        """Called when something happens relating to a file.
+        
+        client -- this client
+        filename -- the filename of the file received
+        event -- a description of the event
+        
+        """
+    )
     
 class JsonClient(BaseClient):
     """A client that communicates with a server."""
@@ -940,6 +959,19 @@ class JsonServer(object):
         """
     )
     
+    fileEvent = signal(object, basestring, basestring, doc=
+        """Called when a file fails to come over the wire.
+        
+        username -- the username of the client
+        filename -- the filename of the file received
+        event -- a description of the event
+        
+        """
+    )
+    
+    def passFileEvent(self, clientName, filename, eventDescription):
+        self.fileEvent.emit(clientName, filename, eventDescription)
+    
     def _newConnection(self):
         """Responds to a new connection occurring."""
         if not self.tcp:
@@ -1024,6 +1056,7 @@ class JsonServer(object):
             socket.activate()
             client = RemoteClient(username, self, socket)
             self._addClient(client)
+            client.fileEvent.connect(self.passFileEvent)
             socket.sendMessage(MESSAGE_ACTIVATE, username=username)
             self.connected.emit(self, username)
         else:
