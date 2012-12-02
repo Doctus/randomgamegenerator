@@ -105,11 +105,13 @@ if __name__ == '__main__':
     client.disconnected.connect(rggRemote.clientDisconnect)
     client.objectReceived.connect(rggRemote.clientReceive)
     client.fileReceived.connect(rggRemote.clientFileReceive)
+    client.fileEvent.connect(rggViews.transferFileResponse)
     server.connected.connect(rggRemote.serverConnect)
     server.disconnected.connect(rggRemote.serverDisconnect)
     server.kicked.connect(rggRemote.serverKick)
     server.objectReceived.connect(rggRemote.serverReceive)
     server.fileReceived.connect(rggRemote.serverFileReceive)
+    server.fileEvent.connect(rggViews.transferFileResponse)
     
     # Start execution
     try:

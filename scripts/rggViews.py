@@ -92,6 +92,7 @@ class _state(object):
         _state.icwidget = rggDockWidget.ICChatWidget(mainWindow)
         _state.uwidget = rggDockWidget.userListWidget(mainWindow)
         _state.mwidget = rggDockWidget.mapEditor(mainWindow)
+        _state.fwidget = rggDockWidget.transferMonitorWidget(mainWindow)
         _state.users = {}
         _state.localuser = User(client.username)
         _state.users[client.username] = _state.localuser
@@ -474,6 +475,9 @@ def kick(username):
 def getSession():
     return _state.session
 
+def transferFileResponse(responsibleClient, filename, eventDescription):
+    _state.fwidget.processFileEvent(responsibleClient, filename, eventDescription)
+    
 # MAPS
 def topmap(mapPosition):
     return _state.session.findTopMap(mapPosition)
