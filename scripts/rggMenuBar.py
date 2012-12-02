@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import PYQT_VERSION_STR
-from rggSystem import translate, mainWindow, SAVE_DIR, VERSION, DEV
+from rggSystem import translate, mainWindow, SAVE_DIR, PLUGINS_DIR, VERSION, DEV
 from rggJson import loadString, jsonload, jsonappend
 import sys, os, rggStyles
 
@@ -201,8 +201,8 @@ class menuBar(object):
         
         self.pluginsModules = []
         self.plugins = {}
-        sys.path.append('plugins')
-        for folder in os.listdir('plugins'):
+        sys.path.append(PLUGINS_DIR)
+        for folder in os.listdir(PLUGINS_DIR):
             if folder == ".svn":
                 continue
             try:
