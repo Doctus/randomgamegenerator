@@ -69,6 +69,10 @@ class BaseClient(object):
         # Doesn't need translation
         self.username = unicode(localHost()) or u'localhost'
         assert(self.username)
+        
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self._updatetransfer)
+        self.timer.start(1000)
     
     @property
     def ready(self):
