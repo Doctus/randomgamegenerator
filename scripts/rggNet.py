@@ -171,6 +171,7 @@ class BaseClient(object):
         """Updates the transfers to send."""
         
         while self.sendList and not self.sentfile:
+            self.fileEvent.emit(self, "", "SENDING: "+str(len(self.sendList))+ " QUEUED")
             filedata = iter(self.sendList).next()
             self.sendList.remove(filedata)
             if self._shouldSendFile(filedata):
@@ -210,11 +211,13 @@ class BaseClient(object):
     def _updatetransfer(self):
         """Opens or updates the transfer socket."""
         if not self.ready:
+            self.fileEvent.emit(self, "", "NOT READY")
             return
         if not self.getList and not self.sendList:
-            print "no send list"
+            self.fileEvent.emit(self, "", "NO SEND LIST")
             return
         if not self.xfer:
+            self.fileEvent.emit(self, "", "NO XFER SOCKET")
             self._openXfer()
             return
         
@@ -510,11 +513,14 @@ class JsonClient(BaseClient):
     def _updateSendReceive(self):
         """Determines the order of updates to avoid deadlock."""
         
+        self.fileEvent.emit(self, "", "CHECKING SEND/RECEIVE")
+        
         # Even if there's a transfer waiting, prioritize sending stuff first
         self._updateSend()
         
         # This check ensures the client priortizes sending over receiving
         if self.sentfile:
+            self.fileEvent.emit(self, "", "SENT FILE")
             return
         self._updateReceive()
         
