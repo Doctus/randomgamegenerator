@@ -387,7 +387,8 @@ def drawCircle(centre, edge, colour, thickness, preview=False):
         vert[1] = vert[3]
     return lines
     
-def drawRegularPolygon(sides, centre, size, colour, thickness, rainbow = False):
+def drawRegularPolygon(sides, centre, size, colour, thickness, rainbow = False, preview = False):
+    #TODO: Add rotation parameter.
     vertices = []
     lines = set()
     for i in xrange(sides):
@@ -396,9 +397,9 @@ def drawRegularPolygon(sides, centre, size, colour, thickness, rainbow = False):
         for q in xrange(sides):
             if sides%2 == 1 or p%(sides/2) != q%(sides/2):
                 if not rainbow:
-                    lines.update(drawSegmentedLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, colour[0], colour[1], colour[2]))
+                    lines.update(drawSegmentedLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, colour[0], colour[1], colour[2], preview))
                 else:
-                    lines.update(drawSegmentedLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, random.random(), random.random(), random.random()))
+                    lines.update(drawSegmentedLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, random.random(), random.random(), random.random(), preview))
     return lines
 
 def addText(text, pos):

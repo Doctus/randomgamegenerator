@@ -1252,6 +1252,11 @@ def mouseMove(screenPosition, mapPosition, displacement):
             elif _state.drawmode == "Line":
                 clearPreviewLines()
                 drawSegmentedLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.thickness, _state.linecolour[0], _state.linecolour[1], _state.linecolour[2], True)
+            elif _state.drawmode == "Pentagram" or _state.drawmode == "Hexagram":
+                if _state.previousLinePlacement != None:
+                    clearPreviewLines()
+                    displacement = max(abs(mapPosition[0]-_state.previousLinePlacement[0]), abs(mapPosition[1]-_state.previousLinePlacement[1]))
+                    drawRegularPolygon(14-len(_state.drawmode), _state.previousLinePlacement, displacement, _state.linecolour, _state.thickness, False, True)
     elif icon == ICON_DELETE: #deleteIcon
         if _state.mouseButton == BUTTON_LEFT:
             if _state.previousLinePlacement != None:
