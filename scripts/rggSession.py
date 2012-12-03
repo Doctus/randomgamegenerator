@@ -201,6 +201,22 @@ class Session(object):
         self.lines = []
         self.linesDict = {}
         self.maphack = 0
+        
+    def hide(self):
+        '''Hide all maps, pogs, and lines while retaining their data.'''
+        for map in self.maps.values():
+            map.hide()
+        for pog in self.pogs.values():
+            pog._realHide(True)
+        clearLines()
+        
+    def show(self):
+        '''Restores display of maps, pogs, and lines after a hide() call.'''
+        for map in self.maps.values():
+            map.show()
+        for pog in self.pogs.values():
+            pog._realHide(False)
+        self.restoreLines()
     
     def dump(self):
         '''Serialize to an object valid for JSON dumping.'''
