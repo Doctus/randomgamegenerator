@@ -2,7 +2,8 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import besmData
 import os, json, gzip
-from rggSystem import CHARSHEETS_DIR
+from rggSystem import CHARSHEETS_DIR, checkFileExtension
+from rggViews import sendCharacterSheet
 
 def jsondump(obj, filename):
     """Dump object to file."""
@@ -583,11 +584,13 @@ class OhNoesALazyGlobalClass:
         self.charload = QAction("Load Character Sheet...", mainWindowReal)
         self.charexport = QAction("Export to Forum Code...", mainWindowReal)
         self.charexportalt = QAction("Export to HTML Page...", mainWindowReal)
+        self.chartransfer = QAction("Transfer to connected players...", mainWindowReal)
         self.fileMenu = QMenu("&File")
         self.fileMenu.addAction(self.charsave)
         self.fileMenu.addAction(self.charload)
         self.fileMenu.addAction(self.charexport)
         self.fileMenu.addAction(self.charexportalt)
+        self.fileMenu.addAction(self.chartransfer)
         self.menubar.addMenu(self.fileMenu)
         self.mainwin = mainWindow
         mainWindowReal.setMenuBar(self.menubar)
@@ -595,7 +598,14 @@ class OhNoesALazyGlobalClass:
         self.charload.triggered.connect(self.jsonImport)
         self.charexport.triggered.connect(self.forumExport)
         self.charexportalt.triggered.connect(self.htmlExport)
-        
+        self.chartransfer.triggered.connect(self.send)
+    
+    def send(self):
+        title, ok = QInputDialog.getText(self.mainwin, "Filename", "Filename for character sheet:")
+        if title and ok:
+            title = checkFileExtension(title, ".rcs")
+            sendCharacterSheet(self.export(), unicode(title))
+    
     def jsonImport(self):
         filename = unicode(QFileDialog.getOpenFileName(self.mainwin, "Load Character Sheet...", os.path.join(os.getcwd(), CHARSHEETS_DIR), "RGG Character Sheets (*.rcs)"))
         if not filename:
