@@ -2,6 +2,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import besmData
 import os, json, gzip
+from rggSystem import CHARSHEETS_DIR
 
 def jsondump(obj, filename):
     """Dump object to file."""
@@ -596,7 +597,7 @@ class OhNoesALazyGlobalClass:
         self.charexportalt.triggered.connect(self.htmlExport)
         
     def jsonImport(self):
-        filename = unicode(QFileDialog.getOpenFileName(self.mainwin, "Load Character Sheet...", os.path.join(os.getcwd(), "save", "characters"), "RGG Character Sheets (*.rcs)"))
+        filename = unicode(QFileDialog.getOpenFileName(self.mainwin, "Load Character Sheet...", os.path.join(os.getcwd(), CHARSHEETS_DIR), "RGG Character Sheets (*.rcs)"))
         if not filename:
             return None
         
@@ -610,7 +611,7 @@ class OhNoesALazyGlobalClass:
         return fields
         
     def jsonExport(self):
-        filename = unicode(QFileDialog.getSaveFileName(self.mainwin, "Save Character Sheet As...", os.path.join(os.getcwd(), "save", "characters", "untitled.rcs"), "RGG Character Sheets (*.rcs)"))
+        filename = unicode(QFileDialog.getSaveFileName(self.mainwin, "Save Character Sheet As...", os.path.join(os.getcwd(), CHARSHEETS_DIR, "untitled.rcs"), "RGG Character Sheets (*.rcs)"))
         if not filename:
             return None
         
@@ -636,7 +637,7 @@ class OhNoesALazyGlobalClass:
         replace("%P", fields["personality"]).replace("%B", fields["background"]).replace("%Y", fields["body"]).replace("%M", fields["mind"]).\
         replace("%L", fields["soul"]).replace("%H", fields["health"]).replace("%E", fields["energy"]).replace("%C", fields["acv"]).replace("%V", fields["dcv"])
         
-        filename = unicode(QFileDialog.getSaveFileName(self.mainwin, "Export Character Sheet As...", os.path.join(os.getcwd(), "save", "characters", "untitled"+outputType), outputFilter))
+        filename = unicode(QFileDialog.getSaveFileName(self.mainwin, "Export Character Sheet As...", os.path.join(os.getcwd(), CHARSHEETS_DIR, "untitled"+outputType), outputFilter))
         if not filename:
             return None
         
