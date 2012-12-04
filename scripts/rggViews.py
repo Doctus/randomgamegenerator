@@ -808,6 +808,17 @@ def sendMultipleTileUpdate(user, mapID, topLeftTile, bottomRightTile, newTileInd
         return
     respondMultipleTileUpdate(allusers(), mapID, topLeftTile, bottomRightTile, newTileIndex)
 
+@serverRPC
+def respondCharacterSheet(data, title):
+    """Prompts user to save incoming character sheet."""
+    if promptYesNo(translate('views', "".join(('Do you wish to save the character sheet ', title, ', overwriting any existing sheet with that name?')))) == 16384:
+        jsondump(data, os.path.join(CHARSHEETS_DIR, title))
+
+@clientRPC
+def sendCharacterSheet(user, data, title):
+    """Sends character sheet to other users."""
+    respondCharacterSheet(allusersbut(user), data, title)
+    
 def clearPogSelection():
     _state.pogSelection = set()
     if _state.pogHover != None:
