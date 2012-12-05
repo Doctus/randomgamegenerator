@@ -57,6 +57,8 @@ if __name__ == '__main__':
     main.glwidget.mouseMoveSignal.connect(rggEvent.mouseMoveEvent)
     main.glwidget.mousePressSignal.connect(rggEvent.mousePressEvent)
     main.glwidget.mouseReleaseSignal.connect(rggEvent.mouseReleaseEvent)
+    main.glwidget.keyPressSignal.connect(rggEvent.keyPressEvent)
+    main.glwidget.keyReleaseSignal.connect(rggEvent.keyReleaseEvent)
     
     # pog drag-placement
     main.glwidget.pogPlace.connect(rggViews.placePog)

@@ -6,6 +6,8 @@ _eaten = False
 _mouseMoveListeners = []
 _mousePressListeners = []
 _mouseReleaseListeners = []
+_keyPressListeners = []
+_keyReleaseListeners = []
 _chatInputListeners = []
 _ICChatInputListeners = []
 _pogUpdateListeners = []
@@ -27,6 +29,12 @@ def addMousePressListener(listener):
 
 def addMouseReleaseListener(listener):
   _mouseReleaseListeners.append(listener)
+  
+def addKeyPressListener(listener):
+  _keyPressListeners.append(listener)
+  
+def addKeyReleaseListener(listener):
+  _keyReleaseListeners.append(listener)
 
 def addChatInputListener(listener):
   _chatInputListeners.append(listener)
@@ -77,6 +85,26 @@ def mouseReleaseEvent(x, y, t):
 
   if not _eaten:
     rggViews.mouseReleaseResponse(x, y, t)
+    
+def keyPressEvent(k):
+  global _eaten
+  _eaten = False
+
+  for listener in _keyPressListeners:
+    listener.keyPressResponse(k)
+
+  if not _eaten:
+    rggViews.keyPressResponse(k)
+    
+def keyReleaseEvent(k):
+  global _eaten
+  _eaten = False
+
+  for listener in _keyReleaseListeners:
+    listener.keyReleaseResponse(k)
+
+  if not _eaten:
+    rggViews.keyReleaseResponse(k)
 
 def chatInputEvent(st):
   global _eaten
