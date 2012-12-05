@@ -1,2 +1,2 @@
 def title():
-    return "MoMMWiki Viewer"
+    return "Wiki Viewer?"
