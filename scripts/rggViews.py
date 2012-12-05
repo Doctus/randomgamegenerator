@@ -78,6 +78,8 @@ class _state(object):
     moveMode = "free"
     moveablePogs = []
     
+    cameraPog = None
+    
     @staticmethod
     def initialize(mainApp):
         _state.menu = rggMenuBar.menuBar()
@@ -913,6 +915,8 @@ def respondDeletePog(pogID):
             _state.pogHover.showTooltip = False
             _state.pogHover = None
         _state.session.removePog(old)
+    if _state.cameraPog and _state.cameraPog.ID == pogID:
+        _state.cameraPog = None
     drawPogCircles()
 
 @clientRPC
@@ -928,11 +932,14 @@ def respondMovementPog(pogids, displacement):
         if pogID in _state.session.pogs.keys():
             pog = _state.session.pogs[pogID]
             pog.displace(displacement)
+    if _state.cameraPog:
+        centerOnPog(_state.cameraPog)
     drawPogCircles()
 
 @clientRPC
 def sendMovementPog(user, pogids, displacement):
     """Creates or updates a pog on the server."""
+    centerOnPog(_state.cameraPog)
     respondMovementPog(allusersbut(user), pogids, displacement)
 
 @serverRPC
@@ -941,10 +948,13 @@ def respondAbsoluteMovementPog(pogids, newloc):
         if pogID in _state.session.pogs.keys():
             pog = _state.session.pogs[pogID]
             pog.move(newloc[i])
+    if _state.cameraPog:
+        centerOnPog(_state.cameraPog)
     drawPogCircles()
     
 @clientRPC
 def sendAbsoluteMovementPog(user, pogids, newloc):
+    centerOnPog(_state.cameraPog)
     respondAbsoluteMovementPog(allusersbut(user), pogids, newloc)
 
 @serverRPC
@@ -1121,6 +1131,16 @@ def generateName(generator, args):
 
 # MISC
 
+def centerOnPog(pog):
+    """Center the camera on a pog."""
+    if not pog: return
+    camsiz = cameraSize()
+    camzoom = getZoom()
+    pospog = pog.position
+    cammod = [(-camsiz[0]/2)+pog._tile.getW()/2, (-camsiz[1]/2)+pog._tile.getH()/2]
+    newpos = (-(pospog[0]*camzoom + cammod[0]), -(pospog[1]*camzoom + cammod[1]))
+    setCameraPosition(newpos)
+
 def reportCamera():
     """Reports the current camera coordinates."""
     say(translate('views', 'x: {0}\ny: {1}', 'formats camera reporting.').format(*cameraPosition()))
@@ -1144,14 +1164,13 @@ def processPogRightclick(selection, pogs):
     #6 HIDE
     #7 LOCK
     #8 DELETE
+    #9 LOCK CAMERA
+    #10 SET MOVEABLE
+    
     mainpog = pogs[0]
+    
     if selection == 0:
-        camsiz = cameraSize()
-        camzoom = getZoom()
-        pospog = mainpog.position
-        cammod = [(-camsiz[0]/2)+mainpog._tile.getW()/2, (-camsiz[1]/2)+mainpog._tile.getH()/2]
-        newpos = (-(pospog[0]*camzoom + cammod[0]), -(pospog[1]*camzoom + cammod[1]))
-        setCameraPosition(newpos)
+        centerOnPog(mainpog)
     elif selection == 1:
         name = promptString(translate('views', "Enter a name for this pog."), inittext = mainpog.name)
         if name is None:
@@ -1208,6 +1227,12 @@ def processPogRightclick(selection, pogs):
         for pog in pogs:
             deletePog(pog)
     elif selection == 9:
+        if _state.cameraPog and _state.cameraPog == mainpog:
+            _state.cameraPog = None
+        else:
+            _state.cameraPog = mainpog
+            centerOnPog(mainpog)
+    elif selection == 10:
         username = promptString(translate('views', "Enter the name of the user who may move this pog (must be exact)."), inittext = "username")
         if username is None:
             return
@@ -1343,6 +1368,8 @@ def mousePress(screenPosition, mapPosition, button):
                 else: hidebutton = "Hide"
                 if pog._locked: lockbutton = "Unlock"
                 else: lockbutton = "Lock"
+                if _state.cameraPog and _state.cameraPog == pog: followbutton = "Unlock Camera"
+                else: followbutton = "Lock Camera to Pog"
                 options = [translate('views', 'Center on pog'),
                         translate('views', 'Set name'),
                         translate('views', 'Generate name'),
@@ -1351,7 +1378,8 @@ def mousePress(screenPosition, mapPosition, button):
                         translate('views', 'Resize'),
                         translate('views', hidebutton),
                         translate('views', lockbutton),
-                        translate('views', 'Delete')]
+                        translate('views', 'Delete'),
+                        translate('views', followbutton)]
                 if isGM(): options.append(translate('views', 'Set as moveable for player'))
                 selected = showPopupMenuAt(
                     (screenPosition[0], screenPosition[1]),

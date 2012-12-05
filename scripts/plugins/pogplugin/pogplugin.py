@@ -63,7 +63,8 @@ class pogListWidget(QtGui.QListWidget):
                         translate('views', 'Resize'),
                         translate('views', hide),
                         translate('views', lock),
-                        translate('views', 'Delete')])
+                        translate('views', 'Delete'),
+                        translate('views', "Lock Camera to Pog")]) #BUG: We can't do the check from here to see if the message should be "unlock camera."
             rggViews.processPogRightclick(selection, self.pogs)
             self.pogwidget.refresh()
         else:
