@@ -154,15 +154,10 @@ class AddSkillDialog(QDialog):
                 self.selectedSkills.append(button.text())
         self.accept()
 
-class CharStatsWidget(QDockWidget):
+class CharStatsWidget(QWidget):
     
     def __init__(self, mainWindow):
-        super(QDockWidget, self).__init__(mainWindow)
-        
-        self.widg = QWidget(self)
-        self.setWindowTitle("Stats")
-        self.setObjectName("CharStatsWidget")
-        self.setFeatures(QDockWidget.NoDockWidgetFeatures)
+        super(CharStatsWidget, self).__init__(mainWindow)
         
         self.charPointsBox = QComboBox(self)
         for x in range(5, 105, 5):
@@ -238,8 +233,7 @@ class CharStatsWidget(QDockWidget):
         self.layout.addWidget(self.defectScroll, 10, 0, 5, 2)
         self.layout.addWidget(self.addDefectButton, 15, 0)
         self.layout.addWidget(self.removeDefectButton, 15, 1)
-        self.widg.setLayout(self.layout)
-        self.setWidget(self.widg)
+        self.setLayout(self.layout)
         
         self.updatePoints()
         
@@ -257,7 +251,6 @@ class CharStatsWidget(QDockWidget):
         self.skillsScroll.itemActivated.connect(self.increaseLevel)
         self.attScroll.itemActivated.connect(self.increaseAttLevel)
         self.defectScroll.itemActivated.connect(self.increaseDefectLevel)
-        mainWindow.addDockWidget(Qt.RightDockWidgetArea, self)
         
     def updateDerivedValues(self):
         if not self.mechMode.isChecked():
@@ -535,15 +528,11 @@ class CharStatsWidget(QDockWidget):
         self.skillsScroll.sortItems()
         self.updatePoints()
 
-class CharBioWidget(QDockWidget):
+class CharBioWidget(QWidget):
     
     def __init__(self, mainWindow):
-        super(QDockWidget, self).__init__(mainWindow)
+        super(CharBioWidget, self).__init__(mainWindow)
         
-        self.widg = QWidget(self)
-        self.setWindowTitle("General Info")
-        self.setObjectName("CharBioWidget")
-        self.setFeatures(QDockWidget.NoDockWidgetFeatures)
         self.layout = QGridLayout()
         
         self.widgetz = {}
@@ -557,10 +546,7 @@ class CharBioWidget(QDockWidget):
             self.widgetz[field] = QTextEdit(self)
             self.layout.addWidget(QLabel(field.capitalize()), len(self.lineFields)/2+i*2, 0, 1, 2)
             self.layout.addWidget(self.widgetz[field], len(self.lineFields)/2+i*2+1, 0, 1, 4)
-        self.widg.setLayout(self.layout) 
-        self.setWidget(self.widg)
-        
-        mainWindow.addDockWidget(Qt.LeftDockWidgetArea, self)
+        self.setLayout(self.layout)
         
     def getExportableData(self):
         fields = {}
@@ -576,7 +562,7 @@ class CharBioWidget(QDockWidget):
 
 class OhNoesALazyGlobalClass:
     
-    def __init__(self, mainWindow, mainWindowReal):
+    def __init__(self, mainWindow, mainWindowReal, layout):
         self.bio = CharBioWidget(mainWindowReal)
         self.stats = CharStatsWidget(mainWindowReal)
         self.menubar = QMenuBar(mainWindowReal)
@@ -593,7 +579,10 @@ class OhNoesALazyGlobalClass:
         self.fileMenu.addAction(self.chartransfer)
         self.menubar.addMenu(self.fileMenu)
         self.mainwin = mainWindow
-        mainWindowReal.setMenuBar(self.menubar)
+        #mainWindowReal.setMenuBar(self.menubar)
+        layout.addWidget(self.menubar, 0, 0, 1, 2)
+        layout.addWidget(self.bio, 1, 0)
+        layout.addWidget(self.stats, 1, 1)
         self.charsave.triggered.connect(self.jsonExport)
         self.charload.triggered.connect(self.jsonImport)
         self.charexport.triggered.connect(self.forumExport)
@@ -729,6 +718,6 @@ DCV: %V
 %B"""
         self.realExport(outputTemplate, "Text files (*.txt)", "\n")
 
-def initWidgets(mainWindow, mainWindowReal):            
+def initWidgets(mainWindow, mainWindowReal, layout):            
     global g 
-    g = OhNoesALazyGlobalClass(mainWindow, mainWindowReal)
+    g = OhNoesALazyGlobalClass(mainWindow, mainWindowReal, layout)

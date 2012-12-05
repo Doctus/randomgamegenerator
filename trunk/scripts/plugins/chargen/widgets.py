@@ -36,10 +36,10 @@ def promptButtonSelection(prompt, text=[], defaultButton = 0, mainWindow=None):
 
     return -1
 
-def initWidgets(mainWindow, mainWindowReal):
+def initWidgets(mainWindow, mainWindowReal, layout):
     #selection = promptButtonSelection("Select a game.", ("Nobilis", "BESM"), mainWindow)
     #if selection == 0:
     #    nobilisWidgets.initWidgets(mainWindow, mainWindowReal)
     #elif selection == 1:
-    besmWidgets.initWidgets(mainWindow, mainWindowReal)
+    besmWidgets.initWidgets(mainWindow, mainWindowReal, layout)
 
