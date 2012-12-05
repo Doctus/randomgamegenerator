@@ -534,6 +534,9 @@ def sendClearSession(user):
 
 def _clearSession():
     clearPogSelection()
+    _state.cameraPog = None
+    _state.pogmove = [0, 0]
+    _state.moveablePogs = []
     _state.session.clear()
     
 def clearSession():
