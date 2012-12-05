@@ -105,19 +105,23 @@ class pogWidget(QtGui.QDockWidget):
         self.listWidget.clear()
         for pog in rggViews.getSession().pogs.values():
             self.pogUpdateResponse(pog)
+        self.update()
         
     def pogUpdateResponse(self, pog):
         for x in xrange(self.listWidget.count()):
             if self.listWidget.item(x).getPog().ID == pog.ID:
                 self.listWidget.item(x).setPog(pog)
+                self.update()
                 return
 
         self.listWidget.addItem(pogItem(pog))
+        self.update()
 
     def pogDeleteResponse(self, pog):
         for x in xrange(self.listWidget.count()):
             if self.listWidget.item(x).getPog().ID == pog.ID:
                 self.listWidget.takeItem(x)
+                self.update()
                 return
 
     def pogSelectionChangedResponse(self):
@@ -129,6 +133,8 @@ class pogWidget(QtGui.QDockWidget):
                 item.setSelected(True)
             else:
                 item.setSelected(False)
+                
+        self.update()
 
 def hajimaru(mainwindow):
     widget = pogWidget(mainwindow)
