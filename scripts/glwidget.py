@@ -51,6 +51,8 @@ class GLWidget(QGLWidget):
     mousePressSignal = pyqtSignal(int, int, int) #x, y, button
     mouseReleaseSignal = pyqtSignal(int, int, int) #x, y, button
     mouseMoveSignal = pyqtSignal(int, int) #x, y
+    keyPressSignal = pyqtSignal(int) #key
+    keyReleaseSignal = pyqtSignal(int) #key
     
     def __init__(self, parent):
         QGLWidget.__init__(self, parent)
@@ -809,12 +811,16 @@ class GLWidget(QGLWidget):
             self.camera[0] += (50 * self.zoom)
         elif event.key() == Qt.Key_Right:
             self.camera[0] -= (50 * self.zoom)
+        else:
+            self.keyPressSignal.emit(event.key())
             
     def keyReleaseEvent(self, event):
         if event.key() == Qt.Key_Control:
             self.ctrl = False
         elif event.key() == Qt.Key_Shift:
             self.shift = False
+        else:
+            self.keyReleaseSignal.emit(event.key())
 
     def wheelEvent(self, mouse):
         oldCoord = [mouse.pos().x(), mouse.pos().y()]

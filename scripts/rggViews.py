@@ -79,6 +79,7 @@ class _state(object):
     moveablePogs = []
     
     cameraPog = None
+    pogmove = [0, 0]
     
     @staticmethod
     def initialize(mainApp):
@@ -123,7 +124,16 @@ class _state(object):
         
         if os.path.exists("rgg2.exe"):
             _state.clearTimer = QtCore.QTimer.singleShot(1000, clearTempFile)
+            
+        _state.pogMoveTimer = QtCore.QTimer()
+        _state.pogMoveTimer.timeout.connect(autoMovePogs)
+        _state.pogMoveTimer.start(40)
 
+def autoMovePogs():
+    if _state.pogmove == [0, 0]:
+        return
+    movePogs(_state.pogmove)
+            
 def clearTempFile():
     os.remove("rgg2.exe")        
         
@@ -1473,3 +1483,21 @@ def mouseReleaseResponse(x, y, t):
     
     mouseRelease(screenPosition, mapPosition, t)
 
+def keyPressResponse(k):
+    if not _state.cameraPog: return
+    setPogSelection(_state.cameraPog)
+    if k == QtCore.Qt.Key_W:
+        _state.pogmove[1] = -5
+    elif k == QtCore.Qt.Key_S:
+        _state.pogmove[1] = 5
+    elif k == QtCore.Qt.Key_A:
+        _state.pogmove[0] = -5
+    elif k == QtCore.Qt.Key_D:
+        _state.pogmove[0] = 5
+        
+def keyReleaseResponse(k):
+    if not _state.cameraPog: return
+    if k == QtCore.Qt.Key_W or k == QtCore.Qt.Key_S:
+        _state.pogmove[1] = 0
+    elif k == QtCore.Qt.Key_A or k == QtCore.Qt.Key_D:
+        _state.pogmove[0] = 0
