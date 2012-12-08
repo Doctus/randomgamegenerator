@@ -824,6 +824,26 @@ def sendMultipleTileUpdate(user, mapID, topLeftTile, bottomRightTile, newTileInd
     respondMultipleTileUpdate(allusers(), mapID, topLeftTile, bottomRightTile, newTileIndex)
 
 @serverRPC
+def respondArbitraryFile(filepath):
+    """Requests a file that another client requested the client to request. We heard you like file requests?"""
+    if promptYesNo(translate('views', "".join(('Do you wish to save the binary file ', filepath, ', overwriting any existing file with that name?')))) == 16384:
+        rggResource.crm._request(filepath)
+
+@clientRPC
+def sendArbitraryFile(user, filepath):
+    """Sends any binary file to other users."""
+    respondArbitraryFile(allusersbut(user), filepath) 
+
+def promptSendFile():
+    """Prompts user to select a file to send."""
+    filename = promptLoadFile(translate('views', 'Select File'),
+        translate('views', 'All files (*.*)'),
+        ".")
+    if not filename:
+        return
+    sendArbitraryFile(os.path.relpath(filename))
+    
+@serverRPC
 def respondCharacterSheet(data, title):
     """Prompts user to save incoming character sheet."""
     if promptYesNo(translate('views', "".join(('Do you wish to save the character sheet ', title, ', overwriting any existing sheet with that name?')))) == 16384:
