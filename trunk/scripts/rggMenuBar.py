@@ -80,6 +80,8 @@ class menuBar(object):
         self.disconnectAct = QtGui.QAction(translate("menubar", "&Disconnect"), main)
         self.disconnectAct.setShortcut("Ctrl+D")
         
+        self.sendFileAct = QtGui.QAction(translate("menubar", "Send file..."), main)
+        
         self.createSurveyAct = QtGui.QAction(translate("menubar", "Create Survey..."), main)
         
         self.aboutAct = QtGui.QAction(translate("menubar", "&About"), main)
@@ -144,6 +146,7 @@ class menuBar(object):
         internetMenu.addAction(self.joinGameAct)
         internetMenu.addSeparator()
         internetMenu.addAction(self.createSurveyAct)
+        internetMenu.addAction(self.sendFileAct)
         internetMenu.addSeparator()
         internetMenu.addAction(self.disconnectAct)
 
