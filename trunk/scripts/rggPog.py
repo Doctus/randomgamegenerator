@@ -150,6 +150,9 @@ class Pog(object):
             mainWindow.glwidget.removeText(self.tooltipId)
             self.tooltipId = mainWindow.glwidget.addText(self.tooltipText(), self._position)
             
+    def setProperties(self, properties):
+        self._properties = properties
+            
     def move(self, newloc):
         if self._locked:
             return self.position

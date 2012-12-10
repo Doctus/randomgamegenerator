@@ -1227,15 +1227,11 @@ def processPogRightclick(selection, pogs):
             pog.layer = newlayer+200
             sendPogAttributes(pog.ID, pog.name, pog.layer, pog.properties)
     elif selection == 4:
-        prompt = translate('views', 'Enter a name for the property (like "Level" or "HP").')
-        key = promptString(prompt)
-        prompt2 = translate('views', 'Enter a value for the property.')
-        value = promptString(prompt2)
-        if key is None or value is None:
-            return
-        for pog in pogs:
-            pog.editProperty(key, value)
-            sendPogAttributes(pog.ID, pog.name, pog.layer, pog.properties)
+        d = rggDialogs.modifyPogAttributesDialog(mainpog.properties)
+        if d.exec_():
+            for pog in pogs:
+                pog.setProperties(d.currentProperties)
+                sendPogAttributes(pog.ID, pog.name, pog.layer, pog.properties)
     elif selection == 5:
         d = rggDialogs.resizeDialog(mainpog._tile.getW(), mainpog._tile.getH(), mainpog.size[0], mainpog.size[1])
         if d.exec_():

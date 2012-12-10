@@ -334,6 +334,52 @@ class resizeDialog(QtGui.QDialog):
 
     def cancelPressed(self, checked):
         self.done(0)
+        
+class modifyPogAttributesDialog(QtGui.QDialog):
+    """A dialog allowing the user to view and modify a pog's attributes."""
+
+    def __init__(self, properties):
+        QtGui.QDialog.__init__(self)
+        self.setWindowTitle("Edit Attributes")
+        
+        self.currentProperties = properties
+        
+        self.table = QtGui.QTableWidget(len(self.currentProperties)+1, 2, self)
+        self.table.setHorizontalHeaderLabels(["Attribute", "Value"])
+        for i, key in enumerate(self.currentProperties.keys()):
+            self.table.setItem(i, 0, QtGui.QTableWidgetItem(key))
+        for i, value in enumerate(self.currentProperties.values()):
+            self.table.setItem(i, 1, QtGui.QTableWidgetItem(value)) 
+
+        self.okButton = QtGui.QPushButton("Ok")
+        self.cancelButton = QtGui.QPushButton("Cancel")
+
+        self.okButton.clicked.connect(self.okPressed)
+        self.cancelButton.clicked.connect(self.cancelPressed)
+
+        self.layout = QtGui.QGridLayout()
+        self.layout.addWidget(self.table, 0, 0, 1, 2)
+        self.layout.addWidget(self.okButton, 1, 0)
+        self.layout.addWidget(self.cancelButton, 1, 1)
+        self.setLayout(self.layout)
+        
+        self.table.cellChanged.connect(self.respondChange)
+        
+    def respondChange(self, row, column):
+        try:
+            self.currentProperties[unicode(self.table.item(row, 0).text())] = unicode(self.table.item(row, 1).text())
+        except AttributeError: #key with no value
+            pass
+        except KeyError: #value with no key
+            pass
+        if row == self.table.rowCount() - 1:
+            self.table.setRowCount(self.table.rowCount() + 1)
+
+    def okPressed(self, checked):
+        self.done(1)
+
+    def cancelPressed(self, checked):
+        self.done(0)
 
 class banDialog(QtGui.QDialog):
     """A dialog used to manage the server banlist."""
