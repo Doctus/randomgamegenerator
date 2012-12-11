@@ -79,6 +79,14 @@ class Session(object):
         self.pogs[pog.ID].destroy()
         del self.pogs[pog.ID]
         
+    def removeAllPogs(self):
+        '''Deletes all pogs in the session.'''
+        import rggEvent
+        for pog in self.pogs.values():
+            rggEvent.pogDeleteEvent(pog)
+            pog.destroy()
+        self.pogs = {}
+        
     def addMap(self, mappe):
         '''Creates a new map and assigns it a unique ID.'''
         if mappe.drawOffset == [0, 0]:

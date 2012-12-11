@@ -63,6 +63,8 @@ class menuBar(object):
         
         self.clearSessAct = QtGui.QAction(translate("menubar", "Clear Session"), main)
         
+        self.deletePogsAct = QtGui.QAction(translate("menubar", "Delete All Pogs"), main)
+        
         self.saveCharsAct = QtGui.QAction(translate("menubar", "Save IC Characters As..."), main)
         
         self.loadCharsAct = QtGui.QAction(translate("menubar", "Load IC Characters..."), main)
@@ -133,6 +135,8 @@ class menuBar(object):
         fileMenu.addSeparator()
         fileMenu.addAction(self.closeSpecificMapAct)
         fileMenu.addAction(self.closeMapAct)
+        fileMenu.addSeparator()
+        fileMenu.addAction(self.deletePogsAct)
         fileMenu.addSeparator()
         fileMenu.addAction(self.saveCharsAct)
         fileMenu.addAction(self.loadCharsAct)

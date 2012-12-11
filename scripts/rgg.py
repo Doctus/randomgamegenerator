@@ -85,6 +85,7 @@ if __name__ == '__main__':
     s.menu.closeSpecificMapAct.triggered.connect(rggViews.closeMap)
     s.menu.closeMapAct.triggered.connect(rggViews.closeAllMaps)
     s.menu.clearSessAct.triggered.connect(rggViews.clearSession)
+    s.menu.deletePogsAct.triggered.connect(rggViews.deleteAllPogs)
     s.menu.saveCharsAct.triggered.connect(rggViews.saveChars)
     s.menu.loadCharsAct.triggered.connect(rggViews.loadChars)
     s.menu.gfxSettingsAct.triggered.connect(rggViews.configureGfx)
