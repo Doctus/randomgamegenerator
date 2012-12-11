@@ -309,7 +309,7 @@ class menuBar(object):
             self.windowMenu.addAction(action)
             
     def about(self):
-        msg = QtGui.QMessageBox()
+        msg = QtGui.QMessageBox(mainWindow)
         if DEV:
             aboutText = " ".join(("RGG", VERSION, "Development Version"))
         else:

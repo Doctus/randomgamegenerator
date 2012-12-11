@@ -683,7 +683,7 @@ def autosaveSession():
 
 @serverRPC
 def respondSurveyAnswers(surveyData, origin):
-    d = rggDialogs.surveyResultsDialog(surveyData, unicode(origin))
+    d = rggDialogs.surveyResultsDialog(surveyData, unicode(origin), mainWindow)
     _state.dialogs_keepalive.append(d)
     d.show()
     
@@ -693,7 +693,7 @@ def sendSurveyAnswers(user, target, surveyData):
     
 @serverRPC
 def respondSurvey(surveyData, origin):
-    d = rggDialogs.respondSurveyDialog(surveyData)
+    d = rggDialogs.respondSurveyDialog(surveyData, mainWindow)
     if d.exec_():
         sendSurveyAnswers(origin, d.getAnswers())
     
@@ -702,7 +702,7 @@ def sendSurvey(user, target, surveyData):
     respondSurvey(getuser(target), surveyData, unicode(user))    
     
 def createSurvey():
-    d = rggDialogs.createSurveyDialog()
+    d = rggDialogs.createSurveyDialog(mainWindow)
     if d.exec_():
         for username in unicode(d.sendTo.text()).split():
             sendSurvey(username, d.addedItems)
@@ -1243,13 +1243,13 @@ def processPogRightclick(selection, pogs):
             pog.layer = newlayer+200
             sendPogAttributes(pog.ID, pog.name, pog.layer, pog.properties)
     elif selection == 4:
-        d = rggDialogs.modifyPogAttributesDialog(mainpog.properties)
+        d = rggDialogs.modifyPogAttributesDialog(mainpog.properties, mainWindow)
         if d.exec_():
             for pog in pogs:
                 pog.setProperties(d.currentProperties)
                 sendPogAttributes(pog.ID, pog.name, pog.layer, pog.properties)
     elif selection == 5:
-        d = rggDialogs.resizeDialog(mainpog._tile.getW(), mainpog._tile.getH(), mainpog.size[0], mainpog.size[1])
+        d = rggDialogs.resizeDialog(mainpog._tile.getW(), mainpog._tile.getH(), mainpog.size[0], mainpog.size[1], mainWindow)
         if d.exec_():
             for pog in pogs:
                 pog.size = (d.wBox.value(), d.hBox.value())

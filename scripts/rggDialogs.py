@@ -68,8 +68,8 @@ class dialog(object):
 class createSurveyDialog(QtGui.QDialog):
     """ A dialog for creating surveys to send to other users."""
     
-    def __init__(self):
-        QtGui.QDialog.__init__(self)
+    def __init__(self, mainWindow):
+        QtGui.QDialog.__init__(self, mainWindow)
         
         self.setWindowTitle("Create Survey")
         
@@ -176,8 +176,8 @@ class createSurveyDialog(QtGui.QDialog):
 class respondSurveyDialog(QtGui.QDialog):
     """A dialog containing a survey from another user."""
     
-    def __init__(self, questions):
-        QtGui.QDialog.__init__(self)
+    def __init__(self, questions, mainWindow):
+        QtGui.QDialog.__init__(self, mainWindow)
         
         self.layoutt = QtGui.QGridLayout()
         self.responseAssociation = {}
@@ -274,8 +274,8 @@ class respondSurveyDialog(QtGui.QDialog):
 class surveyResultsDialog(QtGui.QDialog):
     """A dialog containing another user's answers to a survey."""
     
-    def __init__(self, answers, origin):
-        QtGui.QDialog.__init__(self)
+    def __init__(self, answers, origin, mainWindow):
+        QtGui.QDialog.__init__(self, mainWindow)
         layoutt = QtGui.QVBoxLayout()
         self.setWindowTitle("Response from " + origin)
         for question, answer in answers.items():
@@ -291,8 +291,8 @@ class surveyResultsDialog(QtGui.QDialog):
         
 class resizeDialog(QtGui.QDialog):
 
-    def __init__(self, origx, origy, currw, currh):
-        QtGui.QDialog.__init__(self)
+    def __init__(self, origx, origy, currw, currh, mainWindow):
+        QtGui.QDialog.__init__(self, mainWindow)
         self.owlabel = QtGui.QLabel("Current Width:")
         self.ohlabel = QtGui.QLabel("Current Height:")
         self.owlabel2 = QtGui.QLabel(str(origx))
@@ -338,8 +338,8 @@ class resizeDialog(QtGui.QDialog):
 class modifyPogAttributesDialog(QtGui.QDialog):
     """A dialog allowing the user to view and modify a pog's attributes."""
 
-    def __init__(self, properties):
-        QtGui.QDialog.__init__(self)
+    def __init__(self, properties, mainWindow):
+        QtGui.QDialog.__init__(self, mainWindow)
         self.setWindowTitle("Edit Attributes")
         
         self.currentProperties = properties
