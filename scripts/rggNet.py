@@ -73,6 +73,10 @@ class BaseClient(object):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self._updatetransfer)
         self.timer.start(1000)
+        
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.preemptivelyOpenTransferSocket)
+        self.timer.start(5000)
     
     @property
     def ready(self):
