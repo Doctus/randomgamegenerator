@@ -875,6 +875,22 @@ def deletePog(pog):
     assert(pog.ID)
     sendDeletePog(pog.ID)
 
+@serverRPC
+def respondDeleteAllPogs():
+    _deleteAllPogs()
+    
+@clientRPC
+def sendDeleteAllPogs(user):
+    respondDeleteAllPogs(allusersbut(user))    
+
+def _deleteAllPogs():
+    clearPogSelection()
+    _state.session.removeAllPogs()
+
+def deleteAllPogs():
+    _deleteAllPogs()
+    sendDeleteAllPogs()
+
 def placePog(x, y, pogpath):
     """Places a pog on the map."""
     infograb = QtGui.QPixmap(pogpath)
