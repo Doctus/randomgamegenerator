@@ -1061,6 +1061,9 @@ def respondResizePog(pogID, newW, newH):
 @clientRPC
 def sendResizePog(user, pogID, newW, newH):
     respondResizePog(allusersbut(user), pogID, newW, newH)
+    
+def duplicatePog(pog):
+    createPog(rggPog.Pog.load(pog.dump()))
 
 # DRAWING
 
@@ -1214,7 +1217,8 @@ def processPogRightclick(selection, pogs):
     #7 LOCK
     #8 DELETE
     #9 LOCK CAMERA
-    #10 SET MOVEABLE
+    #10 DUPLICATE
+    #11 SET MOVEABLE
     
     mainpog = pogs[0]
     
@@ -1278,11 +1282,35 @@ def processPogRightclick(selection, pogs):
             _state.cameraPog = mainpog
             centerOnPog(mainpog)
     elif selection == 10:
+        for pog in pogs:
+            duplicatePog(pog)
+    elif selection == 11:
         username = promptString(translate('views', "Enter the name of the user who may move this pog (must be exact)."), inittext = "username")
         if username is None:
             return
         for pog in pogs:
             sendAddMoveablePog(username, pog.ID)
+            
+def pogActionList(pog):
+    if pog.hidden: hidebutton = "Show"
+    else: hidebutton = "Hide"
+    if pog._locked: lockbutton = "Unlock"
+    else: lockbutton = "Lock"
+    if _state.cameraPog and _state.cameraPog == pog: followbutton = "Unlock Camera"
+    else: followbutton = "Lock Camera to Pog"
+    options = [translate('views', 'Center on pog'),
+            translate('views', 'Set name'),
+            translate('views', 'Generate name'),
+            translate('views', 'Set layer'),
+            translate('views', 'Add/edit property'),
+            translate('views', 'Resize'),
+            translate('views', hidebutton),
+            translate('views', lockbutton),
+            translate('views', 'Delete'),
+            translate('views', followbutton),
+            translate('views', 'Duplicate')]
+    if isGM(): options.append(translate('views', 'Set as moveable for player'))
+    return options
 
 # MOUSE ACTIONS
 
@@ -1409,26 +1437,7 @@ def mousePress(screenPosition, mapPosition, button):
                 if pog not in _state.pogSelection:
                     setPogSelection(pog)
                 _state.mouseButton = None
-                if pog.hidden: hidebutton = "Show"
-                else: hidebutton = "Hide"
-                if pog._locked: lockbutton = "Unlock"
-                else: lockbutton = "Lock"
-                if _state.cameraPog and _state.cameraPog == pog: followbutton = "Unlock Camera"
-                else: followbutton = "Lock Camera to Pog"
-                options = [translate('views', 'Center on pog'),
-                        translate('views', 'Set name'),
-                        translate('views', 'Generate name'),
-                        translate('views', 'Set layer'),
-                        translate('views', 'Add/edit property'),
-                        translate('views', 'Resize'),
-                        translate('views', hidebutton),
-                        translate('views', lockbutton),
-                        translate('views', 'Delete'),
-                        translate('views', followbutton)]
-                if isGM(): options.append(translate('views', 'Set as moveable for player'))
-                selected = showPopupMenuAt(
-                    (screenPosition[0], screenPosition[1]),
-                    options)
+                selected = showPopupMenuAt((screenPosition[0], screenPosition[1]), pogActionList(pog))
                 processPogRightclick(selected, list(set([pog] + list(_state.pogSelection))))
     elif icon == ICON_DRAW:
         if button == BUTTON_LEFT:
