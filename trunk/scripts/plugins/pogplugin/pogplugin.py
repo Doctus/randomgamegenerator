@@ -47,24 +47,7 @@ class pogListWidget(QtGui.QListWidget):
             return
 
         if event.button() == QtCore.Qt.RightButton:
-            hide = 'Hide'
-            lock = 'Lock'
-
-            if specificItem.getPog().hidden:
-                hide = 'Show'
-            if specificItem.getPog()._locked:
-                lock = 'Unlock'
-
-            selection = rggSystem.showPopupMenuAtAbs([x, y], [translate('views', 'Center on pog'),
-                        translate('views', 'Set name'),
-                        translate('views', 'Generate name'),
-                        translate('views', 'Set layer'),
-                        translate('views', 'Add/edit property'),
-                        translate('views', 'Resize'),
-                        translate('views', hide),
-                        translate('views', lock),
-                        translate('views', 'Delete'),
-                        translate('views', "Lock Camera to Pog")]) #BUG: We can't do the check from here to see if the message should be "unlock camera."
+            selection = rggSystem.showPopupMenuAtAbs([x, y], rggViews.pogActionList(specificItem.getPog()))
             rggViews.processPogRightclick(selection, self.pogs)
             self.pogwidget.refresh()
         else:
