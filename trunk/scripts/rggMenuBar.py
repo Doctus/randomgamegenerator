@@ -246,7 +246,7 @@ class menuBar(object):
 
         # EVENTS
         
-        self.selectedIcon = 0
+        self.selectIconClicked()
         self.selectIcon.triggered.connect(self.selectIconClicked)
         self.moveIcon.triggered.connect(self.moveIconClicked)
         self.drawIcon.triggered.connect(self.drawIconClicked)
