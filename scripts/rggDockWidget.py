@@ -39,7 +39,7 @@ class transferMonitorWidget(QtGui.QDockWidget):
             self.transferDict[client.username + filename] = QtGui.QListWidgetItem("".join((client.username, ": ", filename, ": ", processed, " / ", size, " (", unicode(float(processed)/float(size)*100), "%)")))
             self.transferList.addItem(self.transferDict[client.username + filename])
         else:
-            self.transferDict[client.username + filename].setText("".join((client.username, ": ", filename, ": ", processed, " / ", size, " (", unicode(float(processed)/float(size)*100), "%)")))
+            self.transferDict[client.username + filename].setText("".join((client.username, ": ", filename, ": ", processed, " / ", size, " (", unicode(round(float(processed)/float(size)*100, 1)), "%)")))
         self.transferList.update()
         self.update()
 
