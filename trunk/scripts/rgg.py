@@ -117,6 +117,7 @@ if __name__ == '__main__':
     server.objectReceived.connect(rggRemote.serverReceive)
     server.fileReceived.connect(rggRemote.serverFileReceive)
     server.fileEvent.connect(rggViews.transferFileResponse)
+    server.partialTransferEvent.connect(rggViews.partialTransferResponse)
     
     # Start execution
     try:

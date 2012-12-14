@@ -1008,8 +1008,22 @@ class JsonServer(object):
         """
     )
     
+    partialTransferEvent = signal(object, basestring, basestring, basestring, doc=
+        """Called when part of a transfer occurs.
+        
+        username -- the username of the client
+        filename -- the filename of the file involved
+        size -- total size of the file
+        processed -- amount of the file transferred so far
+        
+        """
+    )
+    
     def passFileEvent(self, clientName, filename, eventDescription):
         self.fileEvent.emit(clientName, filename, eventDescription)
+        
+    def passPartialTransferEvent(self, clientName, filename, size, processed):
+        self.partialTransferEvent.emit(clientName, filename, size, processed)
     
     def _newConnection(self):
         """Responds to a new connection occurring."""
@@ -1096,6 +1110,7 @@ class JsonServer(object):
             client = RemoteClient(username, self, socket)
             self._addClient(client)
             client.fileEvent.connect(self.passFileEvent)
+            client.partialTransferEvent.connect(self.passPartialTransferEvent)
             socket.sendMessage(MESSAGE_ACTIVATE, username=username)
             self.connected.emit(self, username)
         else:
