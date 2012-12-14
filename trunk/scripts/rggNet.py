@@ -109,6 +109,8 @@ class BaseClient(object):
         socket.commandReceived.connect(self._socketCommand)
         socket.fileSent.connect(self._fileSent)
         socket.fileReceived.connect(self._fileReceived)
+        socket.filePartlySent.connect(self._filePartlySent)
+        socket.filePartlyReceived.connect(self._filePartlyReceived)
     
     def _closeXfer(self):
         """Disconnect the transfer socket."""
@@ -128,6 +130,12 @@ class BaseClient(object):
             x.fileSent.disconnect()
             x.fileReceived.disconnect()
             x.close()
+            
+    def _filePartlySent(self, filename, size, processed):
+        self.partialTransferEvent.emit(self, filename, size, processed)
+        
+    def _filePartlyReceived(self, filename, size, processed):
+        self.partialTransferEvent.emit(self, filename, size, processed)
 
     def send(self, data):
         """Call to send an object over the wire."""
@@ -451,6 +459,17 @@ class BaseClient(object):
         client -- this client
         filename -- the filename of the file received
         event -- a description of the event
+        
+        """
+    )
+    
+    partialTransferEvent = signal(object, basestring, basestring, basestring, doc=
+        """Called when part of a transfer occurs.
+        
+        client -- this client
+        filename -- the filename of the file involved
+        size -- total size of the file
+        processed -- amount of the file transferred so far
         
         """
     )

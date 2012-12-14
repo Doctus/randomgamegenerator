@@ -11,6 +11,7 @@ class transferMonitorWidget(QtGui.QDockWidget):
         super(QtGui.QDockWidget, self).__init__(mainWindow)
         self.setToolTip(self.tr("Allows for monitoring and control of file transfers."))
         self.setWindowTitle(self.tr("Transfer Monitor"))
+        self.transferDict = {}
         self.transferList = QtGui.QListWidget(mainWindow)
         self.widget = QtGui.QWidget(mainWindow)
         self.status = QtGui.QLabel("Initializing", mainWindow)
@@ -32,6 +33,15 @@ class transferMonitorWidget(QtGui.QDockWidget):
         else:
             self.status.setText(event)
             self.update()
+            
+    def processPartialTransferEvent(self, client, filename, size, processed):
+        if client.username + filename not in self.transferDict.keys():
+            self.transferDict[client.username + filename] = QtGui.QListWidgetItem("".join((client.username, ": ", filename, ": ", processed, " / ", size, " (", unicode(float(processed)/float(size)*100), "%)")))
+            self.transferList.addItem(self.transferDict[client.username + filename])
+        else:
+            self.transferDict[client.username + filename].setText("".join((client.username, ": ", filename, ": ", processed, " / ", size, " (", unicode(float(processed)/float(size)*100), "%)")))
+        self.transferList.update()
+        self.update()
 
 class debugConsoleWidget(QtGui.QDockWidget):
 

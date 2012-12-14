@@ -362,6 +362,7 @@ class statefulSocket(object):
                 return
             if not self._rawsend(data):
                 return
+            self.filePartlySent.emit(self.sentfile.filename, unicode(self.sentfile.size), unicode(self.sentfile.processed))
             if self.sentfile.file.atEnd():
                 sentfile = self.sentfile
                 self.sentfile = None
@@ -392,6 +393,7 @@ class statefulSocket(object):
                 if not self.receivedfile.write(self.context, data):
                     self._closeWithPrejudice()
                     return
+                self.filePartlyReceived.emit(self.receivedfile.filename, unicode(self.receivedfile.size), unicode(self.receivedfile.processed))
                 if self.receivedfile.size == self.receivedfile.processed:
                     receivedfile = self.receivedfile
                     self.receivedfile = None
@@ -484,6 +486,26 @@ class statefulSocket(object):
         
         socket -- this socket
         name -- the name of the file
+        
+        """
+    )
+    
+    filePartlySent = signal(basestring, basestring, basestring, doc=
+        """Called when a chunk of a file is sent.
+        
+        filename -- the filename of the file sent
+        size -- the total file size
+        processed -- the amount written so far
+        
+        """
+    )
+    
+    filePartlyReceived = signal(basestring, basestring, basestring, doc=
+        """Called when a chunk of a file is received and written.
+        
+        filename -- the filename of the file received
+        size -- the total file size
+        processed -- the amount written so far
         
         """
     )

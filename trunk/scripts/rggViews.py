@@ -490,6 +490,9 @@ def getSession():
 def transferFileResponse(responsibleClient, filename, eventDescription):
     _state.fwidget.processFileEvent(responsibleClient, filename, eventDescription)
     
+def partialTransferResponse(responsibleClient, filename, size, processed):
+    _state.fwidget.processPartialTransferEvent(responsibleClient, filename, size, processed)
+    
 # MAPS
 def topmap(mapPosition):
     return _state.session.findTopMap(mapPosition)
