@@ -12,11 +12,12 @@ class transferMonitorWidget(QtGui.QDockWidget):
         self.setToolTip(self.tr("Allows for monitoring and control of file transfers."))
         self.setWindowTitle(self.tr("Transfer Monitor"))
         self.transferDict = {}
-        self.transferList = QtGui.QListWidget(mainWindow)
+        self.transferTable = QtGui.QTableWidget(0, 3, mainWindow)
+        self.transferTable.setHorizontalHeaderLabels(["Client", "Filename", "Status"])
         self.widget = QtGui.QWidget(mainWindow)
         self.status = QtGui.QLabel("Initializing", mainWindow)
         self.layout = QtGui.QBoxLayout(2)
-        self.layout.addWidget(self.transferList)
+        self.layout.addWidget(self.transferTable)
         self.layout.addWidget(self.status)
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
@@ -24,24 +25,31 @@ class transferMonitorWidget(QtGui.QDockWidget):
         
         mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
         
-    def addItem(self, client, filename, reason):
-        self.transferList.addItem("".join((client.username, ": ", filename, " (", reason, ")")))
+    def updateItem(self, client, filename, status):
+        '''Update the status of a transfer, creating a new table row for it if it's new.'''
+        if client.username + filename not in self.transferDict.keys():
+            self.transferDict[client.username + filename] = self.transferTable.rowCount()
+            self.transferTable.setRowCount(self.transferTable.rowCount() + 1)
+            for column in (0, 1, 2):
+                self.transferTable.setItem(self.transferTable.rowCount() - 1, column, QtGui.QTableWidgetItem(""))
+        self.transferTable.item(self.transferDict[client.username + filename], 0).setText(client.username)
+        self.transferTable.item(self.transferDict[client.username + filename], 1).setText(filename)
+        self.transferTable.item(self.transferDict[client.username + filename], 2).setText(status)
+        self.transferTable.update()
+        self.update()
         
     def processFileEvent(self, client, filename, event):
+        '''Process a raw file/general status event.'''
         if len(filename) > 1:
-            self.addItem(client, filename, event)
+            self.updateItem(client, filename, event)
         else:
             self.status.setText(event)
             self.update()
             
     def processPartialTransferEvent(self, client, filename, size, processed):
-        if client.username + filename not in self.transferDict.keys():
-            self.transferDict[client.username + filename] = QtGui.QListWidgetItem("".join((client.username, ": ", filename, ": ", processed, " / ", size, " (", unicode(float(processed)/float(size)*100), "%)")))
-            self.transferList.addItem(self.transferDict[client.username + filename])
-        else:
-            self.transferDict[client.username + filename].setText("".join((client.username, ": ", filename, ": ", processed, " / ", size, " (", unicode(round(float(processed)/float(size)*100, 1)), "%)")))
-        self.transferList.update()
-        self.update()
+        '''Process a partial transfer event.'''
+        processedAmount = "".join((unicode(float(processed)/float(size)*100, 1), "%"))
+        self.updateItem(client, filename, processedAmount)
 
 class debugConsoleWidget(QtGui.QDockWidget):
 
