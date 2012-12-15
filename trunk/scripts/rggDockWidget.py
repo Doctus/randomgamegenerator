@@ -49,7 +49,7 @@ class transferMonitorWidget(QtGui.QDockWidget):
             
     def processPartialTransferEvent(self, client, filename, size, processed):
         '''Process a partial transfer event.'''
-        processedAmount = "".join((unicode(float(processed)/float(size)*100, 1), "%"))
+        processedAmount = "".join((unicode(round(float(processed)/float(size)*100, 1)), "%"))
         self.updateItem(client, filename, processedAmount)
 
 class debugConsoleWidget(QtGui.QDockWidget):
