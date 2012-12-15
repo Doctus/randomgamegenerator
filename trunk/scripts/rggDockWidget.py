@@ -32,6 +32,7 @@ class transferMonitorWidget(QtGui.QDockWidget):
             self.transferTable.setRowCount(self.transferTable.rowCount() + 1)
             for column in (0, 1, 2):
                 self.transferTable.setItem(self.transferTable.rowCount() - 1, column, QtGui.QTableWidgetItem(""))
+                self.transferTable.item(self.transferTable.rowCount() - 1, column).setFlags(QtCore.Qt.NoItemFlags)
         self.transferTable.item(self.transferDict[client.username + filename], 0).setText(client.username)
         self.transferTable.item(self.transferDict[client.username + filename], 1).setText(filename)
         self.transferTable.item(self.transferDict[client.username + filename], 2).setText(status)
