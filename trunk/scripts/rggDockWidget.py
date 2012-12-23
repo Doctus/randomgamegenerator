@@ -288,6 +288,9 @@ class ICChatWidget(QtGui.QDockWidget):
         self.connect(self.characterDeleteButton, QtCore.SIGNAL('clicked()'), self.deleteCharacter)
         self.connect(self.characterSelector, QtCore.SIGNAL('currentIndexChanged(int)'), self.setCharacterPreview)
         
+        if len(self.characters) == 0:
+            self.characterDeleteButton.setEnabled(False)
+        
         self.setCharacterPreview()
         
     def setCharacterPreview(self, newIndex=-1):
@@ -344,6 +347,7 @@ class ICChatWidget(QtGui.QDockWidget):
             self.characters.append(newchar)
             jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
             self.characterSelector.setCurrentIndex(self.characterSelector.count()-1)
+            self.characterDeleteButton.setEnabled(True)
             
     def _newChar(self, char):
         self.characterSelector.addItem(char.id)
@@ -355,6 +359,8 @@ class ICChatWidget(QtGui.QDockWidget):
             self.characters.pop(self.characterSelector.currentIndex())
             self.characterSelector.removeItem(self.characterSelector.currentIndex())
             jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
+            if len(self.characters) == 0:
+                self.characterDeleteButton.setEnabled(False)
 
     def processTags(self, message):
         message = message.replace("<", "&lt;").replace(">", "&gt;")
