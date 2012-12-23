@@ -722,7 +722,7 @@ class mapEditor(QtGui.QDockWidget):
 
         self.setWindowTitle(self.tr("Map Editor"))
         self.widget = QtGui.QWidget(mainWindow)
-        self.layout = QtGui.QBoxLayout(2)
+        self.layout = QtGui.QGridLayout()
         self.currentTileLayout = QtGui.QBoxLayout(1)
         self.scrollarea = QtGui.QScrollArea(mainWindow)
         self.noPaintingButton = QtGui.QRadioButton(self.tr("Stop Painting"), mainWindow)
@@ -732,14 +732,17 @@ class mapEditor(QtGui.QDockWidget):
         self.hollowRectPaintingButton = QtGui.QRadioButton(self.tr("Hollow Rectangle Brush"), mainWindow)
         self.currentTileLabel = QtGui.QLabel()
         self.currentTileLabelLabel = QtGui.QLabel(self.tr("Current tile: "))
-        self.layout.addWidget(self.scrollarea)
-        self.layout.addWidget(self.noPaintingButton)
-        self.layout.addWidget(self.singlePaintingButton)
-        self.layout.addWidget(self.rectPaintingButton)
-        self.layout.addWidget(self.hollowRectPaintingButton)
-        self.currentTileLayout.addWidget(self.currentTileLabel)
-        self.currentTileLayout.addWidget(self.currentTileLabelLabel)
-        self.layout.addLayout(self.currentTileLayout)
+        self.undoButton = QtGui.QPushButton("Undo", mainWindow)
+        self.redoButton = QtGui.QPushButton("Redo", mainWindow)
+        self.layout.addWidget(self.scrollarea, 0, 0, 1, 2)
+        self.layout.addWidget(self.noPaintingButton, 1, 0)
+        self.layout.addWidget(self.singlePaintingButton, 2, 0)
+        self.layout.addWidget(self.rectPaintingButton, 3, 0)
+        self.layout.addWidget(self.hollowRectPaintingButton, 4, 0)
+        self.layout.addWidget(self.undoButton, 1, 1)
+        self.layout.addWidget(self.redoButton, 2, 1)
+        self.layout.addWidget(self.currentTileLabel, 5, 1)
+        self.layout.addWidget(self.currentTileLabelLabel, 5, 0)
         self.tilelabel = None
         self.widget.setLayout(self.layout)
         self.setWidget(self.widget)
@@ -748,12 +751,40 @@ class mapEditor(QtGui.QDockWidget):
 
         self.currentMap = None
         
+        self.undo = []
+        self.undoButton.clicked.connect(self._undo)
+        self.undoButton.setEnabled(False)
+        
+        self.redo = []
+        self.redoButton.clicked.connect(self._redo)
+        self.redoButton.setEnabled(False)
+        
         from rggEvent import addMapChangedListener, addMousePressListener, addMouseMoveListener, addMouseReleaseListener
 
         addMapChangedListener(self)
         addMousePressListener(self)
         addMouseMoveListener(self)
         addMouseReleaseListener(self)
+        
+    def _undo(self):
+        from rggViews import _sendTileUpdate
+        redoTiles = []
+        for data in self.undo.pop():
+            redoTiles.append((data[0], data[1], _sendTileUpdate(data[0], data[1], data[2])))
+        self.redo.append(redoTiles)
+        self.redoButton.setEnabled(True)
+        if len(self.undo) == 0:
+            self.undoButton.setEnabled(False)
+            
+    def _redo(self):
+        from rggViews import _sendTileUpdate
+        undoTiles = []
+        for data in self.redo.pop():
+            undoTiles.append((data[0], data[1], _sendTileUpdate(data[0], data[1], data[2])))
+        self.undo.append(undoTiles)
+        self.undoButton.setEnabled(True)
+        if len(self.redo) == 0:
+            self.redoButton.setEnabled(False)
         
     def updateCurrentTile(self):
         self.tilepix = QtGui.QPixmap()
@@ -765,7 +796,7 @@ class mapEditor(QtGui.QDockWidget):
         mapPosition = getMapPosition((x, y))
         
         #This and similar things were a regrettable necessity in the plugin -> nonplugin conversion process.
-        from rggViews import topmap, sendTileUpdate
+        from rggViews import topmap, _sendTileUpdate
         from rggEvent import setEaten
         
         map = topmap(mapPosition)
@@ -781,7 +812,11 @@ class mapEditor(QtGui.QDockWidget):
                 if not map.tilePosExists(clickedtile):
                     setEaten()
                     return
-                sendTileUpdate(map.ID, clickedtile, self.tilelabel.currentTile)
+                oldtile = _sendTileUpdate(map.ID, clickedtile, self.tilelabel.currentTile)
+                self.undo.append([(map.ID, clickedtile, oldtile),])
+                self.redo = []
+                self.redoButton.setEnabled(False)
+                self.undoButton.setEnabled(True)
                 setEaten()
             elif self.isVisible() and (self.rectPaintingButton.isChecked() or self.hollowRectPaintingButton.isChecked()):
                 self.rectStart = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
@@ -815,13 +850,14 @@ class mapEditor(QtGui.QDockWidget):
                 setEaten()
                 return
             if map.tilePosExists(clickedtile) and map.getTile(clickedtile) != self.tilelabel.currentTile:
-                from rggViews import sendTileUpdate
-                sendTileUpdate(map.ID, clickedtile, self.tilelabel.currentTile)
+                from rggViews import _sendTileUpdate
+                oldtile = _sendTileUpdate(map.ID, clickedtile, self.tilelabel.currentTile)
+                self.undo[-1].append((map.ID, clickedtile, oldtile))
             setEaten()
             
     def mouseReleaseResponse(self, x, y, t):
         if t == 0:
-            from rggViews import topmap, sendTileUpdate, sendMultipleTileUpdate
+            from rggViews import topmap, _sendTileUpdate, _sendMultipleTileUpdate
             from rggEvent import setEaten
             if self.currentMap == None:
                 return
@@ -840,7 +876,14 @@ class mapEditor(QtGui.QDockWidget):
                     self.rectStart = None
                     self.rectEnd = None
                     return
-                sendMultipleTileUpdate(self.currentMap.ID, (min(rectEnd[0], self.rectStart[0]), min(rectEnd[1], self.rectStart[1])), (max(rectEnd[0], self.rectStart[0]), max(rectEnd[1], self.rectStart[1])), self.tilelabel.currentTile)
+                self.undo.append([])
+                self.undoButton.setEnabled(True)
+                self.redo = []
+                self.redoButton.setEnabled(False)
+                oldtiles = _sendMultipleTileUpdate(self.currentMap.ID, (min(rectEnd[0], self.rectStart[0]), min(rectEnd[1], self.rectStart[1])), (max(rectEnd[0], self.rectStart[0]), max(rectEnd[1], self.rectStart[1])), self.tilelabel.currentTile)
+                for x in range(min(rectEnd[0], self.rectStart[0]), max(rectEnd[0], self.rectStart[0])+1):
+                    for y in range(min(rectEnd[1], self.rectStart[1]), max(rectEnd[1], self.rectStart[1])+1):
+                        self.undo[-1].append((map.ID, (x, y), oldtiles.pop(0)))
             elif self.isVisible() and self.hollowRectPaintingButton.isChecked() and self.rectStart is not None:
                 rectEnd = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
                             int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
@@ -849,6 +892,10 @@ class mapEditor(QtGui.QDockWidget):
                     self.rectStart = None
                     self.rectEnd = None
                     return
+                self.undo.append([])
+                self.undoButton.setEnabled(True)
+                self.redo = []
+                self.redoButton.setEnabled(False)
                 if cmp(rectEnd[0], self.rectStart[0]) != 0:
                     for x in range(self.rectStart[0], rectEnd[0]+cmp(rectEnd[0], self.rectStart[0]), cmp(rectEnd[0], self.rectStart[0])):
                         if cmp(rectEnd[1], self.rectStart[1]) != 0:
@@ -856,18 +903,22 @@ class mapEditor(QtGui.QDockWidget):
                             for y in range(self.rectStart[1], rectEnd[1]+cmp(rectEnd[1], self.rectStart[1]), cmp(rectEnd[1], self.rectStart[1])):
                                 if x == self.rectStart[0] or x == rectEnd[0] or y == self.rectStart[1] or y == rectEnd[1]:
                                     if self.currentMap.tilePosExists((x, y)):
-                                        sendTileUpdate(self.currentMap.ID, (x, y), self.tilelabel.currentTile)
+                                        oldtile = _sendTileUpdate(self.currentMap.ID, (x, y), self.tilelabel.currentTile)
+                                        self.undo[-1].append((map.ID, (x, y), oldtile))
                         else:
                             if self.currentMap.tilePosExists((x, self.rectStart[1])):
-                                sendTileUpdate(self.currentMap.ID, (x, self.rectStart[1]), self.tilelabel.currentTile)
+                                oldtile = _sendTileUpdate(self.currentMap.ID, (x, self.rectStart[1]), self.tilelabel.currentTile)
+                                self.undo[-1].append((map.ID, (x, self.rectStart[1]), oldtile))
                 else:
                     if cmp(rectEnd[1], self.rectStart[1]) != 0:
                         for y in range(self.rectStart[1], rectEnd[1]+cmp(rectEnd[1], self.rectStart[1]), cmp(rectEnd[1], self.rectStart[1])):
                             if self.currentMap.tilePosExists((self.rectStart[0], y)):
-                                sendTileUpdate(self.currentMap.ID, (self.rectStart[0], y), self.tilelabel.currentTile)
+                                oldtile = _sendTileUpdate(self.currentMap.ID, (self.rectStart[0], y), self.tilelabel.currentTile)
+                                self.undo[-1].append((map.ID, (self.rectStart[0], y), oldtile))
                     else:
                         if self.currentMap.tilePosExists((self.rectStart[0], self.rectStart[1])):
-                                sendTileUpdate(self.currentMap.ID, (self.rectStart[0], self.rectStart[1]), self.tilelabel.currentTile)
+                                oldtile = _sendTileUpdate(self.currentMap.ID, (self.rectStart[0], self.rectStart[1]), self.tilelabel.currentTile)
+                                self.undo[-1].append((map.ID, (self.rectStart[0], self.rectStart[1]), oldtile))
 
     def mapChangedResponse(self, newMap):
         if newMap != None:
