@@ -808,6 +808,12 @@ def sendTileUpdate(user, mapID, tile, newTileIndex):
         return
     respondTileUpdate(allusers(), mapID, tile, newTileIndex)
     
+def _sendTileUpdate(mapID, tile, newTileIndex):
+    map = getmap(mapID)
+    oldtile = map.getTile(tile)
+    sendTileUpdate(mapID, tile, newTileIndex)
+    return oldtile
+    
 @serverRPC
 def respondMultipleTileUpdate(mapID, topLeftTile, bottomRightTile, newTileIndex):
     """Updates multiple specified map tiles in a rectangular area."""
@@ -825,6 +831,15 @@ def sendMultipleTileUpdate(user, mapID, topLeftTile, bottomRightTile, newTileInd
     if not map or not map.tilePosExists(topLeftTile) or not map.tilePosExists(bottomRightTile):
         return
     respondMultipleTileUpdate(allusers(), mapID, topLeftTile, bottomRightTile, newTileIndex)
+    
+def _sendMultipleTileUpdate(mapID, topLeftTile, bottomRightTile, newTileIndex):
+    oldtiles = []
+    map = getmap(mapID)
+    for x in range(topLeftTile[0], bottomRightTile[0]+1):
+        for y in range(topLeftTile[1], bottomRightTile[1]+1):
+            oldtiles.append(map.getTile((x, y)))
+    sendMultipleTileUpdate(mapID, topLeftTile, bottomRightTile, newTileIndex)
+    return oldtiles
 
 @serverRPC
 def respondArbitraryFile(filepath):
