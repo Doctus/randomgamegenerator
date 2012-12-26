@@ -756,6 +756,7 @@ class mapEditor(QtGui.QDockWidget):
         mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, self)
 
         self.currentMap = None
+        self.copyData = None
         
         self.undo = []
         self.undoButton.clicked.connect(self._undo)
@@ -838,6 +839,31 @@ class mapEditor(QtGui.QDockWidget):
                             int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
                 self.tilelabel.currentTile = map.getTile(clickedtile)
                 self.tilelabel.updateTile()
+                setEaten()
+        elif t == 6:
+            if self.isVisible() and not self.noPaintingButton.isChecked() and self.copyData:
+                if self.singlePaintingButton.isChecked():
+                    clickedtile = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
+                                int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
+                    for row, columns in enumerate(self.copyData):
+                        for column, tile in enumerate(columns):
+                            _sendTileUpdate(map.ID, (clickedtile[0]+row, clickedtile[1]+column), tile)
+                elif self.rectPaintingButton.isChecked():
+                    self.rectStart = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
+                                int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
+                    if not map.tilePosExists(self.rectStart):
+                        setEaten()
+                        self.rectStart = None
+                        return
+                    setEaten()
+        elif t == 8:
+            if self.isVisible() and not self.noPaintingButton.isChecked():
+                self.rectStart = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
+                                int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
+                if not map.tilePosExists(self.rectStart):
+                    setEaten()
+                    self.rectStart = None
+                    return
                 setEaten()
 
     def mouseMoveResponse(self, x, y):
@@ -925,6 +951,55 @@ class mapEditor(QtGui.QDockWidget):
                         if self.currentMap.tilePosExists((self.rectStart[0], self.rectStart[1])):
                                 oldtile = _sendTileUpdate(self.currentMap.ID, (self.rectStart[0], self.rectStart[1]), self.tilelabel.currentTile)
                                 self.undo[-1].append((map.ID, (self.rectStart[0], self.rectStart[1]), oldtile))
+        elif t == 6:
+            if self.isVisible() and self.rectPaintingButton.isChecked() and self.copyData:
+                from rggViews import topmap, _sendTileUpdate
+                from rggEvent import setEaten
+                if self.currentMap == None:
+                    return
+                mapPosition = getMapPosition((x, y))
+                map = topmap(mapPosition)
+                self.dragging = False
+                if map == None or map != self.currentMap:
+                    return
+                setEaten()
+                rectEnd = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
+                            int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
+                if not map.tilePosExists(rectEnd):
+                    self.rectStart = None
+                    self.rectEnd = None
+                    return
+                topleft = (min(self.rectStart[0], rectEnd[0]), min(self.rectStart[1], rectEnd[1]))
+                bottomright = (max(self.rectStart[0], rectEnd[0]), max(self.rectStart[1], rectEnd[1]))
+                for row in xrange(1+(bottomright[0]-topleft[0])):
+                    for column in xrange(1+(bottomright[1]-topleft[1])):
+                        _sendTileUpdate(self.currentMap.ID, (topleft[0]+row, topleft[1]+column), self.copyData[row%len(self.copyData)][column%len(self.copyData[row%len(self.copyData)])])
+        elif t == 8:
+            if self.isVisible() and not self.noPaintingButton.isChecked():
+                from rggViews import topmap
+                from rggEvent import setEaten
+                if self.currentMap == None:
+                    return
+                mapPosition = getMapPosition((x, y))
+                map = topmap(mapPosition)
+                self.dragging = False
+                if map == None or map != self.currentMap:
+                    return
+                rectEnd = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
+                            int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
+                setEaten()
+                if not map.tilePosExists(rectEnd):
+                    self.rectStart = None
+                    self.rectEnd = None
+                    return
+                topleft = (min(self.rectStart[0], rectEnd[0]), min(self.rectStart[1], rectEnd[1]))
+                bottomright = (max(self.rectStart[0], rectEnd[0]), max(self.rectStart[1], rectEnd[1]))
+                copypaste = []
+                for row in xrange(1+(bottomright[0]-topleft[0])):
+                    copypaste.append([])
+                    for column in xrange(1+(bottomright[1]-topleft[1])):
+                        copypaste[row].append(map.getTile((topleft[0]+row, topleft[1]+column)))
+                self.copyData = copypaste
 
     def mapChangedResponse(self, newMap):
         if newMap != None:

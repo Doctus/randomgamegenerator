@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+    <html lang="en">
+        <head>
+            <title>RGG Map Editor Documentation</title>
+            <meta charset="utf-8" />
+            <style>
+                body {background:white;color:black;font-family:sans-serif}
+                h2 {border-top: solid silver 1px}
+                ol ol li {list-style-type:lower-roman}
+            </style>
+        </head>
+        <body>
+            <h1>RGG Map Editor Documentation</h1>
+            <nav>
+            <h2>Contents</h2>
+            <ol>
+                <li><a href="#intro">Overview</a></li>
+                <li><a href="#drawmodes">Draw Modes</a></li>
+                    <ol>
+                        <li><a href="#single">Single Tile Drawing</a></li>
+			<li><a href="#rect">Rectangle Drawing</a></li>
+			<li><a href="#hollow">Hollow Rectangle Drawing</a></li>
+                    </ol>
+		<li><a href="#additional">Additional Functions</a></li>
+                    <ol>
+                        <li><a href="#eyedropper">Tile Selection</a></li>
+			<li><a href="#copypaste">Copying and Pasting</a></li>
+			<li><a href="#undo">Undo and Redo</a></li>
+                    </ol>
+            </ol>
+            </nav>
+              <div id="intro">
+              <h2>Overview</h2>
+                <p>The map editor provides tools for drawing and editing tileset-based maps. You must create a map with a valid tileset to use the map editor.</p>
+              </div>
+              <div id="drawmodes">
+              <h2>Draw Modes</h2>
+                <p>The map editor has three distinct draw modes and a no-draw mode. The latter mode disables most map editor functions, allowing the widget to be left open when you're not drawing without interfering with other activities.</p>
+		<div id="single">
+                  <h3>Single Tile Drawing</h3>
+                    <p>With a tile from the tileset selected, left-click on the map to draw that tile. Left-clicking and dragging will draw on all tiles over which the cursor is dragged.</p>
+                 </div>
+		<div id="rect">
+                  <h3>Rectangle Drawing</h3>
+                    <p>With a tile from the tileset selected, left-click on the map and drag to another point to fill the rectangle bounded by those points with the selected tile.</p>
+                 </div>
+		<div id="hollow">
+                  <h3>Hollow Rectangle Drawing</h3>
+                    <p>This mode works exactly like rectangle drawing, but changes only the borders of the rectangle.</p>
+                 </div>
+              </div>
+              <div id="additional">
+              <h2>Additional Functions</h2>
+		<div id="eyedropper">
+                  <h3>Tile Selection</h3>
+                    <p>Select a tileset by clicking on a map to identify the map you wish to edit, then left-click on the tileset within the map editor to choose a tile.</p>
+                    <p>It is also possible to "pick up" a tile on the map by ctrl-right clicking it.</p>
+                 </div>
+		<div id="copypaste">
+                  <h3>Copying and Pasting</h3>
+                    <p>Shift-right click and drag to copy a rectangular area of tiles. Shift-left clicking in single tile mode will paste one full copy of the area, while shift-left clicking in rectangle drawing mode will fill the area with the copied tiles as a pattern.</p>
+                 </div>
+		<div id="undo">
+                  <h3>Undo and Redo</h3>
+                    <p>It is possible to undo and redo most map editor drawing actions with no depth limit.</p>
+                    <p>You can only undo and redo your own local changes, not changes made by other users. An undo action that affects a tile changed by another user will, however, overwrite that user's change when reverting to the old state.</p>
+                    <p>It is not currently possible to undo paste actions.</p>
+                 </div>
+              </div>
+        </body>
+    </html>

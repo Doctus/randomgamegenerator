@@ -13,7 +13,7 @@ def singlify(matchobj):
         
 def _getFantasy():
     word = random.choice(double_letters)
-    return double.sub(singlify, word[:-1])
+    return double.sub(singlify, word[:-2]).title()
     
 def getName(args):
     if args == "help": return "Generates a fantasy-ish name by removing a double letter from an actual word."
