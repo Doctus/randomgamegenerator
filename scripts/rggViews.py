@@ -857,17 +857,18 @@ def releaseChat():
     sendReleaseChat()
 
 @serverRPC
-def respondStoreChat(message):
+def respondStoreChat(message, username):
     _state.storedMessages.append(message)
+    say(" ".join((username, "has stored a message.")))
 
 @clientRPC
-def sendStoreChat(user, message):
-    respondStoreChat(allusers(), message)
+def sendStoreChat(user, message, username):
+    respondStoreChat(allusers(), message, username)
 
 def storeChat(message):
     sendStoreChat(translate('views', '{name}: {sayText}').format(
         name=linkedName(localuser().username),
-        sayText=message))
+        sayText=message), localuser().username)
 
 @serverRPC
 def respondArbitraryFile(filepath):
