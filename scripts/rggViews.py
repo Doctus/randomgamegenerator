@@ -75,6 +75,8 @@ class _state(object):
     
     GM = None
     
+    storedMessages = []
+    
     moveMode = "free"
     moveablePogs = []
     
@@ -840,6 +842,32 @@ def _sendMultipleTileUpdate(mapID, topLeftTile, bottomRightTile, newTileIndex):
             oldtiles.append(map.getTile((x, y)))
     sendMultipleTileUpdate(mapID, topLeftTile, bottomRightTile, newTileIndex)
     return oldtiles
+
+@serverRPC
+def respondReleaseChat():
+    for message in _state.storedMessages:
+        say(message)
+    _state.storedMessages = []
+
+@clientRPC
+def sendReleaseChat(user):
+    respondReleaseChat(allusers())
+
+def releaseChat():
+    sendReleaseChat()
+
+@serverRPC
+def respondStoreChat(message):
+    _state.storedMessages.append(message)
+
+@clientRPC
+def sendStoreChat(user, message):
+    respondStoreChat(allusers(), message)
+
+def storeChat(message):
+    sendStoreChat(translate('views', '{name}: {sayText}').format(
+        name=linkedName(localuser().username),
+        sayText=message))
 
 @serverRPC
 def respondArbitraryFile(filepath):

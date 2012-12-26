@@ -172,6 +172,22 @@ camera.documentation = fake.translate('chatdoc',
         <dd>/cam</dd>
     </dl><br>
     """)
+    
+@chat('store', 'rumble', 'simultaneous')
+def store(message):
+    rggViews.storeChat(message)
+    
+store.documentation = fake.translate('chatdoc',
+    """store: store message for simultaneous display.  Example: /store I defend against the goblin.<br>
+    """)
+    
+@chat('release', 'display')
+def store(message):
+    rggViews.releaseChat()
+    
+store.documentation = fake.translate('chatdoc',
+    """release: display stored simultaneous messages.<br>
+    """)
 
 def chat(st):
     """Parses and executes chat commands."""
