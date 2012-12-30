@@ -248,8 +248,7 @@ class BaseClient(object):
             
     def transferHack(self):
         '''Kiiiind of crazy...'''
-        if not self.getList and not self.sendList:
-            self._closeXfer()
+        if self.ready and not self.getList and not self.sendList and not self.xfer.busy():
             self._openXfer()
     
     def allowSend(client, filename, size, checksum):
