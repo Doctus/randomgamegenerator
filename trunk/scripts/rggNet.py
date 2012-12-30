@@ -699,6 +699,8 @@ class RemoteClient(BaseClient):
         """Called when a socket disconnects."""
         if socket == self.obj:
             self.server._dropClient(self.username, errorMessage)
+        elif socket == self.xfer:
+            self.xfer.close()
         super(RemoteClient, self)._socketDisconnected(socket, errorMessage)
     
     def _socketObject(self, socket, data):
