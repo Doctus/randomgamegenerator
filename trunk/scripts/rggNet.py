@@ -75,8 +75,8 @@ class BaseClient(object):
         self.timer.start(1000)
         
         self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.preemptivelyOpenTransferSocket)
-        self.timer.start(5000)
+        self.timer.timeout.connect(self.transferHack)
+        self.timer.start(30000)
     
     @property
     def ready(self):
@@ -245,6 +245,12 @@ class BaseClient(object):
         if not self.xfer:
             self._openXfer()
             return
+            
+    def transferHack(self):
+        '''Kiiiind of crazy...'''
+        if not self.getList and not self.sendList:
+            self._closeXfer()
+            self._openXfer()
     
     def allowSend(client, filename, size, checksum):
         """Replacable hook for determining which files should be sent."""
@@ -699,8 +705,6 @@ class RemoteClient(BaseClient):
         """Called when a socket disconnects."""
         if socket == self.obj:
             self.server._dropClient(self.username, errorMessage)
-        elif socket == self.xfer:
-            self.xfer.close()
         super(RemoteClient, self)._socketDisconnected(socket, errorMessage)
     
     def _socketObject(self, socket, data):
