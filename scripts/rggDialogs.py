@@ -366,13 +366,19 @@ class modifyPogAttributesDialog(QtGui.QDialog):
         self.table.cellChanged.connect(self.respondChange)
         
     def respondChange(self, row, column):
-        try:
-            self.currentProperties[unicode(self.table.item(row, 0).text())] = unicode(self.table.item(row, 1).text())
-        except AttributeError: #key with no value
-            pass
-        except KeyError: #value with no key
-            pass
-        if row == self.table.rowCount() - 1:
+        self.currentProperties = {}
+        for tableRow in xrange(self.table.rowCount() + 1):
+            try:
+                assert len(unicode(self.table.item(tableRow, 0).text())) > 0
+                assert len(unicode(self.table.item(tableRow, 1).text())) > 0
+                self.currentProperties[unicode(self.table.item(tableRow, 0).text())] = unicode(self.table.item(tableRow, 1).text())
+            except AttributeError:
+                pass
+            except KeyError:
+                pass
+            except AssertionError:
+                pass
+        if row == self.table.rowCount() - 1 and self.table.item(row, 0) and len(unicode(self.table.item(row, 0).text())) > 0:
             self.table.setRowCount(self.table.rowCount() + 1)
 
     def okPressed(self, checked):
