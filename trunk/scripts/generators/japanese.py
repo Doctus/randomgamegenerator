@@ -50,10 +50,10 @@ def getName(args):
         return _getJapaneseFemaleFullName()
     elif "male" in args and "full" in args:
         return _getJapaneseMaleFullName()
-    elif "male" in args:
-        return _getJapaneseMaleName()
     elif "female" in args:
         return _getJapaneseFemaleName()
+    elif "male" in args:
+        return _getJapaneseMaleName()    
     elif "surname" in args:
         return _getJapaneseSurname()
     elif "full" in args:
