@@ -424,7 +424,7 @@ def getMapPosition(screenCoordinates):
 def checkVersion():
     '''If this is a release, and a newer release is available, returns a link to that release. Otherwise returns None.'''
     if DEV: return None
-    latest = str(urllib2.urlopen('http://www.daydreamspiral.com/rgg').read()).split()
+    latest = str(urllib2.urlopen('31.25.101.129/rgg_ver.php').read()).split()
     if latest[0] > VERSION:
         return latest[1]
     return None
