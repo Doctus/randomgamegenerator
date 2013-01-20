@@ -648,7 +648,7 @@ class hostDialog(dialog):
 
     def checkIP(self):
         import urllib2
-        ip = str(urllib2.urlopen('31.25.101.129/rgg_ip.php').read())
+        ip = str(urllib2.urlopen('http://31.25.101.129/rgg_ip.php').read())
         
         with open("2of12inf.txt", "r") as f:
             dat = f.readlines()
