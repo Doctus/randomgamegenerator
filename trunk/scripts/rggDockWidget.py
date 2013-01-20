@@ -288,11 +288,16 @@ class ICChatWidget(QtGui.QDockWidget):
         self.connect(self.characterDeleteButton, QtCore.SIGNAL('clicked()'), self.deleteCharacter)
         self.connect(self.characterSelector, QtCore.SIGNAL('currentIndexChanged(int)'), self.setCharacterPreview)
         
-        if len(self.characters) == 0:
-            self.characterDeleteButton.setEnabled(False)
+        self.updateDeleteButton()
         
         self.setCharacterPreview()
-        
+    
+    def updateDeleteButton(self):
+        if len(self.characters) == 0:
+            self.characterDeleteButton.setEnabled(False)
+        else:
+            self.characterDeleteButton.setEnabled(True)
+    
     def setCharacterPreview(self, newIndex=-1):
         try:
             preview = QtGui.QPixmap(os.path.join(unicode(PORTRAIT_DIR), unicode(self.characters[self.characterSelector.currentIndex()].portrait)))
@@ -347,7 +352,7 @@ class ICChatWidget(QtGui.QDockWidget):
             self.characters.append(newchar)
             jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
             self.characterSelector.setCurrentIndex(self.characterSelector.count()-1)
-            self.characterDeleteButton.setEnabled(True)
+            self.updateDeleteButton()
             
     def _newChar(self, char):
         self.characterSelector.addItem(char.id)
@@ -359,8 +364,7 @@ class ICChatWidget(QtGui.QDockWidget):
             self.characters.pop(self.characterSelector.currentIndex())
             self.characterSelector.removeItem(self.characterSelector.currentIndex())
             jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
-            if len(self.characters) == 0:
-                self.characterDeleteButton.setEnabled(False)
+            self.updateDeleteButton()
 
     def processTags(self, message):
         message = message.replace("<", "&lt;").replace(">", "&gt;")
@@ -397,6 +401,7 @@ class ICChatWidget(QtGui.QDockWidget):
         for char in chartemp:
             loaded = ICChar.load(char)
             self._newChar(loaded)
+        self.updateDeleteButton()
     
     ICChatInput = signal(basestring, basestring, basestring, doc=
         """Called when in-character chat input is received.
