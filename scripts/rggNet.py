@@ -74,9 +74,9 @@ class BaseClient(object):
         self.timer.timeout.connect(self._updatetransfer)
         self.timer.start(1000)
         
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.transferHack)
-        self.timer.start(30000)
+        #self.timer = QtCore.QTimer()
+        #self.timer.timeout.connect(self.transferHack)
+        #self.timer.start(3600000)
     
     @property
     def ready(self):
