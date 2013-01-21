@@ -583,6 +583,19 @@ class JsonClient(BaseClient):
         """
     )
     
+    transferDisconnected = signal(object, basestring, doc=
+        """Called when the transfer socket disconnects or fails to connect.
+        
+        Not called when disconnected manually (through close()).
+        
+        Never called when hosting; you will never be disconnected automatically.
+        
+        client -- this client
+        errorMessage -- the untranslated reason the connection failed
+        
+        """
+    )
+    
     objectReceived = signal(object, dict, doc=
         """Called when an object is received over the wire.
         
@@ -626,6 +639,8 @@ class JsonClient(BaseClient):
         """Called when a socket disconnects."""
         if socket == self.obj:
             self.disconnected.emit(self, errorMessage)
+        if socket == self.xfer:
+            self.transferDisconnected.emit(self, errorMessage)
         super(JsonClient, self)._socketDisconnected(socket, errorMessage)
     
     def _activateSocket(self, socket, username):
@@ -704,6 +719,8 @@ class RemoteClient(BaseClient):
         """Called when a socket disconnects."""
         if socket == self.obj:
             self.server._dropClient(self.username, errorMessage)
+        elif socket == self.xfer:
+            self.server._respondXferDisconnect(self.username, errorMessage)
         super(RemoteClient, self)._socketDisconnected(socket, errorMessage)
     
     def _socketObject(self, socket, data):
@@ -940,6 +957,13 @@ class JsonServer(object):
         assert(username in self.clients)
         del self.clients[username]
         self.disconnected.emit(self, client.username, errorMessage)
+        
+    def _respondXferDisconnect(self, username, errorMessage):
+        """Attempt to reestablish a lost transfer socket connection."""
+        assert(self.userExists(username))
+        assert(username in self.clients)
+        assert(client != self.client)
+        self.transferDisconnected.emit(self, client.username, errorMessage)
     
     connected = signal(object, basestring, doc=
         """Called when a client connects to the server.
@@ -952,6 +976,20 @@ class JsonServer(object):
     
     disconnected = signal(object, basestring, basestring, doc=
         """Called when a client disconnects from the server.
+        
+        Not called when disconnected manually (through close()).
+        
+        Never called when hosting; you will never be disconnected automatically.
+        
+        server -- this server
+        username -- the username of the client
+        errorMessage -- the untranslated reason the connection failed
+        
+        """
+    )
+    
+    transferDisconnected = signal(object, basestring, basestring, doc=
+        """Called when a client transfer socket disconnects from the server.
         
         Not called when disconnected manually (through close()).
         

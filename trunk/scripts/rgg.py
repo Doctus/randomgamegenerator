@@ -113,6 +113,7 @@ if __name__ == '__main__':
     client.partialTransferEvent.connect(rggViews.partialTransferResponse)
     server.connected.connect(rggRemote.serverConnect)
     server.disconnected.connect(rggRemote.serverDisconnect)
+    server.transferDisconnected.connect(rggRemote.serverTransferDisconnect)
     server.kicked.connect(rggRemote.serverKick)
     server.objectReceived.connect(rggRemote.serverReceive)
     server.fileReceived.connect(rggRemote.serverFileReceive)
