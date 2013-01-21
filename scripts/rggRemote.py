@@ -23,7 +23,7 @@ import re, os
 import rggViews, rggRPC, rggResource
 from rggSystem import translate, fake, makePortableFilename, PORTRAIT_DIR
 from rggViews import say, ICSay, announce, linkedName, getmap, allmaps
-from rggViews import localhandle, localuser, getuser, allusers, allusersbut, usernames, User, addUserToList, getNetUserList, respondUserRemove, clearUserList
+from rggViews import localhandle, localuser, getuser, allusers, allusersbut, usernames, User, addUserToList, getNetUserList, respondUserRemove, clearUserList, reconnectTransferSocket
 from rggRPC import clientRPC, serverRPC
 
 @serverRPC
@@ -251,6 +251,15 @@ def serverDisconnect(server, username, errorMessage):
         fake.translate('remote', '{username} has left the game. {error}'),
             username=user.username, error=errorMessage)
     respondUserRemove(allusers(), username)
+    
+def serverTransferDisconnect(server, username, errorMessage):
+    """Occurs when a client's transfer socket disconnects.
+    
+    username -- a username for the client
+    errorMessage -- a human-readable error message for why the connection failed
+    
+    """
+    reconnectTransferSocket(getuser(username))
     
 def serverKick(server, username):
     """Occurs when a client is kicked.

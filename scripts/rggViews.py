@@ -161,7 +161,11 @@ def updateRGG(path):
     os.remove("temp.zip")
     subprocess.Popen("rgg2.exe", close_fds=True)
     sys.exit()
-        
+
+@serverRPC    
+def reconnectTransferSocket():
+    client._openXfer()
+    
 def drawPogCircles():
     clearSelectionCircles()
     for pog in _state.pogSelection:
