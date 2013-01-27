@@ -611,6 +611,7 @@ class GLWidget(QGLWidget):
 
         x, y, w, h = image.textureRect
         dx, dy, dw, dh = image.drawRect
+        r = float(image.rotation)
 
         cx, cy = self.camera
 
@@ -621,9 +622,9 @@ class GLWidget(QGLWidget):
         if mod:
             glmod.drawTexture(image.textureId, dx, dy, dw, dh, x, y, w, h)
         else:
-            self.drawTexture(image.textureId, dx, dy, dw, dh, x, y, w, h)
+            self.drawTexture(image.textureId, dx, dy, dw, dh, x, y, w, h, r)
 
-    def drawTexture(self, texture, dx, dy, dw, dh, x, y, w, h):
+    def drawTexture(self, texture, dx, dy, dw, dh, x, y, w, h, r):
         '''
         texture is an int
         textureRect is a list of size 4, determines which square to take from the texture
@@ -631,6 +632,11 @@ class GLWidget(QGLWidget):
         '''
 
         glBindTexture(self.texext, texture)
+        
+        glPushMatrix()
+        glTranslatef(dx+dw/2, dy+dh/2, 0)
+        glRotatef(r, 0, 0, 1.0)
+        glTranslatef(-1*(dx+dw/2), -1*(dy+dh/2), 0)
 
         glBegin(GL_QUADS)
         #Top-left vertex (corner)
@@ -649,6 +655,8 @@ class GLWidget(QGLWidget):
         glTexCoord2f(x, y)
         glVertex3f(dx, (dy+dh), 0)
         glEnd()
+        
+        glPopMatrix()
         
     def calculateVBOList(self, image = None, delete = False):
         '''

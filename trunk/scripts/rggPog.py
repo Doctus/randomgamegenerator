@@ -143,6 +143,10 @@ class Pog(object):
             self._tileStore.setDrawW(size[0])
             self._tileStore.setDrawH(size[1])
             
+    def setRotation(self, rotation):
+        if self._tileStore:
+            self._tileStore.setRotation(rotation)
+            
     def editProperty(self, key, value):
         self._properties[key] = value
         if self._showTooltip:
