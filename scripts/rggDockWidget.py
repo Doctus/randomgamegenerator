@@ -1,5 +1,5 @@
 from PyQt4 import QtGui, QtCore
-from rggSystem import signal, findFiles, POG_DIR, PORTRAIT_DIR, LOG_DIR, IMAGE_EXTENSIONS, IMAGE_NAME_FILTER, CHAR_DIR, MUSIC_DIR, SAVE_DIR, makePortableFilename, promptSaveFile, getMapPosition
+from rggSystem import signal, findFiles, POG_DIR, PORTRAIT_DIR, LOG_DIR, IMAGE_EXTENSIONS, IMAGE_NAME_FILTER, CHAR_DIR, MUSIC_DIR, SAVE_DIR, makePortableFilename, promptSaveFile, getMapPosition, mainWindow
 from rggDialogs import newCharacterDialog, banDialog
 from rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
 import os, os.path, time
@@ -553,7 +553,9 @@ class pogTree(QtGui.QTreeView):
             #print self.model().mimeData([i]).text()
             
             drag.setMimeData(self.model().mimeData([i]))
-            drag.setPixmap(QtGui.QPixmap(self.model().mimeData([i]).text()))
+            basePixmap = QtGui.QPixmap(self.model().mimeData([i]).text())
+            scaledPixmap = basePixmap.scaled(basePixmap.width()*mainWindow.glwidget.zoom, basePixmap.height()*mainWindow.glwidget.zoom)
+            drag.setPixmap(scaledPixmap)
             drag.setHotSpot(QtCore.QPoint(0, 0))
             drag.start()
         
