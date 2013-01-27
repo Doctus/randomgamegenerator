@@ -223,10 +223,18 @@ class dropDownField(dialogField):
             widget.addItem(choice)
         if index >= 0:
             widget.setCurrentIndex(index)
+        widget.currentIndexChanged.connect(self.emitEvil)
         return widget
+    
+    def emitEvil(self, trash):
+        self.evil.emit()
     
     def _getWidgetValue(self, widget):
         return unicode(widget.currentText())
+        
+    evil = signal(doc=
+        """Ponies!"""
+    )
 
 class sliderField(dialogField):
     """A field made up of an integer slider."""
