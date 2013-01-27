@@ -103,6 +103,8 @@ class _state(object):
         _state.users[client.username] = _state.localuser
         _state.keepalive = 4
         
+        _state.mwidget.moveMapButton.clicked.connect(moveMap)
+        
         purgeEmptyImages()
         
         _state.pingTimer = QtCore.QTimer()
@@ -162,6 +164,9 @@ def updateRGG(path):
     subprocess.Popen("rgg2.exe", close_fds=True)
     sys.exit()
 
+def moveMap():
+    pass
+    
 @serverRPC    
 def reconnectTransferSocket():
     client._openXfer()
@@ -602,7 +607,7 @@ def saveMap():
     mapIDs = []
     
     for ID, map in _state.session.maps.items():
-        mapNames.append(map.mapname)
+        mapNames.append("".join((map.mapname, " (", unicode(ID), ")")))
         mapIDs.append(ID)
 
     selectedButton = rggSystem.promptButtonSelection("Which map do you want to save?", mapNames, 0)
@@ -641,7 +646,7 @@ def closeMap():
     mapIDs = []
     
     for ID, map in _state.session.maps.items():
-        mapNames.append(map.mapname)
+        mapNames.append("".join((map.mapname, " (", unicode(ID), ")")))
         mapIDs.append(ID)
 
     selectedButton = rggSystem.promptButtonSelection("Which map do you want to close?", mapNames, 0)

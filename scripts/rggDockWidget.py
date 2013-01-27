@@ -747,6 +747,7 @@ class mapEditor(QtGui.QDockWidget):
         self.currentTileLabelLabel = QtGui.QLabel(self.tr("Current tile: "))
         self.undoButton = QtGui.QPushButton("Undo", mainWindow)
         self.redoButton = QtGui.QPushButton("Redo", mainWindow)
+        self.moveMapButton = QtGui.QPushButton("Move Map", mainWindow)
         self.layout.addWidget(self.scrollarea, 0, 0, 1, 2)
         self.layout.addWidget(self.noPaintingButton, 1, 0)
         self.layout.addWidget(self.singlePaintingButton, 2, 0)
@@ -754,6 +755,7 @@ class mapEditor(QtGui.QDockWidget):
         self.layout.addWidget(self.hollowRectPaintingButton, 4, 0)
         self.layout.addWidget(self.undoButton, 1, 1)
         self.layout.addWidget(self.redoButton, 2, 1)
+        self.layout.addWidget(self.moveMapButton, 3, 1)
         self.layout.addWidget(self.currentTileLabel, 5, 1)
         self.layout.addWidget(self.currentTileLabelLabel, 5, 0)
         self.tilelabel = None
