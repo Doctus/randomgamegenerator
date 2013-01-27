@@ -30,6 +30,7 @@ class tile(object):
         self.destroyed = False
         self.VBOData = numpy.zeros((8, 2), 'f')
         self.origtextrect = textureRect
+        self.rotation = 0.0
 
         if self.glwidget.texext == GL_TEXTURE_2D:
             origsize = self.glwidget.getImageSize(self.imagepath)
@@ -104,6 +105,9 @@ class tile(object):
 
     def height(self):
         return self.drawRect[3]
+        
+    def setRotation(self, rotation):
+        self.rotation = rotation
 
     def setDrawRect(self, drawRect):
         self.drawRect = drawRect
