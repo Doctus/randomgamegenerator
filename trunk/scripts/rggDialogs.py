@@ -465,14 +465,15 @@ class newMapDialog(dialog):
         if len(tilesets) <= 0:
             raise RuntimeError(translate('newMapDialog',
                 'Cannot create a map when no tilesets are available.'))
+                
+        self.tilesetField = dropDownField(translate('newMapDialog', 'Tileset'), tilesets, value=data.get('tileset', tilesets[0]))
         
         return dict(
             mapName=stringField(translate('newMapDialog', 'Map Name'),
                 value=data.get('mapName', translate('newMapDialog', 'Generic Map'))),
             authName=stringField(translate('newMapDialog', 'Author Name'),
                 value=data.get('authName', translate('newMapDialog', 'Anonymous'))),
-            tileset=dropDownField(translate('newMapDialog', 'Tileset'), tilesets,
-                value=data.get('tileset', tilesets[0])),
+            tileset= self.tilesetField,
             mapWidth=integerField(translate('newMapDialog', 'Map Width'),
                 min=1, max=65535, value=data.get('mapWidth', 25)),
             mapHeight=integerField(translate('newMapDialog', 'Map Height'),
@@ -533,9 +534,22 @@ class newMapDialog(dialog):
         # Signals
         widget.connect(okayButton, QtCore.SIGNAL('clicked()'), okayPressed)
         widget.connect(cancelButton, QtCore.SIGNAL('clicked()'), widget.reject)
+        self.tilesetField.evil.connect(self.loadTilesize)
+        
+        self.loadTilesize()
         
         # Show to user
         return (widget.exec_() == QtGui.QDialog.Accepted)
+        
+    def loadTilesize(self):
+        """Attempt to load a stored tilesize for the current tileset, if it exists."""
+        try:
+            js = jsonload(os.path.join(SAVE_DIR, "tilesets.rgs"))
+            size = loadCoordinates('newMapDialog.'+self.clean()['tileset'], js.get(self.clean()['tileset']))
+            self.fields['tileWidth']._widget.setValue(size[0])
+            self.fields['tileHeight']._widget.setValue(size[1])
+        except:
+            pass
         
     def clean(self):
         """Check for errors and return well-formatted data."""
@@ -545,6 +559,7 @@ class newMapDialog(dialog):
     def save(self):
         """Make a new map and return it."""
         assert(self.cleanData)
+        jsonappend({self.cleanData['tileset']:[self.cleanData['tileWidth'], self.cleanData['tileHeight']]}, os.path.join(SAVE_DIR, "tilesets.rgs"))
         return rggMap.Map(
             self.cleanData['mapName'],
             self.cleanData['authName'],
