@@ -1340,11 +1340,11 @@ def processPogRightclick(selection, pogs):
     elif selection == 10:
         for pog in pogs:
             duplicatePog(pog)
-    elif selection == 11:
-        rotation = promptInteger("Enter a rotation angle.", min=0, max=359, default=0)
-        if rotation is None: return
-        for pog in pogs:
-            pog.setRotation(rotation)
+    #elif selection == 11:
+    #    rotation = promptInteger("Enter a rotation angle.", min=0, max=359, default=0)
+    #    if rotation is None: return
+    #    for pog in pogs:
+    #        pog.setRotation(rotation)
     elif selection == 11:
         username = promptString(translate('views', "Enter the name of the user who may move this pog (must be exact)."), inittext = "username")
         if username is None:
@@ -1369,8 +1369,8 @@ def pogActionList(pog):
             translate('views', lockbutton),
             translate('views', 'Delete'),
             translate('views', followbutton),
-            translate('views', 'Duplicate'),
-            translate('views', 'Rotate')]
+            translate('views', 'Duplicate')]#,
+            #translate('views', 'Rotate')]
     if isGM(): options.append(translate('views', 'Set as moveable for player'))
     return options
 
