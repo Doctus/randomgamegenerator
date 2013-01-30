@@ -1,4 +1,4 @@
-RGG v1.02b "Of twilight evenings and of long ago"
+RGG v1.03 "The King that was Not"
 
 http://code.google.com/p/randomgamegenerator/
 
@@ -41,6 +41,37 @@ Special Thanks:
   Everyone from MoMM and #attercop
 
 Changelog:
+
+v1.03 "The King that was Not"                 January 29, 2013
+
+   Fixes
+    * Fixed hidden pogs sometimes being visible.
+    * Fixed the "0kb file" issue for good (probably).
+    * Fixed several other transfer-related issues.
+    * Fixed several dialogs not displaying the correct icon.
+    * Some buttons now disable themselves when appropriate
+      rather than doing nothing when clicked.
+    * IP/version checks will now work consistently.
+    * When placing a pog, the drag image now scales properly.
+
+   Features and Changes
+    * Added default tilesets suitable to playing Chess and Go.
+    * Added a transfer monitor widget.
+    * Added two more generators.
+    * Added preview when drawing pentagrams and hexagrams.
+    * Moved character sheets to their own save folder.
+    * Added transfer command for character sheets.
+    * Added arbitrary file transfer command.
+    * Made the character creator a normal dock widget instead of
+      a completely separate window.
+    * Added ability to lock camera to a pog and move it with WASD.
+    * Greatly improved pog attributes dialog.
+    * Added a remove-all-pogs command to the File menu.
+    * The map editor now supports undo/redo and copy-paste.
+    * Added simultaneous message display.
+    * Tileset sizes will now be saved and automatically loaded.
+
+  ---
 
 v1.02b "Of twilight evenings and of long ago" November 4, 2012
 

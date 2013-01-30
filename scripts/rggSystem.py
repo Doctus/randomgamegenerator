@@ -67,7 +67,7 @@ COLOURS = {"White":(1.0, 1.0, 1.0),
            "Blue": (0.0, 0.0, 1.0),
            "Purple": (0.76, 0.0, 1.0),
            "Black": (0.0, 0.0, 0.0)}
-VERSION = "1.03"
+VERSION = "1.04"
 DEV = True
 PING_INTERVAL_SECONDS = 10
 
