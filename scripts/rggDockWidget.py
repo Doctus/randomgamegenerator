@@ -353,6 +353,7 @@ class ICChatWidget(QtGui.QDockWidget):
             jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
             self.characterSelector.setCurrentIndex(self.characterSelector.count()-1)
             self.updateDeleteButton()
+            self.setCharacterPreview()
             
     def _newChar(self, char):
         self.characterSelector.addItem(char.id)
@@ -402,6 +403,7 @@ class ICChatWidget(QtGui.QDockWidget):
             loaded = ICChar.load(char)
             self._newChar(loaded)
         self.updateDeleteButton()
+        self.setCharacterPreview()
     
     ICChatInput = signal(basestring, basestring, basestring, doc=
         """Called when in-character chat input is received.
