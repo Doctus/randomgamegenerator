@@ -574,7 +574,7 @@ def sendSession(user):
 
 def newMap():
     """Allows the user to choose a new map."""
-    dialog = newMapDialog()
+    dialog = newMapDialog(authName=localhandle())
     
     def accept():
         valid = dialog.is_valid()
