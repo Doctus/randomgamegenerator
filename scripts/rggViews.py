@@ -116,6 +116,11 @@ class _state(object):
         _state.dialogs_keepalive = []
         
         try:
+            _state.portraitSize = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))['portraitsize']
+        except:
+            _state.portraitSize = "64"
+        
+        try:
             mainWindow.readGeometry()
         except:
             pass
@@ -218,6 +223,17 @@ def promptTimestampFormat():
     if newFormat is None:
         return
     setTimestampFormat(newFormat)
+    
+def getPortraitSize():
+    return _state.portraitSize
+    
+def setPortraitSize():
+    prompt = translate("views", "Please enter a portrait size.")
+    newSize = promptInteger(prompt)
+    if newSize is None:
+        return
+    _state.portraitSize = newSize
+    jsonappend({'portraitsize':newSize}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
 
 # MESSAGES
 

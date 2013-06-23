@@ -101,6 +101,7 @@ if __name__ == '__main__':
     s.menu.thicknessMenu.triggered.connect(rggViews.setThickness)
     s.menu.colourMenu.triggered.connect(rggViews.setLineColour)
     s.menu.langMenu.triggered.connect(rggViews.setLanguage)
+    s.menu.portraitMenu.triggered.connect(rggViews.setPortraitSize)
     
     server = rggRPC.server
     client = rggRPC.client
