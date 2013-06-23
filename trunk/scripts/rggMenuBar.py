@@ -110,6 +110,8 @@ class menuBar(object):
 
         self.setTimestampFormatAct = QtGui.QAction(translate("menubar", "Set Timestamp Format..."), main)
         
+        self.portraitMenu = QtGui.QAction(translate("menubar", "Set IC Portrait Size..."), main)
+        
         self.selectIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-select-icon.png"), "Select Tool", main)
         self.selectIcon.setShortcut("Ctrl+T")
         self.selectIcon.setToolTip("Select Tool (Ctrl+T)")
@@ -200,6 +202,7 @@ class menuBar(object):
         self.optionsMenu.addAction(self.toggleAlertsAct)
         self.optionsMenu.addAction(self.toggleTimestampsAct)
         self.optionsMenu.addAction(self.setTimestampFormatAct)
+        self.optionsMenu.addAction(self.portraitMenu)
         self.optionsMenu.addAction(self.gfxSettingsAct)
         self.optionsMenu.addAction(self.drawTimerSettingsAct)
         

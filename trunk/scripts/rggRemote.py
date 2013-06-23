@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 import re, os
 import rggViews, rggRPC, rggResource
 from rggSystem import translate, fake, makePortableFilename, PORTRAIT_DIR
-from rggViews import say, ICSay, announce, linkedName, getmap, allmaps
+from rggViews import say, ICSay, announce, linkedName, getmap, allmaps, getPortraitSize
 from rggViews import localhandle, localuser, getuser, allusers, allusersbut, usernames, User, addUserToList, getNetUserList, respondUserRemove, clearUserList, reconnectTransferSocket
 from rggRPC import clientRPC, serverRPC
 
@@ -66,8 +66,9 @@ def respondICSay(chname, message, portrait):
         portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
         IAMTHEDOOMPHANTOM = rggResource.crm.translateFile(makePortableFilename(os.path.join(PORTRAIT_DIR, portrait)), rggResource.RESOURCE_IMAGE)
         #^ Don't remember whether this is still needed for transfer etc.
-        ICSay(translate('remote', '<table><tr><td><img src="{port}" width="64" height="64"></td><td>{name}: {sayText}</td></tr></table><br />').format(
-            port=portfile,                                                        
+        ICSay(translate('remote', '<table><tr><td><img src="{port}" width="{size}" height="{size}"></td><td>{name}: {sayText}</td></tr></table><br />').format(
+            port=portfile,
+            size=getPortraitSize(),
             name=linkedName(chname),
             sayText=message))
     else:
@@ -99,8 +100,9 @@ def sendEmote(user, message):
 def respondICEmote(chname, message, portrait):
     if len(portrait) > 1:
         portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
-        ICSay(translate('remote', '<table><tr><td><img src="{port}" width="64" height="64"></td><td><i>{name} {emote}</i></td></tr></table><br />').format(
-            port=portfile,                                                                      
+        ICSay(translate('remote', '<table><tr><td><img src="{port}" width="{size}" height="{size}"></td><td><i>{name} {emote}</i></td></tr></table><br />').format(
+            port=portfile, 
+            size=getPortraitSize(),            
             name=linkedName(chname),
             emote=message))
     else:
@@ -119,8 +121,9 @@ def sendICEmote(user, message, chname, portrait):
 def respondICWhisperSender(target, message, chname, portrait):
     if len(portrait) > 1:
         portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
-        ICSay(translate('remote', '<table><tr><td><img src="{port}" width="64" height="64"></td><td>To {name}: {message}</td></tr></table><br />').format(
-            port=portfile,                                                                      
+        ICSay(translate('remote', '<table><tr><td><img src="{port}" width="{size}" height="{size}"></td><td>To {name}: {message}</td></tr></table><br />').format(
+            port=portfile,
+            size=getPortraitSize(),
             name=linkedName(target),
             message=message))
     else:
@@ -132,8 +135,9 @@ def respondICWhisperSender(target, message, chname, portrait):
 def respondICWhisperTarget(sender, message, chname, portrait):
     if len(portrait) > 1:
         portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
-        ICSay(translate('remote', '<table><tr><td><img src="{port}" width="64" height="64"></td><td>{name} whispers: {message}</td></tr></table><br />').format(
-            port=portfile,                                                                      
+        ICSay(translate('remote', '<table><tr><td><img src="{port}" width="{size}" height="{size}"></td><td>{name} whispers: {message}</td></tr></table><br />').format(
+            port=portfile,
+            size=getPortraitSize(),
             name=linkedName(chname),
             message=message))
     else:
