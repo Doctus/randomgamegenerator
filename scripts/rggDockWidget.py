@@ -1,5 +1,5 @@
 from PyQt4 import QtGui, QtCore
-from rggSystem import signal, findFiles, POG_DIR, PORTRAIT_DIR, LOG_DIR, IMAGE_EXTENSIONS, IMAGE_NAME_FILTER, CHAR_DIR, MUSIC_DIR, SAVE_DIR, makePortableFilename, promptSaveFile, getMapPosition, mainWindow
+from rggSystem import signal, findFiles, POG_DIR, PORTRAIT_DIR, LOG_DIR, IMAGE_EXTENSIONS, IMAGE_NAME_FILTER, CHAR_DIR, MUSIC_DIR, SAVE_DIR, makePortableFilename, promptSaveFile, promptYesNo, getMapPosition, mainWindow
 from rggDialogs import newCharacterDialog, banDialog
 from rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
 import os, os.path, time
@@ -262,11 +262,14 @@ class ICChatWidget(QtGui.QDockWidget):
         self.characterAddButton.setToolTip(self.tr("Add a new in-character chat character via a dialog box."))
         self.characterDeleteButton = QtGui.QPushButton(self.tr("Delete"), mainWindow)
         self.characterDeleteButton.setToolTip(self.tr("Delete the currently selected in-character chat character."))
+        self.characterClearButton = QtGui.QPushButton(self.tr("Clear"), mainWindow)
+        self.characterClearButton.setToolTip(self.tr("Deletes all in-character chat characters."))
         self.layout = QtGui.QGridLayout()
         self.layout.addWidget(self.widgetEditor, 0, 0, 1, 4)
         self.layout.addWidget(self.widgetLineInput, 1, 1, 1, 3)
         self.layout.addWidget(self.characterPreview, 1, 0, 2, 1)
         self.layout.addWidget(self.characterDeleteButton, 2, 3, 1, 1)
+        self.layout.addWidget(self.characterClearButton, 3, 3, 1, 1)
         self.layout.addWidget(self.characterAddButton, 2, 2, 1, 1)
         self.layout.addWidget(self.characterSelector, 2, 1, 1, 1)
         self.widget.setLayout(self.layout)
@@ -286,6 +289,7 @@ class ICChatWidget(QtGui.QDockWidget):
         self.widgetLineInput.returnPressed.connect(self.processInput)
         self.connect(self.characterAddButton, QtCore.SIGNAL('clicked()'), self.newCharacter)
         self.connect(self.characterDeleteButton, QtCore.SIGNAL('clicked()'), self.deleteCharacter)
+        self.connect(self.characterClearButton, QtCore.SIGNAL('clicked()'), self.clearCharacters)
         self.connect(self.characterSelector, QtCore.SIGNAL('currentIndexChanged(int)'), self.setCharacterPreview)
         
         self.updateDeleteButton()
@@ -366,6 +370,14 @@ class ICChatWidget(QtGui.QDockWidget):
             self.characterSelector.removeItem(self.characterSelector.currentIndex())
             jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
             self.updateDeleteButton()
+            
+    def clearCharacters(self):
+		if promptYesNo('Really clear all characters?') == 16384:
+			self.characters = []
+			self.characterSelector.clear()
+			jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
+			self.updateDeleteButton()
+			self.setCharacterPreview()
 
     def processTags(self, message):
         message = message.replace("<", "&lt;").replace(">", "&gt;")
