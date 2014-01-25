@@ -229,7 +229,11 @@ def getPortraitSize():
     
 def setPortraitSize():
     prompt = translate("views", "Please enter a portrait size.")
-    newSize = promptInteger(prompt)
+    try:
+        defaultsize = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))['portraitsize']
+    except:
+        defaultsize = 64
+    newSize = promptInteger(prompt, default=defaultsize)
     if newSize is None:
         return
     _state.portraitSize = newSize
