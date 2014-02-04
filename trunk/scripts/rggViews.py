@@ -1103,7 +1103,7 @@ def respondPogAttributes(pogID, name, layer, properties):
     '''Sends various attributes of a pog over the wire.'''
     if pogID in _state.session.pogs.keys():
         pog = _state.session.pogs[pogID]
-		if not pog: return
+        if not pog: return
         pog.name = name
         pog.layer = layer
         pog.properties = properties
@@ -1260,6 +1260,16 @@ def generateName(generator, args):
 
 # MISC
 
+@serverRPC
+def respondCenterOnPog(pogID):
+    if pogID in _state.session.pogs.keys():
+        pog = _state.session.pogs[pogID]
+        centerOnPog(pog)
+
+@clientRPC
+def sendCenterOnPog(user, pogID):
+    respondCenterOnPog(allusers(), pogID)
+
 def centerOnPog(pog):
     """Center the camera on a pog."""
     if not pog: return
@@ -1367,6 +1377,8 @@ def processPogRightclick(selection, pogs):
     #    for pog in pogs:
     #        pog.setRotation(rotation)
     elif selection == 11:
+        sendCenterOnPog(mainpog.ID)
+    elif selection == 12:
         username = promptString(translate('views', "Enter the name of the user who may move this pog (must be exact)."), inittext = "username")
         if username is None:
             return
@@ -1390,7 +1402,8 @@ def pogActionList(pog):
             translate('views', lockbutton),
             translate('views', 'Delete'),
             translate('views', followbutton),
-            translate('views', 'Duplicate')]#,
+            translate('views', 'Duplicate'),
+            translate('views', 'Center Everyone')]#,
             #translate('views', 'Rotate')]
     if isGM(): options.append(translate('views', 'Set as moveable for player'))
     return options
