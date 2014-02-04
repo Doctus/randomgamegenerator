@@ -1103,6 +1103,7 @@ def respondPogAttributes(pogID, name, layer, properties):
     '''Sends various attributes of a pog over the wire.'''
     if pogID in _state.session.pogs.keys():
         pog = _state.session.pogs[pogID]
+		if not pog: return
         pog.name = name
         pog.layer = layer
         pog.properties = properties
