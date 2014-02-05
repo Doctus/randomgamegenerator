@@ -2,7 +2,7 @@ from PyQt4 import QtGui, QtCore
 from rggSystem import signal, findFiles, POG_DIR, PORTRAIT_DIR, LOG_DIR, IMAGE_EXTENSIONS, IMAGE_NAME_FILTER, CHAR_DIR, MUSIC_DIR, SAVE_DIR, makePortableFilename, promptSaveFile, promptYesNo, getMapPosition, mainWindow
 from rggDialogs import newCharacterDialog, banDialog
 from rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
-import os, os.path, time
+import os, os.path, time, re
 #import rggEvent
 
 class transferMonitorWidget(QtGui.QDockWidget):
@@ -172,6 +172,8 @@ class chatWidget(QtGui.QDockWidget):
         '''If the url appears to be one of the /tell links in a player name, load it to the input.'''
         if "/tell" in unicode(url):
             self.widgetLineInput.setText(url.toString())
+        else:
+            QtGui.QDesktopServices.openUrl(QtCore.QUrl(url))
 
     def toggleTimestamp(self, newsetting):
         if newsetting == "On":
@@ -202,6 +204,8 @@ class chatWidget(QtGui.QDockWidget):
         for validTag in ("i", "b", "u", "s"):
             message = message.replace("".join(("[", validTag, "]")), "".join(("<", validTag, ">")))
             message = message.replace("".join(("[", "/", validTag, "]")), "".join(("<", "/", validTag, ">")))
+        message = re.sub(r"\[url\](.*?)\[/url\]", r"<a href=\1>\1</a>", message)
+        message = message.replace("/>", ">") #prevents anchor from closing with trailing slash in URL
         return message
     
     def processInput(self):
@@ -372,12 +376,12 @@ class ICChatWidget(QtGui.QDockWidget):
             self.updateDeleteButton()
             
     def clearCharacters(self):
-		if promptYesNo('Really clear all characters?') == 16384:
-			self.characters = []
-			self.characterSelector.clear()
-			jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
-			self.updateDeleteButton()
-			self.setCharacterPreview()
+        if promptYesNo('Really clear all characters?') == 16384:
+            self.characters = []
+            self.characterSelector.clear()
+            jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
+            self.updateDeleteButton()
+            self.setCharacterPreview()
 
     def processTags(self, message):
         message = message.replace("<", "&lt;").replace(">", "&gt;")
