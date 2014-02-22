@@ -589,8 +589,8 @@ def respondSession(sess):
     _state.session = rggSession.Session.load(sess)
     
 @clientRPC
-def sendSession(user):
-    respondSession(allusersbut(user), _state.session.dump())
+def sendSession(user, session):
+    respondSession(allusersbut(user), session)
 
 def newMap():
     """Allows the user to choose a new map."""
@@ -698,7 +698,7 @@ def loadSession():
         obj = jsonload(filename)
         sess = rggSession.Session.load(obj)
         _state.session = sess
-        sendSession()
+        sendSession(_state.session.dump())
     except Exception as e:
         showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
         print e
