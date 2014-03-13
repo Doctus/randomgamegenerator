@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 import re
 import rggSystem
 import os
+import getpass
 from rggSocket import statefulSocket, generateChecksum, fileData
 from rggSystem import translate, mainWindow, signal, makeLocalFilename
 from PyQt4 import QtCore, QtNetwork
@@ -43,7 +44,7 @@ class ConnectionData(object):
     """Data used to create a network connection."""
     
     def __init__(self, host=None, port=6812, username=translate('net', 'Anonymous', 'default connection username'), passw=''):
-        self.host = host or localHost()
+        self.host = host or localUser() or localHost()
         self.port = port
         self.username = username
         self.password = passw
@@ -67,7 +68,7 @@ class BaseClient(object):
         self.sentfile = None
         self.receivedfile = None
         # Doesn't need translation
-        self.username = unicode(localHost()) or u'localhost'
+        self.username = unicode(localUser()) or u'localhost'
         assert(self.username)
         
         self.timer = QtCore.QTimer()
@@ -1187,4 +1188,8 @@ class JsonServer(object):
 def localHost():
     """Gets the name of the local machine."""
     return unicode(QtNetwork.QHostInfo.localHostName())
+
+def localUser():
+    """Gets the name of the local user."""
+    return unicode(getpass.getuser())
 
