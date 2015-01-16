@@ -21,10 +21,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 import re, os
 import rggViews, rggRPC, rggResource
-from rggSystem import translate, fake, makePortableFilename, PORTRAIT_DIR
+from rggSystem import translate, fake, makePortableFilename
 from rggViews import say, ICSay, announce, linkedName, getmap, allmaps, getPortraitSize
 from rggViews import localhandle, localuser, getuser, allusers, allusersbut, usernames, User, addUserToList, getNetUserList, respondUserRemove, clearUserList, reconnectTransferSocket
 from rggRPC import clientRPC, serverRPC
+from rggConstants import *
 
 @serverRPC
 def respondError(message, *args, **kwargs):

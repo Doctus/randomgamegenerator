@@ -1,5 +1,5 @@
 from PyQt4 import QtGui, QtCore
-from rggSystem import signal, findFiles, POG_DIR, PORTRAIT_DIR, LOG_DIR, IMAGE_EXTENSIONS, IMAGE_NAME_FILTER, CHAR_DIR, MUSIC_DIR, SAVE_DIR, makePortableFilename, promptSaveFile, promptYesNo, getMapPosition, mainWindow
+from rggSystem import signal, findFiles, makePortableFilename, promptSaveFile, promptYesNo, getMapPosition, mainWindow
 from rggDialogs import newCharacterDialog, banDialog
 from rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
 import os, os.path, time, re

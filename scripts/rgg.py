@@ -3,6 +3,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.QtOpenGL import *
 from rggJson import loadString, jsonload
+from rggConstants import *
 import os
 
 if __name__ == '__main__':

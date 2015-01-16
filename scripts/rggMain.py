@@ -12,7 +12,7 @@ from PyQt4.QtGui import *
 from glwidget import *
 
 from rggJson import loadInteger, jsonload
-from rggSystem import SAVE_DIR
+from rggConstants import *
 
 class MainWindow(QMainWindow):
     '''Wrapper class for...well, the game? Maybe this needs to be called the game engine then'''
