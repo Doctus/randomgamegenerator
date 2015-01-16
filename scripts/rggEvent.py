@@ -1,8 +1,26 @@
-import rggViews, rggChat, rggICChat
+'''
+rggEvent - for the Random Game Generator project            
+By Doctus (kirikayuumura.noir@gmail.com)
+
+Handling of signal/slot system for user input and network event response.
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+'''
 
 # Globals
 
-_eaten = False
 _mouseMoveListeners = []
 _mousePressListeners = []
 _mouseReleaseListeners = []
@@ -15,129 +33,117 @@ _pogDeleteListeners = []
 _pogSelectionChangedListeners = []
 _mapChangedListeners = []
 
-def setEaten():
-  global _eaten
-  _eaten = True
-
 # Add listener functions
+# Priority value should normally be a *_RESPONSE_LEVEL from rggConstants
 
-def addMouseMoveListener(listener):
-  _mouseMoveListeners.append(listener)
+def addMouseMoveListener(listener, priority):
+    _mouseMoveListeners.append((listener, priority))
+    _mouseMoveListeners.sort(key=lambda item: item[1])
 
-def addMousePressListener(listener):
-  _mousePressListeners.append(listener)
+def addMousePressListener(listener, priority):
+    _mousePressListeners.append((listener, priority))
+    _mousePressListeners.sort(key=lambda item: item[1])
 
-def addMouseReleaseListener(listener):
-  _mouseReleaseListeners.append(listener)
+def addMouseReleaseListener(listener, priority):
+    _mouseReleaseListeners.append((listener, priority))
+    _mouseReleaseListeners.sort(key=lambda item: item[1])
   
-def addKeyPressListener(listener):
-  _keyPressListeners.append(listener)
+def addKeyPressListener(listener, priority):
+    _keyPressListeners.append((listener, priority))
+    _keyPressListeners.sort(key=lambda item: item[1])
   
-def addKeyReleaseListener(listener):
-  _keyReleaseListeners.append(listener)
+def addKeyReleaseListener(listener, priority):
+    _keyReleaseListeners.append((listener, priority))
+    _keyReleaseListeners.sort(key=lambda item: item[1])
 
-def addChatInputListener(listener):
-  _chatInputListeners.append(listener)
+def addChatInputListener(listener, priority):
+    _chatInputListeners.append((listener, priority))
+    _chatInputListeners.sort(key=lambda item: item[1])
 
-def addICChatInputListener(listener):
-  _ICChatInputListeners.append(listener)
+def addICChatInputListener(listener, priority):
+    _ICChatInputListeners.append((listener, priority))
+    _ICChatInputListeners.sort(key=lambda item: item[1])
 
-def addPogUpdateListener(listener):
-  _pogUpdateListeners.append(listener)
+def addPogUpdateListener(listener, priority):
+    _pogUpdateListeners.append((listener, priority))
+    _pogUpdateListeners.sort(key=lambda item: item[1])
 
-def addPogDeleteListener(listener):
-  _pogDeleteListeners.append(listener)
+def addPogDeleteListener(listener, priority):
+    _pogDeleteListeners.append((listener, priority))
+    _pogDeleteListeners.sort(key=lambda item: item[1])
 
-def addPogSelectionChangedListener(listener):
-  _pogSelectionChangedListeners.append(listener)
+def addPogSelectionChangedListener(listener, priority):
+    _pogSelectionChangedListeners.append((listener, priority))
+    _pogSelectionChangedListeners.sort(key=lambda item: item[1])
 
-def addMapChangedListener(listener):
-  _mapChangedListeners.append(listener)
+def addMapChangedListener(listener, priority):
+    _mapChangedListeners.append((listener, priority))
+    _mapChangedListeners.sort(key=lambda item: item[1])
 
 # Event functions
 
 def mouseMoveEvent(x, y):
-  global _eaten
-  _eaten = False
 
-  for listener in _mouseMoveListeners:
-    listener.mouseMoveResponse(x, y)
-
-  if not _eaten:
-    rggViews.mouseMoveResponse(x, y)
+    for listener, priority in _mouseMoveListeners:
+        if listener(x, y):
+            return
 
 def mousePressEvent(x, y, t):
-  global _eaten
-  _eaten = False
 
-  for listener in _mousePressListeners:
-    listener.mousePressResponse(x, y, t)
-
-  if not _eaten:
-    rggViews.mousePressResponse(x, y, t)
+    for listener, priority in _mousePressListeners:
+        if listener(x, y, t):
+            return
 
 def mouseReleaseEvent(x, y, t):
-  global _eaten
-  _eaten = False
 
-  for listener in _mouseReleaseListeners:
-    listener.mouseReleaseResponse(x, y, t)
-
-  if not _eaten:
-    rggViews.mouseReleaseResponse(x, y, t)
+    for listener, priority in _mouseReleaseListeners:
+        if listener(x, y, t):
+            return
     
 def keyPressEvent(k):
-  global _eaten
-  _eaten = False
 
-  for listener in _keyPressListeners:
-    listener.keyPressResponse(k)
-
-  if not _eaten:
-    rggViews.keyPressResponse(k)
+    for listener, priority in _keyPressListeners:
+        if listener(k):
+            return
     
 def keyReleaseEvent(k):
-  global _eaten
-  _eaten = False
 
-  for listener in _keyReleaseListeners:
-    listener.keyReleaseResponse(k)
-
-  if not _eaten:
-    rggViews.keyReleaseResponse(k)
+    for listener, priority in _keyReleaseListeners:
+        if listener(k):
+            return
 
 def chatInputEvent(st):
-  global _eaten
-  _eaten = False
 
-  for listener in _chatInputListeners:
-    listener.chatInputResponse(st)
-
-  if not _eaten:
-    rggChat.chat(st)
+    for listener, priority in _chatInputListeners:
+        if listener(st):
+            return
 
 def ICChatInputEvent(st, chname, portrait):
-  global _eaten
-  _eaten = False
 
-  for listener in _ICChatInputListeners:
-    listener.ICChatInputResponse(st, chname, portrait)
-
-  if not _eaten:
-    rggICChat.chat(st, chname, portrait)
+    for listener, priority in _ICChatInputListeners:
+        if listener(st, chname, portrait):
+            return
 
 def pogUpdateEvent(pog): #may either add a new pog, or update an existing one. Beware.
-  for listener in _pogUpdateListeners:
-    listener.pogUpdateResponse(pog)
+
+    for listener, priority in _pogUpdateListeners:
+        if listener.pogUpdateResponse(pog):
+            return
 
 def pogDeleteEvent(pog):
-  for listener in _pogDeleteListeners:
-    listener.pogDeleteResponse(pog)
+
+    for listener, priority in _pogDeleteListeners:
+        if listener.pogDeleteResponse(pog):
+            return
 
 def pogSelectionChangedEvent():
-  for listener in _pogSelectionChangedListeners:
-    listener.pogSelectionChangedResponse()
+
+    for listener, priority in _pogSelectionChangedListeners:
+        if listener():
+            return
 
 def mapChangedEvent(newMap):
-  for listener in _mapChangedListeners:
-    listener.mapChangedResponse(newMap)
+
+    for listener, priority in _mapChangedListeners:
+        if listener(newMap):
+            return
