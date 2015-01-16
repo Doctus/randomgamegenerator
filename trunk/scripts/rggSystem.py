@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 import sys, random, math, urllib2
 import os, os.path
 from PyQt4 import QtCore, QtGui
+from rggConstants import *
 
 class wAction(QtGui.QAction):
 
@@ -44,32 +45,6 @@ class fake(object):
 # Real translation
 def translate(*args):
     return unicode(QtCore.QCoreApplication.translate(*args))
-
-IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".ppm", ".xbm", ".xpm")
-IMAGE_NAME_FILTER = list(('*{ext}'.format(ext=ext) for ext in IMAGE_EXTENSIONS))
-IMAGE_FILTER = fake.translate('system', 'Images ({imageList})').format(
-    imageList=','.join('*{ext}'.format(ext=ext) for ext in IMAGE_EXTENSIONS))
-TILESET_DIR = 'data/tilesets'
-POG_DIR = 'data/pogs'
-PORTRAIT_DIR = 'data/portraits'
-PLUGINS_DIR = 'plugins'
-LOG_DIR = 'save/logs'
-MAP_DIR = 'save/maps'
-CHAR_DIR = 'save/characters'
-CHARSHEETS_DIR = 'save/sheets'
-MUSIC_DIR = 'data/music'
-SAVE_DIR = 'save'
-COLOURS = {"White":(1.0, 1.0, 1.0), 
-           "Red": (1.0, 0.0, 0.0), 
-           "Orange": (1.0, 0.5, 0.0), 
-           "Yellow": (1.0, 1.0, 0.0),
-           "Green": (0.0, 0.8, 0.2),
-           "Blue": (0.0, 0.0, 1.0),
-           "Purple": (0.76, 0.0, 1.0),
-           "Black": (0.0, 0.0, 0.0)}
-VERSION = "1.04"
-DEV = True
-PING_INTERVAL_SECONDS = 10
 
 mainWindow = None
 

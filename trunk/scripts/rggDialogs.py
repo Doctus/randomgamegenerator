@@ -21,11 +21,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os, os.path
 import rggMap
-from rggSystem import fake, translate, showErrorMessage, findFiles, IMAGE_EXTENSIONS, IMAGE_NAME_FILTER, TILESET_DIR, PORTRAIT_DIR, SAVE_DIR, makePortableFilename
+from rggSystem import fake, translate, showErrorMessage, findFiles, makePortableFilename
 from rggFields import integerField, floatField, stringField, dropDownField, sliderField, validationError
 from rggNet import ConnectionData, localHost
 from rggJson import *
 from PyQt4 import QtGui, QtCore
+from rggConstants import *
 
 class dialog(object):
     """A base class for dialogs.

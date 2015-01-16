@@ -21,9 +21,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import PYQT_VERSION_STR
-from rggSystem import translate, mainWindow, SAVE_DIR, PLUGINS_DIR, VERSION, DEV
+from rggSystem import translate, mainWindow
 from rggJson import loadString, jsonload, jsonappend
 import sys, os, rggStyles
+from rggConstants import *
 
 ICON_SELECT = 0
 ICON_MOVE = 1

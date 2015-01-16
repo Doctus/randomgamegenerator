@@ -26,6 +26,7 @@ import getpass
 from rggSocket import statefulSocket, generateChecksum, fileData
 from rggSystem import translate, mainWindow, signal, makeLocalFilename
 from PyQt4 import QtCore, QtNetwork
+from rggConstants import *
 
 MESSAGE_IDENTIFY = "IDENTIFY" # Identify this client
 MESSAGE_ACTIVATE = "ACTIVATE" # Assign username
