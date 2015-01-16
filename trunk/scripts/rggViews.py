@@ -19,12 +19,13 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 import time, random, os, base64, sys
-import rggNameGen, rggDice, rggMap, rggTile, rggPog, rggDockWidget, rggDialogs, rggMenuBar, rggResource, rggSystem, rggSession
+import rggNameGen, rggDice, rggMap, rggTile, rggPog, rggDockWidget, rggDialogs, rggMenuBar, rggResource, rggSystem, rggSession, rggEvent
 from rggRPC import server, client, serverRPC, clientRPC
 from rggJson import jsondump, jsonload, jsonappend
 from rggMenuBar import ICON_SELECT, ICON_MOVE, ICON_DRAW, ICON_DELETE
 from rggSystem import *
 from rggDialogs import *
+from rggConstants import *
 from PyQt4 import QtCore, QtGui
 
 # Button enum
@@ -127,47 +128,21 @@ class _state(object):
             
         #Kind of a hack, but the GUI is not ready to display pogs at this point in execution, and I couldn't think of a convenient way to figure out when that happens.
         _state.autoloadTimer = QtCore.QTimer.singleShot(5, autoloadSession)
-        
-        #Wait to check for updates so it doesn't cause noticeable startup slow-down.
-        _state.updateTimer = QtCore.QTimer.singleShot(250, checkForUpdates)
-        
-        if os.path.exists("rgg2.exe"):
-            _state.clearTimer = QtCore.QTimer.singleShot(1000, clearTempFile)
-            
+                    
         _state.pogMoveTimer = QtCore.QTimer()
         _state.pogMoveTimer.timeout.connect(autoMovePogs)
         _state.pogMoveTimer.start(40)
+        
+        rggEvent.addMouseMoveListener(mouseMoveResponse, LATE_RESPONSE_LEVEL)
+        rggEvent.addMousePressListener(mousePressResponse, LATE_RESPONSE_LEVEL)
+        rggEvent.addMouseReleaseListener(mouseReleaseResponse, LATE_RESPONSE_LEVEL)
+        rggEvent.addKeyPressListener(keyPressResponse, LATE_RESPONSE_LEVEL)
+        rggEvent.addKeyReleaseListener(keyReleaseResponse, LATE_RESPONSE_LEVEL)
 
 def autoMovePogs():
     if _state.pogmove == [0, 0]:
         return
     movePogs(_state.pogmove)
-            
-def clearTempFile():
-    os.remove("rgg2.exe")        
-        
-def checkForUpdates():
-    '''Check for newer releases, and prompt player to update if one exists.'''
-    version = checkVersion()
-    if version:
-        if promptYesNo(translate('views', 'A new version of RGG is available. Do you wish to update?')) == 16384:
-            updateRGG(version)
-        
-def updateRGG(path):
-    '''Updates RGG from a zip file downloaded from path.'''
-    import urllib2, zipfile, subprocess
-    data = urllib2.urlopen(path).read()
-    with open("temp.zip", "wb") as f:
-        f.write(data)
-    with zipfile.ZipFile('temp.zip', 'r') as f:
-        for filepath in f.namelist():
-            if "rgg.exe" not in filepath:
-                f.extract(filepath, "..")
-        with open("rgg2.exe", "wb") as newexe:
-            newexe.write(f.open("rgg/rgg.exe").read())
-    os.remove("temp.zip")
-    subprocess.Popen("rgg2.exe", close_fds=True)
-    sys.exit()
 
 def moveMap():
     pass

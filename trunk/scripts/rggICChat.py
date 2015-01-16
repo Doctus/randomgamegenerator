@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 import rggViews, rggRemote
 from rggSystem import fake, translate
 from rggViews import ICSay, announce
+from rggConstants import *
 
 chatCommands = {}
 chatCommandNames = []

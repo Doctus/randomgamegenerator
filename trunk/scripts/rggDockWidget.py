@@ -3,6 +3,7 @@ from rggSystem import signal, findFiles, POG_DIR, PORTRAIT_DIR, LOG_DIR, IMAGE_E
 from rggDialogs import newCharacterDialog, banDialog
 from rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
 import os, os.path, time, re
+from rggConstants import *
 #import rggEvent
 
 class transferMonitorWidget(QtGui.QDockWidget):
@@ -795,10 +796,10 @@ class mapEditor(QtGui.QDockWidget):
         
         from rggEvent import addMapChangedListener, addMousePressListener, addMouseMoveListener, addMouseReleaseListener
 
-        addMapChangedListener(self)
-        addMousePressListener(self)
-        addMouseMoveListener(self)
-        addMouseReleaseListener(self)
+        addMapChangedListener(self.mapChangedResponse, NORMAL_RESPONSE_LEVEL)
+        addMousePressListener(self.mousePressResponse, NORMAL_RESPONSE_LEVEL)
+        addMouseMoveListener(self.mouseMoveResponse, NORMAL_RESPONSE_LEVEL)
+        addMouseReleaseListener(self.mouseReleaseResponse, NORMAL_RESPONSE_LEVEL)
         
     def _undo(self):
         from rggViews import _sendTileUpdate
@@ -831,7 +832,6 @@ class mapEditor(QtGui.QDockWidget):
         
         #This and similar things were a regrettable necessity in the plugin -> nonplugin conversion process.
         from rggViews import topmap, _sendTileUpdate
-        from rggEvent import setEaten
         
         map = topmap(mapPosition)
         if map == None:
@@ -844,29 +844,26 @@ class mapEditor(QtGui.QDockWidget):
                 clickedtile = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
                             int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
                 if not map.tilePosExists(clickedtile):
-                    setEaten()
-                    return
+                    return True
                 oldtile = _sendTileUpdate(map.ID, clickedtile, self.tilelabel.currentTile)
                 self.undo.append([(map.ID, clickedtile, oldtile),])
                 self.redo = []
                 self.redoButton.setEnabled(False)
                 self.undoButton.setEnabled(True)
-                setEaten()
+                return True
             elif self.isVisible() and (self.rectPaintingButton.isChecked() or self.hollowRectPaintingButton.isChecked()):
                 self.rectStart = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
                             int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
                 if not map.tilePosExists(self.rectStart):
-                    setEaten()
                     self.rectStart = None
-                    return
-                setEaten()
+                return True
         elif t == 5:
             if self.isVisible() and not self.noPaintingButton.isChecked():
                 clickedtile = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
                             int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
                 self.tilelabel.currentTile = map.getTile(clickedtile)
                 self.tilelabel.updateTile()
-                setEaten()
+                return True
         elif t == 6:
             if self.isVisible() and not self.noPaintingButton.isChecked() and self.copyData:
                 if self.singlePaintingButton.isChecked():
@@ -879,24 +876,19 @@ class mapEditor(QtGui.QDockWidget):
                     self.rectStart = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
                                 int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
                     if not map.tilePosExists(self.rectStart):
-                        setEaten()
                         self.rectStart = None
-                        return
-                    setEaten()
+                    return True
         elif t == 8:
             if self.isVisible() and not self.noPaintingButton.isChecked():
                 self.rectStart = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
                                 int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
                 if not map.tilePosExists(self.rectStart):
-                    setEaten()
                     self.rectStart = None
-                    return
-                setEaten()
+                return True
 
     def mouseMoveResponse(self, x, y):
         if self.dragging and self.isVisible() and self.singlePaintingButton.isChecked():
             from rggViews import topmap
-            from rggEvent import setEaten
             mapPosition = getMapPosition((x, y))
             map = topmap(mapPosition)
             if map == None:
@@ -905,19 +897,15 @@ class mapEditor(QtGui.QDockWidget):
             clickedtile = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
                             int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
             
-            if not map.tilePosExists(clickedtile):
-                setEaten()
-                return
             if map.tilePosExists(clickedtile) and map.getTile(clickedtile) != self.tilelabel.currentTile:
                 from rggViews import _sendTileUpdate
                 oldtile = _sendTileUpdate(map.ID, clickedtile, self.tilelabel.currentTile)
                 self.undo[-1].append((map.ID, clickedtile, oldtile))
-            setEaten()
+            return True
             
     def mouseReleaseResponse(self, x, y, t):
         if t == 0:
             from rggViews import topmap, _sendTileUpdate, _sendMultipleTileUpdate
-            from rggEvent import setEaten
             if self.currentMap == None:
                 return
             mapPosition = getMapPosition((x, y))
@@ -926,9 +914,8 @@ class mapEditor(QtGui.QDockWidget):
             if map == None or map != self.currentMap:
                 return
             if self.isVisible() and self.singlePaintingButton.isChecked():
-                setEaten()
+                return True
             elif self.isVisible() and self.rectPaintingButton.isChecked() and self.rectStart is not None:
-                setEaten()
                 rectEnd = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
                             int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
                 if not map.tilePosExists(rectEnd):
@@ -943,10 +930,10 @@ class mapEditor(QtGui.QDockWidget):
                 for x in range(min(rectEnd[0], self.rectStart[0]), max(rectEnd[0], self.rectStart[0])+1):
                     for y in range(min(rectEnd[1], self.rectStart[1]), max(rectEnd[1], self.rectStart[1])+1):
                         self.undo[-1].append((map.ID, (x, y), oldtiles.pop(0)))
+                return True
             elif self.isVisible() and self.hollowRectPaintingButton.isChecked() and self.rectStart is not None:
                 rectEnd = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
                             int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
-                setEaten()
                 if not map.tilePosExists(rectEnd):
                     self.rectStart = None
                     self.rectEnd = None
@@ -978,6 +965,7 @@ class mapEditor(QtGui.QDockWidget):
                         if self.currentMap.tilePosExists((self.rectStart[0], self.rectStart[1])):
                                 oldtile = _sendTileUpdate(self.currentMap.ID, (self.rectStart[0], self.rectStart[1]), self.tilelabel.currentTile)
                                 self.undo[-1].append((map.ID, (self.rectStart[0], self.rectStart[1]), oldtile))
+                return True
         elif t == 6:
             if self.isVisible() and self.rectPaintingButton.isChecked() and self.copyData:
                 from rggViews import topmap, _sendTileUpdate
@@ -989,7 +977,6 @@ class mapEditor(QtGui.QDockWidget):
                 self.dragging = False
                 if map == None or map != self.currentMap:
                     return
-                setEaten()
                 rectEnd = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
                             int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
                 if not map.tilePosExists(rectEnd):
@@ -1001,6 +988,7 @@ class mapEditor(QtGui.QDockWidget):
                 for row in xrange(1+(bottomright[0]-topleft[0])):
                     for column in xrange(1+(bottomright[1]-topleft[1])):
                         _sendTileUpdate(self.currentMap.ID, (topleft[0]+row, topleft[1]+column), self.copyData[row%len(self.copyData)][column%len(self.copyData[row%len(self.copyData)])])
+                return True
         elif t == 8:
             if self.isVisible() and not self.noPaintingButton.isChecked():
                 from rggViews import topmap
@@ -1014,7 +1002,6 @@ class mapEditor(QtGui.QDockWidget):
                     return
                 rectEnd = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
                             int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
-                setEaten()
                 if not map.tilePosExists(rectEnd):
                     self.rectStart = None
                     self.rectEnd = None
@@ -1027,6 +1014,7 @@ class mapEditor(QtGui.QDockWidget):
                     for column in xrange(1+(bottomright[1]-topleft[1])):
                         copypaste[row].append(map.getTile((topleft[0]+row, topleft[1]+column)))
                 self.copyData = copypaste
+                return True
 
     def mapChangedResponse(self, newMap):
         if newMap != None:
