@@ -4,7 +4,7 @@ from rggDialogs import newCharacterDialog, banDialog
 from rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
 import os, os.path, time, re
 from rggConstants import *
-#import rggEvent
+from rggEvent import addMapChangedListener, addMousePressListener, addMouseMoveListener, addMouseReleaseListener
 
 class transferMonitorWidget(QtGui.QDockWidget):
 
@@ -793,8 +793,6 @@ class mapEditor(QtGui.QDockWidget):
         self.redo = []
         self.redoButton.clicked.connect(self._redo)
         self.redoButton.setEnabled(False)
-        
-        from rggEvent import addMapChangedListener, addMousePressListener, addMouseMoveListener, addMouseReleaseListener
 
         addMapChangedListener(self.mapChangedResponse, NORMAL_RESPONSE_LEVEL)
         addMousePressListener(self.mousePressResponse, NORMAL_RESPONSE_LEVEL)
@@ -969,7 +967,6 @@ class mapEditor(QtGui.QDockWidget):
         elif t == 6:
             if self.isVisible() and self.rectPaintingButton.isChecked() and self.copyData:
                 from rggViews import topmap, _sendTileUpdate
-                from rggEvent import setEaten
                 if self.currentMap == None:
                     return
                 mapPosition = getMapPosition((x, y))
@@ -992,7 +989,6 @@ class mapEditor(QtGui.QDockWidget):
         elif t == 8:
             if self.isVisible() and not self.noPaintingButton.isChecked():
                 from rggViews import topmap
-                from rggEvent import setEaten
                 if self.currentMap == None:
                     return
                 mapPosition = getMapPosition((x, y))
