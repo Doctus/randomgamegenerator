@@ -537,6 +537,7 @@ class PogFileSystemModel(QFileSystemModel):
         self.absRoot = os.path.abspath(str(POG_DIR))
         
     def data(self, index, role):
+        return None
         basedata = QFileSystemModel.data(self, index, role)
         if basedata.canConvert(69):
             nodes = [index,]

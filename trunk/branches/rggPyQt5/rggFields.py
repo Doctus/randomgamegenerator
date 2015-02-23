@@ -19,7 +19,9 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtCore
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 from rggSystem import translate, showErrorMessage, signal
 
 class validationError(Exception):
@@ -90,7 +92,7 @@ class integerField(dialogField):
                     self.max or translate('integerField', 'infinity')))
     
     def _createWidget(self, parent):
-        widget = QtGui.QSpinBox(parent)
+        widget = QSpinBox(parent)
         if self.min is not None:
             widget.setMinimum(self.min)
         if self.max is not None:
@@ -139,7 +141,7 @@ class floatField(dialogField):
                     self.max or translate('floatField', 'infinity')))
     
     def _createWidget(self, parent):
-        widget = QtGui.QDoubleSpinBox(parent)
+        widget = QDoubleSpinBox(parent)
         widget.setDecimals(self.dec)
         if self.min is not None:
             widget.setMinimum(self.min)
@@ -186,7 +188,7 @@ class stringField(dialogField):
             value = self._cleanValue(self.value)
         except:
             pass
-        widget = QtGui.QLineEdit(value, parent)
+        widget = QLineEdit(value, parent)
         self.widgett = widget
         return widget
     
@@ -216,7 +218,7 @@ class dropDownField(dialogField):
     
     def _createWidget(self, parent):
         index = -1
-        widget = QtGui.QComboBox(parent)
+        widget = QComboBox(parent)
         for choice in self.choices:
             if choice == self.value:
                 index = widget.count()
@@ -259,13 +261,13 @@ class sliderField(dialogField):
     
     def _createWidget(self, parent):
         index = -1
-        widget = QtGui.QSlider(parent)
+        widget = QSlider(parent)
         widget.setOrientation(QtCore.Qt.Horizontal)
         widget.setMinimum(self.min)
         widget.setMaximum(self.max)
         widget.setValue(self.value)
         widget.setTickInterval(1)
-        widget.setTickPosition(QtGui.QSlider.TicksAbove)
+        widget.setTickPosition(QSlider.TicksAbove)
         widget.setPageStep(1)
         widget.valueChanged.connect(self.emitEvil)
         return widget
