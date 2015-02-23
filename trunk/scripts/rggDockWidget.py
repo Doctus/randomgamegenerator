@@ -553,8 +553,7 @@ class PogFileSystemModel(QtGui.QFileSystemModel):
     def mimeData(self, indices):
         path = QtCore.QString(makePortableFilename(os.path.join(POG_DIR, unicode(self.filePath(indices[0])[len(self.absRoot)+1:]))))
         
-        #If there's no "." in the path, assume it's a folder.
-        if "." not in unicode(path): return None
+        if not os.path.isfile(path): return None
         
         mime = QtCore.QMimeData()
         mime.setText(unicode(path))
