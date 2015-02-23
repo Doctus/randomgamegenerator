@@ -36,10 +36,10 @@ def jsondumps(obj):
 def jsondump(obj, filename):
     """Dump object to file."""
     try:
-        with gzip.open(makeLocalFilename(filename), 'wb') as file:
+        with gzip.open(makeLocalFilename(filename), 'wt') as file:
             json.dump(obj, file, sort_keys=True, indent=4)
     except AttributeError: #support for Python <2.7
-        with open(makeLocalFilename(filename), 'wb') as file:
+        with open(makeLocalFilename(filename), 'wt') as file:
             json.dump(obj, file, sort_keys=True, indent=4)
 
 def jsonloads(str):
@@ -51,10 +51,10 @@ def jsonloads(str):
 def jsonload(filename):
     """Loads the object from a file. May throw."""
     try:
-        with gzip.open(makeLocalFilename(filename), 'rb') as file:
+        with gzip.open(makeLocalFilename(filename), 'rt') as file:
             obj = json.load(file)
     except: #might be an old uncompressed save
-        with open(makeLocalFilename(filename), 'rb') as file:
+        with open(makeLocalFilename(filename), 'rt') as file:
             obj = json.load(file)
     assert(isinstance(obj, list) or isinstance(obj, dict))
     return obj

@@ -38,6 +38,7 @@ if __name__ == '__main__':
     main = injectMain()
     
     import rggRPC, rggViews
+    import rggChat, rggICChat #bad, but necessary for now to initialize here
     from rggSignalConfig import connectEvents
     
     # Initialize view state.

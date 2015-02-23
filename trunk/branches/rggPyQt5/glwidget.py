@@ -426,8 +426,9 @@ class GLWidget(QGLWidget):
 
 			texture = int(glGenTextures(1))
 			try:
-				imgdata = img.bits().asstring(img.numBytes())
-			except:
+				imgdata = img.bits().asstring(img.byteCount())
+			except Exception as e:
+				print(e)
 				import sys
 				print("requested to create", qimagepath, layer, textureRect, drawRect, hidden)
 				for x in [0, 1, 2, 3]:
