@@ -535,8 +535,8 @@ class newMapDialog(dialog):
 				widget.accept()
 		
 		# Signals
-		widget.connect(okayButton, QtCore.SIGNAL('clicked()'), okayPressed)
-		widget.connect(cancelButton, QtCore.SIGNAL('clicked()'), widget.reject)
+		okayButton.clicked.connect(okayPressed)
+		cancelButton.clicked.connect(widget.reject)
 		self.tilesetField.evil.connect(self.loadTilesize)
 		
 		self.loadTilesize()
@@ -657,9 +657,9 @@ class hostDialog(dialog):
 				widget.accept()
 		
 		# Signals
-		widget.connect(okayButton, QtCore.SIGNAL('clicked()'), okayPressed)
-		widget.connect(cancelButton, QtCore.SIGNAL('clicked()'), widget.reject)
-		widget.connect(checkIPButton, QtCore.SIGNAL('clicked()'), self.checkIP)
+		okayButton.clicked.connect(okayPressed)
+		cancelButton.clicked.connect(widget.reject)
+		checkIPButton.clicked.connect(self.checkIP)
 		
 		# Show to user
 		return (widget.exec_() == QDialog.Accepted)
@@ -785,8 +785,8 @@ class joinDialog(dialog):
 				widget.accept()
 		
 		# Signals
-		widget.connect(okayButton, QtCore.SIGNAL('clicked()'), okayPressed)
-		widget.connect(cancelButton, QtCore.SIGNAL('clicked()'), widget.reject)
+		okayButton.clicked.connect(okayPressed)
+		cancelButton.clicked.connect(widget.reject)
 		
 		# Show to user
 		return (widget.exec_() == QDialog.Accepted)
@@ -829,6 +829,7 @@ class PortraitFileSystemModel(QFileSystemModel):
 		self.absRoot = os.path.abspath(str(PORTRAIT_DIR))
 		
 	def data(self, index, role):
+		return None
 		basedata = QFileSystemModel.data(self, index, role)
 		if basedata.canConvert(69):
 			nodes = [index,]
@@ -943,8 +944,8 @@ class newCharacterDialog(dialog):
 				widget.accept()
 		
 		# Signals
-		widget.connect(okayButton, QtCore.SIGNAL('clicked()'), okayPressed)
-		widget.connect(cancelButton, QtCore.SIGNAL('clicked()'), widget.reject)
+		okayButton.clicked.connect(okayPressed)
+		cancelButton.clicked.connect(widget.reject)
 		
 		#portraits = findFiles(PORTRAIT_DIR, IMAGE_EXTENSIONS)
 		#portraits.sort(cmp=lambda x,y: cmp(x.lower(), y.lower()))
@@ -1067,8 +1068,8 @@ class gfxSettingsDialog(dialog):
 				widget.accept()
 		
 		# Signals
-		widget.connect(okayButton, QtCore.SIGNAL('clicked()'), okayPressed)
-		widget.connect(cancelButton, QtCore.SIGNAL('clicked()'), widget.reject)
+		okayButton.clicked.connect(okayPressed)
+		cancelButton.clicked.connect(widget.reject)
 		
 		# Show to user
 		return (widget.exec_() == QDialog.Accepted)
