@@ -102,6 +102,9 @@ class debugConsoleWidget(QDockWidget):
 				self.buffer = []
 		except UnicodeEncodeError:
 			return
+			
+	def flush(self):
+		pass
 
 class chatLineEdit(QLineEdit):
 
@@ -944,11 +947,11 @@ class mapEditor(QDockWidget):
 				self.undoButton.setEnabled(True)
 				self.redo = []
 				self.redoButton.setEnabled(False)
-				if cmp(rectEnd[0], self.rectStart[0]) != 0:
-					for x in range(self.rectStart[0], rectEnd[0]+cmp(rectEnd[0], self.rectStart[0]), cmp(rectEnd[0], self.rectStart[0])):
-						if cmp(rectEnd[1], self.rectStart[1]) != 0:
+				if rectEnd[0] != self.rectStart[0]:
+					for x in range(self.rectStart[0], rectEnd[0]+(1*(rectEnd[0]-self.rectStart[0])), 1*(rectEnd[0]-self.rectStart[0])):
+						if rectEnd[1] != self.rectStart[1]:
 							#TODO: Less lazy and inefficient implementation for this case.
-							for y in range(self.rectStart[1], rectEnd[1]+cmp(rectEnd[1], self.rectStart[1]), cmp(rectEnd[1], self.rectStart[1])):
+							for y in range(self.rectStart[1], rectEnd[1]+1*(rectEnd[1]-self.rectStart[1]), 1*(rectEnd[1]-self.rectStart[1])):
 								if x == self.rectStart[0] or x == rectEnd[0] or y == self.rectStart[1] or y == rectEnd[1]:
 									if self.currentMap.tilePosExists((x, y)):
 										oldtile = _sendTileUpdate(self.currentMap.ID, (x, y), self.tilelabel.currentTile)
@@ -958,8 +961,8 @@ class mapEditor(QDockWidget):
 								oldtile = _sendTileUpdate(self.currentMap.ID, (x, self.rectStart[1]), self.tilelabel.currentTile)
 								self.undo[-1].append((map.ID, (x, self.rectStart[1]), oldtile))
 				else:
-					if cmp(rectEnd[1], self.rectStart[1]) != 0:
-						for y in range(self.rectStart[1], rectEnd[1]+cmp(rectEnd[1], self.rectStart[1]), cmp(rectEnd[1], self.rectStart[1])):
+					if rectEnd[1] != self.rectStart[1]:
+						for y in range(self.rectStart[1], rectEnd[1]+1*(rectEnd[1]-self.rectStart[1]), 1*(rectEnd[1], self.rectStart[1])):
 							if self.currentMap.tilePosExists((self.rectStart[0], y)):
 								oldtile = _sendTileUpdate(self.currentMap.ID, (self.rectStart[0], y), self.tilelabel.currentTile)
 								self.undo[-1].append((map.ID, (self.rectStart[0], y), oldtile))
