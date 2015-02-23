@@ -19,10 +19,11 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
-import rggViews, rggRemote
+import rggRemote
 from rggSystem import fake, translate
 from rggViews import ICSay, announce
 from rggConstants import *
+import rggEvent
 
 chatCommands = {}
 chatCommandNames = []
@@ -220,5 +221,5 @@ def chat(st, chname, portrait):
                     'Goes inbetween the commands in the commandList.').
                     join(chatCommandNames)))
 
-
+rggEvent.addICChatInputListener(chat, LATE_RESPONSE_LEVEL)
 
