@@ -19,9 +19,11 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
-import rggViews, rggRemote
+import rggRemote
 from rggSystem import fake, translate
-from rggViews import say, announce
+from rggViews import say, announce, generateName, rollDice, reportCamera, storeChat, releaseChat
+from rggConstants import *
+import rggEvent
 
 chatCommands = {}
 chatCommandNames = []
@@ -70,7 +72,7 @@ def randomname(message):
         say(translate('chat',
             "Syntax: /generate NAMETYPE. For a list of available generators, see /generate keys. Use /generate help NAMETYPE for more information on a generator."))
     else:
-        rggViews.generateName(*splitword(message.lower()))
+        generateName(*splitword(message.lower()))
 
 randomname.documentation = fake.translate('chatdoc', 
     """/randomname: This documentation is a lie!<dl>
@@ -89,7 +91,7 @@ def roll(message):
         dice = '2d6'
     else:
         dice = ' '.join(message.split())
-    rggViews.rollDice(dice)
+    rollDice(dice)
 
 roll.documentation = fake.translate('chatdoc', 
     """/roll: Roll the dice. The dice can be in the form of macros or
@@ -109,7 +111,7 @@ def proll(message):
         dice = '2d6'
     else:
         dice = ' '.join(message.split())
-    rggViews.rollDice(dice, True)
+    rollDice(dice, True)
 
 roll.documentation = fake.translate('chatdoc', 
     """/proll: Same as /roll but private.<br>
@@ -164,7 +166,7 @@ whisper.documentation = fake.translate('chatdoc',
 
 @chat('camera', 'cam')
 def camera(message, hidden=True):
-    rggViews.reportCamera()
+    reportCamera()
 
 camera.documentation = fake.translate('chatdoc',
     """camera: Display the current camera location.<dl>
@@ -175,7 +177,7 @@ camera.documentation = fake.translate('chatdoc',
     
 @chat('store', 'rumble', 'simultaneous')
 def store(message):
-    rggViews.storeChat(message)
+    storeChat(message)
     
 store.documentation = fake.translate('chatdoc',
     """store: store message for simultaneous display.  Example: /store I defend against the goblin.<br>
@@ -183,7 +185,7 @@ store.documentation = fake.translate('chatdoc',
     
 @chat('release', 'display')
 def store(message):
-    rggViews.releaseChat()
+    releaseChat()
     
 store.documentation = fake.translate('chatdoc',
     """release: display stored simultaneous messages.<br>
@@ -227,5 +229,5 @@ def chat(st):
                     'Goes inbetween the commands in the commandList.').
                     join(chatCommandNames)))
 
-
+rggEvent.addChatInputListener(chat, LATE_RESPONSE_LEVEL)
 
