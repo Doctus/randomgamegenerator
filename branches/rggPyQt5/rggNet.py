@@ -1109,13 +1109,11 @@ class JsonServer(object):
 		socket.close()
 	
 	def _socketObject(self, socket, obj):
-		print("Socket object received: ", socket)
 		message = "Disallowed object data received"
 		self._forbidSocket(socket, message)
 		return
 	
 	def _socketCommand(self, socket, command, kwargs):
-		print("Message received: ", socket, command)
 		if command != MESSAGE_IDENTIFY:
 			message = "Disallowed initial remote command {command}"
 			message = message.format(command=command)
@@ -1131,7 +1129,6 @@ class JsonServer(object):
 	
 	def _socketIdentified(self, socket, protocol, username, passw = None):
 		"""Socket identifies itself with protocol and username."""
-		print("ID received: ", socket, protocol)
 		if protocol not in (PROTOCOL_OBJECT, PROTOCOL_TRANSFER):
 			message = "Disallowed protocol identified {protocol} ({username})"
 			message = message.format(protocol=protocol, username=username)
