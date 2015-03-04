@@ -58,6 +58,7 @@ class fileData(object):
 	def read(self, context):
 		"""Read a chunk of the file."""
 		data = self.file.read(CHUNK_SIZE)
+		print("Reading: ", data)
 		self.processed += len(data)
 		if len(data) == 0:
 			message = "[{0}] Error reading sent file {filename}."
@@ -79,6 +80,7 @@ class fileData(object):
 		self.processed += len(chunk)
 		assert(len(chunk) > 0)
 		assert(self.processed <= self.size)
+		print("Writing: ",context)
 		self.checkHash.update(chunk)
 		result = self.file.write(chunk)
 		
@@ -152,6 +154,7 @@ class statefulSocket(object):
 		
 	def activate(self):
 		"""Activates this socket."""
+		print("Attempting to activate: ", self)
 		assert(not self.ready)
 		self.ready = True
 		self.active = True
@@ -272,12 +275,13 @@ class statefulSocket(object):
 	def _serialize(data):
 		"""Serialize an object to a message that can be sent."""
 		serial = jsondumps(data)
+		print("Data serialized to: ",serial)
 		return serial
 	
 	def _rawsend(self, serial):
 		"""Sends serialized data."""
 		print("Sending data: ", serial)
-		result = self.socket.write(serial)
+		result = self.socket.write(serial+"\n")
 		if result == len(serial):
 			# I guess flush forces synchronous sending.
 			#self.socket.flush()
@@ -288,8 +292,11 @@ class statefulSocket(object):
 	
 	def _rawreadline(self):
 		"""Reads a line from the socket."""
+		print("Attempting line read")
+		print("Socket can read? ",self.socket.canReadLine())
 		assert(self.socket.canReadLine())
 		data = self.socket.readLine()
+		print("Received line: ", data)
 		if len(data) > 0:
 			assert(data[-1] == '\n')
 			return data
@@ -301,6 +308,7 @@ class statefulSocket(object):
 		"""Reads a line from the socket."""
 		assert(length > 0)
 		data = self.socket.read(length)
+		print("Reading data: ", data)
 		if len(data) == length:
 			return data
 		
@@ -384,6 +392,8 @@ class statefulSocket(object):
 	def updateReceive(self):
 		"""Parses incoming data into messages or objects."""
 		
+		print("Received file: ",self.receivedfile)
+		
 		while True:
 			if self.receivedfile is not None:
 				length = min(CHUNK_SIZE, self.receivedfile.size - self.receivedfile.processed)
@@ -405,23 +415,27 @@ class statefulSocket(object):
 					continue
 			else:
 				if not self.socket.canReadLine():
+					print("Couldn't read line")
+					print(self.socket.readLine(128))
 					return
 				serial = self._rawreadline()
+				print(serial)
 				if serial is None:
 					return
 				# Allow empty lines
 				if EMPTY_REGEX.match(str(serial)):
 					continue
-				#try:
-				print(serial)
-				obj = jsonloads(str(serial))
-				#except:
-				#    self._respondToSocketError("JSON Error", -1, text=serial)
-				#    return
+				try:
+					print(serial)
+					obj = jsonloads(str(serial))
+				except:
+				    self._respondToSocketError("JSON Error", -1, text=serial)
+				    return
 				self.receiveObject(obj)
 	
 	def receiveObject(self, obj):
 		"""Look for internal commands or pass directly to object handler."""
+		print("Object received: ",obj)
 		if obj.get(PARM_INTERNAL) == True:
 			command = obj.get(PARM_COMMAND)
 			if command is not None:
@@ -519,6 +533,7 @@ class statefulSocket(object):
 	
 	def _readyRead(self):
 		"""Called when data is ready."""
+		print("Data ready!")
 		self.updateReceive()
 	
 	def _bytesWritten(self, bytes):
