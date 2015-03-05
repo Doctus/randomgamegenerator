@@ -812,10 +812,12 @@ class GLWidget(QGLWidget):
 		oldCoord2 = self.camera
 		oldCoord2[0] *= float(1)/self.zoom
 		oldCoord2[1] *= float(1)/self.zoom
+		
+		delta = mouse.angleDelta().y() #let's not worry about 2-dimensional wheels.
 
-		if mouse.delta() < 0:
+		if delta < 0:
 			self.zoom -= 0.5
-		elif mouse.delta() > 0:
+		elif delta > 0:
 			self.zoom += 0.5
 
 		if self.zoom < 0.60:

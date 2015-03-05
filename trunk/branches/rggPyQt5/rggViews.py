@@ -26,7 +26,7 @@ from rggMenuBar import ICON_SELECT, ICON_MOVE, ICON_DRAW, ICON_DELETE
 from rggSystem import *
 from rggDialogs import *
 from rggConstants import *
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 # Button enum
 BUTTON_LEFT = 0
@@ -1188,7 +1188,7 @@ def _setLineColour(new):
     
 def setLineColour(menuselection):
     if menuselection.text() == "Custom...":
-        result = QtGui.QColorDialog.getColor(QtCore.Qt.white, mainWindow)
+        result = QtWidgets.QColorDialog.getColor(QtCore.Qt.white, mainWindow)
         _setLineColour((result.redF(), result.greenF(), result.blueF()))
     else:
         _setLineColour(rggSystem.COLOURS[str(menuselection.text())])
