@@ -829,8 +829,9 @@ class PortraitFileSystemModel(QFileSystemModel):
 		self.absRoot = os.path.abspath(str(PORTRAIT_DIR))
 		
 	def data(self, index, role):
+		basedata = super().data(index, role)
+		if basedata: return basedata #TODO: fix this so it works again
 		return None
-		basedata = QFileSystemModel.data(self, index, role)
 		if basedata.canConvert(69):
 			nodes = [index,]
 			while nodes[0].parent().isValid():
