@@ -558,7 +558,7 @@ class PogFileSystemModel(QFileSystemModel):
 		return basedata
 		
 	def mimeData(self, indices):
-		path = QtCore.QString(makePortableFilename(os.path.join(POG_DIR, str(self.filePath(indices[0])[len(self.absRoot)+1:]))))
+		path = makePortableFilename(os.path.join(POG_DIR, str(self.filePath(indices[0])[len(self.absRoot)+1:])))
 		
 		if not os.path.isfile(path): return None
 		
@@ -582,7 +582,7 @@ class pogTree(QTreeView):
 			scaledPixmap = basePixmap.scaled(basePixmap.width()*mainWindow.glwidget.zoom, basePixmap.height()*mainWindow.glwidget.zoom)
 			drag.setPixmap(scaledPixmap)
 			drag.setHotSpot(QtCore.QPoint(0, 0))
-			drag.start()
+			drag.exec_()
 		
 class pogPalette(QDockWidget):
 	"""The list of loaded pogs."""
