@@ -72,7 +72,7 @@ def roll(inpstring):
                     results[die] += currentroll
             for itm in results:
                 highs.append(itm)
-            highs.sort(None, None, True)
+            highs.sort(reverse=True)
             highs = highs[0:keepnum]
             for addend in highs:
                 total += addend
