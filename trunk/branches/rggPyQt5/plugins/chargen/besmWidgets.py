@@ -597,7 +597,7 @@ class OhNoesALazyGlobalClass:
             sendCharacterSheet(self.export(), str(title))
     
     def jsonImport(self):
-        filename = str(QFileDialog.getOpenFileName(self.mainwin, "Load Character Sheet...", os.path.join(os.getcwd(), CHARSHEETS_DIR), "RGG Character Sheets (*.rcs)"))
+        filename = str(QFileDialog.getOpenFileName(self.mainwin, "Load Character Sheet...", os.path.join(os.getcwd(), CHARSHEETS_DIR), "RGG Character Sheets (*.rcs)"))[0]
         if not filename:
             return None
         
@@ -611,7 +611,7 @@ class OhNoesALazyGlobalClass:
         return fields
         
     def jsonExport(self):
-        filename = str(QFileDialog.getSaveFileName(self.mainwin, "Save Character Sheet As...", os.path.join(os.getcwd(), CHARSHEETS_DIR, "untitled.rcs"), "RGG Character Sheets (*.rcs)"))
+        filename = str(QFileDialog.getSaveFileName(self.mainwin, "Save Character Sheet As...", os.path.join(os.getcwd(), CHARSHEETS_DIR, "untitled.rcs"), "RGG Character Sheets (*.rcs)"))[0]
         if not filename:
             return None
         
@@ -637,7 +637,7 @@ class OhNoesALazyGlobalClass:
         replace("%P", fields["personality"]).replace("%B", fields["background"]).replace("%Y", fields["body"]).replace("%M", fields["mind"]).\
         replace("%L", fields["soul"]).replace("%H", fields["health"]).replace("%E", fields["energy"]).replace("%C", fields["acv"]).replace("%V", fields["dcv"])
         
-        filename = str(QFileDialog.getSaveFileName(self.mainwin, "Export Character Sheet As...", os.path.join(os.getcwd(), CHARSHEETS_DIR, "untitled"+outputType), outputFilter))
+        filename = str(QFileDialog.getSaveFileName(self.mainwin, "Export Character Sheet As...", os.path.join(os.getcwd(), CHARSHEETS_DIR, "untitled"+outputType), outputFilter))[0]
         if not filename:
             return None
         
