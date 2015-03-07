@@ -829,21 +829,9 @@ class PortraitFileSystemModel(QFileSystemModel):
 		self.absRoot = os.path.abspath(str(PORTRAIT_DIR))
 		
 	def data(self, index, role):
-		basedata = super().data(index, role)
-		if basedata: return basedata #TODO: fix this so it works again
-		return None
-		if basedata.canConvert(69):
-			nodes = [index,]
-			while nodes[0].parent().isValid():
-				nodes.insert(0, nodes[0].parent())
-			paths = []
-			for node in nodes:
-				paths.append(str(self.data(node, 0).toString()))
-			if len(os.path.splitdrive(os.getcwd())[0]) > 0:
-				paths[0] = os.path.splitdrive(os.getcwd())[0]+"\\"
-			path = os.path.join(*paths)
-			if os.path.isfile(path):
-				return QIcon(path)
+		basedata = QFileSystemModel.data(self, index, role)
+		if role == 1 and os.path.isfile(self.filePath(index)):
+			return QIcon(self.filePath(index))
 		return basedata
 
 class PortraitTreeView(QTreeView):
