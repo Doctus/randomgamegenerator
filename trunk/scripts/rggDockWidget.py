@@ -536,18 +536,8 @@ class PogFileSystemModel(QtGui.QFileSystemModel):
         
     def data(self, index, role):
         basedata = QtGui.QFileSystemModel.data(self, index, role)
-        if basedata.canConvert(69):
-            nodes = [index,]
-            while nodes[0].parent().isValid():
-                nodes.insert(0, nodes[0].parent())
-            paths = []
-            for node in nodes:
-                paths.append(unicode(self.data(node, 0).toString()))
-            if len(os.path.splitdrive(os.getcwd())[0]) > 0:
-                paths[0] = os.path.splitdrive(os.getcwd())[0]+"\\"
-            path = os.path.join(*paths)
-            if os.path.isfile(path):
-                return QtGui.QIcon(path)
+        if role == 1 and os.path.isfile(self.filePath(index)):
+			return QtGui.QIcon(self.filePath(index))
         return basedata
         
     def mimeData(self, indices):
