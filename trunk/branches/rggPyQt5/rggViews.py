@@ -1612,6 +1612,9 @@ def mouseReleaseResponse(x, y, t):
 	mouseRelease(screenPosition, mapPosition, t)
 
 def keyPressResponse(k):
+	if k == QtCore.Qt.Key_Delete:
+		for pog in list(_state.pogSelection):
+			deletePog(pog)
 	if not _state.cameraPog: return
 	setPogSelection(_state.cameraPog)
 	if k == QtCore.Qt.Key_W:
