@@ -308,10 +308,10 @@ class ICChatWidget(QDockWidget):
 		self.setCharacterPreview()
 	
 	def updateDeleteButton(self):
-		if len(self.characters) == 0:
-			self.characterDeleteButton.setEnabled(False)
-		else:
-			self.characterDeleteButton.setEnabled(True)
+		self.characterDeleteButton.setEnabled(self.hasCharacters())
+		self.characterClearButton.setEnabled(self.hasCharacters())
+		self.characterSelector.setEnabled(self.hasCharacters())
+		self.widgetLineInput.setEnabled(self.hasCharacters())
 	
 	def setCharacterPreview(self, newIndex=-1):
 		try:
@@ -376,7 +376,7 @@ class ICChatWidget(QDockWidget):
 		jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
 			
 	def deleteCharacter(self):
-		if len(self.characters) > 0:
+		if self.hasCharacters():
 			self.characters.pop(self.characterSelector.currentIndex())
 			self.characterSelector.removeItem(self.characterSelector.currentIndex())
 			jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
@@ -405,6 +405,9 @@ class ICChatWidget(QDockWidget):
 		self.ICChatInput.emit(self.newmes,
 							str(self.characters[self.characterSelector.currentIndex()].name),
 							str(self.characters[self.characterSelector.currentIndex()].portrait))
+							
+	def hasCharacters(self):
+		return len(self.characters) > 0
 							
 	def dump(self):
 		"""Serialize to an object valid for JSON dumping."""
