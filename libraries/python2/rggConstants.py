@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 VERSION = "1.04"
 DEV = True
+REPOSITORY_LINK = "https://github.com/Doctus/randomgamegenerator"
 
 # Graphical settings
 
