@@ -86,7 +86,7 @@ class _state(object):
     
     @staticmethod
     def initialize(mainApp):
-        _state.menu = rggMenuBar.menuBar()
+        _state.menu = rggMenuBar.menuBar(mapExists, pogExists, charExists)
         
         _state.twidget = rggDockWidget.debugConsoleWidget(mainWindow)
         sys.stdout = _state.twidget
@@ -139,6 +139,19 @@ class _state(object):
         rggEvent.addKeyPressListener(keyPressResponse, LATE_RESPONSE_LEVEL)
         rggEvent.addKeyReleaseListener(keyReleaseResponse, LATE_RESPONSE_LEVEL)
 
+def mapExists():
+	if len(_state.session.maps.values()) > 0:
+		return True
+	return False
+	
+def pogExists():
+	if len(_state.session.pogs.values()) > 0:
+		return True
+	return False
+	
+def charExists():
+	return len(_state.icwidget.characters) > 0
+		
 def autoMovePogs():
     if _state.pogmove == [0, 0]:
         return

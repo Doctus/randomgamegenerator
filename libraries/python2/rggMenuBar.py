@@ -23,6 +23,7 @@ from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import PYQT_VERSION_STR
 from rggSystem import translate, mainWindow
 from rggJson import loadString, jsonload, jsonappend
+from rggRPC import client
 import sys, os, rggStyles
 from rggConstants import *
 
@@ -34,11 +35,15 @@ ICON_DELETE = 3
 class menuBar(object):
 	"""An object representing the menu bar."""
 	
-	def __init__(self):
+	def __init__(self, mapExistenceCheck=None, pogExistenceCheck=None, charExistenceCheck=None):
 		
 		main = mainWindow
 		
 		self.menubar = main.menuBar()
+		
+		self.mapExistenceCheck = mapExistenceCheck
+		self.pogExistenceCheck = pogExistenceCheck
+		self.charExistenceCheck = charExistenceCheck
 		
 		# ACTIONS
 		
@@ -148,6 +153,10 @@ class menuBar(object):
 		fileMenu.addAction(self.loadSessAct)
 		fileMenu.addAction(self.clearSessAct)
 		
+		self.mapExistsActs = [self.saveMapAct, self.closeSpecificMapAct, self.closeMapAct]
+		self.pogExistsActs = [self.deletePogsAct,]
+		self.characterExistsActs = [self.saveCharsAct,]
+		
 		internetMenu = QtGui.QMenu(translate("menubar", "&Internet"), main)
 		internetMenu.addAction(self.hostGameAct)
 		internetMenu.addAction(self.joinGameAct)
@@ -156,6 +165,9 @@ class menuBar(object):
 		internetMenu.addAction(self.sendFileAct)
 		internetMenu.addSeparator()
 		internetMenu.addAction(self.disconnectAct)
+		
+		self.connectedActs = [self.createSurveyAct, self.sendFileAct, self.disconnectAct]
+		self.disconnectedActs = [self.hostGameAct, self.joinGameAct]
 
 		self.thicknessMenu = QtGui.QMenu(translate("menubar", "&Thickness"), main)
 		for x in range(1, 11):
@@ -262,6 +274,8 @@ class menuBar(object):
 		stylesMenu.triggered.connect(self.changeStyle)
 		self.pluginsMenu.triggered.connect(self.loadPlugin)
 		
+		fileMenu.aboutToShow.connect(self.updateFileMenu)
+		internetMenu.aboutToShow.connect(self.updateInternetMenu)
 		self.windowMenu.aboutToShow.connect(self.updateWidgetMenu)
 		
 		self.aboutAct.triggered.connect(self.about)
@@ -314,6 +328,20 @@ class menuBar(object):
 		self.windowMenu.clear()
 		for action in mainWindow.createPopupMenu().actions():
 			self.windowMenu.addAction(action)
+			
+	def updateFileMenu(self):
+		for act in self.mapExistsActs:
+			act.setEnabled(self.mapExistenceCheck())
+		for act in self.pogExistsActs:
+			act.setEnabled(self.pogExistenceCheck())
+		for act in self.characterExistsActs:
+			act.setEnabled(self.charExistenceCheck())
+			
+	def updateInternetMenu(self):
+		for act in self.connectedActs:
+			act.setEnabled(client.isConnected)
+		for act in self.disconnectedActs:
+			act.setEnabled(not client.isConnected)
 			
 	def about(self):
 		msg = QtGui.QMessageBox(mainWindow)
