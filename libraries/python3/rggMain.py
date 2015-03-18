@@ -10,7 +10,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from .newglwidget import GLWidget
+from .glwidget import GLWidget
 
 from .rggJson import loadInteger, jsonload
 from .rggConstants import *
@@ -32,6 +32,15 @@ class MainWindow(QMainWindow):
 		self.glwidget = GLWidget(self)
 		self.setCentralWidget(self.glwidget)
 		
+		self.drawTimer = QTimer()
+		self.drawTimer.timeout.connect(self.drawTimerTimeout)
+		try:
+			js = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
+			drawtimer = loadInteger('init.drawtimer', js.get('drawtimer'))
+			self.drawTimer.start(drawtimer)
+		except:
+			self.drawTimer.start(20)
+		
 	def readGeometry(self):
 		settings = QSettings("AttercopProductions", "RGG")
 		settings.beginGroup("MainWindow")
@@ -46,3 +55,6 @@ class MainWindow(QMainWindow):
 		settings.setValue("windowState", self.saveState())
 		settings.endGroup()
 		QMainWindow.closeEvent(self, event)
+		
+	def drawTimerTimeout(self):
+		self.glwidget.updateGL()

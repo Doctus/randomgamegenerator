@@ -63,6 +63,7 @@ v1.04 "Fate and Chance cast lots"               [in dev], 2015
     * Added option to set in-character portrait display size.
     * Added a "clear all" button for in-character characters.
     * Added "center everyone on pog" command.
+    * Added a dark stylesheet.
 
 v1.03 "The King that was Not"                 January 29, 2013
 
