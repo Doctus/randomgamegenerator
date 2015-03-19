@@ -175,6 +175,12 @@ class chatWidget(QDockWidget):
 		self.widgetEditor.anchorClicked.connect(self.anchorClicked)
 		self.widgetLineInput.returnPressed.connect(self.processInput)
 		
+	def toggleDarkBackgroundSupport(self, dark):
+		if dark:
+			self.widgetEditor.document().setDefaultStyleSheet("a {color: cyan; }")
+		else:
+			self.widgetEditor.document().setDefaultStyleSheet("a {color: blue; }")
+	
 	def anchorClicked(self, url):
 		'''If the url appears to be one of the /tell links in a player name, load it to the input.'''
 		if "/tell" in str(url):

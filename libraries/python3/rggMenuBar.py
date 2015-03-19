@@ -193,10 +193,11 @@ class menuBar(object):
 		drawMenu.addMenu(self.thicknessMenu)
 		drawMenu.addMenu(self.colourMenu)
 		
-		stylesMenu = QMenu(translate("menubar", "&Styles"), main)
+		self.stylesMenu = QMenu(translate("menubar", "&Styles"), main)
 		for style in list(rggStyles.sheets.keys()):
-			stylesMenu.addAction(QAction(style, main))
-		self.resetStyle()
+			act = QAction(style, main)
+			act.isDark = rggStyles.sheets[style][1]
+			self.stylesMenu.addAction(act)
 
 		self.langMenu = QMenu(translate("menubar", "&Language"), main)
 		ned = QAction(translate("menubar", "Dutch"), main)
@@ -214,7 +215,7 @@ class menuBar(object):
 			
 		self.optionsMenu = QMenu(translate("menubar", "&Options"), main)
 		self.optionsMenu.addMenu(self.langMenu)
-		self.optionsMenu.addMenu(stylesMenu)
+		self.optionsMenu.addMenu(self.stylesMenu)
 		self.optionsMenu.addSeparator()
 		self.optionsMenu.addAction(self.toggleAlertsAct)
 		self.optionsMenu.addAction(self.toggleTimestampsAct)
@@ -275,7 +276,6 @@ class menuBar(object):
 		self.drawIcon.triggered.connect(self.drawIconClicked)
 		self.deleteIcon.triggered.connect(self.deleteIconClicked)
 		
-		stylesMenu.triggered.connect(self.changeStyle)
 		self.pluginsMenu.triggered.connect(self.loadPlugin)
 		
 		fileMenu.aboutToShow.connect(self.updateFileMenu)
@@ -317,17 +317,9 @@ class menuBar(object):
 		if len(self.pluginsMenu.actions()) == 0:
 			self.pluginhide.setVisible(False)
 	
-	def resetStyle(self):
-		try:
-			obj = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
-			mainWindow.setStyleSheet(rggStyles.sheets[obj["style"]])
-		except:
-			mainWindow.setStyleSheet(rggStyles.sheets["Default"])
-	
-	def changeStyle(self, act):
-		#TODO: make this instead linked to rggViews which calls this and also toggleDarkBackgroundSupport on chat widgets
-		mainWindow.setStyleSheet(rggStyles.sheets[str(act.text())])
-		jsonappend({'style':str(act.text())}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
+	def changeStyle(self, styleName):
+		mainWindow.setStyleSheet(rggStyles.sheets[styleName][0])
+		jsonappend({'style':styleName}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
 		
 	def updateWidgetMenu(self):
 		self.windowMenu.clear()

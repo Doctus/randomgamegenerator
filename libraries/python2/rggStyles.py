@@ -1117,4 +1117,4 @@ QStatusBar::item {
     background-color: #3A3939;
 }'''
 
-sheets = {"Default":standard, "Dark":dark, "Celtic":celtica}
+sheets = {"Default":(standard, False), "Dark":(dark, True), "Celtic":(celtica, False)}

@@ -30,6 +30,7 @@ from . import rggResource
 from . import rggSystem
 from . import rggSession
 from . import rggEvent
+from . import rggStyles
 from .rggRPC import server, client, serverRPC, clientRPC
 from .rggJson import jsondump, jsonload, jsonappend
 from .rggMenuBar import ICON_SELECT, ICON_MOVE, ICON_DRAW, ICON_DELETE, menuBar
@@ -130,6 +131,12 @@ class _state(object):
 			_state.portraitSize = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))['portraitsize']
 		except:
 			_state.portraitSize = "64"
+			
+		try:
+			obj = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
+			setStyle(obj["style"], rggStyles.sheets[obj["style"]][1])
+		except:
+			setStyle("Default", False)
 		
 		try:
 			mainWindow.readGeometry()
@@ -169,6 +176,14 @@ def autoMovePogs():
 
 def moveMap():
 	pass
+	
+def changeStyle(act):
+	setStyle(str(act.text()), act.isDark)
+	
+def setStyle(styleName, isDark):
+	_state.menu.changeStyle(styleName)
+	_state.cwidget.toggleDarkBackgroundSupport(isDark)
+	_state.icwidget.toggleDarkBackgroundSupport(isDark)
 	
 @serverRPC    
 def reconnectTransferSocket():

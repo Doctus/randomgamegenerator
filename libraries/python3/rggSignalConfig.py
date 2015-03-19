@@ -41,6 +41,7 @@ def connectMenuEvents(menu):
     menu.colourMenu.triggered.connect(rggViews.setLineColour)
     menu.langMenu.triggered.connect(rggViews.setLanguage)
     menu.portraitMenu.triggered.connect(rggViews.setPortraitSize)
+    menu.stylesMenu.triggered.connect(rggViews.changeStyle)
 
 def connectClientEvents(client):
     client.connected.connect(rggRemote.clientConnect)

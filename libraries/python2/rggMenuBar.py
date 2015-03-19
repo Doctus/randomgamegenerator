@@ -189,10 +189,11 @@ class menuBar(object):
 		drawMenu.addMenu(self.thicknessMenu)
 		drawMenu.addMenu(self.colourMenu)
 		
-		stylesMenu = QtGui.QMenu(translate("menubar", "&Styles"), main)
+		self.stylesMenu = QtGui.QMenu(translate("menubar", "&Styles"), main)
 		for style in rggStyles.sheets.keys():
-			stylesMenu.addAction(QtGui.QAction(style, main))
-		self.resetStyle()
+			act = QtGui.QAction(style, main)
+			act.isDark = rggStyles.sheets[style][1]
+			self.stylesMenu.addAction(act)
 
 		self.langMenu = QtGui.QMenu(translate("menubar", "&Language"), main)
 		ned = QtGui.QAction(translate("menubar", "Dutch"), main)
@@ -210,7 +211,7 @@ class menuBar(object):
 			
 		self.optionsMenu = QtGui.QMenu(translate("menubar", "&Options"), main)
 		self.optionsMenu.addMenu(self.langMenu)
-		self.optionsMenu.addMenu(stylesMenu)
+		self.optionsMenu.addMenu(self.stylesMenu)
 		self.optionsMenu.addSeparator()
 		self.optionsMenu.addAction(self.toggleAlertsAct)
 		self.optionsMenu.addAction(self.toggleTimestampsAct)
@@ -271,7 +272,6 @@ class menuBar(object):
 		self.drawIcon.triggered.connect(self.drawIconClicked)
 		self.deleteIcon.triggered.connect(self.deleteIconClicked)
 		
-		stylesMenu.triggered.connect(self.changeStyle)
 		self.pluginsMenu.triggered.connect(self.loadPlugin)
 		
 		fileMenu.aboutToShow.connect(self.updateFileMenu)
@@ -313,16 +313,9 @@ class menuBar(object):
 		if len(self.pluginsMenu.actions()) == 0:
 			self.pluginhide.setVisible(False)
 	
-	def resetStyle(self):
-		try:
-			obj = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
-			mainWindow.setStyleSheet(rggStyles.sheets[obj["style"]])
-		except:
-			mainWindow.setStyleSheet(rggStyles.sheets["Default"])
-	
-	def changeStyle(self, act):
-		mainWindow.setStyleSheet(rggStyles.sheets[unicode(act.text())])
-		jsonappend({'style':unicode(act.text())}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
+	def changeStyle(self, styleName):
+		mainWindow.setStyleSheet(rggStyles.sheets[styleName][0])
+		jsonappend({'style':styleName}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
 		
 	def updateWidgetMenu(self):
 		self.windowMenu.clear()
