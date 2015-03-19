@@ -156,6 +156,7 @@ class chatWidget(QDockWidget):
 		self.setObjectName("Chat Widget")
 		self.timestamp = False
 		self.timestampformat = "[%H:%M:%S]"
+		self.messageCache = []
 
 		try:
 			js = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
@@ -180,6 +181,13 @@ class chatWidget(QDockWidget):
 			self.widgetEditor.document().setDefaultStyleSheet("a {color: cyan; }")
 		else:
 			self.widgetEditor.document().setDefaultStyleSheet("a {color: blue; }")
+		self.refreshMessages()
+			
+	def refreshMessages(self):
+		'''Clear the text display and re-add all messages with current style settings etc.'''
+		self.widgetEditor.clear()
+		for message in self.messageCache:
+			self.widgetEditor.append(message)
 	
 	def anchorClicked(self, url):
 		'''If the url appears to be one of the /tell links in a player name, load it to the input.'''
@@ -198,8 +206,11 @@ class chatWidget(QDockWidget):
 		self.scroll = (self.widgetEditor.verticalScrollBar().value() ==
 				   self.widgetEditor.verticalScrollBar().maximum())
 		if self.timestamp:
-			self.widgetEditor.append(" ".join((time.strftime(self.timestampformat, time.localtime()), mes)))
+			message = " ".join((time.strftime(self.timestampformat, time.localtime()), mes))
+			self.messageCache.append(message)
+			self.widgetEditor.append(message)
 		else:
+			self.messageCache.append(mes)
 			self.widgetEditor.append(mes)
 		if self.scroll:
 			self.widgetEditor.verticalScrollBar().setValue(self.widgetEditor.verticalScrollBar().maximum())
@@ -292,6 +303,7 @@ class ICChatWidget(QDockWidget):
 		self.widget.setLayout(self.layout)
 		self.setWidget(self.widget)
 		self.setObjectName("IC Chat Widget")
+		self.messageCache = []
 		
 		self.setAcceptDrops(True)
 		
@@ -318,6 +330,13 @@ class ICChatWidget(QDockWidget):
 			self.widgetEditor.document().setDefaultStyleSheet("a {color: cyan; }")
 		else:
 			self.widgetEditor.document().setDefaultStyleSheet("a {color: blue; }")
+		self.refreshMessages()
+			
+	def refreshMessages(self):
+		'''Clear the text display and re-add all messages with current style settings etc.'''
+		self.widgetEditor.clear()
+		for message in self.messageCache:
+			self.widgetEditor.append(message)
 	
 	def updateDeleteButton(self):
 		self.characterDeleteButton.setEnabled(self.hasCharacters())
@@ -338,6 +357,7 @@ class ICChatWidget(QDockWidget):
 	def insertMessage(self, mes):
 		self.scroll = (self.widgetEditor.verticalScrollBar().value() ==
 				   self.widgetEditor.verticalScrollBar().maximum())
+		self.messageCache.append(mes)
 		self.widgetEditor.append(mes)
 		if self.scroll:
 			self.widgetEditor.verticalScrollBar().setValue(self.widgetEditor.verticalScrollBar().maximum())
