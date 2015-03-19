@@ -22,7 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 from PyQt5 import QtCore
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import PYQT_VERSION_STR
+from PyQt5.Qt import PYQT_VERSION_STR
+from PyQt5.QtCore import QT_VERSION_STR
 from .rggSystem import translate, mainWindow
 from .rggJson import loadString, jsonload, jsonappend
 from .rggRPC import client
@@ -350,9 +351,9 @@ class menuBar(object):
 	def about(self):
 		msg = QMessageBox(mainWindow)
 		if DEV:
-			aboutText = " ".join(("RGG", VERSION, "Development Version"))
+			aboutText = " ".join(("RGG", VERSION, "Development Version", "\nPython", ".".join(str(x) for x in sys.version_info[:3]), "\nPyQt", PYQT_VERSION_STR, "(Qt", QT_VERSION_STR+")"))
 		else:
-			aboutText = " ".join(("RGG", VERSION, "Release"))
+			aboutText = " ".join(("RGG", VERSION, "Release", "\nPython", ".".join(str(x) for x in sys.version_info[:3]), "\nPyQt", PYQT_VERSION_STR, "(Qt", QT_VERSION_STR+")"))
 		msg.setText(aboutText)
 		msg.setInformativeText(REPOSITORY_LINK)
 		msg.setWindowTitle("About")
