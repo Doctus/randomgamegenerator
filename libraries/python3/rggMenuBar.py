@@ -354,6 +354,6 @@ class menuBar(object):
 		else:
 			aboutText = " ".join(("RGG", VERSION, "Release"))
 		msg.setText(aboutText)
-		msg.setInformativeText("http://code.google.com/p/randomgamegenerator/")
+		msg.setInformativeText(REPOSITORY_LINK)
 		msg.setWindowTitle("About")
 		msg.exec_()

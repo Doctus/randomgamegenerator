@@ -1,5 +1,17 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from .rggTile import *
+from .rggSystem import POG_DIR, promptSaveFile, signal
 import random
+
+def nextPowerOfTwo(val):
+	val -= 1
+	val = (val >> 1) | val
+	val = (val >> 2) | val
+	val = (val >> 4) | val
+	val = (val >> 8) | val
+	val = (val >> 16) | val
+	val += 1
+	return val
 
 class GLWidget(QtWidgets.QOpenGLWidget):
 
@@ -45,9 +57,13 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 		version.setVersion(2, 0)
 		self.functions = self.context.versionFunctions(version)
 		self.functions.initializeOpenGLFunctions()
-		self.functions.glClearColor(1.0, 1.0, 1.0, 1.0)
+		self.functions.glClearColor(0, 0, 0, 1.0)
 		self.texext = self.functions.GL_TEXTURE_2D
-		self.makeCurrent()
+		self.npot = 3
+		self.anifilt = 0
+		self.magfilter = self.functions.GL_NEAREST
+		self.mipminfilter = self.functions.GL_NEAREST_MIPMAP_NEAREST
+		self.minfilter = self.functions.GL_NEAREST
 
 	def paintGL(self):
 		self.functions.glClear(self.functions.GL_COLOR_BUFFER_BIT)
@@ -297,10 +313,244 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 	def dropEvent(self, event):
 		if event.mimeData().hasImage():
 			dat = event.mimeData().imageData()
-			img = QImage(dat)
+			img = QtGui.QImage(dat)
 			filename = promptSaveFile('Save Pog', 'Pog files (*.png)', POG_DIR)
 			if filename is not None:
 				img.save(filename, "PNG")
 			event.acceptProposedAction()
 		elif event.mimeData().hasText():
 			self.pogPlace.emit(event.pos().x(), event.pos().y(), str(event.mimeData().text()))
+			
+	def getImageSize(self, image):
+		qimg = None
+
+		if image in self.qimages:
+			qimg = self.qimages[image][0]
+		else:
+			qimg = QtGui.QImage(image)
+
+		return qimg.size()
+		
+	def addText(self, text, pos):
+		self.texts.append([self.textid, text, pos])
+		self.textid += 1
+		return self.textid - 1
+		
+	def removeText(self, id):
+		for i, t in enumerate(self.texts):
+			if t[0] == id:
+				self.texts.pop(i)
+				return
+			
+	def setTextPos(self, id, pos):
+		for t in self.texts:
+			if t[0] == id:
+				t[2] = pos
+				
+	def createImage(self, qimagepath, layer, textureRect, drawRect, hidden = False, dynamicity = "!default"):
+		'''
+		Creates an rggTile instance, uploads the correct image to GPU if not in cache, and some other helpful things.
+		'''
+		if dynamicity == "!default":
+			dynamicity = self.functions.GL_STATIC_DRAW_ARB
+		#print "requested to create", qimagepath, layer, textureRect, drawRect, hidden
+		layer = int(layer)
+		texture = None
+		found = False
+
+		if qimagepath in self.qimages:
+			qimg = self.qimages[qimagepath][0]
+			if self.qimages[qimagepath][2] > 0:
+				texture = self.qimages[qimagepath][1]
+				found = True
+		else:
+			qimg = QtGui.QImage(qimagepath)
+			print("created", qimagepath)
+
+		if textureRect[2] == -1:
+			textureRect[2] = qimg.width()
+
+		if textureRect[3] == -1:
+			textureRect[3] = qimg.height()
+
+		if drawRect[2] == -1:
+			drawRect[2] = qimg.width()
+
+		if drawRect[3] == -1:
+			drawRect[3] = qimg.height()
+
+		image = tile(qimagepath, textureRect, drawRect, layer, hidden, dynamicity, self)
+
+		if found == False:
+			img = None
+			if self.npot == 0:
+				w = nextPowerOfTwo(qimg.width())
+				h = nextPowerOfTwo(qimg.height())
+				if w != qimg.width() or h != qimg.height():
+					img = self.convertToGLFormat(qimg.scaled(w, h))
+				else:
+					img = self.convertToGLFormat(qimg)
+			else:
+				img = self.convertToGLFormat(qimg)
+
+			texture = int(self.functions.glGenTextures(1))
+			try:
+				imgdata = img.bits().asstring(img.byteCount())
+			except Exception as e:
+				print(e)
+				import sys
+				print("requested to create", qimagepath, layer, textureRect, drawRect, hidden)
+				for x in [0, 1, 2, 3]:
+					f_code = sys._getframe(x).f_code #really bad hack to get the filename and number
+					print("Doing it wrong in " + f_code.co_filename + ":" + str(f_code.co_firstlineno))
+			
+			print("created texture", texture)
+
+			self.functions.glBindTexture(self.texext, texture)
+
+			if self.anifilt > 1.0:
+				self.functions.glTexParameterf(self.texext, self.functions.GL_TEXTURE_MAX_ANISOTROPY_EXT, self.anifilt)
+			if self.npot == 3 and self.mipminfilter != -1:
+				self.functions.glTexParameteri(self.texext, self.functions.GL_TEXTURE_MIN_FILTER, self.mipminfilter)
+				self.functions.glTexParameteri(self.texext, self.functions.GL_TEXTURE_MAG_FILTER, self.magfilter)
+			elif self.npot == 2 and self.mipminfilter != -1:
+				self.functions.glTexParameteri(self.texext, self.functions.GL_TEXTURE_MIN_FILTER, self.mipminfilter)
+				self.functions.glTexParameteri(self.texext, self.functions.GL_TEXTURE_MAG_FILTER, self.magfilter)
+				self.functions.glTexParameteri(self.texext, self.functions.GL_GENERATE_MIPMAP, GL_TRUE)
+			else:
+				self.functions.glTexParameteri(self.texext, self.functions.GL_TEXTURE_MIN_FILTER, self.minfilter)
+				self.functions.glTexParameteri(self.texext, self.functions.GL_TEXTURE_MAG_FILTER, self.magfilter)
+			
+			self.functions.glTexParameteri(self.texext, self.functions.GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+			self.functions.glTexParameteri(self.texext, self.functions.GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE)
+			self.functions.glTexParameteri(self.texext, self.functions.GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+
+			self.functions.glTexImage2D(self.texext, 0, self.functions.GL_RGBA, img.width(), img.height(), 0, self.functions.GL_RGBA, self.functions.GL_UNSIGNED_BYTE, imgdata);
+
+			if self.npot == 3 and self.mipminfilter != -1:
+				self.functions.glEnable(self.functions.GL_TEXTURE_2D)
+				self.functions.glGenerateMipmap(self.functions.GL_TEXTURE_2D)
+			
+			self.qimages[qimagepath] = [qimg, texture, 1] #texture, reference count
+		else:
+			self.qimages[qimagepath][2] += 1
+
+		image.textureId = texture
+
+		if layer not in self.images:
+			self.images[layer] = []
+			self.layers = list(self.images.keys())
+			self.layers.sort()
+			image.createLayer = True
+
+		self.images[layer].append(image)
+		self.allimgs.append(image)
+
+		return image
+
+	def deleteImage(self, image):
+		'''
+		Decreases the reference count of the texture by one, and deletes it if nothing is using it anymore
+		'''
+
+		self.qimages[image.imagepath][2] -= 1
+
+		if self.qimages[image.imagepath][2] <= 0:
+			print("deleting texture", image.textureId)
+			self.functions.glDeleteTextures(image.textureId)
+			del self.qimages[image.imagepath]
+
+		self.images[image.layer].remove(image)
+		self.allimgs.remove(image)
+
+		image = None
+
+	def deleteImages(self, imageArray):
+		'''
+		Decreases the reference count of the texture of each image by one, and deletes it if nothing is using it anymore
+		'''
+
+		for image in imageArray:
+			self.qimages[image.imagepath][2] -= 1
+
+			if self.qimages[image.imagepath][2] <= 0:
+				print("deleting texture", image.textureId)
+				self.functions.glDeleteTextures(image.textureId)
+				del self.qimages[image.imagepath]
+
+			self.images[image.layer].remove(image)
+			self.allimgs.remove(image)
+
+	def drawImage(self, image):
+		if image.hidden:
+			return
+
+		x, y, w, h = image.textureRect
+		dx, dy, dw, dh = image.drawRect
+		r = float(image.rotation)
+
+		cx, cy = self.camera
+
+		# Culling
+		if (dx * self.zoom > self.w - cx) or (dy * self.zoom > self.h - cy) or ((dx + dw) * self.zoom < 0-cx) or ((dy + dh) * self.zoom < 0-cy):
+			return
+
+		self.drawTexture(image.textureId, dx, dy, dw, dh, x, y, w, h, r)
+
+	def drawTexture(self, texture, dx, dy, dw, dh, x, y, w, h, r):
+		'''
+		texture is an int
+		textureRect is a list of size 4, determines which square to take from the texture
+		drawRect is a list of size 4, is used to determine the drawing size
+		'''
+
+		self.functions.glBindTexture(self.texext, texture)
+		
+		self.functions.glPushMatrix()
+		self.functions.glTranslatef(dx+dw/2, dy+dh/2, 0)
+		self.functions.glRotatef(r, 0, 0, 1.0)
+		self.functions.glTranslatef(-1*(dx+dw/2), -1*(dy+dh/2), 0)
+
+		self.functions.glBegin(GL_QUADS)
+		#Top-left vertex (corner)
+		self.functions.glTexCoord2f(x, y+h) #image/texture
+		self.functions.glVertex3f(dx, dy, 0) #screen coordinates
+
+		#Bottom-left vertex (corner)
+		self.functions.glTexCoord2f(x+w, y+h)
+		self.functions.glVertex3f((dx+dw), dy, 0)
+
+		#Bottom-right vertex (corner)
+		self.functions.glTexCoord2f(x+w, y)
+		self.functions.glVertex3f((dx+dw), (dy+dh), 0)
+
+		#Top-right vertex (corner)
+		self.functions.glTexCoord2f(x, y)
+		self.functions.glVertex3f(dx, (dy+dh), 0)
+		self.functions.glEnd()
+		
+		self.functions.glPopMatrix()
+
+	def hideImage(self, image, hide):
+		'''
+		This function should only be called from image.py
+		Use Image.hide() instead.
+		'''
+		pass
+			
+	def setLayer(self, image, newLayer):
+		'''
+		This function should only be called from image.py
+		Use Image.layer instead.
+		'''
+
+		oldLayer = image._layer
+		image._layer = newLayer
+		if newLayer not in self.images:
+			self.images[newLayer] = []
+			self.layers = list(self.images.keys())
+			self.layers.sort()
+			image.createLayer = True
+
+		self.images[oldLayer].remove(image)
+		self.images[newLayer].append(image)

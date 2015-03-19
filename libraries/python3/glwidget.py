@@ -31,8 +31,8 @@ except Exception as e:
 	print("Failed!", e)
 	pass
 
-from rggTile import *
-from rggSystem import POG_DIR, promptSaveFile, signal
+from .rggTile import *
+from .rggSystem import POG_DIR, promptSaveFile, signal
 
 def nextPowerOfTwo(val):
 	val -= 1
@@ -88,8 +88,8 @@ class GLWidget(QGLWidget):
 		self.setAcceptDrops(True)
 
 		try:
-			from rggSystem import SAVE_DIR
-			from rggJson import loadString, jsonload
+			from .rggSystem import SAVE_DIR
+			from .rggJson import loadString, jsonload
 			import os
 			js = jsonload(os.path.join(SAVE_DIR, "gfx_settings.rgs"))
 			self.logoon = loadString('gfx.splash', js.get('Splash'))
@@ -286,8 +286,8 @@ class GLWidget(QGLWidget):
 		Initialize GL
 		'''
 		global mod
-		from rggJson import loadString, loadInteger, loadFloat, jsonload
-		from rggSystem import SAVE_DIR
+		from .rggJson import loadString, loadInteger, loadFloat, jsonload
+		from .rggSystem import SAVE_DIR
 		import os
 
 		self.fieldtemp = [1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", "On", "On", "Magic"]

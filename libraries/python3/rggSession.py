@@ -67,7 +67,7 @@ class Session(object):
         '''Adds a pog to the session, informing rggEvent of the addition.'''
         assert(pog.ID is not None)
         #rggResource.srm.processFile(localuser(), pog._src)
-        import rggEvent
+        from . import rggEvent
         self.pogs[pog.ID] = pog
         rggEvent.pogUpdateEvent(pog)
         self.hideAllHiddenPogs()
@@ -75,14 +75,14 @@ class Session(object):
     def removePog(self, pog):
         '''Deletes a pog.'''
         assert(pog.ID is not None)
-        import rggEvent
+        from . import rggEvent
         rggEvent.pogDeleteEvent(self.pogs[pog.ID])
         self.pogs[pog.ID].destroy()
         del self.pogs[pog.ID]
         
     def removeAllPogs(self):
         '''Deletes all pogs in the session.'''
-        import rggEvent
+        from . import rggEvent
         for pog in list(self.pogs.values()):
             rggEvent.pogDeleteEvent(pog)
             pog.destroy()
