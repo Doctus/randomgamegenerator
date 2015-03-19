@@ -1117,4 +1117,48 @@ QStatusBar::item {
     background-color: #3A3939;
 }'''
 
-sheets = {"Default":(standard, False), "Dark":(dark, True), "Celtic":(celtica, False)}
+fantasia = '''
+*{ background-image: url("data/styles/leather_black_resize.jpg"); color:#b8860b;}
+
+QLineEdit,QTextEdit,QListWidget,QMenu { background-image: url("data/styles/papier13.jpg");color:black}
+
+QListWidget::item, QComboBox, QTreeView, QListView,QScrollArea,QTableView {background-image: url("data/styles/papier13.jpg");color:#000000}
+
+QPushButton {background-image:none;
+    background-color:#121212;
+    background:#121212;
+    border-width: 2px;
+    border-color: #333333;
+    border-style: outset;
+    padding:1em}
+
+QPushButton:pressed {background:#000000;
+    border-width: 2px;
+    border-color: #666666;
+    border-style: inset;}
+
+QPushButton:hover {background:#242424;
+    border-width: 2px;
+    border-color: #333333;
+    border-style: outset;}
+ 
+QMenu::item:selected {background: #917e50;}
+ 
+QMenu::item:pressed {background: #f3f2e5;}
+
+QHeaderView::section {background-image: none;background-color:#fcf4cf;color:#000000}
+
+QMenuBar::item {background-image:url("data/styles/leather_black_resize.jpg");color:#b8860b}
+
+QMenuBar::item:selected {background: #917e50;}
+
+QMenuBar::item:pressed {background: #625c2e;}
+
+QLabel,QRadioButton {background:rgba(0,0,0,0); color:#b8860b;}
+
+QToolTip {background-color:#fcf4cf;color:#000000}
+ }
+
+'''
+
+sheets = {"Default":(standard, False), "Dark":(dark, True), "Celtic":(celtica, False), "Fantasy":(fantasia, False)}
