@@ -324,6 +324,7 @@ class menuBar(object):
 			mainWindow.setStyleSheet(rggStyles.sheets["Default"])
 	
 	def changeStyle(self, act):
+		#TODO: make this instead linked to rggViews which calls this and also toggleDarkBackgroundSupport on chat widgets
 		mainWindow.setStyleSheet(rggStyles.sheets[str(act.text())])
 		jsonappend({'style':str(act.text())}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
 		

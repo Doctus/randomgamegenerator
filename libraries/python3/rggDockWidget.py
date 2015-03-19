@@ -306,6 +306,12 @@ class ICChatWidget(QDockWidget):
 		self.updateDeleteButton()
 		
 		self.setCharacterPreview()
+		
+	def toggleDarkBackgroundSupport(self, dark):
+		if dark:
+			self.widgetEditor.document().setDefaultStyleSheet("a {color: cyan; }")
+		else:
+			self.widgetEditor.document().setDefaultStyleSheet("a {color: blue; }")
 	
 	def updateDeleteButton(self):
 		self.characterDeleteButton.setEnabled(self.hasCharacters())
