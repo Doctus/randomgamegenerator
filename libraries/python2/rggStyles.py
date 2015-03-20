@@ -1157,7 +1157,6 @@ QMenuBar::item:pressed {background: #625c2e;}
 QLabel,QRadioButton {background:rgba(0,0,0,0); color:#b8860b;}
 
 QToolTip {background-color:#fcf4cf;color:#000000}
- }
 
 '''
 
