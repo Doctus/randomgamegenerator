@@ -1,5 +1,5 @@
 '''
-rggConstants - for the Random Game Generator project            
+rggConstants - for the Random Game Generator project
 By Doctus (kirikayuumura.noir@gmail.com)
 
 Configuration values for internal constants.
@@ -27,19 +27,19 @@ REPOSITORY_LINK = "https://github.com/Doctus/randomgamegenerator"
 
 # Graphical settings
 
-COLOURS = {"White":(1.0, 1.0, 1.0), 
-           "Red": (1.0, 0.0, 0.0), 
-           "Orange": (1.0, 0.5, 0.0), 
-           "Yellow": (1.0, 1.0, 0.0),
-           "Green": (0.0, 0.8, 0.2),
-           "Blue": (0.0, 0.0, 1.0),
-           "Purple": (0.76, 0.0, 1.0),
-           "Black": (0.0, 0.0, 0.0)}
-           
+COLOURS = {"White":(1.0, 1.0, 1.0),
+		   "Red": (1.0, 0.0, 0.0),
+		   "Orange": (1.0, 0.5, 0.0),
+		   "Yellow": (1.0, 1.0, 0.0),
+		   "Green": (0.0, 0.8, 0.2),
+		   "Blue": (0.0, 0.0, 1.0),
+		   "Purple": (0.76, 0.0, 1.0),
+		   "Black": (0.0, 0.0, 0.0)}
+
 IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".ppm", ".xbm", ".xpm")
 IMAGE_NAME_FILTER = list(('*{ext}'.format(ext=ext) for ext in IMAGE_EXTENSIONS))
 IMAGE_FILTER = 'Images ({imageList})'.format(imageList=','.join('*{ext}'.format(ext=ext) for ext in IMAGE_EXTENSIONS))
-           
+
 # Network settings
 
 PING_INTERVAL_SECONDS = 10

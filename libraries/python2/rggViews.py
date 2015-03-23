@@ -1,5 +1,5 @@
 '''
-rggViews - for the Random Game Generator project			
+rggViews - for the Random Game Generator project
 By Doctus (kirikayuumura.noir@gmail.com)
 
 Actions which occur in response to user commands.
@@ -38,32 +38,32 @@ BUTTON_SHIFT = 6
 # Feel free to add fields to the user object
 class User(object):
 	"""User representation on the server."""
-	
+
 	def __init__(self, username):
 		self.username = username
-	
+
 	def __repr__(self):
 		return u"User(u'{name}')".format(name=self.username)
-	
+
 	def __unicode__(self):
 		return self.username
-	
+
 	def __str__(self):
 		return self.__unicode__()
 
 class _state(object):
 	"""A state class build to avoid all these global statements."""
-	
+
 	session = rggSession.Session()
-	
+
 	alert = True
-	
+
 	pogSelection = set()
 	pogHover = None
-	
+
 	mouseButton = None
 	mousePosition = (0, 0)
-	
+
 	pogPlacement = False
 	pogPath = "path"
 
@@ -73,25 +73,25 @@ class _state(object):
 	thickness = 1
 	linecolour = [1.0, 1.0, 1.0]
 	drawmode = "Freehand"
-	
+
 	GM = None
-	
+
 	storedMessages = []
-	
+
 	moveMode = "free"
 	moveablePogs = []
-	
+
 	cameraPog = None
 	pogmove = [0, 0]
-	
+
 	@staticmethod
 	def initialize(mainApp):
 		_state.menu = rggMenuBar.menuBar(mapExists, pogExists, charExists)
-		
+
 		_state.twidget = rggDockWidget.debugConsoleWidget(mainWindow)
 		sys.stdout = _state.twidget
 		sys.stderr = _state.twidget
-		
+
 		_state.dwidget = rggDockWidget.diceRoller(mainWindow)
 		_state.pwidget = rggDockWidget.pogPalette(mainWindow)
 		_state.cwidget = rggDockWidget.chatWidget(mainWindow)
@@ -103,42 +103,42 @@ class _state(object):
 		_state.localuser = User(client.username)
 		_state.users[client.username] = _state.localuser
 		_state.keepalive = 4
-		
+
 		_state.mwidget.moveMapButton.clicked.connect(moveMap)
-		
+
 		purgeEmptyImages()
-		
+
 		_state.pingTimer = QtCore.QTimer()
 		_state.pingTimer.timeout.connect(keepAlive)
 		_state.pingTimer.start(rggSystem.PING_INTERVAL_SECONDS*1000)
-		
+
 		_state.App = mainApp
-		
+
 		_state.dialogs_keepalive = []
-		
+
 		try:
 			_state.portraitSize = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))['portraitsize']
 		except:
 			_state.portraitSize = "64"
-			
+
 		try:
 			obj = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
 			setStyle(obj["style"], rggStyles.sheets[obj["style"]][1])
 		except:
 			setStyle("Default", False)
-		
+
 		try:
 			mainWindow.readGeometry()
 		except:
 			pass
-			
+
 		#Kind of a hack, but the GUI is not ready to display pogs at this point in execution, and I couldn't think of a convenient way to figure out when that happens.
 		_state.autoloadTimer = QtCore.QTimer.singleShot(5, autoloadSession)
-					
+
 		_state.pogMoveTimer = QtCore.QTimer()
 		_state.pogMoveTimer.timeout.connect(autoMovePogs)
 		_state.pogMoveTimer.start(40)
-		
+
 		rggEvent.addMouseMoveListener(mouseMoveResponse, LATE_RESPONSE_LEVEL)
 		rggEvent.addMousePressListener(mousePressResponse, LATE_RESPONSE_LEVEL)
 		rggEvent.addMouseReleaseListener(mouseReleaseResponse, LATE_RESPONSE_LEVEL)
@@ -149,15 +149,15 @@ def mapExists():
 	if len(_state.session.maps.values()) > 0:
 		return True
 	return False
-	
+
 def pogExists():
 	if len(_state.session.pogs.values()) > 0:
 		return True
 	return False
-	
+
 def charExists():
 	return len(_state.icwidget.characters) > 0
-		
+
 def autoMovePogs():
 	if _state.pogmove == [0, 0]:
 		return
@@ -165,19 +165,19 @@ def autoMovePogs():
 
 def moveMap():
 	pass
-	
+
 def changeStyle(act):
 	setStyle(str(act.text()), act.isDark)
-	
+
 def setStyle(styleName, isDark):
 	_state.menu.changeStyle(styleName)
 	_state.cwidget.toggleDarkBackgroundSupport(isDark)
 	_state.icwidget.toggleDarkBackgroundSupport(isDark)
-	
-@serverRPC	
+
+@serverRPC
 def reconnectTransferSocket():
 	client._openXfer()
-	
+
 def drawPogCircles():
 	clearSelectionCircles()
 	for pog in _state.pogSelection:
@@ -190,14 +190,14 @@ def addPogSelection(pog):
 def removePogSelection(pog):
 	_state.pogSelection.remove(pog)
 	drawPogCircles()
-	
+
 def setPogSelection(pog):
 	_state.pogSelection = set()
 	addPogSelection(pog)
-	
+
 def addUserToList(name, host=False):
 	_state.uwidget.addUser(name, host)
-	
+
 def toggleAlerts(newValue=None):
 	"""Toggles messages containing the user's handle causing an alert."""
 	if newValue is None:
@@ -225,10 +225,10 @@ def promptTimestampFormat():
 	if newFormat is None:
 		return
 	setTimestampFormat(newFormat)
-	
+
 def getPortraitSize():
 	return _state.portraitSize
-	
+
 def setPortraitSize():
 	prompt = translate("views", "Please enter a portrait size.")
 	try:
@@ -260,7 +260,7 @@ def say(message):
 def announce(message):
 	"""Say an OOC message. This documentation is a lie."""
 	_state.cwidget.insertMessage(message)
-	
+
 def ICSay(message):
 	_state.icwidget.insertMessage(message)
 
@@ -312,19 +312,19 @@ def isGM():
 def changeGM(username):
 	_state.GM = username
 	_state.uwidget.setGM(username)
-	
+
 @serverRPC
 def respondChangeGM(username, origin):
 	if _state.GM is None or origin == _state.GM:
 		changeGM(username)
-	
+
 @clientRPC
 def sendChangeGM(user, username, origin):
 	respondChangeGM(allusers(), username, origin)
-	
+
 def selectGM(newname):
 	sendChangeGM(newname, localhandle())
-	
+
 def playerOptions(playername):
 	loc = mainWindow.mapFromGlobal(QtGui.QCursor.pos()) #This gives the wrong result on one axis most of the time, and I've no idea why.
 	selected = showPopupMenuAt(
@@ -335,46 +335,46 @@ def playerOptions(playername):
 		sendToggleMoveMode(getuser(playername))
 	elif selected == 1:
 		selectGM(playername)
-	
-	
+
+
 @serverRPC
 def respondSetMoveMode(newMode):
 	_state.moveMode = unicode(newMode)
-	
+
 @clientRPC
 def sendSetMoveMode(user, target, newMode):
 	respondSetMoveMode(getuser(target), newMode)
-	
+
 @serverRPC
 def respondToggleMoveMode():
 	if _state.moveMode == "free":
 		_state.moveMode = "fixed"
 	else:
 		_state.moveMode = "free"
-	
+
 @clientRPC
 def sendToggleMoveMode(user, target):
 	respondToggleMoveMode(target)
-	
+
 @serverRPC
 def respondAddMoveablePog(pogID):
 	_state.moveablePogs.append(pogID)
-	
+
 @clientRPC
 def sendAddMoveablePog(user, target, pogID):
 	respondAddMoveablePog(getuser(target), pogID)
-	
+
 def setUwidgetLocal():
 	_state.uwidget.localname = localhandle()
 
-@serverRPC	
+@serverRPC
 def respondPing():
 	_state.keepalive = 4
-	
+
 @clientRPC
 def sendPing(user):
 	respondPing(user)
-	
+
 def keepAlive():
 	_state.keepalive -= 1
 	if _state.keepalive == 1:
@@ -386,7 +386,7 @@ def keepAlive():
 def respondPossibleDisconnect():
 	say(translate('views', '<font color="red">Connection appears to have been lost.</font>'))
 	disconnectGame()
-	
+
 # TODO: Name changing needs to be synched across the wire
 # The workaround is to log out and back in.
 #def changeName(user, name):
@@ -435,15 +435,15 @@ def hostGame():
 	if client.isConnected:
 		say(translate('views', "You are already in a game."))
 		return
-	
+
 	dialog = hostDialog()
-	
+
 	def accept():
 		valid = dialog.is_valid()
 		if not valid:
 			showErrorMessage(dialog.error)
 		return valid
-	
+
 	if dialog.exec_(mainWindow, accept):
 		connection = dialog.save()
 		server.setPassword(connection.password)
@@ -457,7 +457,7 @@ def hostGame():
 		else:
 			#TODO: better error message here
 			say(translate('views', 'Unable to access network; perhaps the port is in use?'))
-		
+
 
 def updateBanlist():
 	"""Update server banlist based on banlist.rgs file."""
@@ -471,21 +471,21 @@ def updateBanlist():
 				pass
 	except:
 		pass
-		
+
 def joinGame():
 	"""Allows the user to join a game."""
 	if client.isConnected:
 		say(translate('views', "You are already in a game."))
 		return
-	
+
 	dialog = joinDialog()
-	
+
 	def accept():
 		valid = dialog.is_valid()
 		if not valid:
 			showErrorMessage(dialog.error)
 		return valid
-	
+
 	if dialog.exec_(mainWindow, accept):
 		_clearSession() #Just in case...
 		connection = dialog.save()
@@ -508,7 +508,7 @@ def disconnectGame():
 	if not client.isConnected:
 		say(translate('views', "You are not connected."))
 		return
-	
+
 	killConnection()
 	say(translate('views', "Disconnected."))
 	clearUserList()
@@ -516,16 +516,16 @@ def disconnectGame():
 def kick(username):
 	"""Kicks specified user."""
 	server.kick(username)
-	
+
 def getSession():
 	return _state.session
 
 def transferFileResponse(responsibleClient, filename, eventDescription):
 	_state.fwidget.processFileEvent(responsibleClient, filename, eventDescription)
-	
+
 def partialTransferResponse(responsibleClient, filename, size, processed):
 	_state.fwidget.processPartialTransferEvent(responsibleClient, filename, size, processed)
-	
+
 # MAPS
 def topmap(mapPosition):
 	return _state.session.findTopMap(mapPosition)
@@ -546,15 +546,15 @@ def chooseMap():
 @serverRPC
 def respondCloseAllMaps():
 	_closeAllMaps()
-	
+
 @clientRPC
 def sendCloseAllMaps(user):
-	respondCloseAllMaps(allusersbut(user))	
+	respondCloseAllMaps(allusersbut(user))
 
 def _closeAllMaps():
 	clearPogSelection()
 	_state.session.closeAllMaps()
-	
+
 def closeAllMaps():
 	if promptYesNo(translate('views', 'Are you sure you want to close all maps for all connected players?')) == 16384:
 		_closeAllMaps()
@@ -563,10 +563,10 @@ def closeAllMaps():
 @serverRPC
 def respondClearSession():
 	_clearSession()
-	
+
 @clientRPC
 def sendClearSession(user):
-	respondClearSession(allusersbut(user))	
+	respondClearSession(allusersbut(user))
 
 def _clearSession():
 	clearPogSelection()
@@ -574,22 +574,22 @@ def _clearSession():
 	_state.pogmove = [0, 0]
 	_state.moveablePogs = []
 	_state.session.clear()
-	
+
 def clearSession():
 	if promptYesNo(translate('views', 'Are you sure you want to clear the current session completely for all connected players?')) == 16384:
 		_clearSession()
-		sendClearSession()  
-	
+		sendClearSession()
+
 def internalAddMap(map):
 	_state.session.addMap(map)
 	sendMapCreate(map.ID, map.dump(), map.tileset)
-	
+
 @serverRPC
 def respondSession(sess):
 	if _state.session is not None:
 		_state.session.clear()
 	_state.session = rggSession.Session.load(sess)
-	
+
 @clientRPC
 def sendSession(user, session):
 	respondSession(allusersbut(user), session)
@@ -597,13 +597,13 @@ def sendSession(user, session):
 def newMap():
 	"""Allows the user to choose a new map."""
 	dialog = newMapDialog(authName=localhandle())
-	
+
 	def accept():
 		valid = dialog.is_valid()
 		if not valid:
 			showErrorMessage(dialog.error)
 		return valid
-	
+
 	if dialog.exec_(mainWindow, accept):
 		map = dialog.save()
 		internalAddMap(map)
@@ -627,7 +627,7 @@ def saveMap():
 	"""Allows the user to save a map."""
 	mapNames = []
 	mapIDs = []
-	
+
 	for ID, map in _state.session.maps.items():
 		mapNames.append("".join((map.mapname, " (", unicode(ID), ")")))
 		mapIDs.append(ID)
@@ -638,42 +638,42 @@ def saveMap():
 	except IndexError:
 		print "Error: no maps exist to save."
 		return
-	
+
 	filename = promptSaveFile(translate('views', 'Save Map'),
 		translate('views', 'Random Game Map files (*.rgm)'),
 		rggSystem.MAP_DIR)
 	if not filename:
 		return
-	
+
 	jsondump(map.dump(), checkFileExtension(filename, ".rgm"))
 
 @serverRPC
 def respondCloseSpecificMap(ID):
 	_closeSpecificMap(ID)
-	
+
 @clientRPC
 def sendCloseSpecificMap(user, ID):
-	respondCloseSpecificMap(allusersbut(user), ID)	
+	respondCloseSpecificMap(allusersbut(user), ID)
 
 def _closeSpecificMap(ID):
 	_state.session.closeMap(ID)
-	
+
 def closeSpecificMap(ID):
 	_closeSpecificMap(ID)
 	sendCloseSpecificMap(ID)
-	
+
 def closeMap():
 	"""Allows the user to close a map."""
 	mapNames = []
 	mapIDs = []
-	
+
 	for ID, map in _state.session.maps.items():
 		mapNames.append("".join((map.mapname, " (", unicode(ID), ")")))
 		mapIDs.append(ID)
 
 	selectedButton = rggSystem.promptButtonSelection("Which map do you want to close?", mapNames, 0)
 	map = mapIDs[selectedButton]
-	
+
 	closeSpecificMap(map)
 
 def autoloadSession():
@@ -684,7 +684,7 @@ def autoloadSession():
 		#Don't bother sending since we shouldn't be connected to anything yet.
 	except:
 		pass
-		
+
 
 
 def loadSession():
@@ -711,7 +711,7 @@ def saveSession():
 		rggSystem.MAP_DIR)
 	if not filename:
 		return
-	
+
 	jsondump(_state.session.dump(), checkFileExtension(filename, ".rgg"))
 
 def autosaveSession():
@@ -722,39 +722,39 @@ def respondSurveyAnswers(surveyData, origin):
 	d = rggDialogs.surveyResultsDialog(surveyData, unicode(origin), mainWindow)
 	_state.dialogs_keepalive.append(d)
 	d.show()
-	
+
 @clientRPC
 def sendSurveyAnswers(user, target, surveyData):
-	respondSurveyAnswers(getuser(target), surveyData, unicode(user))  
-	
+	respondSurveyAnswers(getuser(target), surveyData, unicode(user))
+
 @serverRPC
 def respondSurvey(surveyData, origin):
 	d = rggDialogs.respondSurveyDialog(surveyData, mainWindow)
 	if d.exec_():
 		sendSurveyAnswers(origin, d.getAnswers())
-	
+
 @clientRPC
 def sendSurvey(user, target, surveyData):
-	respondSurvey(getuser(target), surveyData, unicode(user))	
-	
+	respondSurvey(getuser(target), surveyData, unicode(user))
+
 def createSurvey():
 	d = rggDialogs.createSurveyDialog(mainWindow)
 	if d.exec_():
 		for username in unicode(d.sendTo.text()).split():
 			sendSurvey(username, d.addedItems)
-	
+
 def saveChars():
-	
+
 	filename = promptSaveFile(translate('views', 'Save Characters'),
 		translate('views', 'Random Game Character files (*.rgc)'),
 		rggSystem.CHAR_DIR)
 	if not filename:
 		return
-	
+
 	jsondump(_state.icwidget.dump(), checkFileExtension(filename, ".rgc"))
-	
+
 def loadChars():
-	
+
 	filename = promptLoadFile(translate('views', 'Open Characters'),
 		translate('views', 'Random Game Character files (*.rgc)'),
 		rggSystem.CHAR_DIR)
@@ -774,17 +774,17 @@ def configureDrawTimer():
 		val = [13, 20, 35, 45, 60][selectedButton]
 		sav = dict(drawtimer=val)
 		jsonappend(sav, os.path.join(SAVE_DIR, "ui_settings.rgs"))
-		
+
 def configureGfx():
 	"""Allows the user to change the opengl settings."""
 	dialog = gfxSettingsDialog()
-	
+
 	def accept():
 		valid = dialog.is_valid()
 		if not valid:
 			showErrorMessage(dialog.error)
 		return valid
-	
+
 	if dialog.exec_(mainWindow, accept):
 		settings = dialog.save()
 		jsondump(settings,  os.path.join(SAVE_DIR, "gfx_settings.rgs"))
@@ -794,16 +794,16 @@ def setLanguage(new):
 	#This should ideally be translated into the newly selected language, but I have no idea how to accomplish that.
 	info = QtGui.QMessageBox(QtGui.QMessageBox.Information, "Language Changed", "".join(('Your new language setting "', str(new.iconText()), '" will take effect the next time you start RGG.')), QtGui.QMessageBox.Ok)
 	info.exec_()
-	
+
 @serverRPC
 def respondUserList(list):
 	for item in list:
 		addUserToList(item[0], item[1])
-		
+
 @serverRPC
 def respondUserRemove(name):
 	_state.uwidget.removeUser(name)
-	
+
 def clearUserList():
 	_state.uwidget.clearUserList()
 
@@ -820,7 +820,7 @@ def respondMapCreate(ID, mapDump):
 @clientRPC
 def sendMapCreate(user, ID, map, tileset):
 	"""Creates or updates the specified map."""
-	
+
 	rggResource.srm.processFile(user, tileset)
 
 	respondMapCreate(allusersbut(user), ID, map)
@@ -840,13 +840,13 @@ def sendTileUpdate(user, mapID, tile, newTileIndex):
 	if not map or not map.tilePosExists(tile):
 		return
 	respondTileUpdate(allusers(), mapID, tile, newTileIndex)
-	
+
 def _sendTileUpdate(mapID, tile, newTileIndex):
 	map = getmap(mapID)
 	oldtile = map.getTile(tile)
 	sendTileUpdate(mapID, tile, newTileIndex)
 	return oldtile
-	
+
 @serverRPC
 def respondMultipleTileUpdate(mapID, topLeftTile, bottomRightTile, newTileIndex):
 	"""Updates multiple specified map tiles in a rectangular area."""
@@ -864,7 +864,7 @@ def sendMultipleTileUpdate(user, mapID, topLeftTile, bottomRightTile, newTileInd
 	if not map or not map.tilePosExists(topLeftTile) or not map.tilePosExists(bottomRightTile):
 		return
 	respondMultipleTileUpdate(allusers(), mapID, topLeftTile, bottomRightTile, newTileIndex)
-	
+
 def _sendMultipleTileUpdate(mapID, topLeftTile, bottomRightTile, newTileIndex):
 	oldtiles = []
 	map = getmap(mapID)
@@ -910,7 +910,7 @@ def respondArbitraryFile(filepath):
 @clientRPC
 def sendArbitraryFile(user, filepath):
 	"""Sends any binary file to other users."""
-	respondArbitraryFile(allusersbut(user), filepath) 
+	respondArbitraryFile(allusersbut(user), filepath)
 
 def promptSendFile():
 	"""Prompts user to select a file to send."""
@@ -920,7 +920,7 @@ def promptSendFile():
 	if not filename:
 		return
 	sendArbitraryFile(os.path.relpath(filename))
-	
+
 @serverRPC
 def respondCharacterSheet(data, title):
 	"""Prompts user to save incoming character sheet."""
@@ -931,7 +931,7 @@ def respondCharacterSheet(data, title):
 def sendCharacterSheet(user, data, title):
 	"""Sends character sheet to other users."""
 	respondCharacterSheet(allusersbut(user), data, title)
-	
+
 def clearPogSelection():
 	_state.pogSelection = set()
 	if _state.pogHover != None:
@@ -956,10 +956,10 @@ def deletePog(pog):
 @serverRPC
 def respondDeleteAllPogs():
 	_deleteAllPogs()
-	
+
 @clientRPC
 def sendDeleteAllPogs(user):
-	respondDeleteAllPogs(allusersbut(user))	
+	respondDeleteAllPogs(allusersbut(user))
 
 def _deleteAllPogs():
 	clearPogSelection()
@@ -1026,7 +1026,7 @@ def respondUpdatePog(pogID, pogDump):
 @clientRPC
 def sendUpdatePog(user, pogID, pogDump):
 	"""Creates or updates a pog on the server."""
-	
+
 	# Upload (or check that we already have) the image resource from the client
 	rggResource.srm.processFile(user, pogDump['src'])
 	respondUpdatePog(allusersbut(user), pogID, pogDump)
@@ -1078,7 +1078,7 @@ def respondAbsoluteMovementPog(pogids, newloc):
 	if _state.cameraPog:
 		centerOnPog(_state.cameraPog)
 	drawPogCircles()
-	
+
 @clientRPC
 def sendAbsoluteMovementPog(user, pogids, newloc):
 	centerOnPog(_state.cameraPog)
@@ -1136,11 +1136,11 @@ def respondResizePog(pogID, newW, newH):
 	if pogID in _state.session.pogs.keys():
 		pog = _state.session.pogs[pogID]
 		pog.size = (newW, newH)
-	
+
 @clientRPC
 def sendResizePog(user, pogID, newW, newH):
 	respondResizePog(allusersbut(user), pogID, newW, newH)
-	
+
 def duplicatePog(pog):
 	createPog(rggPog.Pog.load(pog.dump()))
 
@@ -1154,7 +1154,7 @@ def respondLine(x, y, w, h, thickness, r, g, b):
 @clientRPC
 def sendLine(user, x, y, w, h, thickness, r, g, b):
 	respondLine(allusers(), x, y, w, h, thickness, r, g, b)
-	
+
 @serverRPC
 def respondSegmentedLine(x, y, w, h, thickness, r, g, b):
 	lines = drawSegmentedLine(x, y, w, h, thickness, r, g, b)
@@ -1164,7 +1164,7 @@ def respondSegmentedLine(x, y, w, h, thickness, r, g, b):
 @clientRPC
 def sendSegmentedLine(user, x, y, w, h, thickness, r, g, b):
 	respondSegmentedLine(allusers(), x, y, w, h, thickness, r, g, b)
-	
+
 @serverRPC
 def respondCircle(centre, edge, colour, thickness):
 	lines = drawCircle(centre, edge, colour, thickness)
@@ -1174,7 +1174,7 @@ def respondCircle(centre, edge, colour, thickness):
 @clientRPC
 def sendCircle(user, centre, edge, colour, thickness):
 	respondCircle(allusers(), centre, edge, colour, thickness)
-	
+
 @serverRPC
 def respondRectangle(x, y, w, h, colour, thickness):
 	lines = drawRectangleMadeOfLines(x, y, w, h, colour, thickness)
@@ -1184,7 +1184,7 @@ def respondRectangle(x, y, w, h, colour, thickness):
 @clientRPC
 def sendRectangle(user, x, y, w, h, colour, thickness):
 	respondRectangle(allusers(), x, y, w, h, colour, thickness)
-	
+
 @serverRPC
 def respondPolygon(sides, centre, edge, colour, thickness):
 	lines = drawRegularPolygon(sides, centre, edge, colour, thickness)
@@ -1203,16 +1203,16 @@ def respondDeleteLine(x, y, w, h):
 @clientRPC
 def sendDeleteLine(user, x, y, w, h):
 	respondDeleteLine(allusers(), x, y, w, h)
-	
+
 def _setThickness(new):
 	_state.thickness = new
 
 def setThickness(new):
 	_setThickness(int(new.text()))
-	
+
 def _setLineColour(new):
 	_state.linecolour = [new[0], new[1], new[2]]
-	
+
 def setLineColour(menuselection):
 	if menuselection.text() == "Custom...":
 		result = QtGui.QColorDialog.getColor(QtCore.Qt.white, mainWindow)
@@ -1289,12 +1289,12 @@ def reportCamera():
 def renamePog(pog, name):
 	pog.name = name
 	sendPogAttributes(pog.ID, pog.name, pog.layer, pog.properties)
-	
+
 def purgeEmptyImages():
 	"""Deletes all empty files in the pog, portrait, and tileset folders."""
 	for dir in (POG_DIR, PORTRAIT_DIR, TILESET_DIR):
 		purgeEmptyFiles(dir)
-	
+
 def processPogRightclick(selection, pogs):
 	#0 CENTER
 	#1 SET NAME
@@ -1308,9 +1308,9 @@ def processPogRightclick(selection, pogs):
 	#9 LOCK CAMERA
 	#10 DUPLICATE
 	#11 SET MOVEABLE
-	
+
 	mainpog = pogs[0]
-	
+
 	if selection == 0:
 		centerOnPog(mainpog)
 	elif selection == 1:
@@ -1386,7 +1386,7 @@ def processPogRightclick(selection, pogs):
 			return
 		for pog in pogs:
 			sendAddMoveablePog(username, pog.ID)
-			
+
 def pogActionList(pog):
 	if pog.hidden: hidebutton = "Show"
 	else: hidebutton = "Hide"
@@ -1476,9 +1476,9 @@ def mouseMove(screenPosition, mapPosition, displacement):
 				_state.previousLinePlacement = mapPosition #We only do this so that we have a topLeft
 
 def mousePress(screenPosition, mapPosition, button):
-	
+
 	import rggEvent
-	
+
 	icon = _state.menu.selectedIcon
 	if icon == ICON_MOVE:
 		return
@@ -1547,7 +1547,7 @@ def mousePress(screenPosition, mapPosition, button):
 	elif icon == ICON_DELETE:
 		if button == BUTTON_LEFT:
 			_state.previousLinePlacement = mapPosition
-			
+
 
 def mouseRelease(screenPosition, mapPosition, button):
 	_state.mouseButton = None
@@ -1569,7 +1569,7 @@ def mouseRelease(screenPosition, mapPosition, button):
 		_state.previousLinePlacement = None
 	elif icon == ICON_DELETE:
 		if(_state.previousLinePlacement != None and _state.nextLinePlacement != None):
-			
+
 			clearRectangles()
 
 			x = _state.previousLinePlacement[0]
@@ -1580,10 +1580,10 @@ def mouseRelease(screenPosition, mapPosition, button):
 				x, w = w, x
 			if(y > h):
 				y, h = h, y
-			
+
 			w -= x
 			h -= y
-			#print '(x, y, w, h) (' + str(x) + ', ' + str(y) + ', ' + str(w) + ', ' + str(h) + ')' 
+			#print '(x, y, w, h) (' + str(x) + ', ' + str(y) + ', ' + str(w) + ', ' + str(h) + ')'
 
 			sendDeleteLine(x, y, w, h)
 
@@ -1595,12 +1595,12 @@ def mouseMoveResponse(x, y):
 	screenPosition = (x, y)
 	mapPosition = getMapPosition(screenPosition)
 	displacement = map(lambda p,m,d: p/d - m/d, screenPosition, _state.mousePosition,  (getZoom(), getZoom()))
-	
+
 	#print mapPosition
 	#print cameraPosition()
-	
+
 	mouseMove(screenPosition, mapPosition, displacement)
-	
+
 	_state.mousePosition = screenPosition
 
 def mousePressResponse(x, y, t):
@@ -1608,21 +1608,21 @@ def mousePressResponse(x, y, t):
 
 	screenPosition = (x, y)
 	mapPosition = getMapPosition(screenPosition)
-	
+
 	_state.mousePosition = screenPosition
 	_state.mouseButton = t
-	
+
 	mousePress(screenPosition, mapPosition, t)
-	
+
 def mouseReleaseResponse(x, y, t):
 	#print 'release', x, y, t
-	
+
 	screenPosition = (x, y)
 	mapPosition = getMapPosition(screenPosition)
-	
+
 	_state.mousePosition = screenPosition
 	_state.mouseButton = t
-	
+
 	mouseRelease(screenPosition, mapPosition, t)
 
 def keyPressResponse(k):
@@ -1636,7 +1636,7 @@ def keyPressResponse(k):
 		_state.pogmove[0] = -5
 	elif k == QtCore.Qt.Key_D:
 		_state.pogmove[0] = 5
-		
+
 def keyReleaseResponse(k):
 	if not _state.cameraPog: return
 	if k == QtCore.Qt.Key_W or k == QtCore.Qt.Key_S:

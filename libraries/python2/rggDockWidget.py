@@ -23,9 +23,9 @@ class transferMonitorWidget(QtGui.QDockWidget):
 		self.widget.setLayout(self.layout)
 		self.setWidget(self.widget)
 		self.setObjectName("Transfer Monitor")
-		
+
 		mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
-		
+
 	def updateItem(self, client, filename, status):
 		'''Update the status of a transfer, creating a new table row for it if it's new.'''
 		if client.username + filename not in self.transferDict.keys():
@@ -39,7 +39,7 @@ class transferMonitorWidget(QtGui.QDockWidget):
 		self.transferTable.item(self.transferDict[client.username + filename], 2).setText(status)
 		self.transferTable.update()
 		self.update()
-		
+
 	def processFileEvent(self, client, filename, event):
 		'''Process a raw file/general status event.'''
 		if len(filename) > 1:
@@ -47,7 +47,7 @@ class transferMonitorWidget(QtGui.QDockWidget):
 		else:
 			self.status.setText(event)
 			self.update()
-			
+
 	def processPartialTransferEvent(self, client, filename, size, processed):
 		'''Process a partial transfer event.'''
 		processedAmount = "".join((unicode(round(float(processed)/float(size)*100, 1)), "%"))
@@ -78,17 +78,17 @@ class debugConsoleWidget(QtGui.QDockWidget):
 		self.widget.setLayout(self.layout)
 		self.setWidget(self.widget)
 		self.setObjectName("Debug Console")
-		
+
 		self.buffer = []
-		
+
 		mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
-		
+
 	def saveLogToggle(self, int):
 		if int == 0:
 			jsonappend({'debuglog':'Off'}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
 		else:
 			jsonappend({'debuglog':'On'}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
-		
+
 	def write(self, data):
 		try:
 			self.buffer.append(data)
@@ -164,25 +164,25 @@ class chatWidget(QtGui.QDockWidget):
 			self.timestampformat = loadString('chatWidget.timestampformat', js.get('timestampformat'))
 		except:
 			pass
-		
+
 		mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
-		
+
 		self.widgetEditor.anchorClicked.connect(self.anchorClicked)
 		self.widgetLineInput.returnPressed.connect(self.processInput)
-		
+
 	def toggleDarkBackgroundSupport(self, dark):
 		if dark:
 			self.widgetEditor.document().setDefaultStyleSheet("a {color: cyan; }")
 		else:
 			self.widgetEditor.document().setDefaultStyleSheet("a {color: blue; }")
 		self.refreshMessages()
-			
+
 	def refreshMessages(self):
 		'''Clear the text display and re-add all messages with current style settings etc.'''
 		self.widgetEditor.clear()
 		for message in self.messageCache:
 			self.widgetEditor.append(message)
-		
+
 	def anchorClicked(self, url):
 		'''If the url appears to be one of the /tell links in a player name, load it to the input.'''
 		if "/tell" in unicode(url):
@@ -195,7 +195,7 @@ class chatWidget(QtGui.QDockWidget):
 			self.timestamp = True
 		else:
 			self.timestamp = False
-	
+
 	def insertMessage(self, mes):
 		self.scroll = (self.widgetEditor.verticalScrollBar().value() ==
 				   self.widgetEditor.verticalScrollBar().maximum())
@@ -225,37 +225,37 @@ class chatWidget(QtGui.QDockWidget):
 		message = re.sub(r"\[url\](.*?)\[/url\]", r"<a href=\1>\1</a>", message)
 		message = message.replace("/>", ">") #prevents anchor from closing with trailing slash in URL
 		return message
-	
+
 	def processInput(self):
 		self.newmes = unicode(self.widgetLineInput.text())
 		self.newmes = self.processTags(self.newmes)
 		self.widgetLineInput.clear()
 		self.widgetLineInput.addMessage(self.newmes)
 		self.chatInput.emit(self.newmes)
-	
+
 	chatInput = signal(basestring, doc=
 		"""Called when chat input is received.
-		
+
 		text -- the message entered
-		
+
 		"""
 	)
-	
+
 class ICChar():
 	"""I should probably be in another file but I'm here anyway! Nyah!"""
-	
+
 	def __init__(self, i, na, por):
 		self.id = i
 		self.name = na
 		self.portrait = por
-		
+
 	def dump(self):
 		"""Serialize to a (ry"""
 		return dict(
 			id=self.id,
 			name=self.name,
 			portrait=self.portrait)
-	
+
 	@staticmethod
 	def load(obj):
 		"""Deserialize (ry"""
@@ -264,7 +264,7 @@ class ICChar():
 			loadString('ICChar.name', obj.get('name')),
 			loadString('ICChar.portrait', obj.get('portrait')))
 		return char
-	
+
 class ICChatWidget(QtGui.QDockWidget):
 
 	def __init__(self, mainWindow):
@@ -298,40 +298,40 @@ class ICChatWidget(QtGui.QDockWidget):
 		self.setWidget(self.widget)
 		self.setObjectName("IC Chat Widget")
 		self.messageCache = []
-		
+
 		self.setAcceptDrops(True)
-		
+
 		mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self)
-		
+
 		#TODO: Store and access characters in a better fashion.
 		try:
 			self.load(jsonload(os.path.join(CHAR_DIR, "autosave.rgc")))
 		except:
 			self.characters = []
-		
+
 		self.widgetLineInput.returnPressed.connect(self.processInput)
 		self.connect(self.characterAddButton, QtCore.SIGNAL('clicked()'), self.newCharacter)
 		self.connect(self.characterDeleteButton, QtCore.SIGNAL('clicked()'), self.deleteCharacter)
 		self.connect(self.characterClearButton, QtCore.SIGNAL('clicked()'), self.clearCharacters)
 		self.connect(self.characterSelector, QtCore.SIGNAL('currentIndexChanged(int)'), self.setCharacterPreview)
-		
+
 		self.updateDeleteButton()
-		
+
 		self.setCharacterPreview()
-		
+
 	def toggleDarkBackgroundSupport(self, dark):
 		if dark:
 			self.widgetEditor.document().setDefaultStyleSheet("a {color: cyan; }")
 		else:
 			self.widgetEditor.document().setDefaultStyleSheet("a {color: blue; }")
 		self.refreshMessages()
-			
+
 	def refreshMessages(self):
 		'''Clear the text display and re-add all messages with current style settings etc.'''
 		self.widgetEditor.clear()
 		for message in self.messageCache:
 			self.widgetEditor.append(message)
-	
+
 	def updateDeleteButton(self):
 		if len(self.characters) == 0:
 			self.characterDeleteButton.setEnabled(False)
@@ -343,7 +343,7 @@ class ICChatWidget(QtGui.QDockWidget):
 			self.characterClearButton.setEnabled(True)
 			self.characterSelector.setEnabled(True)
 			self.widgetLineInput.setEnabled(True)
-	
+
 	def setCharacterPreview(self, newIndex=-1):
 		try:
 			preview = QtGui.QPixmap(os.path.join(unicode(PORTRAIT_DIR), unicode(self.characters[self.characterSelector.currentIndex()].portrait)))
@@ -353,7 +353,7 @@ class ICChatWidget(QtGui.QDockWidget):
 			self.characterPreview.setPixmap(preview)
 		except:
 			self.characterPreview.clear()
-	
+
 	def insertMessage(self, mes):
 		self.scroll = (self.widgetEditor.verticalScrollBar().value() ==
 				   self.widgetEditor.verticalScrollBar().maximum())
@@ -369,7 +369,7 @@ class ICChatWidget(QtGui.QDockWidget):
 				self.logfile.close()
 		except:
 			pass
-			
+
 	def dragEnterEvent(self, event):
 		if event.mimeData().hasImage():
 			event.acceptProposedAction()
@@ -382,16 +382,16 @@ class ICChatWidget(QtGui.QDockWidget):
 			if filename is not None:
 				img.save(filename, "PNG")
 			event.acceptProposedAction()
-			
+
 	def newCharacter(self):
 		dialog = newCharacterDialog()
-		
+
 		def accept():
 			valid = dialog.is_valid()
 			if not valid:
 				showErrorMessage(dialog.error)
 			return valid
-		
+
 		if dialog.exec_(self.parentWidget(), accept):
 			newchardat = dialog.save()
 			newchar = ICChar(*newchardat)
@@ -401,19 +401,19 @@ class ICChatWidget(QtGui.QDockWidget):
 			self.characterSelector.setCurrentIndex(self.characterSelector.count()-1)
 			self.updateDeleteButton()
 			self.setCharacterPreview()
-			
+
 	def _newChar(self, char):
 		self.characterSelector.addItem(char.id)
 		self.characters.append(char)
 		jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
-			
+
 	def deleteCharacter(self):
 		if len(self.characters) > 0:
 			self.characters.pop(self.characterSelector.currentIndex())
 			self.characterSelector.removeItem(self.characterSelector.currentIndex())
 			jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
 			self.updateDeleteButton()
-			
+
 	def clearCharacters(self):
 		if promptYesNo('Really clear all characters?') == 16384:
 			self.characters = []
@@ -428,7 +428,7 @@ class ICChatWidget(QtGui.QDockWidget):
 			message = message.replace("".join(("[", validTag, "]")), "".join(("<", validTag, ">")))
 			message = message.replace("".join(("[", "/", validTag, "]")), "".join(("<", "/", validTag, ">")))
 		return message
-		
+
 	def processInput(self):
 		self.newmes = unicode(self.widgetLineInput.text())
 		self.newmes = self.processTags(self.newmes)
@@ -440,19 +440,19 @@ class ICChatWidget(QtGui.QDockWidget):
 
 	def hasCharacters(self):
 		return len(self.characters) > 0
-							
+
 	def dump(self):
 		"""Serialize to an object valid for JSON dumping."""
 
 		return dict(
 			chars=dict([(i, char.dump()) for i, char in enumerate(self.characters)]))
-	
+
 	def load(self, obj):
 		"""Deserialize set of IC characters from a dictionary."""
-		
+
 		self.characters = []
 		self.characterSelector.clear()
-		
+
 		chars = loadObject('ICChatWidget.chars', obj.get('chars'))
 		chartemp = [None]*len(chars.keys())
 		for ID, char in chars.items():
@@ -462,16 +462,16 @@ class ICChatWidget(QtGui.QDockWidget):
 			self._newChar(loaded)
 		self.updateDeleteButton()
 		self.setCharacterPreview()
-	
+
 	ICChatInput = signal(basestring, basestring, basestring, doc=
 		"""Called when in-character chat input is received.
-		
+
 		charname -- the character name currently selected
 		text -- the message entered
 		portrait -- the portrait path, relative to data/portraits
-		
+
 		""")
-	
+
 class diceRoller(QtGui.QDockWidget):
 
 	def __init__(self, mainWindow):
@@ -511,13 +511,13 @@ class diceRoller(QtGui.QDockWidget):
 
 	def changeCurrentMacro(self, n):
 		self.currentMacro = n
-	
+
 	def rollDice(self):
 		current = self.diceArea.item(self.currentMacro)
 		if current is not None:
 			text = unicode(current.text())
 			self.rollRequested.emit(text[text.rfind(':')+1:])
-			
+
 	def _addMacro(self, macro):
 		self.macros.append(QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), macro))
 		self.diceArea.addItem(self.macros[len(self.macros)-1])
@@ -536,32 +536,32 @@ class diceRoller(QtGui.QDockWidget):
 
 	def summonMacro(self):
 		self.macroRequested.emit()
-		
+
 	def load(self, obj):
 		 """Deserialize set of macros from a dictionary."""
 		 self.macros = []
 		 macroz = loadObject('diceRoller.macros', obj.get('macros'))
 		 for ID, macro in macroz.items():
 			 self._addMacro(macro)
-	
+
 	def dump(self):
 		"""Serialize to an object valid for JSON dumping."""
-		
+
 		macroz = []
 		for i in range(0,self.diceArea.count()):
 			macroz.append(unicode(self.diceArea.item(i).text(), 'UTF-8'))
 
 		return dict(
 			macros=dict([(i, macro) for i, macro in enumerate(macroz)]))
-	
+
 	rollRequested = signal(basestring, doc=
 		"""Called when the roll button is hit.
-		
+
 		roll -- the dice to be rolled
-		
+
 		"""
 	)
-	
+
 	macroRequested = signal(doc=
 		"""Called when the add macro button is pressed."""
 	)
@@ -574,18 +574,18 @@ class PogFileSystemModel(QtGui.QFileSystemModel):
 		self.setNameFilters(IMAGE_NAME_FILTER)
 		self.setNameFilterDisables(False)
 		self.absRoot = os.path.abspath(unicode(POG_DIR))
-		
+
 	def data(self, index, role):
 		basedata = QtGui.QFileSystemModel.data(self, index, role)
 		if role == 1 and os.path.isfile(self.filePath(index)):
 			return QtGui.QIcon(self.filePath(index))
 		return basedata
-		
+
 	def mimeData(self, indices):
 		path = QtCore.QString(makePortableFilename(os.path.join(POG_DIR, unicode(self.filePath(indices[0])[len(self.absRoot)+1:]))))
-		
+
 		if not os.path.isfile(path): return None
-		
+
 		mime = QtCore.QMimeData()
 		mime.setText(unicode(path))
 		return mime
@@ -593,24 +593,24 @@ class PogFileSystemModel(QtGui.QFileSystemModel):
 class pogTree(QtGui.QTreeView):
 
 	def startDrag(self, event):
-		for i in self.selectedIndexes(): 
+		for i in self.selectedIndexes():
 			drag = QtGui.QDrag(self)
-			
+
 			#Don't drag folders.
 			if not self.model().mimeData([i]): return
-			
+
 			#print self.model().mimeData([i]).text()
-			
+
 			drag.setMimeData(self.model().mimeData([i]))
 			basePixmap = QtGui.QPixmap(self.model().mimeData([i]).text())
 			scaledPixmap = basePixmap.scaled(basePixmap.width()*mainWindow.glwidget.zoom, basePixmap.height()*mainWindow.glwidget.zoom)
 			drag.setPixmap(scaledPixmap)
 			drag.setHotSpot(QtCore.QPoint(0, 0))
 			drag.start()
-		
+
 class pogPalette(QtGui.QDockWidget):
 	"""The list of loaded pogs."""
-	
+
 	def __init__(self, mainWindow):
 		"""Initializes the pog palette."""
 		super(QtGui.QDockWidget, self).__init__(mainWindow)
@@ -632,20 +632,20 @@ class pogPalette(QtGui.QDockWidget):
 		self.setWidget(self.widget)
 		self.setObjectName("Pog Palette")
 		mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
-	
+
 class userListList(QtGui.QListWidget):
 
 	def __init__(self, parent, ulmain):
 		QtGui.QListWidget.__init__(self)
 		self.ulmain = ulmain
 		self.itemActivated.connect(self.changeGM)
-		
+
 	def changeGM(self, item):
 		self.ulmain.provideOptions(self.currentRow())
-	
+
 class userListWidget(QtGui.QDockWidget):
 	"""The list of connected users."""
-	
+
 	def __init__(self, mainWindow):
 		"""Initializes the user list."""
 		super(QtGui.QDockWidget, self).__init__(mainWindow)
@@ -663,7 +663,7 @@ class userListWidget(QtGui.QDockWidget):
 		self.gmname = None
 		self.localname = None
 		mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
-		
+
 	def addUser(self, name, host=False):
 		self.internalList.append((name, host))
 		nametmp = name
@@ -681,20 +681,20 @@ class userListWidget(QtGui.QDockWidget):
 		if self.gmname == name:
 			nametmp = "[GM] " + nametmp
 		self.listOfUsers.addItem(nametmp)
-		
+
 	def removeUser(self, name):
 		for i, item in enumerate(self.internalList):
 			if item[0] == name:
 				self.internalList.pop(i)
 				self.listOfUsers.takeItem(i)
-	
+
 	def getUsers(self):
 		return self.internalList
-	
+
 	def clearUserList(self):
 		self.internalList = []
 		self.listOfUsers.clear()
-		
+
 	def refreshDisplay(self):
 		self.listOfUsers.clear()
 		for item in self.internalList:
@@ -704,52 +704,52 @@ class userListWidget(QtGui.QDockWidget):
 			if self.gmname == item[0]:
 				nametmp = "[GM] " + nametmp
 			self.listOfUsers.addItem(nametmp)
-		
+
 	def setGM(self, new):
 		self.gmname = new
 		self.refreshDisplay()
-		
+
 	def provideOptions(self, ID):
 		if self.gmname != self.localname:
 			return
 		name = self.internalList[ID][0]
 		#self.setGM(name)
 		self.selectGM.emit(name)
-		
+
 	def requestKick(self):
 		name = self.internalList[self.listOfUsers.currentRow()][0]
 		if name == self.localname:
 			return
 		self.kickPlayer.emit(name)
-		
+
 	def openBanDialog(self):
 		banDialog().exec_()
 		self.requestBanlistUpdate.emit()
-		
+
 	selectGM = signal(basestring, doc=
 		"""Called to request a menu be summoned containing actions targeting the selected player.
 			Sorry for the misleading legacy name."""
 	)
-	
+
 	kickPlayer = signal(basestring, doc=
 		"""Called to request player kicking."""
 	)
-	
+
 	requestBanlistUpdate = signal(doc=
 		"""Called to request that the banlist be updated."""
 	)
-	
+
 class fileItem(QtGui.QListWidgetItem):
 
 	def __init__(self, file, dir, panel):
 		QtGui.QListWidgetItem.__init__(self)
 		self.file = file
 		self.dir = dir
-		
+
 		self.setText(file[5:len(file)-3])
 
 class mapEditorLabel(QtGui.QLabel):
-	
+
 	def __init__(self, tilesize, width, height, par, currentTile=0):
 		super(QtGui.QLabel, self).__init__()
 		self.tilex, self.tiley = tilesize
@@ -759,11 +759,11 @@ class mapEditorLabel(QtGui.QLabel):
 		self.openglfix = (height / self.tiley)-1
 		self.currentTile = currentTile
 		self.par = par
-	
+
 	def mousePressEvent(self, ev):
 		self.currentTile = (ev.x()/self.tilex) + abs((ev.y()/self.tiley)-self.openglfix)*self.wrap
 		self.updateTile()
-		
+
 	def updateTile(self):
 		self.currentTileDimensions = (self.currentTile%(self.wid/self.tilex)*self.tilex, (self.hei - self.tiley) - (int((self.currentTile*self.tilex)/self.wid)*self.tiley), self.tilex, self.tiley)
 		self.par.updateCurrentTile()
@@ -772,7 +772,7 @@ class mapEditor(QtGui.QDockWidget):
 
 	def __init__(self, mainWindow):
 		super(QtGui.QDockWidget, self).__init__(mainWindow)
-		
+
 		#self.__eat = True
 		self.painting = True
 		self.dragging = False
@@ -811,11 +811,11 @@ class mapEditor(QtGui.QDockWidget):
 
 		self.currentMap = None
 		self.copyData = None
-		
+
 		self.undo = []
 		self.undoButton.clicked.connect(self._undo)
 		self.undoButton.setEnabled(False)
-		
+
 		self.redo = []
 		self.redoButton.clicked.connect(self._redo)
 		self.redoButton.setEnabled(False)
@@ -824,7 +824,7 @@ class mapEditor(QtGui.QDockWidget):
 		addMousePressListener(self.mousePressResponse, NORMAL_RESPONSE_LEVEL)
 		addMouseMoveListener(self.mouseMoveResponse, NORMAL_RESPONSE_LEVEL)
 		addMouseReleaseListener(self.mouseReleaseResponse, NORMAL_RESPONSE_LEVEL)
-		
+
 	def _undo(self):
 		from rggViews import _sendTileUpdate
 		redoTiles = []
@@ -834,7 +834,7 @@ class mapEditor(QtGui.QDockWidget):
 		self.redoButton.setEnabled(True)
 		if len(self.undo) == 0:
 			self.undoButton.setEnabled(False)
-			
+
 	def _redo(self):
 		from rggViews import _sendTileUpdate
 		undoTiles = []
@@ -844,19 +844,19 @@ class mapEditor(QtGui.QDockWidget):
 		self.undoButton.setEnabled(True)
 		if len(self.redo) == 0:
 			self.redoButton.setEnabled(False)
-		
+
 	def updateCurrentTile(self):
 		self.tilepix = QtGui.QPixmap()
 		self.tilepix.load(self.currentMap.tileset)
 		self.tilepix = self.tilepix.copy(QtCore.QRect(*self.tilelabel.currentTileDimensions))
 		self.currentTileLabel.setPixmap(self.tilepix)
-		
+
 	def mousePressResponse(self, x, y, t):
 		mapPosition = getMapPosition((x, y))
-		
+
 		#This and similar things were a regrettable necessity in the plugin -> nonplugin conversion process.
 		from rggViews import topmap, _sendTileUpdate
-		
+
 		map = topmap(mapPosition)
 		if map == None:
 			return
@@ -920,13 +920,13 @@ class mapEditor(QtGui.QDockWidget):
 				return
 			clickedtile = (int(((mapPosition[0] - map.drawOffset[0]) / self.tilelabel.tilex)),
 							int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
-			
+
 			if map.tilePosExists(clickedtile) and map.getTile(clickedtile) != self.tilelabel.currentTile:
 				from rggViews import _sendTileUpdate
 				oldtile = _sendTileUpdate(map.ID, clickedtile, self.tilelabel.currentTile)
 				self.undo[-1].append((map.ID, clickedtile, oldtile))
 			return True
-			
+
 	def mouseReleaseResponse(self, x, y, t):
 		if t == 0:
 			from rggViews import topmap, _sendTileUpdate, _sendMultipleTileUpdate

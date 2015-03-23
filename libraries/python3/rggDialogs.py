@@ -1,5 +1,5 @@
 '''
-rggDialogs - for the Random Game Generator project            
+rggDialogs - for the Random Game Generator project
 By Doctus (kirikayuumura.noir@gmail.com)
 
 Design inspired by Django Forms.
@@ -32,24 +32,24 @@ from .rggConstants import *
 
 class dialog(object):
 	"""A base class for dialogs.
-	
+
 	"""
-	
+
 	def __init__(self):
 		"""Initializes the dialog, with optional parameters."""
 		self.cleanData = None
 		self._error = None
-	
+
 	def clean(self):
 		"""Check for errors and return well-formatted data."""
 		raise NotImplementedError()
-	
+
 	@property
 	def error(self):
 		"""Access any errors on this dialog."""
 		self.is_valid()
 		return self._error
-	
+
 	def is_valid(self):
 		"""Return true if the data is valid and complete."""
 		try:
@@ -63,26 +63,26 @@ class dialog(object):
 			else:
 				# Catch-all shouldn't be seen by end-users
 				self._error = translate('dialog', "There is an error in your input.")
-	
+
 	def save(self):
 		"""Utilize validated data to make changes."""
 		raise NotImplementedError()
 
 class createSurveyDialog(QDialog):
 	""" A dialog for creating surveys to send to other users."""
-	
+
 	def __init__(self, mainWindow):
 		QDialog.__init__(self, mainWindow)
-		
+
 		self.setWindowTitle("Create Survey")
-		
+
 		self.addedItems = []
-		
+
 		self.addbutton = QPushButton("Add")
 		self.types = QComboBox()
 		self.sendToLabel = QLabel("Send to: ")
 		self.sendTo = QLineEdit()
-		
+
 		self.multiChoicePromptLabel = QLabel("Prompt: ")
 		self.multiChoicePrompt = QLineEdit()
 		self.multiChoiceOptions = QTextEdit()
@@ -93,17 +93,17 @@ class createSurveyDialog(QDialog):
 		self.allThatApplyPromptLabel = QLabel("Prompt: ")
 		self.allThatApplyPrompt = QLineEdit()
 		self.allThatApplyOptions = QTextEdit()
-		
+
 		self.okButton = QPushButton("Ok")
 		self.cancelButton = QPushButton("Cancel")
-	
+
 		self.addbutton.clicked.connect(self.addNewItem)
 		self.okButton.clicked.connect(self.okPressed)
 		self.cancelButton.clicked.connect(self.cancelPressed)
-		
+
 		for itemtype in ("Multiple choice", "Fill-in", "Yes/no", "Check all that apply"):
 			self.types.addItem(itemtype)
-		
+
 		self.layoutt = QGridLayout()
 		self.layoutt.addWidget(self.addbutton, 0, 1)
 		self.layoutt.addWidget(self.types, 0, 0)
@@ -111,7 +111,7 @@ class createSurveyDialog(QDialog):
 		self.layoutt.addWidget(self.sendTo, 10, 1)
 		self.layoutt.addWidget(self.okButton, 11, 0)
 		self.layoutt.addWidget(self.cancelButton, 11, 1)
-		
+
 		self.layoutt.addWidget(self.multiChoicePromptLabel, 1, 0)
 		self.layoutt.addWidget(self.multiChoicePrompt, 1, 1)
 		self.layoutt.addWidget(self.multiChoiceOptions, 2, 0, 1, 2)
@@ -122,12 +122,12 @@ class createSurveyDialog(QDialog):
 		self.layoutt.addWidget(self.allThatApplyPromptLabel, 1, 0)
 		self.layoutt.addWidget(self.allThatApplyPrompt, 1, 1)
 		self.layoutt.addWidget(self.allThatApplyOptions, 2, 0, 1, 2)
-		
+
 		self.setLayout(self.layoutt)
-		
+
 		self.types.currentIndexChanged.connect(self.displayOptions)
 		self.displayOptions()
-		
+
 	def displayOptions(self, nothing=True):
 		self.multiChoicePromptLabel.hide()
 		self.multiChoicePrompt.hide()
@@ -153,7 +153,7 @@ class createSurveyDialog(QDialog):
 			self.allThatApplyPromptLabel.show()
 			self.allThatApplyPrompt.show()
 			self.allThatApplyOptions.show()
-			
+
 	def addNewItem(self):
 		if self.types.currentText() == "Multiple choice":
 			self.addedItems.append({"type":"Multiple choice", "prompt":str(self.multiChoicePrompt.text()), "options":list(str(self.multiChoiceOptions.toPlainText()).split("\n"))})
@@ -169,29 +169,29 @@ class createSurveyDialog(QDialog):
 			self.addedItems.append({"type":"Check all that apply", "prompt":str(self.allThatApplyPrompt.text()), "options":list(str(self.allThatApplyOptions.toPlainText()).split("\n"))})
 			self.allThatApplyPrompt.clear()
 			self.allThatApplyOptions.clear()
-		
+
 	def okPressed(self, checked):
 		self.done(1)
 
 	def cancelPressed(self, checked):
 		self.done(0)
-		
+
 class respondSurveyDialog(QDialog):
 	"""A dialog containing a survey from another user."""
-	
+
 	def __init__(self, questions, mainWindow):
 		QDialog.__init__(self, mainWindow)
-		
+
 		self.layoutt = QGridLayout()
 		self.responseAssociation = {}
-		
+
 		if len(questions) < 6:
 			horiz = 2
 		elif len(questions) < 10:
 			horiz = 3
 		else:
 			horiz = 4
-		
+
 		for i, question in enumerate(questions):
 			if question["type"] == "Multiple choice":
 				label = QLabel(question["prompt"])
@@ -242,17 +242,17 @@ class respondSurveyDialog(QDialog):
 				box.setLayout(minilayout)
 				self.layoutt.addWidget(box, i/horiz, i%horiz)
 				self.responseAssociation[question["prompt"]] = ("C", opts)
-			
+
 		self.okButton = QPushButton("Ok")
 		self.cancelButton = QPushButton("Cancel")
-		
+
 		self.layoutt.addWidget(self.okButton, 80, 1)
 		self.layoutt.addWidget(self.cancelButton, 80, 0)
 		self.setLayout(self.layoutt)
 
 		self.okButton.clicked.connect(self.okPressed)
 		self.cancelButton.clicked.connect(self.cancelPressed)
-	
+
 	def getAnswers(self):
 		answers = {}
 		for key, value in list(self.responseAssociation.items()):
@@ -267,7 +267,7 @@ class respondSurveyDialog(QDialog):
 						results.append(str(item.text()))
 				answers[key] = "; ".join(results)
 		return answers
-	
+
 	def okPressed(self, checked):
 		self.done(1)
 
@@ -276,7 +276,7 @@ class respondSurveyDialog(QDialog):
 
 class surveyResultsDialog(QDialog):
 	"""A dialog containing another user's answers to a survey."""
-	
+
 	def __init__(self, answers, origin, mainWindow):
 		QDialog.__init__(self, mainWindow)
 		layoutt = QVBoxLayout()
@@ -291,7 +291,7 @@ class surveyResultsDialog(QDialog):
 			box.setLayout(minilayout)
 			layoutt.addWidget(box)
 		self.setLayout(layoutt)
-		
+
 class resizeDialog(QDialog):
 
 	def __init__(self, origx, origy, currw, currh, mainWindow):
@@ -337,22 +337,22 @@ class resizeDialog(QDialog):
 
 	def cancelPressed(self, checked):
 		self.done(0)
-		
+
 class modifyPogAttributesDialog(QDialog):
 	"""A dialog allowing the user to view and modify a pog's attributes."""
 
 	def __init__(self, properties, mainWindow):
 		QDialog.__init__(self, mainWindow)
 		self.setWindowTitle("Edit Attributes")
-		
+
 		self.currentProperties = properties
-		
+
 		self.table = QTableWidget(len(self.currentProperties)+1, 2, self)
 		self.table.setHorizontalHeaderLabels(["Attribute", "Value"])
 		for i, key in enumerate(self.currentProperties.keys()):
 			self.table.setItem(i, 0, QTableWidgetItem(key))
 		for i, value in enumerate(self.currentProperties.values()):
-			self.table.setItem(i, 1, QTableWidgetItem(value)) 
+			self.table.setItem(i, 1, QTableWidgetItem(value))
 
 		self.okButton = QPushButton("Ok")
 		self.cancelButton = QPushButton("Cancel")
@@ -365,9 +365,9 @@ class modifyPogAttributesDialog(QDialog):
 		self.layout.addWidget(self.okButton, 1, 0)
 		self.layout.addWidget(self.cancelButton, 1, 1)
 		self.setLayout(self.layout)
-		
+
 		self.table.cellChanged.connect(self.respondChange)
-		
+
 	def respondChange(self, row, column):
 		self.currentProperties = {}
 		for tableRow in range(self.table.rowCount() + 1):
@@ -396,18 +396,18 @@ class banDialog(QDialog):
 	def __init__(self):
 		QDialog.__init__(self)
 		self.setWindowTitle("Banlist")
-		
+
 		self.list = QListWidget(self)
 		for item in self.loadList():
 			self.list.addItem(QListWidgetItem(item))
-			
+
 		self.inputBox = QLineEdit(self)
-		
+
 		self.addButton = QPushButton("Add")
 		self.deleteButton = QPushButton("Delete")
 		self.okButton = QPushButton("Ok")
 		self.cancelButton = QPushButton("Cancel")
-		
+
 		self.layout = QGridLayout()
 		self.layout.addWidget(self.list, 0, 0, 1, 2)
 		self.layout.addWidget(self.inputBox, 1, 0, 1, 2)
@@ -420,9 +420,9 @@ class banDialog(QDialog):
 		self.deleteButton.clicked.connect(self.delete)
 		self.okButton.clicked.connect(self.okPressed)
 		self.cancelButton.clicked.connect(self.cancelPressed)
-		
+
 		self.setLayout(self.layout)
-		
+
 	def loadList(self):
 		"""Returns the currently saved bans, or a blank list if
 		   file access fails for any reason."""
@@ -431,46 +431,46 @@ class banDialog(QDialog):
 			return obj["IPs"]
 		except:
 			return []
-		
+
 	def saveList(self):
 		ips = []
 		for i in range(self.list.count()):
 			ips.append(str(self.list.item(i).text()))
 		iplist = {"IPs":ips}
 		jsondump(iplist, os.path.join(SAVE_DIR, "banlist.rgs"))
-		
+
 	def add(self):
 		self.list.addItem(self.inputBox.text())
 		self.inputBox.clear()
-		
+
 	def delete(self):
 		self.list.takeItem(self.list.currentRow())
-		
+
 	def okPressed(self, checked):
 		self.saveList()
 		self.done(1)
 
 	def cancelPressed(self, checked):
 		self.done(0)
-		
+
 class newMapDialog(dialog):
 	"""A dialog used to create a new map."""
-	
+
 	def __init__(self, **kwargs):
 		"""Initializes the dialog data."""
 		super(newMapDialog, self).__init__()
 		self.fields = self._createFields(kwargs)
-	
+
 	def _createFields(self, data):
 		"""Create the fields used by this dialog."""
-		
+
 		tilesets = findFiles(TILESET_DIR, IMAGE_EXTENSIONS)
 		if len(tilesets) <= 0:
 			raise RuntimeError(translate('newMapDialog',
 				'Cannot create a map when no tilesets are available.'))
-				
+
 		self.tilesetField = dropDownField(translate('newMapDialog', 'Tileset'), tilesets, value=data.get('tileset', tilesets[0]))
-		
+
 		return dict(
 			mapName=stringField(translate('newMapDialog', 'Map Name'),
 				value=data.get('mapName', translate('newMapDialog', 'Generic Map'))),
@@ -485,65 +485,65 @@ class newMapDialog(dialog):
 				min=1, max=65535, value=data.get('tileWidth', 32)),
 			tileHeight=integerField(translate('newMapDialog', 'Per-Tile Height'),
 				min=1, max=65535, value=data.get('tileHeight', 32)))
-	
+
 	def _interpretFields(self, fields):
 		"""Interpret the fields into a dictionary of clean items."""
 		return dict((key, field.clean()) for key, field in list(fields.items()))
-	
+
 	def exec_(self, parent, accept):
 		"""Executes this dialog as modal, ensuring OK is only hit with valid data.
-		
+
 		parent -- the parent object of this dialog
 		accept() -- Acceptance function;
 			return True to accept data, False to continue (you should show an error)
-		
+
 		returns: True if the OK button is hit and the acceptance function passes.
-		
+
 		"""
-		
+
 		widget = QDialog(parent)
-		
+
 		# Buttons
 		okayButton = QPushButton(translate('newMapDialog', "Create Map"))
 		okayButton.setDefault(True)
 		cancelButton = QPushButton(translate('newMapDialog', "Cancel"))
-		
+
 		# Add fields
 		formLayout = QFormLayout()
 		for id in ('mapName', 'authName', 'mapWidth', 'mapHeight', 'tileset', 'tileWidth', 'tileHeight'):
 			field = self.fields[id]
 			formLayout.addRow(translate('newMapDialog', '{0}: ', 'Row layout').format(field.name), field.widget(widget))
-		
+
 		# Add buttons
 		theLesserOrFalseBox = QBoxLayout(0)
 		theLesserOrFalseBox.addWidget(okayButton)
 		theLesserOrFalseBox.addWidget(cancelButton)
-		
+
 		# Position both
 		grandBox = QBoxLayout(2)
 		grandBox.addLayout(formLayout)
 		grandBox.addLayout(theLesserOrFalseBox)
-		
+
 		# Set up the widget
 		widget.setLayout(grandBox)
 		widget.setModal(True)
 		widget.setWindowTitle(translate('newMapDialog', "New Map"))
-		
+
 		# Allow user to specify validation
 		def okayPressed():
 			if accept():
 				widget.accept()
-		
+
 		# Signals
 		okayButton.clicked.connect(okayPressed)
 		cancelButton.clicked.connect(widget.reject)
 		self.tilesetField.evil.connect(self.loadTilesize)
-		
+
 		self.loadTilesize()
-		
+
 		# Show to user
 		return (widget.exec_() == QDialog.Accepted)
-		
+
 	def loadTilesize(self):
 		"""Attempt to load a stored tilesize for the current tileset, if it exists."""
 		try:
@@ -553,12 +553,12 @@ class newMapDialog(dialog):
 			self.fields['tileHeight']._widget.setValue(size[1])
 		except:
 			pass
-		
+
 	def clean(self):
 		"""Check for errors and return well-formatted data."""
 		self.cleanData = self._interpretFields(self.fields)
 		return self.cleanData
-	
+
 	def save(self):
 		"""Make a new map and return it."""
 		assert(self.cleanData)
@@ -569,27 +569,27 @@ class newMapDialog(dialog):
 			(self.cleanData['mapWidth'], self.cleanData['mapHeight']),
 			makePortableFilename(os.path.join('data/tilesets', self.cleanData['tileset'])),
 			(self.cleanData['tileWidth'], self.cleanData['tileHeight']))
-	
+
 class hostDialog(dialog):
 	"""A dialog used to specify parameters to game hosting."""
-	
+
 	def __init__(self, **kwargs):
 		"""Initializes the dialog data."""
 		super(hostDialog, self).__init__()
 		self.fields = self._createFields(kwargs)
-	
+
 	def _createFields(self, data):
 		"""Create the fields used by this dialog."""
-		
+
 		self.fieldtemp = [6812, translate('hostDialog', 'Anonymous')]
-		
+
 		try:
 			js = jsonload(os.path.join(SAVE_DIR, "net_server.rgs"))
 			self.fieldtemp[0] = int(loadString('hostDialog.port', js.get('port')))
 			self.fieldtemp[1] = loadString('hostDialog.username', js.get('username'))
 		except:
 			pass
-		
+
 		return dict(
 			username=stringField(
 				translate('hostDialog', 'Username'),
@@ -601,24 +601,24 @@ class hostDialog(dialog):
 				translate('hostDialog', 'Password'),
 				value=data.get('password', ''),
 				allowEmpty=True))
-	
+
 	def _interpretFields(self, fields):
 		"""Interpret the fields into a dictionary of clean items."""
 		return dict((key, field.clean()) for key, field in list(fields.items()))
-	
+
 	def exec_(self, parent, accept):
 		"""Executes this dialog as modal, ensuring OK is only hit with valid data.
-		
+
 		parent -- the parent object of this dialog
 		accept() -- Acceptance function;
 			return True to accept data, False to continue (you should show an error)
-		
+
 		returns: True if the OK button is hit and the acceptance function passes.
-		
+
 		"""
-		
+
 		widget = QDialog(parent)
-		
+
 		# Buttons
 		okayButton = QPushButton(translate('hostDialog', "Host"))
 		okayButton.setDefault(True)
@@ -628,7 +628,7 @@ class hostDialog(dialog):
 		self.checkIPLabel.setReadOnly(True)
 		self.wordIPLabel = QLineEdit()
 		self.wordIPLabel.setReadOnly(True)
-		
+
 		# Add fields
 		formLayout = QFormLayout()
 		for id in ('port', 'username', 'password'):
@@ -636,7 +636,7 @@ class hostDialog(dialog):
 			formLayout.addRow(
 				translate('hostDialog', '{0}: ', 'Row layout').format(field.name),
 				field.widget(widget))
-		
+
 		# Set up layout
 		grandBox = QGridLayout()
 		grandBox.addLayout(formLayout, 0, 0, 1, 2)
@@ -645,47 +645,47 @@ class hostDialog(dialog):
 		grandBox.addWidget(self.wordIPLabel, 2, 0, 1, 2)
 		grandBox.addWidget(okayButton, 3, 0)
 		grandBox.addWidget(cancelButton, 3, 1)
-		
+
 		# Set up the widget
 		widget.setLayout(grandBox)
 		widget.setModal(True)
 		widget.setWindowTitle(translate('hostDialog', "Host Game"))
-		
+
 		# Allow user to specify validation
 		def okayPressed():
 			if accept():
 				widget.accept()
-		
+
 		# Signals
 		okayButton.clicked.connect(okayPressed)
 		cancelButton.clicked.connect(widget.reject)
 		checkIPButton.clicked.connect(self.checkIP)
-		
+
 		# Show to user
 		return (widget.exec_() == QDialog.Accepted)
 
 	def checkIP(self):
 		import urllib.request, urllib.error, urllib.parse
 		ip = str(urllib.request.urlopen('http://31.25.101.129/rgg_ip.php').read(), "UTF-8")
-		
+
 		with open(os.path.join("data", "2of12inf.txt"), "rt") as f:
 			dat = f.readlines()
 			ipdat = ip.split(".")
 			vals = ((int(ipdat[0])*256+int(ipdat[1])),(int(ipdat[2])*256+int(ipdat[3])))
 			wordresult = " ".join((dat[vals[0]][:-1], dat[vals[1]][:-1]))
-			
+
 		self.checkIPLabel.setText(ip)
 		self.wordIPLabel.setText(wordresult)
-	
+
 	def dump(self):
 		return dict(username=self.cleanData['username'],
 					port=str(self.cleanData['port']))
-		
+
 	def clean(self):
 		"""Check for errors and return well-formatted data."""
 		self.cleanData = self._interpretFields(self.fields)
 		return self.cleanData
-	
+
 	def save(self):
 		"""Make a new map and return it."""
 		assert(self.cleanData)
@@ -695,20 +695,20 @@ class hostDialog(dialog):
 			pass
 		return ConnectionData(localHost(), self.cleanData['port'],
 			self.cleanData['username'], self.cleanData['password'])
-	
+
 class joinDialog(dialog):
 	"""A dialog used to specify parameters to game joining."""
-	
+
 	def __init__(self, **kwargs):
 		"""Initializes the dialog data."""
 		super(joinDialog, self).__init__()
 		self.fields = self._createFields(kwargs)
-	
+
 	def _createFields(self, data):
 		"""Create the fields used by this dialog."""
-		
+
 		self.fieldtemp = [localHost(), 6812, translate('joinDialog', 'Anonymous')]
-		
+
 		try:
 			js = jsonload(os.path.join(SAVE_DIR, "net_settings.rgs"))
 			self.fieldtemp[0] = loadString('joinDialog.host', js.get('host'))
@@ -716,7 +716,7 @@ class joinDialog(dialog):
 			self.fieldtemp[2] = loadString('joinDialog.username', js.get('username'))
 		except:
 			pass
-		
+
 		return dict(
 			username=stringField(translate('joinDialog', 'Username'),
 				value=data.get('username', self.fieldtemp[2])),
@@ -728,32 +728,32 @@ class joinDialog(dialog):
 				translate('joinDialog', 'Password'),
 				value=data.get('password', ''),
 				allowEmpty=True))
-	
+
 	def _interpretFields(self, fields):
 		"""Interpret the fields into a dictionary of clean items."""
 		return dict((key, field.clean()) for key, field in list(fields.items()))
-	
+
 	def exec_(self, parent, accept):
 		"""Executes this dialog as modal, ensuring OK is only hit with valid data.
-		
+
 		parent -- the parent object of this dialog
 		accept() -- Acceptance function;
 			return True to accept data, False to continue (you should show an error)
-		
+
 		returns: True if the OK button is hit and the acceptance function passes.
-		
+
 		"""
-		
+
 		widget = QDialog(parent)
-		
+
 		# Buttons
 		okayButton = QPushButton(translate('joinDialog', "Join"))
 		okayButton.setDefault(True)
 		cancelButton = QPushButton(translate('joinDialog', "Cancel"))
-		
+
 		warningLabel1 = QLabel(translate('joinDialog', "Warning: open maps or other session"))
 		warningLabel2 = QLabel(translate('joinDialog', "data will be replaced upon joining."))
-		
+
 		# Add fields
 		formLayout = QFormLayout()
 		for id in ('host', 'port', 'username', 'password'):
@@ -761,36 +761,36 @@ class joinDialog(dialog):
 			formLayout.addRow(
 				translate('joinDialog', '{0}: ', 'Row layout').format(field.name),
 				field.widget(widget))
-		
+
 		# Add buttons
 		theLesserOrFalseBox = QBoxLayout(0)
 		theLesserOrFalseBox.addWidget(okayButton)
 		theLesserOrFalseBox.addWidget(cancelButton)
-		
+
 		# Position both
 		grandBox = QBoxLayout(2)
 		grandBox.addLayout(formLayout)
 		grandBox.addLayout(theLesserOrFalseBox)
 		grandBox.addWidget(warningLabel1)
 		grandBox.addWidget(warningLabel2)
-		
+
 		# Set up the widget
 		widget.setLayout(grandBox)
 		widget.setModal(True)
 		widget.setWindowTitle(translate('joinDialog', "Join Game"))
-		
+
 		# Allow user to specify validation
 		def okayPressed():
 			if accept():
 				widget.accept()
-		
+
 		# Signals
 		okayButton.clicked.connect(okayPressed)
 		cancelButton.clicked.connect(widget.reject)
-		
+
 		# Show to user
 		return (widget.exec_() == QDialog.Accepted)
-		
+
 	def clean(self):
 		"""Check for errors and return well-formatted data."""
 		self.cleanData = self._interpretFields(self.fields)
@@ -803,12 +803,12 @@ class joinDialog(dialog):
 				ipextract = str(".".join((str(wordindex[0]//256), str(wordindex[0]%256), str(wordindex[1]//256), str(wordindex[1]%256))))
 				self.cleanData['host'] = ipextract
 		return self.cleanData
-	
+
 	def dump(self):
 		return dict(host=self.cleanData['host'],
 					port=str(self.cleanData['port']),
 					username=str(self.cleanData['username']))
-	
+
 	def save(self):
 		"""Make a new map and return it."""
 		assert(self.cleanData)
@@ -818,7 +818,7 @@ class joinDialog(dialog):
 			pass
 		return ConnectionData(self.cleanData['host'], self.cleanData['port'],
 			self.cleanData['username'], self.cleanData['password'])
-	
+
 class PortraitFileSystemModel(QFileSystemModel):
 
 	def __init__(self):
@@ -827,7 +827,7 @@ class PortraitFileSystemModel(QFileSystemModel):
 		self.setNameFilters(IMAGE_NAME_FILTER)
 		self.setNameFilterDisables(False)
 		self.absRoot = os.path.abspath(str(PORTRAIT_DIR))
-		
+
 	def data(self, index, role):
 		basedata = QFileSystemModel.data(self, index, role)
 		if role == 1 and os.path.isfile(self.filePath(index)):
@@ -842,18 +842,18 @@ class PortraitTreeView(QTreeView):
 	def selectionChanged(self, selected, deselected):
 		super(QTreeView, self).selectionChanged(selected, deselected)
 		self.call.changePort(selected)
-		
+
 class newCharacterDialog(dialog):
 	"""A dialog used to create a new character for in-character chat."""
-	
+
 	def __init__(self, **kwargs):
 		"""Initializes the dialog data."""
 		super(newCharacterDialog, self).__init__()
 		self.fields = self._createFields(kwargs)
-	
+
 	def _createFields(self, data):
 		"""Create the fields used by this dialog."""
-		
+
 		return dict(
 			listid=stringField(
 				translate('newCharacterDialog', 'List ID'),
@@ -864,24 +864,24 @@ class newCharacterDialog(dialog):
 			portrait=stringField(
 				translate('newCharacterDialog', 'Portrait'),
 				value=data.get('portrait', translate('newCharacterDialog', ' '))))
-	
+
 	def _interpretFields(self, fields):
 		"""Interpret the fields into a dictionary of clean items."""
 		return dict((key, field.clean()) for key, field in list(fields.items()))
-	
+
 	def exec_(self, parent, accept):
 		"""Executes this dialog as modal, ensuring OK is only hit with valid data.
-		
+
 		parent -- the parent object of this dialog
 		accept() -- Acceptance function;
 			return True to accept data, False to continue (you should show an error)
-		
+
 		returns: True if the OK button is hit and the acceptance function passes.
-		
+
 		"""
-		
+
 		widget = QDialog(parent)
-		
+
 		# Buttons
 		okayButton = QPushButton(translate('newCharacterDialog', "Create"))
 		okayButton.setDefault(True)
@@ -896,7 +896,7 @@ class newCharacterDialog(dialog):
 		self.portraitArea.setColumnHidden(2, True)
 		self.portraitArea.setColumnHidden(3, True)
 		self.portraitPreview = QLabel(" ")
-		
+
 		# Add fields
 		formLayout = QFormLayout()
 		for id in ('listid', 'charactername', 'portrait'):
@@ -904,47 +904,47 @@ class newCharacterDialog(dialog):
 			formLayout.addRow(
 				translate('newCharacterDialog', '{0}: ', 'Row layout').format(field.name),
 				field.widget(widget))
-		
+
 		# Add buttons
 		theLesserOrFalseBox = QBoxLayout(0)
 		theLesserOrFalseBox.addWidget(okayButton)
 		theLesserOrFalseBox.addWidget(cancelButton)
-		
+
 		# Position both
 		grandBox = QBoxLayout(2)
 		grandBox.addLayout(formLayout)
 		grandBox.addWidget(self.portraitPreview)
 		grandBox.addLayout(theLesserOrFalseBox)
-		
+
 		evilBox = QBoxLayout(0)
 		evilBox.addWidget(self.portraitArea)
 		evilBox.addLayout(grandBox)
-		
+
 		#self.portraitArea.pressed.connect(self.changePort)
-		
+
 		# Set up the widget
 		widget.setLayout(evilBox)
 		widget.setModal(True)
 		widget.setWindowTitle(translate('newCharacterDialog', "Create Character"))
-		
+
 		# Allow user to specify validation
 		def okayPressed():
 			if accept():
 				widget.accept()
-		
+
 		# Signals
 		okayButton.clicked.connect(okayPressed)
 		cancelButton.clicked.connect(widget.reject)
-		
+
 		#portraits = findFiles(PORTRAIT_DIR, IMAGE_EXTENSIONS)
 		#portraits.sort(cmp=lambda x,y: cmp(x.lower(), y.lower()))
 		#for greatJustice in portraits:
-		#    icon = QIcon(os.path.join(PORTRAIT_DIR, greatJustice))
-		#    self.portraitArea.addItem(QListWidgetItem(icon, greatJustice))
-		
+		#	icon = QIcon(os.path.join(PORTRAIT_DIR, greatJustice))
+		#	self.portraitArea.addItem(QListWidgetItem(icon, greatJustice))
+
 		# Show to user
 		return (widget.exec_() == QDialog.Accepted)
-	
+
 	def changePort(self, selection):
 		for i in selection.indexes():
 			portrait = i
@@ -957,30 +957,30 @@ class newCharacterDialog(dialog):
 			return
 		preview = preview.scaled(min(preview.width(), 64), min(preview.height(), 64))
 		self.portraitPreview.setPixmap(preview)
-		
+
 	def clean(self):
 		"""Check for errors and return well-formatted data."""
 		self.cleanData = self._interpretFields(self.fields)
 		return self.cleanData
-	
+
 	def save(self):
 		"""Make a new character and return it."""
 		assert(self.cleanData)
-		return([self.cleanData['listid'], 
-				self.cleanData['charactername'], 
+		return([self.cleanData['listid'],
+				self.cleanData['charactername'],
 				self.cleanData['portrait']])
 
 class gfxSettingsDialog(dialog):
 	"""A dialog used to set graphics options."""
-	
+
 	def __init__(self, **kwargs):
 		"""Initializes the dialog data."""
 		super(gfxSettingsDialog, self).__init__()
 		self.fields = self._createFields(kwargs)
-	
+
 	def _createFields(self, data):
 		"""Create the fields used by this dialog."""
-		
+
 		self.fields = {}
 
 		try:
@@ -991,7 +991,7 @@ class gfxSettingsDialog(dialog):
 				self.fields[field] = loadString(GFX_PREFIX + field, js.get(field))
 		except IOError as e:
 			print("Graphics settings file could not be loaded: %s" % e)
-			self.fields = {ANI_FILTER_STRING:1.0, MIN_FILTER_STRING:"GL_NEAREST", MAG_FILTER_STRING:"GL_NEAREST", 
+			self.fields = {ANI_FILTER_STRING:1.0, MIN_FILTER_STRING:"GL_NEAREST", MAG_FILTER_STRING:"GL_NEAREST",
 							MIPMIN_FILTER_STRING:"GL_NEAREST_MIPMAP_NEAREST", FSAA_SETTING_STRING:1, VBO_SETTING_STRING:1}
 
 		return dict(
@@ -1007,67 +1007,67 @@ class gfxSettingsDialog(dialog):
 				value=data.get(FSAA_SETTING_STRING, self.fields[FSAA_SETTING_STRING])),
 			VBO=dropDownField(translate('gfxSettingsDialog', VBO_SETTING_STRING), ON_OFF_OPTIONS,
 				value=data.get(VBO_SETTING_STRING, self.fields[VBO_SETTING_STRING])))
-	
+
 	def _interpretFields(self, fields):
 		"""Interpret the fields into a dictionary of clean items."""
 		return dict((key, field.clean()) for key, field in list(fields.items()))
-	
+
 	def exec_(self, parent, accept):
 		"""Executes this dialog as modal, ensuring OK is only hit with valid data.
-		
+
 		parent -- the parent object of this dialog
 		accept() -- Acceptance function;
 			return True to accept data, False to continue (you should show an error)
-		
+
 		returns: True if the OK button is hit and the acceptance function passes.
-		
+
 		"""
-		
+
 		widget = QDialog(parent)
-		
+
 		# Buttons
 		okayButton = QPushButton(translate('gfxSettingsDialog', "Save"))
 		okayButton.setDefault(True)
 		cancelButton = QPushButton(translate('gfxSettingsDialog', "Cancel"))
-		
+
 		# Add fields
 		formLayout = QFormLayout()
 		for id in (ANI_FILTER_STRING, MIN_FILTER_STRING, MAG_FILTER_STRING, MIPMIN_FILTER_STRING, FSAA_SETTING_STRING, VBO_SETTING_STRING):
 			field = self.fields[id]
 			formLayout.addRow(translate('gfxSettingsDialog', '{0}: ', 'Row layout').format(field.name), field.widget(widget))
-		
+
 		# Add buttons
 		theLesserOrFalseBox = QBoxLayout(0)
 		theLesserOrFalseBox.addWidget(okayButton)
 		theLesserOrFalseBox.addWidget(cancelButton)
-		
+
 		# Position both
 		grandBox = QBoxLayout(2)
 		grandBox.addLayout(formLayout)
 		grandBox.addLayout(theLesserOrFalseBox)
-		
+
 		# Set up the widget
 		widget.setLayout(grandBox)
 		widget.setModal(True)
 		widget.setWindowTitle(translate('gfxSettingsDialog', "Configure Graphics"))
-		
+
 		# Allow user to specify validation
 		def okayPressed():
 			if accept():
 				widget.accept()
-		
+
 		# Signals
 		okayButton.clicked.connect(okayPressed)
 		cancelButton.clicked.connect(widget.reject)
-		
+
 		# Show to user
 		return (widget.exec_() == QDialog.Accepted)
-		
+
 	def clean(self):
 		"""Check for errors and return well-formatted data."""
 		self.cleanData = self._interpretFields(self.fields)
 		return self.cleanData
-	
+
 	def save(self):
 		"""Make a new map and return it."""
 		assert(self.cleanData)

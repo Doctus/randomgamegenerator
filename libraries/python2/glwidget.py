@@ -53,7 +53,7 @@ class GLWidget(QGLWidget):
 	mouseMoveSignal = pyqtSignal(int, int) #x, y
 	keyPressSignal = pyqtSignal(int) #key
 	keyReleaseSignal = pyqtSignal(int) #key
-	
+
 	def __init__(self, parent):
 		QGLWidget.__init__(self, parent)
 
@@ -83,7 +83,7 @@ class GLWidget(QGLWidget):
 		self.textid = 0
 		self.vertByteCount = ADT.arrayByteCount(numpy.zeros((8, 2), 'f'))
 		self.logoon = "Off"
-		
+
 		self.setAcceptDrops(True)
 
 		try:
@@ -189,27 +189,27 @@ class GLWidget(QGLWidget):
 			for t in split:
 				if len(t) == 0:
 					continue
-				
+
 				self.renderText(float(text[2][0]), float(text[2][1])+pos, 0, t)
 				pos += 16
 
 		glPopMatrix()
-		
+
 	def addSelectionCircle(self, splasifarcity, x, y, radius):
 		if not splasifarcity in self.selectionCircles:
 			self.selectionCircles[splasifarcity] = []
-			
+
 		self.selectionCircles[splasifarcity].append((float(x), float(y), float(radius)))
-		
+
 	def clearSelectionCircles(self):
 		self.selectionCircles.clear()
-		
+
 	def addLine(self, thickness, x, y, w, h, r, g, b):
 		if not thickness in self.lines:
 			self.lines[thickness] = []
-			
+
 		self.lines[thickness].append((float(x), float(y), float(w), float(h), float(r), float(g), float(b)))
-		
+
 	def deleteLine(self, thickness, x, y, w, h):
 		for thickness in self.lines:
 			new_list = []
@@ -218,26 +218,26 @@ class GLWidget(QGLWidget):
 					   and not self.pointIntersectRect((line[2], line[3]), (x, y, w, h)):
 				   new_list.append(line)
 			self.lines[thickness] = new_list
-			
+
 	def addPreviewLine(self, thickness, x, y, w, h, r, g, b):
 		if not thickness in self.previewLines:
 			self.previewLines[thickness] = []
-			
+
 		self.previewLines[thickness].append((float(x), float(y), float(w), float(h), float(r), float(g), float(b)))
-						
+
 	def clearLines(self):
 		self.lines.clear()
-		
+
 	def clearPreviewLines(self):
 		self.previewLines.clear()
-		
+
 	def addRectangle(self, x, y, w, h, r, g, b):
 		self.rectangles[1].append((float(x), float(y), float(w), float(h), float(r), float(g), float(b)))
-		
+
 	def clearRectangles(self):
 		self.rectangles = {1:[]}
-					
-	def pointIntersectRect(self, point, rect): 
+
+	def pointIntersectRect(self, point, rect):
 	#point: (x, y)
 	#rect:  (x, y, w, h)
 		if point[0] < rect[0] or point[0] > rect[0] + rect[2]:
@@ -248,7 +248,7 @@ class GLWidget(QGLWidget):
 
 	def resizeGL(self, w, h):
 		'''
-		Resize the GL window 
+		Resize the GL window
 		'''
 
 		glViewport(0, 0, w, h)
@@ -302,12 +302,12 @@ class GLWidget(QGLWidget):
 		except:
 			print "no settings detected"
 			pass
-		
+
 		try:
 			self.fieldtemp[6] = loadString('gfx.magic', js.get('Magic'))
 		except:
 			pass
-		
+
 		if self.fieldtemp[6] == "More Magic":
 			try: glEnable(GL_MULTISAMPLE) #Supposed to fail
 			except: pass
@@ -432,7 +432,7 @@ class GLWidget(QGLWidget):
 				for x in [0, 1, 2, 3]:
 					f_code = sys._getframe(x).f_code #really bad hack to get the filename and number
 					print "Doing it wrong in " + f_code.co_filename + ":" + str(f_code.co_firstlineno)
-			
+
 			print "created texture", texture
 
 			glBindTexture(self.texext, texture)
@@ -449,7 +449,7 @@ class GLWidget(QGLWidget):
 			else:
 				glTexParameteri(self.texext, GL_TEXTURE_MIN_FILTER, self.minfilter)
 				glTexParameteri(self.texext, GL_TEXTURE_MAG_FILTER, self.magfilter)
-			
+
 			glTexParameteri(self.texext, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
 			glTexParameteri(self.texext, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE)
 			glTexParameteri(self.texext, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
@@ -461,7 +461,7 @@ class GLWidget(QGLWidget):
 			if self.npot == 3 and self.mipminfilter != -1:
 				glEnable(GL_TEXTURE_2D)
 				glGenerateMipmap(GL_TEXTURE_2D)
-			
+
 			self.qimages[qimagepath] = [qimg, texture, 1] #texture, reference count
 		else:
 			self.qimages[qimagepath][2] += 1
@@ -502,7 +502,7 @@ class GLWidget(QGLWidget):
 		size = len(self.allimgs)
 
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, self.VBO)
-		
+
 		#print self.offset, (self.VBOBuffer*self.vertByteCount)
 
 		if self.VBOBuffer <= size or image == None or self.offset + self.vertByteCount >= self.VBOBuffer*self.vertByteCount:
@@ -520,9 +520,9 @@ class GLWidget(QGLWidget):
 
 				glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, self.offset, self.vertByteCount, VBOData)
 				self.offset += self.vertByteCount
-			
+
 			self.calculateVBOList()
-			
+
 			glBindBuffer(GL_ARRAY_BUFFER_ARB, 0)
 			return True
 
@@ -604,7 +604,7 @@ class GLWidget(QGLWidget):
 		'''
 
 		glBindTexture(self.texext, texture)
-		
+
 		glPushMatrix()
 		glTranslatef(dx+dw/2, dy+dh/2, 0)
 		glRotatef(r, 0, 0, 1.0)
@@ -627,9 +627,9 @@ class GLWidget(QGLWidget):
 		glTexCoord2f(x, y)
 		glVertex3f(dx, (dy+dh), 0)
 		glEnd()
-		
+
 		glPopMatrix()
-		
+
 	def calculateVBOList(self, image = None, delete = False):
 		'''
 		Create the VBO list to be passed on to the module for drawing
@@ -677,7 +677,7 @@ class GLWidget(QGLWidget):
 		'''
 		if self.vbos:
 			self.calculateVBOList(image, hide)
-			
+
 	def setLayer(self, image, newLayer):
 		'''
 		This function should only be called from image.py
@@ -699,7 +699,7 @@ class GLWidget(QGLWidget):
 
 		if self.vbos:
 			self.calculateVBOList(image)
-			
+
 	def getImageSize(self, image):
 		qimg = None
 
@@ -709,18 +709,18 @@ class GLWidget(QGLWidget):
 			qimg = QImage(image)
 
 		return qimg.size()
-		
+
 	def addText(self, text, pos):
 		self.texts.append([self.textid, text, pos])
 		self.textid += 1
 		return self.textid - 1
-		
+
 	def removeText(self, id):
 		for i, t in enumerate(self.texts):
 			if t[0] == id:
 				self.texts.pop(i)
 				return
-			
+
 	def setTextPos(self, id, pos):
 		for t in self.texts:
 			if t[0] == id:
@@ -728,12 +728,12 @@ class GLWidget(QGLWidget):
 
 	def mouseMoveEvent(self, mouse):
 		self.mouseMoveSignal.emit(mouse.pos().x(), mouse.pos().y())
-		
+
 		mouse.accept()
 
 	def mousePressEvent(self, mouse):
 		button = 0
-		
+
 		if self.ctrl:
 			print "ctrl pressed1"
 			button += 3
@@ -749,10 +749,10 @@ class GLWidget(QGLWidget):
 		self.mousePressSignal.emit(mouse.pos().x(), mouse.pos().y(), button)
 
 		mouse.accept()
-		
+
 	def mouseReleaseEvent(self, mouse):
 		button = 0
-		
+
 		if self.ctrl:
 			button += 3
 		if self.shift:
@@ -793,7 +793,7 @@ class GLWidget(QGLWidget):
 			self.camera[0] -= (50 * self.zoom)
 		else:
 			self.keyPressSignal.emit(event.key())
-			
+
 	def keyReleaseEvent(self, event):
 		if event.key() == Qt.Key_Control:
 			self.ctrl = False
@@ -826,11 +826,11 @@ class GLWidget(QGLWidget):
 
 
 		mouse.accept()
-		
+
 	def leaveEvent(self, event):
 		self.ctrl = False
 		self.shift = False
-		
+
 	def dragEnterEvent(self, event):
 		if event.mimeData().hasImage():
 			event.acceptProposedAction()
@@ -847,7 +847,7 @@ class GLWidget(QGLWidget):
 			event.acceptProposedAction()
 		elif event.mimeData().hasText():
 			self.pogPlace.emit(event.pos().x(), event.pos().y(), unicode(event.mimeData().text()))
-			
+
 	pogPlace = signal(int, int, basestring, doc=
 		"""Called to request pog placement on the map."""
 	)

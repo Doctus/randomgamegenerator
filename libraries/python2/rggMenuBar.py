@@ -1,5 +1,5 @@
 '''
-rggMenuBar - for the Random Game Generator project            
+rggMenuBar - for the Random Game Generator project
 By Doctus (kirikayuumura.noir@gmail.com)
 
 Menu bar and menu items.
@@ -34,71 +34,71 @@ ICON_DELETE = 3
 
 class menuBar(object):
 	"""An object representing the menu bar."""
-	
+
 	def __init__(self, mapExistenceCheck=None, pogExistenceCheck=None, charExistenceCheck=None):
-		
+
 		main = mainWindow
-		
+
 		self.menubar = main.menuBar()
-		
+
 		self.mapExistenceCheck = mapExistenceCheck
 		self.pogExistenceCheck = pogExistenceCheck
 		self.charExistenceCheck = charExistenceCheck
-		
+
 		# ACTIONS
-		
+
 		self.newMapAct = QtGui.QAction(translate("menubar", "&New Map..."), main)
 		self.newMapAct.setShortcut("Ctrl+N")
-		
+
 		self.loadMapAct = QtGui.QAction(translate("menubar", "Load Map..."), main)
 		#self.loadMapAct.setShortcut("Ctrl+L")
-		
+
 		self.saveMapAct = QtGui.QAction(translate("menubar", "Save Map As..."), main)
 		#self.saveMapAct.setShortcut("Ctrl+S")
-		
+
 		self.closeSpecificMapAct = QtGui.QAction(translate("menubar", "Close Map"), main)
-		
+
 		self.closeMapAct = QtGui.QAction(translate("menubar", "&Close All Maps"), main)
 		self.closeMapAct.setShortcut("Ctrl+Shift+W")
-		
+
 		self.loadSessAct = QtGui.QAction(translate("menubar", "&Load Session..."), main)
 		self.loadSessAct.setShortcut("Ctrl+L")
-		
+
 		self.saveSessAct = QtGui.QAction(translate("menubar", "&Save Session As..."), main)
 		self.saveSessAct.setShortcut("Ctrl+S")
-		
+
 		self.clearSessAct = QtGui.QAction(translate("menubar", "Clear Session"), main)
-		
+
 		self.deletePogsAct = QtGui.QAction(translate("menubar", "Delete All Pogs"), main)
-		
+
 		self.saveCharsAct = QtGui.QAction(translate("menubar", "Save IC Characters As..."), main)
-		
+
 		self.loadCharsAct = QtGui.QAction(translate("menubar", "Load IC Characters..."), main)
 
 		self.gfxSettingsAct = QtGui.QAction(translate("menubar", "Configure Graphics..."), main)
-		
+
 		self.drawTimerSettingsAct = QtGui.QAction(translate("menubar", "Configure FPS..."), main)
-		
+
 		self.hostGameAct = QtGui.QAction(translate("menubar", "&Host Game..."), main)
 		self.hostGameAct.setShortcut("Ctrl+H")
 
 		self.joinGameAct = QtGui.QAction(translate("menubar", "&Join Game..."), main)
 		self.joinGameAct.setShortcut("Ctrl+J")
-		
+
 		self.disconnectAct = QtGui.QAction(translate("menubar", "&Disconnect"), main)
 		self.disconnectAct.setShortcut("Ctrl+D")
-		
+
 		self.sendFileAct = QtGui.QAction(translate("menubar", "Send file..."), main)
-		
+
 		self.createSurveyAct = QtGui.QAction(translate("menubar", "Create Survey..."), main)
-		
+
 		self.aboutAct = QtGui.QAction(translate("menubar", "&About"), main)
 		self.aboutAct.setShortcut("Ctrl+A")
 
 		self.thicknessOneAct = QtGui.QAction(translate("menubar", "&One"), main)
 		self.thicknessTwoAct = QtGui.QAction(translate("menubar", "&Two"), main)
 		self.thicknessThreeAct = QtGui.QAction(translate("menubar", "&Three"), main)
-		
+
 		self.toggleAlertsAct = QtGui.QAction(translate("menubar", "Chat Username Notify"), main)
 		self.toggleAlertsAct.setCheckable(True)
 		self.toggleAlertsAct.setChecked(True)
@@ -115,13 +115,13 @@ class menuBar(object):
 			pass
 
 		self.setTimestampFormatAct = QtGui.QAction(translate("menubar", "Set Timestamp Format..."), main)
-		
+
 		self.portraitMenu = QtGui.QAction(translate("menubar", "Set IC Portrait Size..."), main)
-		
+
 		self.selectIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-select-icon.png"), "Select Tool", main)
 		self.selectIcon.setShortcut("Ctrl+T")
 		self.selectIcon.setToolTip("Select Tool (Ctrl+T)")
-		
+
 		self.moveIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-move-icon.png"), "Move Tool", main)
 		self.moveIcon.setShortcut("Ctrl+M")
 		self.moveIcon.setToolTip("Move Tool (Ctrl+M)")
@@ -135,7 +135,7 @@ class menuBar(object):
 		self.deleteIcon.setToolTip("Delete Tool (Ctrl+R)")
 
 		# MENUS
-		
+
 		fileMenu = QtGui.QMenu(translate("menubar", "&File"), main)
 		fileMenu.addAction(self.newMapAct)
 		fileMenu.addAction(self.loadMapAct)
@@ -152,11 +152,11 @@ class menuBar(object):
 		fileMenu.addAction(self.saveSessAct)
 		fileMenu.addAction(self.loadSessAct)
 		fileMenu.addAction(self.clearSessAct)
-		
+
 		self.mapExistsActs = [self.saveMapAct, self.closeSpecificMapAct, self.closeMapAct]
 		self.pogExistsActs = [self.deletePogsAct,]
 		self.characterExistsActs = [self.saveCharsAct,]
-		
+
 		internetMenu = QtGui.QMenu(translate("menubar", "&Internet"), main)
 		internetMenu.addAction(self.hostGameAct)
 		internetMenu.addAction(self.joinGameAct)
@@ -165,14 +165,14 @@ class menuBar(object):
 		internetMenu.addAction(self.sendFileAct)
 		internetMenu.addSeparator()
 		internetMenu.addAction(self.disconnectAct)
-		
+
 		self.connectedActs = [self.createSurveyAct, self.sendFileAct, self.disconnectAct]
 		self.disconnectedActs = [self.hostGameAct, self.joinGameAct]
 
 		self.thicknessMenu = QtGui.QMenu(translate("menubar", "&Thickness"), main)
 		for x in range(1, 11):
 			self.thicknessMenu.addAction(QtGui.QAction(str(x), main))
-		
+
 		self.colourMenu = QtGui.QMenu(translate("menubar", "&Colour"), main)
 		#Don't translate colour names yet
 		self.colourMenu.addAction(QtGui.QAction("White", main))
@@ -188,7 +188,7 @@ class menuBar(object):
 		drawMenu = QtGui.QMenu(translate("menubar", "&Draw"), main)
 		drawMenu.addMenu(self.thicknessMenu)
 		drawMenu.addMenu(self.colourMenu)
-		
+
 		self.stylesMenu = QtGui.QMenu(translate("menubar", "&Styles"), main)
 		for style in rggStyles.sheets.keys():
 			act = QtGui.QAction(style, main)
@@ -208,7 +208,7 @@ class menuBar(object):
 		deu = QtGui.QAction(translate("menubar", "German"), main)
 		deu.setIconText("German")
 		self.langMenu.addAction(deu)
-			
+
 		self.optionsMenu = QtGui.QMenu(translate("menubar", "&Options"), main)
 		self.optionsMenu.addMenu(self.langMenu)
 		self.optionsMenu.addMenu(self.stylesMenu)
@@ -219,10 +219,10 @@ class menuBar(object):
 		self.optionsMenu.addAction(self.portraitMenu)
 		self.optionsMenu.addAction(self.gfxSettingsAct)
 		self.optionsMenu.addAction(self.drawTimerSettingsAct)
-		
-		
+
+
 		self.pluginsMenu = QtGui.QMenu(translate("menubar", "&Plugins"), main)
-		
+
 		self.pluginsModules = []
 		self.plugins = {}
 		sys.path.append(PLUGINS_DIR)
@@ -238,12 +238,12 @@ class menuBar(object):
 					pass
 		except Exception as e:
 			pass
-				
+
 		self.windowMenu = QtGui.QMenu(translate("menubar", "Window"), main)
-		
+
 		self.helpMenu = QtGui.QMenu(translate("menubar", "&Help"), main)
 		self.helpMenu.addAction(self.aboutAct)
-		
+
 		# MENUBAR
 
 		self.menubar.addMenu(fileMenu)
@@ -265,32 +265,32 @@ class menuBar(object):
 		self.menubar.addAction(self.deleteIcon)
 
 		# EVENTS
-		
+
 		self.selectIconClicked()
 		self.selectIcon.triggered.connect(self.selectIconClicked)
 		self.moveIcon.triggered.connect(self.moveIconClicked)
 		self.drawIcon.triggered.connect(self.drawIconClicked)
 		self.deleteIcon.triggered.connect(self.deleteIconClicked)
-		
+
 		self.pluginsMenu.triggered.connect(self.loadPlugin)
-		
+
 		fileMenu.aboutToShow.connect(self.updateFileMenu)
 		internetMenu.aboutToShow.connect(self.updateInternetMenu)
 		self.windowMenu.aboutToShow.connect(self.updateWidgetMenu)
-		
+
 		self.aboutAct.triggered.connect(self.about)
-		
+
 	def resetIcons(self):
 		self.selectIcon.setIcon(QtGui.QIcon("./data/FAD-select-icon.png"))
 		self.moveIcon.setIcon(QtGui.QIcon("./data/FAD-move-icon.png"))
 		self.drawIcon.setIcon(QtGui.QIcon("./data/FAD-freehand-icon.png"))
 		self.deleteIcon.setIcon(QtGui.QIcon("./data/FAD-eraser-icon.png"))
-	
+
 	def selectIconClicked(self):
 		self.resetIcons()
 		self.selectIcon.setIcon(QtGui.QIcon("./data/FAD-select-icon-selected.png"))
 		self.selectedIcon = ICON_SELECT
-	
+
 	def moveIconClicked(self):
 		self.resetIcons()
 		self.moveIcon.setIcon(QtGui.QIcon("./data/FAD-move-icon-selected.png"))
@@ -305,23 +305,23 @@ class menuBar(object):
 		self.resetIcons()
 		self.deleteIcon.setIcon(QtGui.QIcon("./data/FAD-eraser-icon-selected.png"))
 		self.selectedIcon = ICON_DELETE
-		
+
 	def loadPlugin(self, act):
 		exec("from " + (self.plugins[unicode(act.text())]) + " import " + (self.plugins[unicode(act.text())]))
 		exec(self.plugins[unicode(act.text())] + ".hajimaru(mainWindow)")
 		self.pluginsMenu.removeAction(act)
 		if len(self.pluginsMenu.actions()) == 0:
 			self.pluginhide.setVisible(False)
-	
+
 	def changeStyle(self, styleName):
 		mainWindow.setStyleSheet(rggStyles.sheets[styleName][0])
 		jsonappend({'style':styleName}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
-		
+
 	def updateWidgetMenu(self):
 		self.windowMenu.clear()
 		for action in mainWindow.createPopupMenu().actions():
 			self.windowMenu.addAction(action)
-			
+
 	def updateFileMenu(self):
 		for act in self.mapExistsActs:
 			act.setEnabled(self.mapExistenceCheck())
@@ -329,13 +329,13 @@ class menuBar(object):
 			act.setEnabled(self.pogExistenceCheck())
 		for act in self.characterExistsActs:
 			act.setEnabled(self.charExistenceCheck())
-			
+
 	def updateInternetMenu(self):
 		for act in self.connectedActs:
 			act.setEnabled(client.isConnected)
 		for act in self.disconnectedActs:
 			act.setEnabled(not client.isConnected)
-			
+
 	def about(self):
 		msg = QtGui.QMessageBox(mainWindow)
 		if DEV:

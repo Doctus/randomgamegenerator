@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
 
 		self.glwidget = GLWidget(self)
 		self.setCentralWidget(self.glwidget)
-		
+
 		self.drawTimer = QTimer()
 		self.drawTimer.timeout.connect(self.drawTimerTimeout)
 		try:
@@ -40,14 +40,14 @@ class MainWindow(QMainWindow):
 			self.drawTimer.start(drawtimer)
 		except:
 			self.drawTimer.start(20)
-		
+
 	def readGeometry(self):
 		settings = QSettings("AttercopProductions", "RGG")
 		settings.beginGroup("MainWindow")
 		self.restoreGeometry(settings.value("geometry").toByteArray())
 		self.restoreState(settings.value("windowState").toByteArray())
 		settings.endGroup()
-		
+
 	def closeEvent(self, event):
 		settings = QSettings("AttercopProductions", "RGG")
 		settings.beginGroup("MainWindow")
@@ -55,6 +55,6 @@ class MainWindow(QMainWindow):
 		settings.setValue("windowState", self.saveState())
 		settings.endGroup()
 		QMainWindow.closeEvent(self, event)
-		
+
 	def drawTimerTimeout(self):
 		self.glwidget.updateGL()

@@ -28,7 +28,7 @@ generators = {}
 try:
 	for file in os.listdir(GENERATOR_DIR):
 		if ".py" in file and "__init__" not in file and ".pyc" not in file:
-			#This is kind of bad, but since we have to use the "from generators" 
+			#This is kind of bad, but since we have to use the "from generators"
 			#syntax I don't know a cleaner way to do this.
 			exec("from generators import "+file[:-3])
 			exec("generators[file[:-3]] = "+file[:-3]+".getName")
@@ -36,22 +36,22 @@ except Exception as e:
 	pass
 
 def getName(generator, args):
-    '''Return a random name by passing generator args.'''
-    if generator == "keys":
-        return ", ".join(list(generators.keys()))
-    elif generator == "help":
-        if not args:
-            return "Type '/generate help NAMETYPE' for more information on a specific generator. Available generators: " + ", ".join(list(generators.keys()))
-        try:
-            return generators[args]("help")
-        except KeyError:
-            return "Key Error: no generator named " + str(args) + ". For a list of available generators, see /generate keys."
-    elif generator == "kaijyuu":
-        result = []
-        for x in range(0, random.choice((3, 4, 5))):
-            result.append(getName(random.choice(KAIJYUUKEYS), "exalted full"))
-        return " ".join(result)
-    try:
-        return generators[generator](args)
-    except KeyError:
-        return "Key Error: no generator named " + str(generator) + ". For a list of available generators, see /generate keys."
+	'''Return a random name by passing generator args.'''
+	if generator == "keys":
+		return ", ".join(list(generators.keys()))
+	elif generator == "help":
+		if not args:
+			return "Type '/generate help NAMETYPE' for more information on a specific generator. Available generators: " + ", ".join(list(generators.keys()))
+		try:
+			return generators[args]("help")
+		except KeyError:
+			return "Key Error: no generator named " + str(args) + ". For a list of available generators, see /generate keys."
+	elif generator == "kaijyuu":
+		result = []
+		for x in range(0, random.choice((3, 4, 5))):
+			result.append(getName(random.choice(KAIJYUUKEYS), "exalted full"))
+		return " ".join(result)
+	try:
+		return generators[generator](args)
+	except KeyError:
+		return "Key Error: no generator named " + str(generator) + ". For a list of available generators, see /generate keys."

@@ -1,5 +1,5 @@
 '''
-rggRemote - for the Random Game Generator project            
+rggRemote - for the Random Game Generator project
 By Doctus (kirikayuumura.noir@gmail.com)
 
 Remote views.
@@ -29,274 +29,274 @@ from .rggConstants import *
 
 @serverRPC
 def respondError(message, *args, **kwargs):
-    """Responds as an error message.
-    
-    message -- the error message to send
-        should be fake translated so it is
-        done on the client instead of the server.
-    
-    Extra arguments are passed to format the translated string.
-    
-    """
-    say(translate('error', message).format(*args, **kwargs))
+	"""Responds as an error message.
+
+	message -- the error message to send
+		should be fake translated so it is
+		done on the client instead of the server.
+
+	Extra arguments are passed to format the translated string.
+
+	"""
+	say(translate('error', message).format(*args, **kwargs))
 
 @serverRPC
 def respondDice(username, message):
-    say(translate('remote', '{sayText}').format(
-        sayText=message))
-    ICSay(translate('remote', '{sayText}').format(                                                       
-        sayText=message))
-        
+	say(translate('remote', '{sayText}').format(
+		sayText=message))
+	ICSay(translate('remote', '{sayText}').format(
+		sayText=message))
+
 @clientRPC
 def sendDice(user, message):
-    respondDice(allusers(), user.username, message)
+	respondDice(allusers(), user.username, message)
 
 @serverRPC
 def respondSay(username, message):
-    say(translate('remote', '{name}: {sayText}').format(
-        name=linkedName(username),
-        sayText=message))
+	say(translate('remote', '{name}: {sayText}').format(
+		name=linkedName(username),
+		sayText=message))
 
 @clientRPC
 def sendSay(user, message):
-    respondSay(allusers(), user.username, message)
-    
+	respondSay(allusers(), user.username, message)
+
 @serverRPC
 def respondICSay(chname, message, portrait):
-    if len(portrait) > 1:
-        portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
-        IAMTHEDOOMPHANTOM = rggResource.crm.translateFile(makePortableFilename(os.path.join(PORTRAIT_DIR, portrait)), rggResource.RESOURCE_IMAGE)
-        #^ Don't remember whether this is still needed for transfer etc.
-        ICSay(translate('remote', '<table><tr><td><img src="{port}" width="{size}" height="{size}"></td><td>{name}: {sayText}</td></tr></table><br />').format(
-            port=portfile,
-            size=getPortraitSize(),
-            name=linkedName(chname),
-            sayText=message))
-    else:
-        ICSay(translate('remote', '{name}: {sayText}</p>').format(                                                       
-        name=linkedName(chname),
-        sayText=message))
+	if len(portrait) > 1:
+		portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
+		IAMTHEDOOMPHANTOM = rggResource.crm.translateFile(makePortableFilename(os.path.join(PORTRAIT_DIR, portrait)), rggResource.RESOURCE_IMAGE)
+		#^ Don't remember whether this is still needed for transfer etc.
+		ICSay(translate('remote', '<table><tr><td><img src="{port}" width="{size}" height="{size}"></td><td>{name}: {sayText}</td></tr></table><br />').format(
+			port=portfile,
+			size=getPortraitSize(),
+			name=linkedName(chname),
+			sayText=message))
+	else:
+		ICSay(translate('remote', '{name}: {sayText}</p>').format(
+		name=linkedName(chname),
+		sayText=message))
 
 @clientRPC
 def sendICSay(user, message, chname, portrait):
-    rggResource.crm.listen(portrait, rggResource.RESOURCE_IMAGE, rggResource.crm, doNothing)
-    if len(portrait) > 1:
-        rggResource.srm.processFile(user, makePortableFilename(os.path.join(PORTRAIT_DIR, portrait)))
-    respondICSay(allusers(), chname, message, portrait)
-    
+	rggResource.crm.listen(portrait, rggResource.RESOURCE_IMAGE, rggResource.crm, doNothing)
+	if len(portrait) > 1:
+		rggResource.srm.processFile(user, makePortableFilename(os.path.join(PORTRAIT_DIR, portrait)))
+	respondICSay(allusers(), chname, message, portrait)
+
 def doNothing(blah, bleh, bloh):
-    pass
+	pass
 
 @serverRPC
 def respondEmote(username, message):
-    say(translate('remote', '<i>{name} {emote}</i>').format(
-        name=linkedName(username),
-        emote=message))
+	say(translate('remote', '<i>{name} {emote}</i>').format(
+		name=linkedName(username),
+		emote=message))
 
 @clientRPC
 def sendEmote(user, message):
-    respondEmote(allusers(), user.username, message)
+	respondEmote(allusers(), user.username, message)
 
 @serverRPC
 def respondICEmote(chname, message, portrait):
-    if len(portrait) > 1:
-        portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
-        ICSay(translate('remote', '<table><tr><td><img src="{port}" width="{size}" height="{size}"></td><td><i>{name} {emote}</i></td></tr></table><br />').format(
-            port=portfile, 
-            size=getPortraitSize(),            
-            name=linkedName(chname),
-            emote=message))
-    else:
-        ICSay(translate('remote', '<i>{name} {emote}</i>').format(                                                                    
-            name=linkedName(chname),
-            emote=message))
-        
+	if len(portrait) > 1:
+		portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
+		ICSay(translate('remote', '<table><tr><td><img src="{port}" width="{size}" height="{size}"></td><td><i>{name} {emote}</i></td></tr></table><br />').format(
+			port=portfile,
+			size=getPortraitSize(),
+			name=linkedName(chname),
+			emote=message))
+	else:
+		ICSay(translate('remote', '<i>{name} {emote}</i>').format(
+			name=linkedName(chname),
+			emote=message))
+
 
 @clientRPC
 def sendICEmote(user, message, chname, portrait):
-    if len(portrait) > 1:
-        rggResource.srm.processFile(user, makePortableFilename(os.path.join(PORTRAIT_DIR, portrait)))
-    respondICEmote(allusers(), chname, message, portrait)
+	if len(portrait) > 1:
+		rggResource.srm.processFile(user, makePortableFilename(os.path.join(PORTRAIT_DIR, portrait)))
+	respondICEmote(allusers(), chname, message, portrait)
 
 @serverRPC
 def respondICWhisperSender(target, message, chname, portrait):
-    if len(portrait) > 1:
-        portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
-        ICSay(translate('remote', '<table><tr><td><img src="{port}" width="{size}" height="{size}"></td><td>To {name}: {message}</td></tr></table><br />').format(
-            port=portfile,
-            size=getPortraitSize(),
-            name=linkedName(target),
-            message=message))
-    else:
-        ICSay(translate('remote', 'To {name}: {message}').format(                                                                    
-            name=linkedName(chname),
-            message=message))
+	if len(portrait) > 1:
+		portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
+		ICSay(translate('remote', '<table><tr><td><img src="{port}" width="{size}" height="{size}"></td><td>To {name}: {message}</td></tr></table><br />').format(
+			port=portfile,
+			size=getPortraitSize(),
+			name=linkedName(target),
+			message=message))
+	else:
+		ICSay(translate('remote', 'To {name}: {message}').format(
+			name=linkedName(chname),
+			message=message))
 
 @serverRPC
 def respondICWhisperTarget(sender, message, chname, portrait):
-    if len(portrait) > 1:
-        portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
-        ICSay(translate('remote', '<table><tr><td><img src="{port}" width="{size}" height="{size}"></td><td>{name} whispers: {message}</td></tr></table><br />').format(
-            port=portfile,
-            size=getPortraitSize(),
-            name=linkedName(chname),
-            message=message))
-    else:
-        ICSay(translate('remote', '{name} whispers: {message}').format(                                                                    
-            name=linkedName(chname),
-            message=message))
+	if len(portrait) > 1:
+		portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
+		ICSay(translate('remote', '<table><tr><td><img src="{port}" width="{size}" height="{size}"></td><td>{name} whispers: {message}</td></tr></table><br />').format(
+			port=portfile,
+			size=getPortraitSize(),
+			name=linkedName(chname),
+			message=message))
+	else:
+		ICSay(translate('remote', '{name} whispers: {message}').format(
+			name=linkedName(chname),
+			message=message))
 
 @clientRPC
 def sendICWhisper(user, target, message, chname, portrait):
-    target = target.lower()
-    targetuser = getuser(target)
-    if not targetuser:
-        respondError(user, fake.translate('remote', '{target} does not exist.'), target=target)
-    else:
-        respondICWhisperSender(user, targetuser.username, message, chname, portrait)
-        respondICWhisperTarget(targetuser, user.username, message, chname, portrait)    
-    
+	target = target.lower()
+	targetuser = getuser(target)
+	if not targetuser:
+		respondError(user, fake.translate('remote', '{target} does not exist.'), target=target)
+	else:
+		respondICWhisperSender(user, targetuser.username, message, chname, portrait)
+		respondICWhisperTarget(targetuser, user.username, message, chname, portrait)
+
 @serverRPC
 def respondWhisperSender(target, message):
-    say(translate('remote', 'To {username}: {message}').format(
-        username=linkedName(target),
-        message=message))
+	say(translate('remote', 'To {username}: {message}').format(
+		username=linkedName(target),
+		message=message))
 
 @serverRPC
 def respondWhisperTarget(sender, message):
-    say(translate('remote', '{username} whispers: {message}').format(
-        username=linkedName(sender),
-        message=message))
+	say(translate('remote', '{username} whispers: {message}').format(
+		username=linkedName(sender),
+		message=message))
 
 @clientRPC
 def sendWhisper(user, target, message):
-    target = target.lower()
-    targetuser = getuser(target)
-    if not targetuser:
-        respondError(user, fake.translate('remote', '{target} does not exist.'), target=target)
-    else:
-        respondWhisperSender(user, targetuser.username, message)
-        respondWhisperTarget(targetuser, user.username, message)
+	target = target.lower()
+	targetuser = getuser(target)
+	if not targetuser:
+		respondError(user, fake.translate('remote', '{target} does not exist.'), target=target)
+	else:
+		respondWhisperSender(user, targetuser.username, message)
+		respondWhisperTarget(targetuser, user.username, message)
 
 @serverRPC
 def respondUserJoin(username):
-    say(translate('remote', "{name} has joined!").format(name=username))
-    addUserToList(username)
+	say(translate('remote', "{name} has joined!").format(name=username))
+	addUserToList(username)
 
 # LOW-LEVEL NETWORKING
 
 def clientConnect(client, username):
-    """Occurs when the client is ready to start sending data."""
-    #print "Client connected."
-    rggViews.renameuser(localhandle(), username)
-    rggViews._closeAllMaps()
-    rggViews.setUwidgetLocal()
-    say(translate('remote', "Welcome, {name}!").format(name=username))
-    rggRPC.client.preemptivelyOpenTransferSocket()
+	"""Occurs when the client is ready to start sending data."""
+	#print "Client connected."
+	rggViews.renameuser(localhandle(), username)
+	rggViews._closeAllMaps()
+	rggViews.setUwidgetLocal()
+	say(translate('remote', "Welcome, {name}!").format(name=username))
+	rggRPC.client.preemptivelyOpenTransferSocket()
 
 def clientDisconnect(client, errorMessage):
-    """Occurs when the client connection disconnects without being told to.
-    
-    errorMessage -- a human-readable error message for why the connection failed
-    
-    """
-    #print "Client disconnected."
-    say(translate('remote', "Disconnected. {0}").format(errorMessage))
-    clearUserList()
-    
+	"""Occurs when the client connection disconnects without being told to.
+
+	errorMessage -- a human-readable error message for why the connection failed
+
+	"""
+	#print "Client disconnected."
+	say(translate('remote', "Disconnected. {0}").format(errorMessage))
+	clearUserList()
+
 def clientReceive(client, data):
-    """Occurs when the client receives data.
-    
-    data -- a dictionary or list of serialized data
-    
-    """
-    #print "client received"
-    rggRPC.receiveClientRPC(data)
+	"""Occurs when the client receives data.
+
+	data -- a dictionary or list of serialized data
+
+	"""
+	#print "client received"
+	rggRPC.receiveClientRPC(data)
 
 def clientFileReceive(client, filename):
-    """Occurs when the client receives data.
-    
-    filename -- the name of the file received
-    
-    """
-    pass
+	"""Occurs when the client receives data.
+
+	filename -- the name of the file received
+
+	"""
+	pass
 
 def serverConnect(server, username):
-    """Occurs when a new client joins.
-    
-    username -- a username for the client
-    
-    """
-    #print "Server found user."
-    user = User(username)
-    rggViews.adduser(user)
-    respondUserJoin(allusersbut(user), username)
-    rggViews.respondSession(user, rggViews.getSession().dump())
-    rggViews.respondChangeGM(user, rggViews.getGM(), localhandle())
-    #for ID, map in allmaps():
-    #    rggViews.respondMapCreate(user, ID, map.dump())
-    rggViews.respondUserList(user, getNetUserList())
+	"""Occurs when a new client joins.
+
+	username -- a username for the client
+
+	"""
+	#print "Server found user."
+	user = User(username)
+	rggViews.adduser(user)
+	respondUserJoin(allusersbut(user), username)
+	rggViews.respondSession(user, rggViews.getSession().dump())
+	rggViews.respondChangeGM(user, rggViews.getGM(), localhandle())
+	#for ID, map in allmaps():
+	#	rggViews.respondMapCreate(user, ID, map.dump())
+	rggViews.respondUserList(user, getNetUserList())
 
 @serverRPC
 def disconnectionMessage(message, error, *args, **kwargs):
-    """Special translation for a disconnection message."""
-    #print "Server dropped user."
-    error = translate('socket', error)
-    say(translate('error', message).format(*args, error=disconnect, **kwargs))
+	"""Special translation for a disconnection message."""
+	#print "Server dropped user."
+	error = translate('socket', error)
+	say(translate('error', message).format(*args, error=disconnect, **kwargs))
 
 def serverDisconnect(server, username, errorMessage):
-    """Occurs when a client disconnects without being kicked.
-    
-    username -- a username for the client
-    errorMessage -- a human-readable error message for why the connection failed
-    
-    """
-    user = rggViews.removeuser(username)
-    respondError(allusers(),
-        fake.translate('remote', '{username} has left the game. {error}'),
-            username=user.username, error=errorMessage)
-    respondUserRemove(allusers(), username)
-    
+	"""Occurs when a client disconnects without being kicked.
+
+	username -- a username for the client
+	errorMessage -- a human-readable error message for why the connection failed
+
+	"""
+	user = rggViews.removeuser(username)
+	respondError(allusers(),
+		fake.translate('remote', '{username} has left the game. {error}'),
+			username=user.username, error=errorMessage)
+	respondUserRemove(allusers(), username)
+
 def serverTransferDisconnect(server, username, errorMessage):
-    """Occurs when a client's transfer socket disconnects.
-    
-    username -- a username for the client
-    errorMessage -- a human-readable error message for why the connection failed
-    
-    """
-    reconnectTransferSocket(getuser(username))
-    
+	"""Occurs when a client's transfer socket disconnects.
+
+	username -- a username for the client
+	errorMessage -- a human-readable error message for why the connection failed
+
+	"""
+	reconnectTransferSocket(getuser(username))
+
 def serverKick(server, username):
-    """Occurs when a client is kicked.
-    
-    username -- a username for the client
-    
-    """
-    user = rggViews.removeuser(username)
-    respondError(allusers(),
-        fake.translate('remote', '{username} was kicked by the host.'),
-            username=user.username)
-    respondUserRemove(allusers(), username)
+	"""Occurs when a client is kicked.
+
+	username -- a username for the client
+
+	"""
+	user = rggViews.removeuser(username)
+	respondError(allusers(),
+		fake.translate('remote', '{username} was kicked by the host.'),
+			username=user.username)
+	respondUserRemove(allusers(), username)
 
 def serverReceive(server, username, data):
-    """Occurs when the server receives data.
-    
-    username -- a username for the client
-    data - a dictionary or list of serialized data
-    
-    """
-    #print username, getuser(username), usernames(), allusers()
-    assert(getuser(username))
-    #print "server received"
-    rggRPC.receiveServerRPC(getuser(username), data)
+	"""Occurs when the server receives data.
+
+	username -- a username for the client
+	data - a dictionary or list of serialized data
+
+	"""
+	#print username, getuser(username), usernames(), allusers()
+	assert(getuser(username))
+	#print "server received"
+	rggRPC.receiveServerRPC(getuser(username), data)
 
 
 def serverFileReceive(server, username, filename):
-    """Occurs when the client receives data.
-    
-    username -- the name of the sending user
-    filename -- the name of the file received
-    
-    """
-    pass
+	"""Occurs when the client receives data.
+
+	username -- the name of the sending user
+	filename -- the name of the file received
+
+	"""
+	pass
 

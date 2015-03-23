@@ -1,5 +1,5 @@
 '''
-initialization - for the Random Game Generator project            
+initialization - for the Random Game Generator project
 By Doctus (kirikayuumura.noir@gmail.com)
 
 Qt and C++ services.
@@ -34,7 +34,7 @@ class wAction(QAction):
 
 class fake(object):
 	"""Fake translation tools."""
-	
+
 	@staticmethod
 	def translate(context, key, *args):
 		"""Fake translate to mark strings before they are used."""
@@ -52,42 +52,42 @@ mainWindow = None
 
 def signal(*args, **kwargs):
 	"""Creates a signal."""
-	
+
 	# Figure out parameters
 	parameters = args
 	for parm in parameters:
 		if not isinstance(parm, type):
 			raise TypeError("Parameters to the signal constructor must be types.")
 	doc = kwargs.get('doc')
-	
+
 	# A unique key
 	key = object()
-	
+
 	def get(self):
 		if not hasattr(self, '_signals'):
 			self._signals = {}
 		if key not in self._signals:
 			self._signals[key] = signalStorage(parameters)
 		return self._signals[key]
-	
+
 	return property(get, doc=doc)
 
 class signalStorage(object):
 	"""A signal mechanism similar to Qt's signals.
-	
+
 	Would have used Qt's if they supported python better.
-	
+
 	"""
-	
+
 	def __init__(self, parameters):
 		"""Initializes the signal.
-		
+
 		args -- the parameters used to trigger the signal
-		
+
 		"""
 		self.callbacks = set()
 		self.parameters = parameters
-	
+
 	def emit(self, *args):
 		"""Emit this signal to all connected slots."""
 		if len(args) != len(self.parameters):
@@ -102,15 +102,15 @@ class signalStorage(object):
 				import traceback
 				print("ERROR encountered in signal handler {handler}:".format(handler=repr(callback)))
 				traceback.print_exc()
-	
+
 	def connect(self, callable):
 		"""Connect this signal to a slot. (Python callable.)"""
 		self.callbacks.add(callable)
-		
+
 	def disconnect(self, callable=None):
 		"""Disconnect this signal from a specified slot,
 		or all slots if no parameter is specified.
-		
+
 		"""
 		if callable is None:
 			self.callbacks = set()
@@ -180,7 +180,7 @@ def promptInteger(prompt, title=translate('system', "Input", 'default integer pr
 	if not ok:
 		return None
 	return int(value)
-	
+
 def promptCoordinates(prompt1, prompt2, title=translate('system', "Input", 'default coordinate prompt title'),
 		min=-sys.maxsize, max=sys.maxsize, step=1):
 	value1 = promptInteger(prompt1, title, min, max, step)
@@ -249,7 +249,7 @@ def promptYesNo(prompt):
 	questionDialog.setText(prompt)
 	questionDialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
 	return questionDialog.exec_()
-	
+
 def findFiles(dir, extensions):
 	"""Get the list of files with one of the given extensions."""
 	files = []
@@ -270,7 +270,7 @@ def checkFileExtension(filename, extension):
 	if extension not in filename:
 		return filename + extension
 	return filename
-	
+
 def cameraPosition():
 	return mainWindow.glwidget.camera
 
@@ -300,13 +300,13 @@ def makePortableFilename(filename):
 
 def drawSelectionCircle(x, y, splasifarcity, radius):
 	mainWindow.glwidget.addSelectionCircle(splasifarcity, x, y, radius)
-	
+
 def clearSelectionCircles():
 	mainWindow.glwidget.clearSelectionCircles()
-	
+
 def drawRectangle(x, y, w, h, r, g, b):
 	mainWindow.glwidget.addRectangle(x, y, w, h, r, g, b)
-	
+
 def clearRectangles():
 	mainWindow.glwidget.clearRectangles()
 
@@ -315,13 +315,13 @@ def drawLine(x, y, w, h, thickness, r, g, b):
 
 def deleteLine(x, y, w, h, thickness = -1):
 	mainWindow.glwidget.deleteLine(thickness, x, y, w, h)
-	
+
 def drawPreviewLine(x, y, w, h, thickness, r, g, b):
 	mainWindow.glwidget.addPreviewLine(thickness, x, y, w, h, r, g, b)
 
 def clearLines():
 	mainWindow.glwidget.clearLines()
-	
+
 def clearPreviewLines():
 	mainWindow.glwidget.clearPreviewLines()
 
@@ -347,7 +347,7 @@ def drawSegmentedLine(x, y, w, h, thickness, r, g, b, preview=False):
 		first = drawSegmentedLine(x, y, (x+w)/2.0, (y+h)/2.0, thickness, r, g, b, preview)
 		second = drawSegmentedLine((x+w)/2.0, (y+h)/2.0, w, h, thickness, r, g, b, preview)
 		return first | second
-	
+
 def drawRectangleMadeOfLines(x, y, w, h, colour, thickness, preview=False):
 	'''Draws lines in a rectangular shape.'''
 	return drawSegmentedLine(x, y, w, y, thickness, colour[0], colour[1], colour[2], preview) | drawSegmentedLine(w, y, w, h, thickness, colour[0], colour[1], colour[2], preview) | drawSegmentedLine(w, h, x, h, thickness, colour[0], colour[1], colour[2], preview) | drawSegmentedLine(x, h, x, y, thickness, colour[0], colour[1], colour[2], preview)
@@ -364,7 +364,7 @@ def drawCircle(centre, edge, colour, thickness, preview=False):
 		vert[0] = vert[2]
 		vert[1] = vert[3]
 	return lines
-	
+
 def drawRegularPolygon(sides, centre, size, colour, thickness, rainbow = False, preview = False):
 	#TODO: Add rotation parameter.
 	vertices = []
@@ -382,10 +382,10 @@ def drawRegularPolygon(sides, centre, size, colour, thickness, rainbow = False, 
 
 def addText(text, pos):
 	return mainWindow.glwidget.addText(text, pos)
-	
+
 def removeText(ID):
 	mainWindow.glwidget.removeText(ID)
-					
+
 def setZoom(zoom):
 	#_main.setZoom(zoom)
 	print("unimplemented2")
@@ -393,20 +393,20 @@ def setZoom(zoom):
 
 def getZoom():
 	return mainWindow.glwidget.zoom
-	
+
 def getMapPosition(screenCoordinates):
 	mapPosition = list(map(lambda p,c,d: p/d - c/d, screenCoordinates, cameraPosition(), (getZoom(), getZoom())))
 	return mapPosition
-	
+
 def checkVersion():
 	'''DEPRECATED: always returns None'''
 	'''If this is a release, and a newer release is available, returns a link to that release. Otherwise returns None.'''
 	#if DEV: return None
 	#latest = str(urllib.request.urlopen('http://31.25.101.129/rgg_ver.php').read()).split()
 	#if latest[0] > VERSION:
-	#    return latest[1]
+	#	return latest[1]
 	return None
-	
+
 def purgeEmptyFiles(rootpath):
 	'''Recursively deletes all empty files in rootpath and its subdirectories. Never deletes directories.'''
 	for (dirpath, dirnames, filenames) in os.walk(str(rootpath)):

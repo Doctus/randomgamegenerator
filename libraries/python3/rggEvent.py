@@ -1,5 +1,5 @@
 '''
-rggEvent - for the Random Game Generator project            
+rggEvent - for the Random Game Generator project
 By Doctus (kirikayuumura.noir@gmail.com)
 
 Handling of signal/slot system for user input and network event response.
@@ -47,11 +47,11 @@ def addMousePressListener(listener, priority):
 def addMouseReleaseListener(listener, priority):
 	_mouseReleaseListeners.append((listener, priority))
 	_mouseReleaseListeners.sort(key=lambda item: item[1])
-  
+
 def addKeyPressListener(listener, priority):
 	_keyPressListeners.append((listener, priority))
 	_keyPressListeners.sort(key=lambda item: item[1])
-  
+
 def addKeyReleaseListener(listener, priority):
 	_keyReleaseListeners.append((listener, priority))
 	_keyReleaseListeners.sort(key=lambda item: item[1])
@@ -99,13 +99,13 @@ def mouseReleaseEvent(x, y, t):
 	for listener, priority in _mouseReleaseListeners:
 		if listener(x, y, t):
 			return
-	
+
 def keyPressEvent(k):
 
 	for listener, priority in _keyPressListeners:
 		if listener(k):
 			return
-	
+
 def keyReleaseEvent(k):
 
 	for listener, priority in _keyReleaseListeners:
