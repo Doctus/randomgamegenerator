@@ -47,7 +47,7 @@ class tile(object):
 			self.glwidget.deleteImage(self)
 			self.destroyed = True
 		else:
-			print "attempted to destroy an image twice"
+			print("attempted to destroy an image twice")
 
 	@property
 	def hidden(self):

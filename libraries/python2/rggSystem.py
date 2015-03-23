@@ -19,15 +19,24 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
-import sys, random, math, urllib2
-import os, os.path
-from PyQt4 import QtCore, QtGui
-from rggConstants import *
+import os, os.path, sys, random, math
 
-class wAction(QtGui.QAction):
+try:
+	import urllib.request, urllib.error, urllib.parse
+	from PyQt5.QtCore import *
+	from PyQt5.QtGui import *
+	from PyQt5.QtWidgets import *
+	from .rggConstants import *
+except ImportError:
+	import urllib2 as urllib
+	from PyQt4.QtCore import *
+	from PyQt4.QtGui import *
+	from rggConstants import *
+
+class wAction(QAction):
 
 	def __init__(self, text, parent, id):
-		QtGui.QAction.__init__(self, text, parent)
+		QAction.__init__(self, text, parent)
 		self.id = id
 
 class fake(object):
@@ -44,7 +53,10 @@ class fake(object):
 
 # Real translation
 def translate(*args):
-	return unicode(QtCore.QCoreApplication.translate(*args))
+	try:
+		return unicode(QCoreApplication.translate(*args))
+	except Exception as e:
+		return str(QCoreApplication.translate(*args))
 
 mainWindow = None
 
@@ -98,7 +110,7 @@ class signalStorage(object):
 				callback(*args)
 			except Exception as e:
 				import traceback
-				print "ERROR encountered in signal handler {handler}:".format(handler=repr(callback))
+				print("ERROR encountered in signal handler {handler}:".format(handler=repr(callback)))
 				traceback.print_exc()
 
 	def connect(self, callable):
@@ -121,16 +133,19 @@ def injectMain():
 
 	assert(not mainWindow)
 
-	from rggMain import MainWindow
+	try:
+		from .rggMain import MainWindow
+	except ImportError as e:
+		from rggMain import MainWindow
 	mainWindow = MainWindow()
 	return mainWindow
 
 def showErrorMessage(message, title=translate('system', "Error", 'default error prompt title')):
 	"""Pops up an error message to the user."""
-	QtGui.QMessageBox.critical(mainWindow, title, message)
+	QMessageBox.critical(mainWindow, title, message)
 
 def showPopupMenuAt(position, choices):
-	popup = QtGui.QMenu(mainWindow)
+	popup = QMenu(mainWindow)
 	idCounter = 0
 
 	for choice in choices:
@@ -139,7 +154,7 @@ def showPopupMenuAt(position, choices):
 
 	realx = position[0] + (mainWindow.x() + mainWindow.glwidget.x())
 	realy = position[1] + (mainWindow.y() + mainWindow.glwidget.y())
-	selectedAction = popup.exec_(QtCore.QPoint(realx, realy))
+	selectedAction = popup.exec_(QPoint(realx, realy))
 
 	if not selectedAction:
 		return -1
@@ -147,7 +162,7 @@ def showPopupMenuAt(position, choices):
 	return selectedAction.id
 
 def showPopupMenuAtAbs(position, choices):
-	popup = QtGui.QMenu(mainWindow)
+	popup = QMenu(mainWindow)
 	idCounter = 0
 
 	for choice in choices:
@@ -156,7 +171,7 @@ def showPopupMenuAtAbs(position, choices):
 
 	realx = position[0]
 	realy = position[1]
-	selectedAction = popup.exec_(QtCore.QPoint(realx, realy))
+	selectedAction = popup.exec_(QPoint(realx, realy))
 
 	if not selectedAction:
 		return -1
@@ -165,22 +180,25 @@ def showPopupMenuAtAbs(position, choices):
 
 def promptString(prompt, title=translate('system', "Input", 'default string prompt title'), inittext=None):
 	if inittext is not None:
-		text, ok = QtGui.QInputDialog.getText(mainWindow, title, prompt, text=inittext)
+		text, ok = QInputDialog.getText(mainWindow, title, prompt, text=inittext)
 	else:
-		text, ok = QtGui.QInputDialog.getText(mainWindow, title, prompt)
+		text, ok = QInputDialog.getText(mainWindow, title, prompt)
 	if not ok:
 		return None
-	return unicode(text)
+	try:
+		return unicode(text)
+	except Exception as e:
+		return str(text)
 
 def promptInteger(prompt, title=translate('system', "Input", 'default integer prompt title'),
-		min=-sys.maxint, max=sys.maxint, default=0, step=1):
-	value, ok = QtGui.QInputDialog.getInt(mainWindow, title, prompt, default, min, max, step)
+		min=-sys.maxsize, max=sys.maxsize, default=0, step=1):
+	value, ok = QInputDialog.getInt(mainWindow, title, prompt, default, min, max, step)
 	if not ok:
 		return None
 	return int(value)
 
 def promptCoordinates(prompt1, prompt2, title=translate('system', "Input", 'default coordinate prompt title'),
-		min=-sys.maxint, max=sys.maxint, step=1):
+		min=-sys.maxsize, max=sys.maxsize, step=1):
 	value1 = promptInteger(prompt1, title, min, max, step)
 	if value1 is None:
 		return None
@@ -190,22 +208,24 @@ def promptCoordinates(prompt1, prompt2, title=translate('system', "Input", 'defa
 	return (value1, value2)
 
 def promptLoadFile(title, filter, dir=''):
-	filename = QtGui.QFileDialog.getOpenFileName(mainWindow,
+	filename = QFileDialog.getOpenFileName(mainWindow,
 		title,
 		dir,
-		filter)
+		filter)[0]
 	if not filename:
 		return None
-	return makePortableFilename(unicode(filename))
+	return filename
+	#return makePortableFilename(str(filename)) #does this really need to be portable?
 
 def promptSaveFile(title, filter, dir=''):
-	filename = QtGui.QFileDialog.getSaveFileName(mainWindow,
+	filename = QFileDialog.getSaveFileName(mainWindow,
 		title,
 		dir,
-		filter)
+		filter)[0]
 	if not filename:
 		return None
-	return makePortableFilename(unicode(filename))
+	return filename
+	#return makePortableFilename(str(filename)) #does this really need to be portable?
 
 def promptButtonSelection(prompt, text=[], defaultButton = 0):
 	convertedText = ()
@@ -219,7 +239,6 @@ def promptButtonSelection(prompt, text=[], defaultButton = 0):
 
 	buttons = []
 
-	from PyQt4.QtGui import QMessageBox
 	questionDialog = QMessageBox(mainWindow);
 	questionDialog.setText(prompt);
 
@@ -242,7 +261,6 @@ def promptButtonSelection(prompt, text=[], defaultButton = 0):
 	return -1
 
 def promptYesNo(prompt):
-	from PyQt4.QtGui import QMessageBox
 	questionDialog = QMessageBox(mainWindow)
 	questionDialog.setText(prompt)
 	questionDialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
@@ -367,10 +385,10 @@ def drawRegularPolygon(sides, centre, size, colour, thickness, rainbow = False, 
 	#TODO: Add rotation parameter.
 	vertices = []
 	lines = set()
-	for i in xrange(sides):
+	for i in range(sides):
 		vertices.append((centre[0]+size*math.cos(2*math.pi*i/sides), centre[1]+size*math.sin(2*math.pi*i/sides)))
-	for p in xrange(sides):
-		for q in xrange(sides):
+	for p in range(sides):
+		for q in range(sides):
 			if sides%2 == 1 or p%(sides/2) != q%(sides/2):
 				if not rainbow:
 					lines.update(drawSegmentedLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, colour[0], colour[1], colour[2], preview))
@@ -386,31 +404,36 @@ def removeText(ID):
 
 def setZoom(zoom):
 	#_main.setZoom(zoom)
-	print "unimplemented2"
+	print("unimplemented2")
 	return False
 
 def getZoom():
 	return mainWindow.glwidget.zoom
 
 def getMapPosition(screenCoordinates):
-	mapPosition = map(lambda p,c,d: p/d - c/d, screenCoordinates, cameraPosition(), (getZoom(), getZoom()))
+	mapPosition = list(map(lambda p,c,d: p/d - c/d, screenCoordinates, cameraPosition(), (getZoom(), getZoom())))
 	return mapPosition
 
 def checkVersion():
+	'''DEPRECATED: always returns None'''
 	'''If this is a release, and a newer release is available, returns a link to that release. Otherwise returns None.'''
-	if DEV: return None
-	latest = str(urllib2.urlopen('http://31.25.101.129/rgg_ver.php').read()).split()
-	if latest[0] > VERSION:
-		return latest[1]
+	#if DEV: return None
+	#latest = str(urllib.request.urlopen('http://31.25.101.129/rgg_ver.php').read()).split()
+	#if latest[0] > VERSION:
+	#	return latest[1]
 	return None
 
 def purgeEmptyFiles(rootpath):
 	'''Recursively deletes all empty files in rootpath and its subdirectories. Never deletes directories.'''
-	for (dirpath, dirnames, filenames) in os.walk(unicode(rootpath)):
+	try:
+		rootpath = unicode(rootpath)
+	except Exception as e:
+		rootpath = str(rootpath)
+	for (dirpath, dirnames, filenames) in os.walk(rootpath):
 		for filename in filenames:
 			path = os.path.join(dirpath, filename)
 			try:
 				if os.stat(path).st_size == 0:
 					os.remove(path)
 			except WindowsError:
-				print "Warning: pog locale error."
+				print("Warning: pog locale error.")

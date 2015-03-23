@@ -1,8 +1,13 @@
 
-import re, hashlib
-from rggJson import jsondumps, jsonloads
-from rggSystem import fake, translate, mainWindow, signal
-from PyQt4 import QtCore, QtNetwork
+import re, hashlib, sys
+try:
+	from .rggJson import jsondumps, jsonloads
+	from .rggSystem import fake, translate, mainWindow, signal
+	from PyQt5 import QtCore, QtNetwork
+except ImportError as e:
+	from rggJson import jsondumps, jsonloads
+	from rggSystem import fake, translate, mainWindow, signal
+	from PyQt4 import QtCore, QtNetwork
 
 # Major protocols used by the socket
 PROTOCOL_UNKNOWN = 'RGG_UNKNOWN' # unidentified protocol
@@ -61,16 +66,16 @@ class fileData(object):
 		self.processed += len(data)
 		if len(data) == 0:
 			message = "[{0}] Error reading sent file {filename}."
-			print message.format(context, filename=self.filename)
+			print(message.format(context, filename=self.filename))
 			return None
 		if self.processed > self.size:
 			message = "[{0}] Sent file {filename} has too many bytes."
-			print message.format(context, filename=self.filename)
+			print(message.format(context, filename=self.filename))
 			return None
 		if self.file.atEnd():
 			if self.processed != self.size:
 				message = "[{0}] Sent file {filename} has too few bytes."
-				print message.format(context, filename=self.filename)
+				print(message.format(context, filename=self.filename))
 				return None
 		return data
 
@@ -84,12 +89,12 @@ class fileData(object):
 
 		if result != len(chunk):
 			message = "[{0}] Error writing received file data {filename}."
-			print message.format(context, filename=self.filename)
+			print(message.format(context, filename=self.filename))
 			return False
 
 		if self.size == self.processed and self.digest != self.checkHash.hexdigest():
 			message = "[{0}] Received file checksum does not match; {filename} '{sum1}' vs '{sum2}'"
-			print message.format(context, filename=self.filename, sum1=self.digest, sum2=self.checkHash.hexdigest())
+			print(message.format(context, filename=self.filename, sum1=self.digest, sum2=self.checkHash.hexdigest()))
 			return False
 
 		return True
@@ -155,7 +160,7 @@ class statefulSocket(object):
 		assert(not self.ready)
 		self.ready = True
 		self.active = True
-		print "[{0}] Activated!".format(self.context)
+		print("[{0}] Activated!".format(self.context))
 
 	@property
 	def busy(self):
@@ -182,7 +187,7 @@ class statefulSocket(object):
 				self.socket.disconnectFromHost()
 			else:
 				self.socket.close()
-			print "[{0}] Closed connection.".format(self.context)
+			print("[{0}] Closed connection.".format(self.context))
 
 	def _closeWithPrejudice(self):
 		"""Close the socket, reporting a disconnection message if not already closed."""
@@ -217,8 +222,8 @@ class statefulSocket(object):
 			message = "[{context}] {header}: could not process message {sample}length {length}"
 		else:
 			message = "[{context}] {header}: partial message {sample}length {partial}/{length}"
-		sample = statefulSocket._sampleText(serial)
-		print message.format(context=self.context, sample=text, length=len(serial), partial=result)
+		#sample = statefulSocket._sampleText(serial)
+		print(message.format(context=self.context, header=header, sample=text, length=length, partial=result))
 
 		self._closeWithPrejudice()
 
@@ -272,10 +277,12 @@ class statefulSocket(object):
 	def _serialize(data):
 		"""Serialize an object to a message that can be sent."""
 		serial = jsondumps(data)
-		return QtCore.QByteArray(serial + '\n')
+		return serial
 
 	def _rawsend(self, serial):
 		"""Sends serialized data."""
+		if sys.version_info >= (3,):
+			serial = serial+"\n" #fix for new python behavior
 		result = self.socket.write(serial)
 		if result == len(serial):
 			# I guess flush forces synchronous sending.
@@ -289,6 +296,8 @@ class statefulSocket(object):
 		"""Reads a line from the socket."""
 		assert(self.socket.canReadLine())
 		data = self.socket.readLine()
+		if sys.version_info >= (3,):
+			data = str(data, "UTF-8")
 		if len(data) > 0:
 			assert(data[-1] == '\n')
 			return data
@@ -333,7 +342,7 @@ class statefulSocket(object):
 			PARM_COMMAND: command,
 			PARM_INTERNAL: True,
 		}
-		for key, arg in kwargs.items():
+		for key, arg in list(kwargs.items()):
 			obj[key] = arg
 		self.sendObject(obj)
 
@@ -362,7 +371,10 @@ class statefulSocket(object):
 				return
 			if not self._rawsend(data):
 				return
-			self.filePartlySent.emit(self.sentfile.filename, unicode(self.sentfile.size), unicode(self.sentfile.processed))
+			try:
+				self.filePartlySent.emit(self.sentfile.filename, unicode(self.sentfile.size), unicode(self.sentfile.processed))
+			except Exception as e:
+				self.filePartlySent.emit(self.sentfile.filename, str(self.sentfile.size), str(self.sentfile.processed))
 			if self.sentfile.file.atEnd():
 				sentfile = self.sentfile
 				self.sentfile = None
@@ -393,7 +405,10 @@ class statefulSocket(object):
 				if not self.receivedfile.write(self.context, data):
 					self._closeWithPrejudice()
 					return
-				self.filePartlyReceived.emit(self.receivedfile.filename, unicode(self.receivedfile.size), unicode(self.receivedfile.processed))
+				try:
+					self.filePartlyReceived.emit(self.receivedfile.filename, unicode(self.receivedfile.size), unicode(self.receivedfile.processed))
+				except Exception as e:
+					self.filePartlyReceived.emit(self.receivedfile.filename, str(self.receivedfile.size), str(self.receivedfile.processed))
 				if self.receivedfile.size == self.receivedfile.processed:
 					receivedfile = self.receivedfile
 					self.receivedfile = None
@@ -408,12 +423,15 @@ class statefulSocket(object):
 				if serial is None:
 					return
 				# Allow empty lines
-				if EMPTY_REGEX.match(serial):
+				if EMPTY_REGEX.match(str(serial)):
 					continue
 				try:
-					obj = jsonloads(unicode(serial))
+					try:
+						obj = jsonloads(unicode(serial))
+					except Exception as e:
+						obj = jsonloads(str(serial))
 				except:
-					self._respondToSocketError("JSON Error", result, text=serial)
+					self._respondToSocketError("JSON Error", -1, text=serial)
 					return
 				self.receiveObject(obj)
 
@@ -442,7 +460,7 @@ class statefulSocket(object):
 		"""
 	)
 
-	disconnected = signal(object, basestring, doc=
+	disconnected = signal(object, str, doc=
 		"""Called when the socket disconnects or fails to connect.
 
 		Not called when disconnected manually (through close()).
@@ -462,7 +480,7 @@ class statefulSocket(object):
 		"""
 	)
 
-	commandReceived = signal(object, basestring, dict, doc=
+	commandReceived = signal(object, str, dict, doc=
 		"""Called when data is received over the wire.
 
 		socket -- this socket
@@ -472,7 +490,7 @@ class statefulSocket(object):
 		"""
 	)
 
-	fileSent = signal(object, basestring, doc=
+	fileSent = signal(object, str, doc=
 		"""Called when a file is done sending.
 
 		socket -- this socket
@@ -481,7 +499,7 @@ class statefulSocket(object):
 		"""
 	)
 
-	fileReceived = signal(object, basestring, doc=
+	fileReceived = signal(object, str, doc=
 		"""Called when a file is done receiving.
 
 		socket -- this socket
@@ -490,7 +508,7 @@ class statefulSocket(object):
 		"""
 	)
 
-	filePartlySent = signal(basestring, basestring, basestring, doc=
+	filePartlySent = signal(str, str, str, doc=
 		"""Called when a chunk of a file is sent.
 
 		filename -- the filename of the file sent
@@ -500,7 +518,7 @@ class statefulSocket(object):
 		"""
 	)
 
-	filePartlyReceived = signal(basestring, basestring, basestring, doc=
+	filePartlyReceived = signal(str, str, str, doc=
 		"""Called when a chunk of a file is received and written.
 
 		filename -- the filename of the file received
@@ -524,7 +542,7 @@ class statefulSocket(object):
 
 	def _disconnected(self):
 		"""Called when disconnected from the server."""
-		print "[{0}] Disconnected.".format(self.context)
+		print("[{0}] Disconnected.".format(self.context))
 		# TODO: Should we delete the socket here?
 		self.socket.deleteLater()
 
@@ -540,13 +558,13 @@ class statefulSocket(object):
 
 		if self.clientside:
 			if newState == s.HostLookupState:
-				print "[{0}] Looking up host...".format(self.context)
+				print("[{0}] Looking up host...".format(self.context))
 				return
 			if newState == s.ConnectingState:
-				print "[{0}] Connecting...".format(self.context)
+				print("[{0}] Connecting...".format(self.context))
 				return
 			if newState == s.ConnectedState:
-				print "[{0}] Connected. Awaiting activation...".format(self.context)
+				print("[{0}] Connected. Awaiting activation...".format(self.context))
 				self.connected.emit(self)
 				return
 
@@ -555,8 +573,8 @@ class statefulSocket(object):
 
 		if oldState == s.UnconnectedState:
 			return
-		print "[{context}] Closing error #{id} {message}".format(
-			context=self.context, id=self.socket.error(), message=self.socket.errorString())
+		print("[{context}] Closing error #{id} {message}".format(
+			context=self.context, id=self.socket.error(), message=self.socket.errorString()))
 		self.state = s.ConnectedState
 		self.close()
 		self.disconnected.emit(self, self.disconnectionError(oldState, self.socket.error()))
@@ -569,5 +587,5 @@ class statefulSocket(object):
 
 	def _error(self, err):
 		"""Writes errors to the console."""
-		print "[{context}] ERROR #{id} {message}".format(
-			context=self.context, id=self.socket.error(), message=self.socket.errorString())
+		print("[{context}] ERROR #{id} {message}".format(
+			context=self.context, id=self.socket.error(), message=self.socket.errorString()))
