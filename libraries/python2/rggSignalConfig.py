@@ -1,4 +1,7 @@
-import rggRemote, rggViews, rggEvent
+try:
+	from . import rggRemote, rggViews, rggEvent
+except ImportError:
+	import rggRemote, rggViews, rggEvent
 
 def connectChatWidgetEvents(widget):
 	widget.chatInput.connect(rggEvent.chatInputEvent)

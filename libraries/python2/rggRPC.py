@@ -20,7 +20,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
 import sys
-from rggNet import JsonServer, JsonClient
+try:
+	from .rggNet import JsonServer, JsonClient
+except ImportError:
+	from rggNet import JsonServer, JsonClient
 
 # Base server and client implementations
 client = JsonClient()
@@ -120,17 +123,17 @@ def resolveRPCValues(callable):
 	"""Figures out the signature of the callable."""
 
 	assert(callable.__name__)
-	assert(callable.func_code)
+	assert(callable.__code__)
 
 	# Grab some parameters from the function
 	command = callable.__name__ # command name
 	if command in clientResponses:
 		raise RuntimeError("RPC command '{0}' has the same name as another command.".format(command))
 
-	code = callable.func_code
+	code = callable.__code__
 	# min number of parameters
-	if callable.func_defaults:
-		minargs = code.co_argcount - len(callable.func_defaults)
+	if callable.__defaults__:
+		minargs = code.co_argcount - len(callable.__defaults__)
 	else:
 		minargs = code.co_argcount
 
@@ -198,7 +201,7 @@ def unpackRPCData(data):
 
 	#print command, repr(args), repr(kwargs)
 	# bugfix: need kwargs to be strings
-	kwargs=dict((str(key), item) for key, item in kwargs.items())
+	kwargs=dict((str(key), item) for key, item in list(kwargs.items()))
 	#print repr(kwargs)
 
 	return command, args, kwargs
@@ -216,14 +219,14 @@ def receiveClientRPC(data):
 	try:
 		command, args, kwargs = unpackRPCData(data)
 		if not command in clientResponses:
-			print "Client: attempt to run unknown command {command}".format(command=command)
+			print("Client: attempt to run unknown command {command}".format(command=command))
 			excepting = False
 			return
 		clientResponses[command](args, kwargs)
 		excepting = False
 	finally:
 		if excepting:
-			print "Client: error processing data: {0}; {1}".format(repr(data), sys.exc_info()[:2])
+			print("Client: error processing data: {0}; {1}".format(repr(data), sys.exc_info()[:2]))
 
 def receiveServerRPC(user, data):
 	"""Occurs when the server receives data.
@@ -237,11 +240,11 @@ def receiveServerRPC(user, data):
 	try:
 		command, args, kwargs = unpackRPCData(data)
 		if not command in serverResponses:
-			print "Server: attempt to run unknown command from {user} {command}".format(user=user.username, command=command)
+			print("Server: attempt to run unknown command from {user} {command}".format(user=user.username, command=command))
 			excepting = False
 			return
 		serverResponses[command](user, args, kwargs)
 		excepting = False
 	finally:
 		if excepting:
-			print "Server: error processing data for user ({0}): {1}; {2}".format(id, repr(data), sys.exc_info()[:2])
+			print("Server: error processing data for user ({0}): {1}; {2}".format(id, repr(data), sys.exc_info()[:2]))

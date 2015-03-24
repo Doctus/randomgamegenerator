@@ -19,11 +19,14 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
-import sys, random, weakref
-import os, os.path
+import sys, random, weakref, os, os.path
 from collections import defaultdict
-from PyQt4 import QtCore, QtGui
-from rggRPC import client, server, clientRPC, serverRPC
+try:
+	from PyQt5 import QtCore
+	from .rggRPC import client, server, clientRPC, serverRPC
+except ImportError:
+	from PyQt4 import QtCore
+	from rggRPC import client, server, clientRPC, serverRPC
 
 RESOURCE_IMAGE = "image"
 RESOURCE_SOUND = "sound"
@@ -122,7 +125,7 @@ class clientResourceMapper(object):
 		# Clean out old listeners
 		oldlisteners = self._listeners
 		self._listeners = defaultdict(list)
-		for filename, listeners in oldlisteners.items():
+		for filename, listeners in list(oldlisteners.items()):
 			newlist = [listener for listener in self._listeners if listener()]
 			if len(newlist):
 				self._listeners[filename] = newlist
@@ -132,7 +135,7 @@ class clientResourceMapper(object):
 		"""Reloads the status of a group of files."""
 		self._status = defaultdict(lambda: STATE_UNKNOWN)
 		self._exists = defaultdict(bool)
-		for filename, status in statusMapping.values():
+		for filename, status in list(statusMapping.values()):
 			if status == STATE_UNKNOWN:
 				continue
 			self._update(filename, status)
@@ -158,7 +161,7 @@ class clientResourceMapper(object):
 			if cb:
 				cb(filename)
 			else:
-				print "needClean"
+				print("needClean")
 				needClean = True
 		# Clean up expired weak references
 		if needClean:
@@ -184,7 +187,7 @@ class clientResourceMapper(object):
 
 	def _onFileReceived(self, client, filename):
 		"""Responds to a file being successfully transferred."""
-		print "file", filename, "received"
+		print("file", filename, "received")
 		self._update(filename, STATE_DONE)
 
 	def _onFileFailed(self, client, filename):
@@ -194,7 +197,7 @@ class clientResourceMapper(object):
 			# Could either have verified correctly or failed to transfer
 			# Either way, call it present
 			status = STATE_DONE
-			print "file", filename, "assumed received"
+			print("file", filename, "assumed received")
 		else:
 			# Missing on server or failed to transfer
 			# Call it missing
