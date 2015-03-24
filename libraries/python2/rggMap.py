@@ -17,10 +17,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
-import sys
-import rggTile, rggSystem, rggResource, random
-from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
-from rggSystem import mainWindow
+import sys, random
+try:
+	from . import rggTile, rggSystem, rggResource
+	from .rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
+	from .rggSystem import mainWindow
+except ImportError:
+	import rggTile, rggSystem, rggResource
+	from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
+	from rggSystem import mainWindow
 
 class Map(object):
 
@@ -34,7 +39,7 @@ class Map(object):
 		self.tileset = tileset
 		self.tilesize = tilesize
 
-		self.tileindexes = [0 for i in xrange(mapsize[0] * mapsize[1])]
+		self.tileindexes = [0 for i in range(mapsize[0] * mapsize[1])]
 		self.hidden = False
 		self.tiles = None
 		self.initted = False
@@ -61,7 +66,7 @@ class Map(object):
 		displacement[0] = drawOffset[0] - self._drawOffset[0]
 		displacement[1] = drawOffset[1] - self._drawOffset[1]
 		self._drawOffset = drawOffset
-		print "drawOffset:", drawOffset
+		print("drawOffset:", drawOffset)
 
 		if self.tiles != None:
 			for t in self.tiles:
@@ -103,13 +108,13 @@ class Map(object):
 		if self.tiles != None:
 			mainWindow.glwidget.deleteImages(self.tiles)
 
-		print "deleted tiles"
+		print("deleted tiles")
 
 		self.tiles = [None]*self.mapsize[0]*self.mapsize[1]
 		mainWindow.glwidget.reserveVBOSize(self.mapsize[0] * self.mapsize[1])
 
-		for y in xrange(0, self.mapsize[1]):
-			for x in xrange(0, self.mapsize[0]):
+		for y in range(0, self.mapsize[1]):
+			for x in range(0, self.mapsize[0]):
 				texx = self.tileindexes[x+self.mapsize[0]*y]%(imgsize.width()/self.tilesize[0])*self.tilesize[0]
 				texy = int((self.tileindexes[x+self.mapsize[0]*y]*self.tilesize[0])/imgsize.width())*self.tilesize[1]
 				textureRect = (texx, texy, self.tilesize[0], self.tilesize[1])
@@ -117,12 +122,12 @@ class Map(object):
 				temptile = mainWindow.glwidget.createImage(src, 0, textureRect, drawRect, self.hidden)
 				self.tiles[x+y*self.mapsize[0]] = temptile
 
-		print "created tiles"
+		print("created tiles")
 
 	def _updateSrc(self, crm, filename, translation):
 		if filename == self.tileset and crm._status[filename] == rggResource.STATE_DONE:
 			self._createTiles()
-		print "update src", self.ID, filename, self.tileset, crm._status[filename]
+		print("update src", self.ID, filename, self.tileset, crm._status[filename])
 
 	def getTile(self, tile):
 		"""Change the specified tile."""

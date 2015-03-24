@@ -18,12 +18,16 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
-
-import rggRemote
-from rggSystem import fake, translate
-from rggViews import ICSay, announce
-from rggConstants import *
-import rggEvent
+try:
+	from . import rggRemote, rggEvent
+	from .rggSystem import fake, translate
+	from .rggViews import ICSay, announce
+	from .rggConstants import *
+except ImportError:
+	import rggRemote, rggEvent
+	from rggSystem import fake, translate
+	from rggViews import ICSay, announce
+	from rggConstants import *
 
 chatCommands = {}
 chatCommandNames = []
@@ -185,7 +189,10 @@ whisper.documentation = fake.translate('chatdoc',
 
 def chat(st, chname, portrait):
 	"""Parses and executes chat commands."""
-	st = unicode(st)
+	try:
+		st = unicode(st)
+	except UnicodeEncodeError:
+		st = str(st)
 
 	if (len(st) <= 0):
 		return

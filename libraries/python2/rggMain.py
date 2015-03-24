@@ -6,13 +6,19 @@
 
 import os
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-
-from glwidget import *
-
-from rggJson import loadInteger, jsonload
-from rggConstants import *
+try:
+	from PyQt5.QtCore import *
+	from PyQt5.QtGui import *
+	from PyQt5.QtWidgets import *
+	from .glwidget import GLWidget
+	from .rggJson import loadInteger, jsonload
+	from .rggConstants import *
+except ImportError:
+	from PyQt4.QtCore import *
+	from PyQt4.QtGui import *
+	from glwidget import GLWidget
+	from rggJson import loadInteger, jsonload
+	from rggConstants import *
 
 class MainWindow(QMainWindow):
 	'''Wrapper class for...well, the game? Maybe this needs to be called the game engine then'''
@@ -30,7 +36,6 @@ class MainWindow(QMainWindow):
 
 		self.glwidget = GLWidget(self)
 		self.setCentralWidget(self.glwidget)
-		self.glwidget.makeCurrent()
 
 		self.drawTimer = QTimer()
 		self.drawTimer.timeout.connect(self.drawTimerTimeout)

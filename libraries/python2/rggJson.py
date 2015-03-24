@@ -18,10 +18,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
-
-from rggFields import validationError
-from rggSystem import makeLocalFilename
-import json, gzip
+import json, gzip, sys
+try:
+	from .rggFields import validationError
+	from .rggSystem import makeLocalFilename
+except ImportError:
+	from rggFields import validationError
+	from rggSystem import makeLocalFilename
 
 def jsondumps(obj):
 	"""Dumps the object into a string. Contains no newlines."""
@@ -29,17 +32,20 @@ def jsondumps(obj):
 	#serial = json.dumps(obj, separators=(',',':'))
 	# pretty print
 	serial = json.dumps(obj, sort_keys=True)
-	assert(isinstance(serial, basestring))
-	assert('\n' not in serial and u'\n' not in serial)
+	if sys.version_info >= (3,):
+		assert(isinstance(serial, str))
+	else:
+		assert(isinstance(serial, basestring))
+	assert('\n' not in serial)
 	return serial
 
 def jsondump(obj, filename):
 	"""Dump object to file."""
 	try:
-		with gzip.open(makeLocalFilename(filename), 'wb') as file:
+		with gzip.open(makeLocalFilename(filename), 'wt') as file:
 			json.dump(obj, file, sort_keys=True, indent=4)
 	except AttributeError: #support for Python <2.7
-		with open(makeLocalFilename(filename), 'wb') as file:
+		with open(makeLocalFilename(filename), 'wt') as file:
 			json.dump(obj, file, sort_keys=True, indent=4)
 
 def jsonloads(str):
@@ -51,10 +57,10 @@ def jsonloads(str):
 def jsonload(filename):
 	"""Loads the object from a file. May throw."""
 	try:
-		with gzip.open(makeLocalFilename(filename), 'rb') as file:
+		with gzip.open(makeLocalFilename(filename), 'rt') as file:
 			obj = json.load(file)
 	except: #might be an old uncompressed save
-		with open(makeLocalFilename(filename), 'rb') as file:
+		with open(makeLocalFilename(filename), 'rt') as file:
 			obj = json.load(file)
 	assert(isinstance(obj, list) or isinstance(obj, dict))
 	return obj
@@ -63,7 +69,7 @@ def jsonappend(obj, filename):
 	"""Dump object to file. Merges with existing file if present."""
 	try:
 		dat = jsonload(filename)
-		newdat = dict(dat.items() + obj.items())
+		newdat = dict(list(dat.items()) + list(obj.items()))
 		jsondump(newdat, filename)
 	except:
 		jsondump(obj, filename)
@@ -71,7 +77,11 @@ def jsonappend(obj, filename):
 def loadString(name, value, allowEmpty=False):
 	if allowEmpty and value is None:
 		return ''
-	if isinstance(value, basestring):
+	if sys.version_info >= (3,):
+		strtype = str
+	else:
+		strtype = basestring
+	if isinstance(value, strtype):
 		if allowEmpty or len(value) > 0:
 			return value
 	raise validationError('Validation expected {0} to be a string, found {1}.'.format(name, value))
@@ -119,7 +129,7 @@ def loadCoordinates(name, value, length=None, min=None, max=None):
 	if isinstance(value, list) or isinstance(value, tuple):
 		if length is None or len(value) == length:
 			return tuple(loadInteger('{name}[{coord}]'.format(name=name, coord=i),
-				value[i], min=min, max=max) for i in xrange(len(value)))
+				value[i], min=min, max=max) for i in range(len(value)))
 	raise validationError(
 		'Validation expected {0} to be an array of coordinates, found {1}.'.
 			format(name, value))
