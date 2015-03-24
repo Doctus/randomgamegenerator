@@ -25,7 +25,6 @@ GENERATOR_DIR = "generators"
 KAIJYUUKEYS = ("technique", "dwarf", "japanese", "food", "weapon", "artifood", "french", "macguffin")
 
 generators = {}
-
 try:
 	for file in os.listdir(GENERATOR_DIR):
 		if ".py" in file and "__init__" not in file and ".pyc" not in file:
@@ -39,10 +38,10 @@ except Exception as e:
 def getName(generator, args):
 	'''Return a random name by passing generator args.'''
 	if generator == "keys":
-		return ", ".join(generators.keys())
+		return ", ".join(list(generators.keys()))
 	elif generator == "help":
 		if not args:
-			return "Type '/generate help NAMETYPE' for more information on a specific generator. Available generators: " + ", ".join(generators.keys())
+			return "Type '/generate help NAMETYPE' for more information on a specific generator. Available generators: " + ", ".join(list(generators.keys()))
 		try:
 			return generators[args]("help")
 		except KeyError:

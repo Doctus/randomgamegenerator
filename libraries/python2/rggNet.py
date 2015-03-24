@@ -19,14 +19,17 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
-import re
-import rggSystem
-import os
-import getpass
-from rggSocket import statefulSocket, generateChecksum, fileData
-from rggSystem import translate, mainWindow, signal, makeLocalFilename
-from PyQt4 import QtCore, QtNetwork
-from rggConstants import *
+import re, os, getpass
+try:
+	from PyQt5 import QtCore, QtNetwork
+	from .rggSocket import statefulSocket, generateChecksum, fileData
+	from .rggSystem import translate, mainWindow, signal, makeLocalFilename, findRandomAppend
+	from .rggConstants import *
+except ImportError:
+	from PyQt4 import QtCore, QtNetwork
+	from rggSocket import statefulSocket, generateChecksum, fileData
+	from rggSystem import translate, mainWindow, signal, makeLocalFilename, findRandomAppend
+	from rggConstants import *
 
 MESSAGE_IDENTIFY = "IDENTIFY" # Identify this client
 MESSAGE_ACTIVATE = "ACTIVATE" # Assign username
@@ -69,7 +72,10 @@ class BaseClient(object):
 		self.sentfile = None
 		self.receivedfile = None
 		# Doesn't need translation
-		self.username = unicode(localUser()) or u'localhost'
+		try:
+			self.username = unicode(localUser())
+		except Exception:
+			self.username = str(localUser()) or 'localhost'
 		assert(self.username)
 
 		self.timer = QtCore.QTimer()
@@ -176,7 +182,7 @@ class BaseClient(object):
 			size=filedata.size,
 			checksum=filedata.digest)
 		message = "[{0}] Requested transfer of {filename} [{size} {checksum}]"
-		print message.format(self.obj.context, filename=filedata.filename, size=filedata.size,checksum=filedata.digest)
+		print(message.format(self.obj.context, filename=filedata.filename, size=filedata.size,checksum=filedata.digest))
 		self.fileEvent.emit(self, filename, "Requested")
 		self._updatetransfer()
 		return True
@@ -190,7 +196,7 @@ class BaseClient(object):
 
 		while self.sendList and not self.sentfile:
 			self.fileEvent.emit(self, "", "SENDING: "+str(len(self.sendList))+ " QUEUED")
-			filedata = iter(self.sendList).next()
+			filedata = next(iter(self.sendList))
 			self.sendList.remove(filedata)
 			if self._shouldSendFile(filedata):
 				self.sentfile = filedata
@@ -204,7 +210,7 @@ class BaseClient(object):
 				self.obj.sendMessage(MESSAGE_IGNORE, filename=filedata.filename)
 				socket = self.obj
 				message = "[{0}] Ignored transfer of {filename} [{size} {checksum}]"
-			print message.format(socket.context, filename=filedata.filename, size=filedata.size,checksum=filedata.digest)
+			print(message.format(socket.context, filename=filedata.filename, size=filedata.size,checksum=filedata.digest))
 		if self.sentfile: self.fileEvent.emit(self, "", "EXITED SEND LOOP DUE TO SENTFILE  ("+str(len(self.sendList))+ " FILES REMAIN QUEUED)")
 
 	def _updateReceive(self):
@@ -215,12 +221,12 @@ class BaseClient(object):
 			filename = self.receivedfile.filename
 			if self._shouldReceiveFile(self.receivedfile):
 				message = "[{0}] Accepted transfer of {filename} [{size} {checksum}]"
-				print message.format(self.xfer.context, filename=filename, size=self.receivedfile.size, checksum=self.receivedfile.digest)
+				print(message.format(self.xfer.context, filename=filename, size=self.receivedfile.size, checksum=self.receivedfile.digest))
 				self.xfer.sendMessage(MESSAGE_ACCEPT, filename=filename)
 				self.xfer.receiveFile(self.receivedfile)
 			else:
 				message = "[{0}] Rejected transfer of {filename} [{size} {checksum}]"
-				print message.format(self.xfer.context, filename=filename, size=self.receivedfile.size, checksum=self.receivedfile.digest)
+				print(message.format(self.xfer.context, filename=filename, size=self.receivedfile.size, checksum=self.receivedfile.digest))
 				self._fileFailed(filename)
 				self.xfer.sendMessage(MESSAGE_REJECT, filename=filename)
 			self.getList.discard(filename)
@@ -268,7 +274,7 @@ class BaseClient(object):
 			# Can we open the file?
 			if not fileData.file.open(QtCore.QFile.ReadOnly):
 				self.fileEvent.emit(self, filename, "SENDFILE Could not open")
-				print "SENDFILE Could not open"
+				print("SENDFILE Could not open")
 				return False
 			try:
 				file = fileData.file
@@ -278,7 +284,7 @@ class BaseClient(object):
 				if fileData.size is not None and fileData.digest is not None:
 					if size == fileData.size and digest == fileData.digest:
 						self.fileEvent.emit(self, filename, "SENDFILE Size and digest match")
-						print "SENDFILE Size and digest match"
+						print("SENDFILE Size and digest match")
 						return False
 
 				fileData.size = file.size()
@@ -288,12 +294,12 @@ class BaseClient(object):
 				if not self.allowSend(fileData.filename,
 						fileData.size, fileData.digest):
 					self.fileEvent.emit(self, filename, "SENDFILE User hook")
-					print "SENDFILE User hook"
+					print("SENDFILE User hook")
 					return False
 
 				file = None
 				self.fileEvent.emit(self, filename, "SENDFILE Success")
-				print "SENDFILE Success"
+				print("SENDFILE Success")
 				return True
 			finally:
 				if file:
@@ -309,32 +315,32 @@ class BaseClient(object):
 		# Did we ask for the file?
 		if not filename in self.getList:
 			self.fileEvent.emit(self, filename, "RECVFILE Duplicate")
-			print "RECVFILE Duplicate"
+			print("RECVFILE Duplicate")
 			return False
 		try:
 			# Can we open the file?
 			if not file.open(QtCore.QFile.ReadWrite):
 				self.fileEvent.emit(self, filename, "RECVFILE Could not open")
-				print "RECVFILE Could not open"
+				print("RECVFILE Could not open")
 				return False
 			try:
 				# Do we already have an identical copy?
 				if file.size() == fileData.size:
 					if generateChecksum(file) == fileData.digest:
 						self.fileEvent.emit(self, filename, "RECVFILE Size and digest match")
-						print "RECVFILE Size and digest match"
+						print("RECVFILE Size and digest match")
 						return False
 
 				# User hook
 				if not self.allowReceipt(fileData.filename,
 						fileData.size, fileData.digest):
 					self.fileEvent.emit(self, filename, "RECVFILE User hook")
-					print "RECVFILE User hook"
+					print("RECVFILE User hook")
 					return False
 
 				file = None
 				self.fileEvent.emit(self, filename, "RECVFILE Success")
-				print "RECVFILE Success"
+				print("RECVFILE Success")
 				return True
 			finally:
 				if file:
@@ -367,21 +373,21 @@ class BaseClient(object):
 		if socket == self.obj:
 			if command not in (MESSAGE_ACTIVATE, MESSAGE_GET, MESSAGE_IGNORE):
 				message = "[{0}] Unexpected object command {command}"
-				print message.format(socket.context, command=command)
+				print(message.format(socket.context, command=command))
 				return
 		elif socket == self.xfer:
 			if command not in (MESSAGE_ACTIVATE, MESSAGE_PUT, MESSAGE_ACCEPT, MESSAGE_REJECT):
 				message = "[{0}] Unexpected transfer command {command}"
-				print message.format(socket.context, command=command)
+				print(message.format(socket.context, command=command))
 				return
 		else:
 			return
 		if ((command == MESSAGE_ACTIVATE) == socket.ready):
 			message = "[{0}] Unexpected command {command}"
-			print message.format(socket.context, command=command)
+			print(message.format(socket.context, command=command))
 			return
 		try:
-			kwargs = dict((str(key), val) for key, val in kwargs.items())
+			kwargs = dict((str(key), val) for key, val in list(kwargs.items()))
 			if command == MESSAGE_ACTIVATE:
 				self._activateSocket(socket, **kwargs)
 			elif command == MESSAGE_GET:
@@ -396,7 +402,7 @@ class BaseClient(object):
 				self._rejectFile(socket, **kwargs)
 		except TypeError as e:
 			message = "[{0}] Invalid parameters to remote command {command}: {parms}; {err}"
-			print message.format(socket.context, command=command, parms=repr(kwargs), err=e)
+			print(message.format(socket.context, command=command, parms=repr(kwargs), err=e))
 
 	def _activateSocket(self, socket, username):
 		"""Activates the socket."""
@@ -413,7 +419,7 @@ class BaseClient(object):
 
 		if self.receivedfile is not None:
 			message = "[{0}] Remote duplicate PUT; ignoring {filename}"
-			print message.format(socket.context, filename=self.receivedfile.filename)
+			print(message.format(socket.context, filename=self.receivedfile.filename))
 
 		self.receivedfile = fileData(QtCore.QFile(makeLocalFilename(filename)), filename, size, digest)
 		self._updatetransfer()
@@ -421,7 +427,7 @@ class BaseClient(object):
 	def _ignoreFile(self, socket, filename):
 		"""Responds to a file request."""
 		message = "[{0}] Remote refused to send {filename}"
-		print message.format(socket.context, filename=filename)
+		print(message.format(socket.context, filename=filename))
 		self.fileEvent.emit(self, filename, "Remote refused to send")
 		if filename in self.getList:
 			self.getList.remove(filename)
@@ -432,7 +438,7 @@ class BaseClient(object):
 		"""Starts sending the specified file."""
 		if not self.sentfile or self.sentfile.filename != filename:
 			message = "[{0}] Attempt to accept unexpected file {filename}"
-			print message.format(socket.context, filename=filename)
+			print(message.format(socket.context, filename=filename))
 			socket._disconnectWithPrejudice()
 			return
 		socket.sendFile(self.sentfile)
@@ -442,7 +448,7 @@ class BaseClient(object):
 		"""Cancels sending the specified file."""
 		if not self.sentfile or self.sentfile.filename != filename:
 			message = "[{0}] Attempt to reject unexpected file {filename}"
-			print message.format(socket.context, filename=filename)
+			print(message.format(socket.context, filename=filename))
 			return
 		self.sendList.remove(filename)
 		self.sentfile.file.close()
@@ -460,26 +466,52 @@ class BaseClient(object):
 		"""Notify that the socket did not send the specified file."""
 		pass
 
-	fileEvent = signal(object, basestring, basestring, doc=
-		"""Called when something happens relating to a file.
+	try:
 
-		client -- this client
-		filename -- the filename of the file received
-		event -- a description of the event
+		fileEvent = signal(object, str, str, doc=
+			"""Called when something happens relating to a file.
 
-		"""
-	)
+			client -- this client
+			filename -- the filename of the file received
+			event -- a description of the event
 
-	partialTransferEvent = signal(object, basestring, basestring, basestring, doc=
-		"""Called when part of a transfer occurs.
+			"""
+		)
 
-		client -- this client
-		filename -- the filename of the file involved
-		size -- total size of the file
-		processed -- amount of the file transferred so far
+		partialTransferEvent = signal(object, str, str, str, doc=
+			"""Called when part of a transfer occurs.
 
-		"""
-	)
+			client -- this client
+			filename -- the filename of the file involved
+			size -- total size of the file
+			processed -- amount of the file transferred so far
+
+			"""
+		)
+
+	except Exception:
+
+		fileEvent = signal(object, basestring, basestring, doc=
+			"""Called when something happens relating to a file.
+
+			client -- this client
+			filename -- the filename of the file received
+			event -- a description of the event
+
+			"""
+		)
+
+		partialTransferEvent = signal(object, basestring, basestring, basestring, doc=
+			"""Called when part of a transfer occurs.
+
+			client -- this client
+			filename -- the filename of the file involved
+			size -- total size of the file
+			processed -- amount of the file transferred so far
+
+			"""
+		)
+
 
 class JsonClient(BaseClient):
 	"""A client that communicates with a server."""
@@ -560,70 +592,140 @@ class JsonClient(BaseClient):
 
 	# SIGNALS
 
-	connected = signal(object, basestring, doc=
-		"""Called when the client is ready to start sending;
-		when isConnected becomes True.
+	try:
 
-		Never called when hosting; can send immediately in that case.
+		connected = signal(object, basestring, doc=
+			"""Called when the client is ready to start sending;
+			when isConnected becomes True.
 
-		client -- this client
-		username -- the username the server is using
+			Never called when hosting; can send immediately in that case.
 
-		"""
-	)
+			client -- this client
+			username -- the username the server is using
 
-	disconnected = signal(object, basestring, doc=
-		"""Called when the client disconnects or fails to connect.
+			"""
+		)
 
-		Not called when disconnected manually (through close()).
+		disconnected = signal(object, basestring, doc=
+			"""Called when the client disconnects or fails to connect.
 
-		Never called when hosting; you will never be disconnected automatically.
+			Not called when disconnected manually (through close()).
 
-		client -- this client
-		errorMessage -- the untranslated reason the connection failed
+			Never called when hosting; you will never be disconnected automatically.
 
-		"""
-	)
+			client -- this client
+			errorMessage -- the untranslated reason the connection failed
 
-	transferDisconnected = signal(object, basestring, doc=
-		"""Called when the transfer socket disconnects or fails to connect.
+			"""
+		)
 
-		Not called when disconnected manually (through close()).
+		transferDisconnected = signal(object, basestring, doc=
+			"""Called when the transfer socket disconnects or fails to connect.
 
-		Never called when hosting; you will never be disconnected automatically.
+			Not called when disconnected manually (through close()).
 
-		client -- this client
-		errorMessage -- the untranslated reason the connection failed
+			Never called when hosting; you will never be disconnected automatically.
 
-		"""
-	)
+			client -- this client
+			errorMessage -- the untranslated reason the connection failed
 
-	objectReceived = signal(object, dict, doc=
-		"""Called when an object is received over the wire.
+			"""
+		)
 
-		client -- this client
-		data -- the data received
+		objectReceived = signal(object, dict, doc=
+			"""Called when an object is received over the wire.
 
-		"""
-	)
+			client -- this client
+			data -- the data received
 
-	fileReceived = signal(object, basestring, doc=
-		"""Called when a file is received over the wire.
+			"""
+		)
 
-		client -- this client
-		filename -- the filename of the file received
+		fileReceived = signal(object, basestring, doc=
+			"""Called when a file is received over the wire.
 
-		"""
-	)
+			client -- this client
+			filename -- the filename of the file received
 
-	fileFailed = signal(object, basestring, doc=
-		"""Called when a file fails to come over the wire.
+			"""
+		)
 
-		client -- this client
-		filename -- the filename of the file received
+		fileFailed = signal(object, basestring, doc=
+			"""Called when a file fails to come over the wire.
 
-		"""
-	)
+			client -- this client
+			filename -- the filename of the file received
+
+			"""
+		)
+
+	except Exception:
+
+		connected = signal(object, basestring, doc=
+			"""Called when the client is ready to start sending;
+			when isConnected becomes True.
+
+			Never called when hosting; can send immediately in that case.
+
+			client -- this client
+			username -- the username the server is using
+
+			"""
+		)
+
+		disconnected = signal(object, basestring, doc=
+			"""Called when the client disconnects or fails to connect.
+
+			Not called when disconnected manually (through close()).
+
+			Never called when hosting; you will never be disconnected automatically.
+
+			client -- this client
+			errorMessage -- the untranslated reason the connection failed
+
+			"""
+		)
+
+		transferDisconnected = signal(object, basestring, doc=
+			"""Called when the transfer socket disconnects or fails to connect.
+
+			Not called when disconnected manually (through close()).
+
+			Never called when hosting; you will never be disconnected automatically.
+
+			client -- this client
+			errorMessage -- the untranslated reason the connection failed
+
+			"""
+		)
+
+		objectReceived = signal(object, dict, doc=
+			"""Called when an object is received over the wire.
+
+			client -- this client
+			data -- the data received
+
+			"""
+		)
+
+		fileReceived = signal(object, basestring, doc=
+			"""Called when a file is received over the wire.
+
+			client -- this client
+			filename -- the filename of the file received
+
+			"""
+		)
+
+		fileFailed = signal(object, basestring, doc=
+			"""Called when a file fails to come over the wire.
+
+			client -- this client
+			filename -- the filename of the file received
+
+			"""
+		)
+
 
 	def setPassword(self, new):
 		self.password = new
@@ -772,10 +874,10 @@ class JsonServer(object):
 
 		result = tcp.listen(QtNetwork.QHostAddress("0.0.0.0"), port)
 		if result:
-			print "[SERVER] Listening on {0}:{1}".format(tcp.serverAddress().toString(), tcp.serverPort())
+			print("[SERVER] Listening on {0}:{1}".format(tcp.serverAddress().toString(), tcp.serverPort()))
 			self.tcp = tcp
 		else:
-			print "[SERVER] Error on listen attempt; {0}".format(tcp.errorString())
+			print("[SERVER] Error on listen attempt; {0}".format(tcp.errorString()))
 			# TODO: Should we delete the server here?
 			tcp.deleteLater()
 
@@ -788,7 +890,7 @@ class JsonServer(object):
 		if self.isConnected:
 			tcp = self.tcp
 			self.tcp = None
-			for client in self.clients.values():
+			for client in list(self.clients.values()):
 				client.close()
 			for socket in self.unknown:
 				socket.close()
@@ -796,7 +898,7 @@ class JsonServer(object):
 			tcp.close()
 			# TODO: Should we delete the server here?
 			tcp.deleteLater()
-			print "[SERVER] No longer listening."
+			print("[SERVER] No longer listening.")
 
 	def send(self, username, data):
 		"""Call to send an object over the wire."""
@@ -813,7 +915,7 @@ class JsonServer(object):
 		if users:
 			users = set(self._processUsername(username) for username in users)
 		else:
-			users = self.clients.keys()
+			users = list(self.clients.keys())
 		for shortname in users:
 			assert(shortname in self.clients)
 			self.clients[shortname].receive(data)
@@ -839,7 +941,10 @@ class JsonServer(object):
 
 	def _processUsername(self, username):
 		"""Processes a username to lowercase."""
-		return unicode(username).lower()
+		try:
+			return unicode(username).lower()
+		except UnicodeEncodeError:
+			return str(username).lower()
 
 	def _addClient(self, client):
 		"""Adds a client to the list."""
@@ -862,7 +967,7 @@ class JsonServer(object):
 
 	def addBan(self, IP):
 		"""Adds the given IP to the banlist."""
-		self.banlist.add(unicode(IP))
+		self.banlist.add(str(IP))
 
 	def clearBanlist(self):
 		"""Clears all entries from the banlist."""
@@ -871,20 +976,23 @@ class JsonServer(object):
 	@property
 	def users(self):
 		"""Returns the list of usernames."""
-		return self.clients.keys()
+		return list(self.clients.keys())
 
 	def userIP(self, username):
 		"""Gets the IP of an existing client."""
 		if not self.userExists(username):
 			raise RuntimeError("Invalid username {0}".format(username))
 		if self.clients[self._processUsername(username)] == self.client:
-			return u"127.0.0.1"
-		return unicode(self.clients[self._processUsername(username)].obj.socket.peerAddress())
+			return "127.0.0.1"
+		try:
+			return unicode(self.clients[self._processUsername(username)].obj.socket.peerAddress())
+		except UnicodeEncodeError:
+			return str(self.clients[self._processUsername(username)].obj.socket.peerAddress())
 
 	def baseUsername(server):
 		"""Replaceable hook for the base 'guest' username."""
 		# NOTE: should not localize
-		return u'guest'
+		return 'guest'
 
 	def allowUsername(server, username):
 		"""Replacable hook for determining whether a username is OK.
@@ -900,10 +1008,10 @@ class JsonServer(object):
 		if not username:
 			username = self.baseUsername()
 		if self.userExists(username):
-			username = username + ('-' + rggSystem.findRandomAppend())
+			username = username + ('-' + findRandomAppend())
 			while self.userExists(username):
-				username += rggSystem.findRandomAppend()
-		return unicode(username)
+				username += findRandomAppend()
+		return str(username)
 
 	def setPassword(self, new):
 		self.password = new
@@ -967,102 +1075,203 @@ class JsonServer(object):
 		assert(client != self.client)
 		self.transferDisconnected.emit(self, client.username, errorMessage)
 
-	connected = signal(object, basestring, doc=
+	try:
+
+		connected = signal(object, basestring, doc=
+			"""Called when a client connects to the server.
+
+			server -- this server
+			username -- the username of the client
+
+			"""
+		)
+
+		disconnected = signal(object, basestring, basestring, doc=
+			"""Called when a client disconnects from the server.
+
+			Not called when disconnected manually (through close()).
+
+			Never called when hosting; you will never be disconnected automatically.
+
+			server -- this server
+			username -- the username of the client
+			errorMessage -- the untranslated reason the connection failed
+
+			"""
+		)
+
+		transferDisconnected = signal(object, basestring, basestring, doc=
+			"""Called when a client transfer socket disconnects from the server.
+
+			Not called when disconnected manually (through close()).
+
+			Never called when hosting; you will never be disconnected automatically.
+
+			server -- this server
+			username -- the username of the client
+			errorMessage -- the untranslated reason the connection failed
+
+			"""
+		)
+
+		kicked = signal(object, basestring, doc=
+			"""Called when a client is kicked from the server.
+
+			server -- this server
+			username -- the username of the client
+
+			"""
+		)
+
+		objectReceived = signal(object, basestring, dict, doc=
+			"""Called when an object is received from the client over the wire.
+
+			server -- this server
+			username -- the username of the client
+			data -- the data received
+
+			"""
+		)
+
+		fileReceived = signal(object, basestring, basestring, doc=
+			"""Called when a file is received over the wire.
+
+			server -- this server
+			username -- the username of the client
+			filename -- the filename of the file received
+
+			"""
+		)
+
+		fileFailed = signal(object, basestring, basestring, doc=
+			"""Called when a file fails to come over the wire.
+
+			server -- this server
+			username -- the username of the client
+			filename -- the filename of the file received
+
+			"""
+		)
+
+		fileEvent = signal(object, basestring, basestring, doc=
+			"""Called when a file fails to come over the wire.
+
+			username -- the username of the client
+			filename -- the filename of the file received
+			event -- a description of the event
+
+			"""
+		)
+
+		partialTransferEvent = signal(object, basestring, basestring, basestring, doc=
+			"""Called when part of a transfer occurs.
+
+			username -- the username of the client
+			filename -- the filename of the file involved
+			size -- total size of the file
+			processed -- amount of the file transferred so far
+
+			"""
+		)
+
+	except Exception:
+
+		connected = signal(object, str, doc=
 		"""Called when a client connects to the server.
 
 		server -- this server
 		username -- the username of the client
 
 		"""
-	)
+		)
 
-	disconnected = signal(object, basestring, basestring, doc=
-		"""Called when a client disconnects from the server.
+		disconnected = signal(object, str, str, doc=
+			"""Called when a client disconnects from the server.
 
-		Not called when disconnected manually (through close()).
+			Not called when disconnected manually (through close()).
 
-		Never called when hosting; you will never be disconnected automatically.
+			Never called when hosting; you will never be disconnected automatically.
 
-		server -- this server
-		username -- the username of the client
-		errorMessage -- the untranslated reason the connection failed
+			server -- this server
+			username -- the username of the client
+			errorMessage -- the untranslated reason the connection failed
 
-		"""
-	)
+			"""
+		)
 
-	transferDisconnected = signal(object, basestring, basestring, doc=
-		"""Called when a client transfer socket disconnects from the server.
+		transferDisconnected = signal(object, str, str, doc=
+			"""Called when a client transfer socket disconnects from the server.
 
-		Not called when disconnected manually (through close()).
+			Not called when disconnected manually (through close()).
 
-		Never called when hosting; you will never be disconnected automatically.
+			Never called when hosting; you will never be disconnected automatically.
 
-		server -- this server
-		username -- the username of the client
-		errorMessage -- the untranslated reason the connection failed
+			server -- this server
+			username -- the username of the client
+			errorMessage -- the untranslated reason the connection failed
 
-		"""
-	)
+			"""
+		)
 
-	kicked = signal(object, basestring, doc=
-		"""Called when a client is kicked from the server.
+		kicked = signal(object, str, doc=
+			"""Called when a client is kicked from the server.
 
-		server -- this server
-		username -- the username of the client
+			server -- this server
+			username -- the username of the client
 
-		"""
-	)
+			"""
+		)
 
-	objectReceived = signal(object, basestring, dict, doc=
-		"""Called when an object is received from the client over the wire.
+		objectReceived = signal(object, str, dict, doc=
+			"""Called when an object is received from the client over the wire.
 
-		server -- this server
-		username -- the username of the client
-		data -- the data received
+			server -- this server
+			username -- the username of the client
+			data -- the data received
 
-		"""
-	)
+			"""
+		)
 
-	fileReceived = signal(object, basestring, basestring, doc=
-		"""Called when a file is received over the wire.
+		fileReceived = signal(object, str, str, doc=
+			"""Called when a file is received over the wire.
 
-		server -- this server
-		username -- the username of the client
-		filename -- the filename of the file received
+			server -- this server
+			username -- the username of the client
+			filename -- the filename of the file received
 
-		"""
-	)
+			"""
+		)
 
-	fileFailed = signal(object, basestring, basestring, doc=
-		"""Called when a file fails to come over the wire.
+		fileFailed = signal(object, str, str, doc=
+			"""Called when a file fails to come over the wire.
 
-		server -- this server
-		username -- the username of the client
-		filename -- the filename of the file received
+			server -- this server
+			username -- the username of the client
+			filename -- the filename of the file received
 
-		"""
-	)
+			"""
+		)
 
-	fileEvent = signal(object, basestring, basestring, doc=
-		"""Called when a file fails to come over the wire.
+		fileEvent = signal(object, str, str, doc=
+			"""Called when a file fails to come over the wire.
 
-		username -- the username of the client
-		filename -- the filename of the file received
-		event -- a description of the event
+			username -- the username of the client
+			filename -- the filename of the file received
+			event -- a description of the event
 
-		"""
-	)
+			"""
+		)
 
-	partialTransferEvent = signal(object, basestring, basestring, basestring, doc=
-		"""Called when part of a transfer occurs.
+		partialTransferEvent = signal(object, str, str, str, doc=
+			"""Called when part of a transfer occurs.
 
-		username -- the username of the client
-		filename -- the filename of the file involved
-		size -- total size of the file
-		processed -- amount of the file transferred so far
+			username -- the username of the client
+			filename -- the filename of the file involved
+			size -- total size of the file
+			processed -- amount of the file transferred so far
 
-		"""
-	)
+			"""
+		)
 
 	def passFileEvent(self, clientName, filename, eventDescription):
 		self.fileEvent.emit(clientName, filename, eventDescription)
@@ -1076,19 +1285,20 @@ class JsonServer(object):
 			return
 		while self.tcp.hasPendingConnections():
 			socket = self.tcp.nextPendingConnection()
-			if unicode(socket.peerAddress().toString()) in self.banlist:
+			if str(socket.peerAddress().toString()) in self.banlist:
 				socket.close()
-				print "[SERVER] Banned client attempted to connect: {1}:{2}".format(
-					socket.peerName(), socket.peerAddress().toString(), socket.peerPort())
+				print("[SERVER] Banned client attempted to connect: {1}:{2}".format(
+					socket.peerName(), socket.peerAddress().toString(), socket.peerPort()))
 				return
 			assert(socket)
-			print "[SERVER] New client connected: {1}:{2}".format(
-					socket.peerName(), socket.peerAddress().toString(), socket.peerPort())
+			print("[SERVER] New client connected: {1}:{2}".format(
+					socket.peerName(), socket.peerAddress().toString(), socket.peerPort()))
 			socket = statefulSocket(socket=socket)
 			self.unknown.add(socket)
 			socket.disconnected.connect(self._socketDisconnected)
 			socket.commandReceived.connect(self._socketCommand)
 			socket.objectReceived.connect(self._socketObject)
+			print("Connections successful for ", str(socket))
 
 	def _detachUnknown(self, socket):
 		self.unknown.discard(socket)
@@ -1103,7 +1313,7 @@ class JsonServer(object):
 
 	def _forbidSocket(self, socket, text):
 		message = "[{0}] {1}"
-		print message.format(socket.context, text)
+		print(message.format(socket.context, text))
 		self._detachUnknown(socket)
 		socket.close()
 
@@ -1119,7 +1329,7 @@ class JsonServer(object):
 			self._forbidSocket(socket, message)
 			return
 		try:
-			kwargs = dict((str(key), val) for key, val in kwargs.items())
+			kwargs = dict((str(key), val) for key, val in list(kwargs.items()))
 			self._socketIdentified(socket, **kwargs)
 		except TypeError as e:
 			message = "Invalid parameters to initial remote command {command}: {parms}; {err}"
@@ -1183,14 +1393,20 @@ class JsonServer(object):
 			client._openXfer(socket)
 			socket.sendMessage(MESSAGE_ACTIVATE, username=username)
 			message = "[{0}:{1}] Transfer socket connected to {username}"
-			print message.format(socket.context, client.obj.context, username=username)
+			print(message.format(socket.context, client.obj.context, username=username))
 			client._updatetransfer()
 
 def localHost():
 	"""Gets the name of the local machine."""
-	return unicode(QtNetwork.QHostInfo.localHostName())
+	try:
+		return unicode(QtNetwork.QHostInfo.localHostName())
+	except UnicodeEncodeError:
+		return str(QtNetwork.QHostInfo.localHostName())
 
 def localUser():
 	"""Gets the name of the local user."""
-	return unicode(getpass.getuser())
+	try:
+		return unicode(getpass.getuser())
+	except UnicodeEncodeError:
+		return str(getpass.getuser())
 

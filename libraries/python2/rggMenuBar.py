@@ -18,14 +18,27 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
-
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtCore import PYQT_VERSION_STR, QT_VERSION_STR
-from rggSystem import translate, mainWindow
-from rggJson import loadString, jsonload, jsonappend
-from rggRPC import client
-import sys, os, rggStyles
-from rggConstants import *
+import sys, os
+try:
+	from PyQt5 import QtCore
+	from PyQt5.QtGui import *
+	from PyQt5.QtWidgets import *
+	from PyQt5.Qt import PYQT_VERSION_STR
+	from PyQt5.QtCore import QT_VERSION_STR
+	from . import rggStyles
+	from .rggSystem import translate, mainWindow
+	from .rggJson import loadString, jsonload, jsonappend
+	from .rggRPC import client
+	from .rggConstants import *
+except ImportError:
+	from PyQt4 import QtCore
+	from PyQt4.QtGui import *
+	from PyQt4.QtCore import PYQT_VERSION_STR, QT_VERSION_STR
+	import rggStyles
+	from rggSystem import translate, mainWindow
+	from rggJson import loadString, jsonload, jsonappend
+	from rggRPC import client
+	from rggConstants import *
 
 ICON_SELECT = 0
 ICON_MOVE = 1
@@ -47,63 +60,63 @@ class menuBar(object):
 
 		# ACTIONS
 
-		self.newMapAct = QtGui.QAction(translate("menubar", "&New Map..."), main)
+		self.newMapAct = QAction(translate("menubar", "&New Map..."), main)
 		self.newMapAct.setShortcut("Ctrl+N")
 
-		self.loadMapAct = QtGui.QAction(translate("menubar", "Load Map..."), main)
+		self.loadMapAct = QAction(translate("menubar", "Load Map..."), main)
 		#self.loadMapAct.setShortcut("Ctrl+L")
 
-		self.saveMapAct = QtGui.QAction(translate("menubar", "Save Map As..."), main)
+		self.saveMapAct = QAction(translate("menubar", "Save Map As..."), main)
 		#self.saveMapAct.setShortcut("Ctrl+S")
 
-		self.closeSpecificMapAct = QtGui.QAction(translate("menubar", "Close Map"), main)
+		self.closeSpecificMapAct = QAction(translate("menubar", "Close Map"), main)
 
-		self.closeMapAct = QtGui.QAction(translate("menubar", "&Close All Maps"), main)
+		self.closeMapAct = QAction(translate("menubar", "&Close All Maps"), main)
 		self.closeMapAct.setShortcut("Ctrl+Shift+W")
 
-		self.loadSessAct = QtGui.QAction(translate("menubar", "&Load Session..."), main)
+		self.loadSessAct = QAction(translate("menubar", "&Load Session..."), main)
 		self.loadSessAct.setShortcut("Ctrl+L")
 
-		self.saveSessAct = QtGui.QAction(translate("menubar", "&Save Session As..."), main)
+		self.saveSessAct = QAction(translate("menubar", "&Save Session As..."), main)
 		self.saveSessAct.setShortcut("Ctrl+S")
 
-		self.clearSessAct = QtGui.QAction(translate("menubar", "Clear Session"), main)
+		self.clearSessAct = QAction(translate("menubar", "Clear Session"), main)
 
-		self.deletePogsAct = QtGui.QAction(translate("menubar", "Delete All Pogs"), main)
+		self.deletePogsAct = QAction(translate("menubar", "Delete All Pogs"), main)
 
-		self.saveCharsAct = QtGui.QAction(translate("menubar", "Save IC Characters As..."), main)
+		self.saveCharsAct = QAction(translate("menubar", "Save IC Characters As..."), main)
 
-		self.loadCharsAct = QtGui.QAction(translate("menubar", "Load IC Characters..."), main)
+		self.loadCharsAct = QAction(translate("menubar", "Load IC Characters..."), main)
 
-		self.gfxSettingsAct = QtGui.QAction(translate("menubar", "Configure Graphics..."), main)
+		self.gfxSettingsAct = QAction(translate("menubar", "Configure Graphics..."), main)
 
-		self.drawTimerSettingsAct = QtGui.QAction(translate("menubar", "Configure FPS..."), main)
+		self.drawTimerSettingsAct = QAction(translate("menubar", "Configure FPS..."), main)
 
-		self.hostGameAct = QtGui.QAction(translate("menubar", "&Host Game..."), main)
+		self.hostGameAct = QAction(translate("menubar", "&Host Game..."), main)
 		self.hostGameAct.setShortcut("Ctrl+H")
 
-		self.joinGameAct = QtGui.QAction(translate("menubar", "&Join Game..."), main)
+		self.joinGameAct = QAction(translate("menubar", "&Join Game..."), main)
 		self.joinGameAct.setShortcut("Ctrl+J")
 
-		self.disconnectAct = QtGui.QAction(translate("menubar", "&Disconnect"), main)
+		self.disconnectAct = QAction(translate("menubar", "&Disconnect"), main)
 		self.disconnectAct.setShortcut("Ctrl+D")
 
-		self.sendFileAct = QtGui.QAction(translate("menubar", "Send file..."), main)
+		self.sendFileAct = QAction(translate("menubar", "Send file..."), main)
 
-		self.createSurveyAct = QtGui.QAction(translate("menubar", "Create Survey..."), main)
+		self.createSurveyAct = QAction(translate("menubar", "Create Survey..."), main)
 
-		self.aboutAct = QtGui.QAction(translate("menubar", "&About"), main)
+		self.aboutAct = QAction(translate("menubar", "&About"), main)
 		self.aboutAct.setShortcut("Ctrl+A")
 
-		self.thicknessOneAct = QtGui.QAction(translate("menubar", "&One"), main)
-		self.thicknessTwoAct = QtGui.QAction(translate("menubar", "&Two"), main)
-		self.thicknessThreeAct = QtGui.QAction(translate("menubar", "&Three"), main)
+		self.thicknessOneAct = QAction(translate("menubar", "&One"), main)
+		self.thicknessTwoAct = QAction(translate("menubar", "&Two"), main)
+		self.thicknessThreeAct = QAction(translate("menubar", "&Three"), main)
 
-		self.toggleAlertsAct = QtGui.QAction(translate("menubar", "Chat Username Notify"), main)
+		self.toggleAlertsAct = QAction(translate("menubar", "Chat Username Notify"), main)
 		self.toggleAlertsAct.setCheckable(True)
 		self.toggleAlertsAct.setChecked(True)
 
-		self.toggleTimestampsAct = QtGui.QAction(translate("menubar", "OOC Chat Timestamps"), main)
+		self.toggleTimestampsAct = QAction(translate("menubar", "OOC Chat Timestamps"), main)
 		self.toggleTimestampsAct.setCheckable(True)
 		self.toggleTimestampsAct.setChecked(False)
 
@@ -114,29 +127,29 @@ class menuBar(object):
 		except:
 			pass
 
-		self.setTimestampFormatAct = QtGui.QAction(translate("menubar", "Set Timestamp Format..."), main)
+		self.setTimestampFormatAct = QAction(translate("menubar", "Set Timestamp Format..."), main)
 
-		self.portraitMenu = QtGui.QAction(translate("menubar", "Set IC Portrait Size..."), main)
+		self.portraitMenu = QAction(translate("menubar", "Set IC Portrait Size..."), main)
 
-		self.selectIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-select-icon.png"), "Select Tool", main)
+		self.selectIcon = QAction(QIcon("./data/FAD-select-icon.png"), "Select Tool", main)
 		self.selectIcon.setShortcut("Ctrl+T")
 		self.selectIcon.setToolTip("Select Tool (Ctrl+T)")
 
-		self.moveIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-move-icon.png"), "Move Tool", main)
+		self.moveIcon = QAction(QIcon("./data/FAD-move-icon.png"), "Move Tool", main)
 		self.moveIcon.setShortcut("Ctrl+M")
 		self.moveIcon.setToolTip("Move Tool (Ctrl+M)")
 
-		self.drawIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-freehand-icon.png"), "Draw Tool", main)
+		self.drawIcon = QAction(QIcon("./data/FAD-freehand-icon.png"), "Draw Tool", main)
 		self.drawIcon.setShortcut("Ctrl+E")
 		self.drawIcon.setToolTip("Draw Tool (Ctrl+E)")
 
-		self.deleteIcon = QtGui.QAction(QtGui.QIcon("./data/FAD-eraser-icon.png"), "Delete Tool", main)
+		self.deleteIcon = QAction(QIcon("./data/FAD-eraser-icon.png"), "Delete Tool", main)
 		self.deleteIcon.setShortcut("Ctrl+R")
 		self.deleteIcon.setToolTip("Delete Tool (Ctrl+R)")
 
 		# MENUS
 
-		fileMenu = QtGui.QMenu(translate("menubar", "&File"), main)
+		fileMenu = QMenu(translate("menubar", "&File"), main)
 		fileMenu.addAction(self.newMapAct)
 		fileMenu.addAction(self.loadMapAct)
 		fileMenu.addAction(self.saveMapAct)
@@ -157,59 +170,59 @@ class menuBar(object):
 		self.pogExistsActs = [self.deletePogsAct,]
 		self.characterExistsActs = [self.saveCharsAct,]
 
-		internetMenu = QtGui.QMenu(translate("menubar", "&Internet"), main)
-		internetMenu.addAction(self.hostGameAct)
-		internetMenu.addAction(self.joinGameAct)
-		internetMenu.addSeparator()
-		internetMenu.addAction(self.createSurveyAct)
-		internetMenu.addAction(self.sendFileAct)
-		internetMenu.addSeparator()
-		internetMenu.addAction(self.disconnectAct)
+		self.internetMenu = QMenu(translate("menubar", "&Internet"), main)
+		self.internetMenu.addAction(self.hostGameAct)
+		self.internetMenu.addAction(self.joinGameAct)
+		self.internetMenu.addSeparator()
+		self.internetMenu.addAction(self.createSurveyAct)
+		self.internetMenu.addAction(self.sendFileAct)
+		self.internetMenu.addSeparator()
+		self.internetMenu.addAction(self.disconnectAct)
 
 		self.connectedActs = [self.createSurveyAct, self.sendFileAct, self.disconnectAct]
 		self.disconnectedActs = [self.hostGameAct, self.joinGameAct]
 
-		self.thicknessMenu = QtGui.QMenu(translate("menubar", "&Thickness"), main)
+		self.thicknessMenu = QMenu(translate("menubar", "&Thickness"), main)
 		for x in range(1, 11):
-			self.thicknessMenu.addAction(QtGui.QAction(str(x), main))
+			self.thicknessMenu.addAction(QAction(str(x), main))
 
-		self.colourMenu = QtGui.QMenu(translate("menubar", "&Colour"), main)
+		self.colourMenu = QMenu(translate("menubar", "&Colour"), main)
 		#Don't translate colour names yet
-		self.colourMenu.addAction(QtGui.QAction("White", main))
-		self.colourMenu.addAction(QtGui.QAction("Red", main))
-		self.colourMenu.addAction(QtGui.QAction("Orange", main))
-		self.colourMenu.addAction(QtGui.QAction("Yellow", main))
-		self.colourMenu.addAction(QtGui.QAction("Green", main))
-		self.colourMenu.addAction(QtGui.QAction("Blue", main))
-		self.colourMenu.addAction(QtGui.QAction("Purple", main))
-		self.colourMenu.addAction(QtGui.QAction("Black", main))
-		self.colourMenu.addAction(QtGui.QAction("Custom...", main))
+		self.colourMenu.addAction(QAction("White", main))
+		self.colourMenu.addAction(QAction("Red", main))
+		self.colourMenu.addAction(QAction("Orange", main))
+		self.colourMenu.addAction(QAction("Yellow", main))
+		self.colourMenu.addAction(QAction("Green", main))
+		self.colourMenu.addAction(QAction("Blue", main))
+		self.colourMenu.addAction(QAction("Purple", main))
+		self.colourMenu.addAction(QAction("Black", main))
+		self.colourMenu.addAction(QAction("Custom...", main))
 
-		drawMenu = QtGui.QMenu(translate("menubar", "&Draw"), main)
+		drawMenu = QMenu(translate("menubar", "&Draw"), main)
 		drawMenu.addMenu(self.thicknessMenu)
 		drawMenu.addMenu(self.colourMenu)
 
-		self.stylesMenu = QtGui.QMenu(translate("menubar", "&Styles"), main)
-		for style in rggStyles.sheets.keys():
-			act = QtGui.QAction(style, main)
+		self.stylesMenu = QMenu(translate("menubar", "&Styles"), main)
+		for style in list(rggStyles.sheets.keys()):
+			act = QAction(style, main)
 			act.isDark = rggStyles.sheets[style][1]
 			self.stylesMenu.addAction(act)
 
-		self.langMenu = QtGui.QMenu(translate("menubar", "&Language"), main)
-		ned = QtGui.QAction(translate("menubar", "Dutch"), main)
+		self.langMenu = QMenu(translate("menubar", "&Language"), main)
+		ned = QAction(translate("menubar", "Dutch"), main)
 		ned.setIconText("Dutch")
 		self.langMenu.addAction(ned)
-		eng = QtGui.QAction(translate("menubar", "English"), main)
+		eng = QAction(translate("menubar", "English"), main)
 		eng.setIconText("English")
 		self.langMenu.addAction(eng)
-		nhn = QtGui.QAction(translate("menubar", "Japanese"), main)
+		nhn = QAction(translate("menubar", "Japanese"), main)
 		nhn.setIconText("Japanese")
 		self.langMenu.addAction(nhn)
-		deu = QtGui.QAction(translate("menubar", "German"), main)
+		deu = QAction(translate("menubar", "German"), main)
 		deu.setIconText("German")
 		self.langMenu.addAction(deu)
 
-		self.optionsMenu = QtGui.QMenu(translate("menubar", "&Options"), main)
+		self.optionsMenu = QMenu(translate("menubar", "&Options"), main)
 		self.optionsMenu.addMenu(self.langMenu)
 		self.optionsMenu.addMenu(self.stylesMenu)
 		self.optionsMenu.addSeparator()
@@ -221,7 +234,7 @@ class menuBar(object):
 		self.optionsMenu.addAction(self.drawTimerSettingsAct)
 
 
-		self.pluginsMenu = QtGui.QMenu(translate("menubar", "&Plugins"), main)
+		self.pluginsMenu = QMenu(translate("menubar", "&Plugins"), main)
 
 		self.pluginsModules = []
 		self.plugins = {}
@@ -232,27 +245,27 @@ class menuBar(object):
 					continue
 				try:
 					self.pluginsModules.append(__import__(folder))
-					self.pluginsMenu.addAction(QtGui.QAction(unicode(self.pluginsModules[-1].title()), main))
-					self.plugins[unicode(self.pluginsModules[-1].title())] = folder
+					self.pluginsMenu.addAction(QAction(str(self.pluginsModules[-1].title()), main))
+					self.plugins[str(self.pluginsModules[-1].title())] = folder
 				except:
 					pass
 		except Exception as e:
 			pass
 
-		self.windowMenu = QtGui.QMenu(translate("menubar", "Window"), main)
+		self.windowMenu = QMenu(translate("menubar", "Window"), main)
 
-		self.helpMenu = QtGui.QMenu(translate("menubar", "&Help"), main)
+		self.helpMenu = QMenu(translate("menubar", "&Help"), main)
 		self.helpMenu.addAction(self.aboutAct)
 
 		# MENUBAR
 
 		self.menubar.addMenu(fileMenu)
-		self.menubar.addMenu(internetMenu)
+		self.menubar.addMenu(self.internetMenu)
 		self.menubar.addMenu(drawMenu)
 		self.menubar.addMenu(self.optionsMenu)
 		self.pluginhide = self.menubar.addMenu(self.pluginsMenu)
 		if list(int(r) for r in PYQT_VERSION_STR.split(".")) < [4,  8,  0]:
-			warning = QtGui.QMessageBox()
+			warning = QMessageBox()
 			warning.setText("".join(("Your version of PyQt (", PYQT_VERSION_STR, ") is incompatible with RGG's Window menu, which requires 4.8.0 or newer. Right-click on the menu bar to get an alternate menu.")))
 			warning.exec_()
 		else:
@@ -275,40 +288,40 @@ class menuBar(object):
 		self.pluginsMenu.triggered.connect(self.loadPlugin)
 
 		fileMenu.aboutToShow.connect(self.updateFileMenu)
-		internetMenu.aboutToShow.connect(self.updateInternetMenu)
+		self.internetMenu.aboutToShow.connect(self.updateInternetMenu)
 		self.windowMenu.aboutToShow.connect(self.updateWidgetMenu)
 
 		self.aboutAct.triggered.connect(self.about)
 
 	def resetIcons(self):
-		self.selectIcon.setIcon(QtGui.QIcon("./data/FAD-select-icon.png"))
-		self.moveIcon.setIcon(QtGui.QIcon("./data/FAD-move-icon.png"))
-		self.drawIcon.setIcon(QtGui.QIcon("./data/FAD-freehand-icon.png"))
-		self.deleteIcon.setIcon(QtGui.QIcon("./data/FAD-eraser-icon.png"))
+		self.selectIcon.setIcon(QIcon("./data/FAD-select-icon.png"))
+		self.moveIcon.setIcon(QIcon("./data/FAD-move-icon.png"))
+		self.drawIcon.setIcon(QIcon("./data/FAD-freehand-icon.png"))
+		self.deleteIcon.setIcon(QIcon("./data/FAD-eraser-icon.png"))
 
 	def selectIconClicked(self):
 		self.resetIcons()
-		self.selectIcon.setIcon(QtGui.QIcon("./data/FAD-select-icon-selected.png"))
+		self.selectIcon.setIcon(QIcon("./data/FAD-select-icon-selected.png"))
 		self.selectedIcon = ICON_SELECT
 
 	def moveIconClicked(self):
 		self.resetIcons()
-		self.moveIcon.setIcon(QtGui.QIcon("./data/FAD-move-icon-selected.png"))
+		self.moveIcon.setIcon(QIcon("./data/FAD-move-icon-selected.png"))
 		self.selectedIcon = ICON_MOVE
 
 	def drawIconClicked(self):
 		self.resetIcons()
-		self.drawIcon.setIcon(QtGui.QIcon("./data/FAD-freehand-icon-selected.png"))
+		self.drawIcon.setIcon(QIcon("./data/FAD-freehand-icon-selected.png"))
 		self.selectedIcon = ICON_DRAW
 
 	def deleteIconClicked(self):
 		self.resetIcons()
-		self.deleteIcon.setIcon(QtGui.QIcon("./data/FAD-eraser-icon-selected.png"))
+		self.deleteIcon.setIcon(QIcon("./data/FAD-eraser-icon-selected.png"))
 		self.selectedIcon = ICON_DELETE
 
 	def loadPlugin(self, act):
-		exec("from " + (self.plugins[unicode(act.text())]) + " import " + (self.plugins[unicode(act.text())]))
-		exec(self.plugins[unicode(act.text())] + ".hajimaru(mainWindow)")
+		exec("from " + (self.plugins[str(act.text())]) + " import " + (self.plugins[str(act.text())]))
+		exec(self.plugins[str(act.text())] + ".hajimaru(mainWindow)")
 		self.pluginsMenu.removeAction(act)
 		if len(self.pluginsMenu.actions()) == 0:
 			self.pluginhide.setVisible(False)
@@ -337,7 +350,7 @@ class menuBar(object):
 			act.setEnabled(not client.isConnected)
 
 	def about(self):
-		msg = QtGui.QMessageBox(mainWindow)
+		msg = QMessageBox(mainWindow)
 		if DEV:
 			aboutText = " ".join(("RGG", VERSION, "Development Version", "\nPython", ".".join(str(x) for x in sys.version_info[:3]), "\nPyQt", PYQT_VERSION_STR, "(Qt", QT_VERSION_STR+")"))
 		else:
