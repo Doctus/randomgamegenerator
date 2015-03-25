@@ -15,23 +15,35 @@ from OpenGL.arrays import ArrayDatatype as ADT
 OpenGL.ERROR_CHECKING = False
 OpenGL.ERROR_LOGGING = False
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4.QtOpenGL import *
+try:
+	from PyQt5.QtCore import *
+	from PyQt5.QtGui import *
+	from PyQt5.QtWidgets import *
+	from PyQt5.QtOpenGL import *
+	from .rggTile import *
+	from .rggSystem import POG_DIR, SAVE_DIR, promptSaveFile, signal
+	from .rggJson import loadString, loadInteger, loadFloat, jsonload
+	from .rggConstants import BASE_STRING
+except ImportError:
+	from PyQt4.QtCore import *
+	from PyQt4.QtGui import *
+	from PyQt4.QtOpenGL import *
+	from rggTile import *
+	from rggSystem import POG_DIR, SAVE_DIR, promptSaveFile, signal
+	from rggJson import loadString, loadInteger, loadFloat, jsonload
+	from rggConstants import BASE_STRING
 
-import random, math
+import random, math, os, sys
 
 mod = False
+
 try:
-	print "Loading GLMod"
+	print("Loading GLMod")
 	import glmod
 	mod = True
 except Exception as e:
-	print "Failed!", e
+	print("Failed!", e)
 	pass
-
-from rggTile import *
-from rggSystem import POG_DIR, promptSaveFile, signal
 
 def nextPowerOfTwo(val):
 	val -= 1
@@ -85,23 +97,6 @@ class GLWidget(QGLWidget):
 		self.logoon = "Off"
 
 		self.setAcceptDrops(True)
-
-		try:
-			from rggSystem import SAVE_DIR
-			from rggJson import loadString, jsonload
-			import os
-			js = jsonload(os.path.join(SAVE_DIR, "gfx_settings.rgs"))
-			self.logoon = loadString('gfx.splash', js.get('Splash'))
-			if self.logoon == "On":
-				dirs = os.listdir("data")
-				logos = []
-				for f in dirs:
-					if not "logo" in f:
-						continue
-					logos.append(f)
-				self.logo = [True, 4.00, os.path.join("data", logos[random.randint(0, len(logos)-1)]), random.randint(0, 3)]
-		except:
-			pass
 
 		#settings, as used in SAVE_DIR/gfx_settings.rgs
 		self.npot = 3
@@ -157,7 +152,7 @@ class GLWidget(QGLWidget):
 					glVertex2f(line[0], line[1])
 					glVertex2f(line[2], line[3])
 				glEnd()
-			if self.selectionCircles.has_key(-1):
+			if -1 in self.selectionCircles:
 				glLineWidth(3)
 				glColor3f(0.0, 1.0, 0.0)
 				for circle in self.selectionCircles[-1]:
@@ -285,9 +280,6 @@ class GLWidget(QGLWidget):
 		Initialize GL
 		'''
 		global mod
-		from rggJson import loadString, loadInteger, loadFloat, jsonload
-		from rggSystem import SAVE_DIR
-		import os
 
 		self.fieldtemp = [1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", "On", "On", "Magic"]
 
@@ -300,7 +292,7 @@ class GLWidget(QGLWidget):
 			self.fieldtemp[4] = loadString('gfx.FSAA', js.get('FSAA'))
 			self.fieldtemp[5] = loadString('gfx.VBO', js.get('VBO'))
 		except:
-			print "no settings detected"
+			print("no settings detected")
 			pass
 
 		try:
@@ -314,35 +306,35 @@ class GLWidget(QGLWidget):
 
 		#mipmap support and NPOT texture support block
 		if not hasGLExtension("GL_ARB_framebuffer_object"):
-			print "GL_ARB_framebuffer_object not supported, switching to GL_GENERATE_MIPMAP"
+			print("GL_ARB_framebuffer_object not supported, switching to GL_GENERATE_MIPMAP")
 			self.npot = 2
 		version = glGetString(GL_VERSION)
 		if int(version[0]) == 1 and int(version[2]) < 4: #no opengl 1.4 support
-			print "GL_GENERATE_MIPMAP not supported, not using mipmapping"
+			print("GL_GENERATE_MIPMAP not supported, not using mipmapping")
 			self.npot = 1
 		if not hasGLExtension("GL_ARB_texture_non_power_of_two"):
-			print "GL_ARB_texture_non_power_of_two not supported, switching to GL_ARB_texture_rectangle"
+			print("GL_ARB_texture_non_power_of_two not supported, switching to GL_ARB_texture_rectangle")
 			self.texext = GL_TEXTURE_RECTANGLE_ARB
 			self.npot = 1
 		if not hasGLExtension("GL_ARB_texture_rectangle"):
-			print "GL_TEXTURE_RECTANGLE_ARB not supported, switching to GL_TEXTURE_2D"
+			print("GL_TEXTURE_RECTANGLE_ARB not supported, switching to GL_TEXTURE_2D")
 			self.texext = GL_TEXTURE_2D
 			self.npot = 0
 
 		#assorted settings block
 		if hasGLExtension("GL_EXT_texture_filter_anisotropic") and self.fieldtemp[0] > 1.0:
 			self.anifilt = self.fieldtemp[0]
-			print "using " + str(self.fieldtemp[0]) + "x anisotropic texture filtering. max: " + str(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT))
+			print("using " + str(self.fieldtemp[0]) + "x anisotropic texture filtering. max: " + str(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT)))
 		self.minfilter = self.interpretString(self.fieldtemp[1])
 		self.magfilter = self.interpretString(self.fieldtemp[2])
 		self.mipminfilter = self.interpretString(self.fieldtemp[3])
 		if self.mipminfilter == "Off":
 			self.mipminfilter = -1
 		if self.format().sampleBuffers() and self.fieldtemp[4] == "On":
-			print "enabling "  + str(self.format().samples()) + "x FSAA"
+			print("enabling "  + str(self.format().samples()) + "x FSAA")
 			glEnable(GL_MULTISAMPLE)
 		else:
-			print "FSAA not supported and/or disabled"
+			print("FSAA not supported and/or disabled")
 
 		glEnable(self.texext)
 		glEnable(GL_BLEND)
@@ -355,28 +347,28 @@ class GLWidget(QGLWidget):
 		if mod:
 			ret = glmod.init(self.texext)
 			if ret == -1:
-				print "Something terrible went wrong in initializing glmod"
+				print("Something terrible went wrong in initializing glmod")
 				mod = False
 			elif ret == -2:
 				if self.fieldtemp[5] == "On":
-					print "using gl module, VBO support requested but not available"
+					print("using gl module, VBO support requested but not available")
 				else:
-					print "using gl module, VBO support not requested"
+					print("using gl module, VBO support not requested")
 			else:
 				initok = True
 				if self.fieldtemp[5] == "On":
-					print "using gl module, VBO support requested and available"
+					print("using gl module, VBO support requested and available")
 				else:
-					print "using gl module, VBO support not requested"
+					print("using gl module, VBO support not requested")
 
 		if mod and initok and self.fieldtemp[5] == "On":
 			if glInitVertexBufferObjectARB() and bool(glBindBufferARB):
 				self.vbos = True
-				print "VBO support initialised succesfully"
+				print("VBO support initialised succesfully")
 				self.VBO = int(glGenBuffersARB(1))
 				glmod.initVBO(self.VBO, ADT.arrayByteCount(numpy.zeros((2, 2), 'f')))
 			else:
-				print "VBO support initialisation failed, continuing without"
+				print("VBO support initialisation failed, continuing without")
 
 	#util functions
 	def createImage(self, qimagepath, layer, textureRect, drawRect, hidden = False, dynamicity = GL_STATIC_DRAW_ARB):
@@ -395,7 +387,7 @@ class GLWidget(QGLWidget):
 				found = True
 		else:
 			qimg = QImage(qimagepath)
-			print "created", qimagepath
+			print("created", qimagepath)
 
 		if textureRect[2] == -1:
 			textureRect[2] = qimg.width()
@@ -425,15 +417,15 @@ class GLWidget(QGLWidget):
 
 			texture = int(glGenTextures(1))
 			try:
-				imgdata = img.bits().asstring(img.numBytes())
-			except:
-				import sys
-				print "requested to create", qimagepath, layer, textureRect, drawRect, hidden
+				imgdata = img.bits().asstring(img.byteCount())
+			except Exception as e:
+				print(e)
+				print("requested to create", qimagepath, layer, textureRect, drawRect, hidden)
 				for x in [0, 1, 2, 3]:
 					f_code = sys._getframe(x).f_code #really bad hack to get the filename and number
-					print "Doing it wrong in " + f_code.co_filename + ":" + str(f_code.co_firstlineno)
+					print("Doing it wrong in " + f_code.co_filename + ":" + str(f_code.co_firstlineno))
 
-			print "created texture", texture
+			print("created texture", texture)
 
 			glBindTexture(self.texext, texture)
 
@@ -470,7 +462,7 @@ class GLWidget(QGLWidget):
 
 		if layer not in self.images:
 			self.images[layer] = []
-			self.layers = self.images.keys()
+			self.layers = list(self.images.keys())
 			self.layers.sort()
 			image.createLayer = True
 
@@ -490,7 +482,7 @@ class GLWidget(QGLWidget):
 		'''
 		if self.vbos and size > self.VBOBuffer:
 			self.VBOBuffer = nextPowerOfTwo(size+1)
-			print "reserving size", self.VBOBuffer
+			print("reserving size", self.VBOBuffer)
 
 			self.fillBuffers(None, False) #Automatically does a calculateVBOList()
 
@@ -507,7 +499,7 @@ class GLWidget(QGLWidget):
 
 		if self.VBOBuffer <= size or image == None or self.offset + self.vertByteCount >= self.VBOBuffer*self.vertByteCount:
 			if resize and self.VBOBuffer <= size:
-				print "resizing from", size, "to", nextPowerOfTwo(size+1)
+				print("resizing from", size, "to", nextPowerOfTwo(size+1))
 				self.VBOBuffer = nextPowerOfTwo(size+1)
 
 			glBufferDataARB(GL_ARRAY_BUFFER_ARB, self.VBOBuffer*self.vertByteCount, None, GL_STATIC_DRAW_ARB)
@@ -544,7 +536,7 @@ class GLWidget(QGLWidget):
 		self.qimages[image.imagepath][2] -= 1
 
 		if self.qimages[image.imagepath][2] <= 0:
-			print "deleting texture", image.textureId
+			print("deleting texture", image.textureId)
 			glDeleteTextures(image.textureId)
 			del self.qimages[image.imagepath]
 
@@ -565,7 +557,7 @@ class GLWidget(QGLWidget):
 			self.qimages[image.imagepath][2] -= 1
 
 			if self.qimages[image.imagepath][2] <= 0:
-				print "deleting texture", image.textureId
+				print("deleting texture", image.textureId)
 				glDeleteTextures(image.textureId)
 				del self.qimages[image.imagepath]
 
@@ -690,7 +682,7 @@ class GLWidget(QGLWidget):
 		image._layer = newLayer
 		if newLayer not in self.images:
 			self.images[newLayer] = []
-			self.layers = self.images.keys()
+			self.layers = list(self.images.keys())
 			self.layers.sort()
 			image.createLayer = True
 
@@ -735,7 +727,7 @@ class GLWidget(QGLWidget):
 		button = 0
 
 		if self.ctrl:
-			print "ctrl pressed1"
+			print("ctrl pressed1")
 			button += 3
 		if self.shift:
 			button += 6
@@ -811,9 +803,11 @@ class GLWidget(QGLWidget):
 		oldCoord2[0] *= float(1)/self.zoom
 		oldCoord2[1] *= float(1)/self.zoom
 
-		if mouse.delta() < 0:
+		delta = mouse.angleDelta().y() #let's not worry about 2-dimensional wheels.
+
+		if delta < 0:
 			self.zoom -= 0.5
-		elif mouse.delta() > 0:
+		elif delta > 0:
 			self.zoom += 0.5
 
 		if self.zoom < 0.60:
@@ -846,8 +840,8 @@ class GLWidget(QGLWidget):
 				img.save(filename, "PNG")
 			event.acceptProposedAction()
 		elif event.mimeData().hasText():
-			self.pogPlace.emit(event.pos().x(), event.pos().y(), unicode(event.mimeData().text()))
+			self.pogPlace.emit(event.pos().x(), event.pos().y(), str(event.mimeData().text()))
 
-	pogPlace = signal(int, int, basestring, doc=
+	pogPlace = signal(int, int, BASE_STRING, doc=
 		"""Called to request pog placement on the map."""
 	)

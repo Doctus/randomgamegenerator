@@ -1,23 +1,36 @@
-from PyQt4 import QtGui, QtCore
-from rggSystem import signal, findFiles, makePortableFilename, promptSaveFile, promptYesNo, getMapPosition, mainWindow
-from rggDialogs import newCharacterDialog, banDialog
-from rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
 import os, os.path, time, re
-from rggConstants import *
-from rggEvent import addMapChangedListener, addMousePressListener, addMouseMoveListener, addMouseReleaseListener
 
-class transferMonitorWidget(QtGui.QDockWidget):
+try:
+	from PyQt5 import QtCore
+	from PyQt5.QtGui import *
+	from PyQt5.QtWidgets import *
+	from .rggSystem import signal, findFiles, makePortableFilename, promptSaveFile, promptYesNo, getMapPosition, mainWindow
+	from .rggDialogs import newCharacterDialog, banDialog
+	from .rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
+	from .rggConstants import *
+	from .rggEvent import addMapChangedListener, addMousePressListener, addMouseMoveListener, addMouseReleaseListener
+except ImportError:
+	from PyQt4 import QtCore
+	from PyQt4.QtGui import *
+	from PyQt4.QtWidgets import *
+	from rggSystem import signal, findFiles, makePortableFilename, promptSaveFile, promptYesNo, getMapPosition, mainWindow
+	from rggDialogs import newCharacterDialog, banDialog
+	from rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
+	from rggConstants import *
+	from rggEvent import addMapChangedListener, addMousePressListener, addMouseMoveListener, addMouseReleaseListener
+
+class transferMonitorWidget(QDockWidget):
 
 	def __init__(self, mainWindow):
-		super(QtGui.QDockWidget, self).__init__(mainWindow)
+		super(QDockWidget, self).__init__(mainWindow)
 		self.setToolTip(self.tr("Allows for monitoring and control of file transfers."))
 		self.setWindowTitle(self.tr("Transfer Monitor"))
 		self.transferDict = {}
-		self.transferTable = QtGui.QTableWidget(0, 3, mainWindow)
+		self.transferTable = QTableWidget(0, 3, mainWindow)
 		self.transferTable.setHorizontalHeaderLabels(["Client", "Filename", "Status"])
-		self.widget = QtGui.QWidget(mainWindow)
-		self.status = QtGui.QLabel("Initializing", mainWindow)
-		self.layout = QtGui.QBoxLayout(2)
+		self.widget = QWidget(mainWindow)
+		self.status = QLabel("Initializing", mainWindow)
+		self.layout = QBoxLayout(2)
 		self.layout.addWidget(self.transferTable)
 		self.layout.addWidget(self.status)
 		self.widget.setLayout(self.layout)
@@ -28,11 +41,11 @@ class transferMonitorWidget(QtGui.QDockWidget):
 
 	def updateItem(self, client, filename, status):
 		'''Update the status of a transfer, creating a new table row for it if it's new.'''
-		if client.username + filename not in self.transferDict.keys():
+		if client.username + filename not in list(self.transferDict.keys()):
 			self.transferDict[client.username + filename] = self.transferTable.rowCount()
 			self.transferTable.setRowCount(self.transferTable.rowCount() + 1)
 			for column in (0, 1, 2):
-				self.transferTable.setItem(self.transferTable.rowCount() - 1, column, QtGui.QTableWidgetItem(""))
+				self.transferTable.setItem(self.transferTable.rowCount() - 1, column, QTableWidgetItem(""))
 				self.transferTable.item(self.transferTable.rowCount() - 1, column).setFlags(QtCore.Qt.NoItemFlags)
 		self.transferTable.item(self.transferDict[client.username + filename], 0).setText(client.username)
 		self.transferTable.item(self.transferDict[client.username + filename], 1).setText(filename)
@@ -50,20 +63,20 @@ class transferMonitorWidget(QtGui.QDockWidget):
 
 	def processPartialTransferEvent(self, client, filename, size, processed):
 		'''Process a partial transfer event.'''
-		processedAmount = "".join((unicode(round(float(processed)/float(size)*100, 1)), "%"))
+		processedAmount = "".join((UNICODE_STRING(round(float(processed)/float(size)*100, 1)), "%"))
 		self.updateItem(client, filename, processedAmount)
 
-class debugConsoleWidget(QtGui.QDockWidget):
+class debugConsoleWidget(QDockWidget):
 
 	def __init__(self, mainWindow):
-		super(QtGui.QDockWidget, self).__init__(mainWindow)
+		super(QDockWidget, self).__init__(mainWindow)
 		self.setToolTip(self.tr("A console that prints debug information regarding the program."))
 		self.setWindowTitle(self.tr("Debug Console"))
-		self.widgetEditor = QtGui.QTextBrowser(mainWindow)
-		self.widget = QtGui.QWidget(mainWindow)
+		self.widgetEditor = QTextBrowser(mainWindow)
+		self.widget = QWidget(mainWindow)
 		self.widgetEditor.setReadOnly(True)
 		self.widgetEditor.setOpenLinks(False)
-		self.logToFileToggle = QtGui.QCheckBox(self.tr("Log to file"))
+		self.logToFileToggle = QCheckBox(self.tr("Log to file"))
 		try:
 			if jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))["debuglog"] == "On":
 				self.logToFileToggle.setChecked(True)
@@ -72,7 +85,7 @@ class debugConsoleWidget(QtGui.QDockWidget):
 		except:
 			self.logToFileToggle.setChecked(True)
 		self.logToFileToggle.stateChanged.connect(self.saveLogToggle)
-		self.layout = QtGui.QBoxLayout(2)
+		self.layout = QBoxLayout(2)
 		self.layout.addWidget(self.widgetEditor)
 		self.layout.addWidget(self.logToFileToggle)
 		self.widget.setLayout(self.layout)
@@ -101,10 +114,13 @@ class debugConsoleWidget(QtGui.QDockWidget):
 		except UnicodeEncodeError:
 			return
 
-class chatLineEdit(QtGui.QLineEdit):
+	def flush(self):
+		pass
+
+class chatLineEdit(QLineEdit):
 
 	def __init__(self, mainWindow):
-		super(QtGui.QLineEdit, self).__init__(mainWindow)
+		super(QLineEdit, self).__init__(mainWindow)
 		self.position = 0
 		self.messageHistory = []
 		self.lastInput = ''
@@ -128,21 +144,21 @@ class chatLineEdit(QtGui.QLineEdit):
 			elif self.position == len(self.messageHistory) - 1:
 				self.setText(self.lastInput)
 				self.position += 1
-		QtGui.QLineEdit.keyPressEvent(self, event)
+		QLineEdit.keyPressEvent(self, event)
 
-class chatWidget(QtGui.QDockWidget):
+class chatWidget(QDockWidget):
 
 	def __init__(self, mainWindow):
-		super(QtGui.QDockWidget, self).__init__(mainWindow)
+		super(QDockWidget, self).__init__(mainWindow)
 		self.setToolTip(self.tr("A widget for out-of-character chat and system messages."))
 		self.setWindowTitle(self.tr("OOC Chat / System"))
-		self.widgetEditor = QtGui.QTextBrowser(mainWindow)
+		self.widgetEditor = QTextBrowser(mainWindow)
 		self.widgetLineInput = chatLineEdit(mainWindow)
 		self.widgetLineInput.setToolTip(self.tr("Type text here and press Enter or Return to transmit it."))
-		self.widget = QtGui.QWidget(mainWindow)
+		self.widget = QWidget(mainWindow)
 		self.widgetEditor.setReadOnly(True)
 		self.widgetEditor.setOpenLinks(False)
-		self.layout = QtGui.QBoxLayout(2)
+		self.layout = QBoxLayout(2)
 		self.layout.addWidget(self.widgetEditor)
 		self.layout.addWidget(self.widgetLineInput)
 		self.widget.setLayout(self.layout)
@@ -185,10 +201,10 @@ class chatWidget(QtGui.QDockWidget):
 
 	def anchorClicked(self, url):
 		'''If the url appears to be one of the /tell links in a player name, load it to the input.'''
-		if "/tell" in unicode(url):
+		if "/tell" in UNICODE_STRING(url):
 			self.widgetLineInput.setText(url.toString())
 		else:
-			QtGui.QDesktopServices.openUrl(QtCore.QUrl(url))
+			QDesktopServices.openUrl(QtCore.QUrl(url))
 
 	def toggleTimestamp(self, newsetting):
 		if newsetting == "On":
@@ -227,13 +243,13 @@ class chatWidget(QtGui.QDockWidget):
 		return message
 
 	def processInput(self):
-		self.newmes = unicode(self.widgetLineInput.text())
+		self.newmes = UNICODE_STRING(self.widgetLineInput.text())
 		self.newmes = self.processTags(self.newmes)
 		self.widgetLineInput.clear()
 		self.widgetLineInput.addMessage(self.newmes)
 		self.chatInput.emit(self.newmes)
 
-	chatInput = signal(basestring, doc=
+	chatInput = signal(BASE_STRING, doc=
 		"""Called when chat input is received.
 
 		text -- the message entered
@@ -265,28 +281,28 @@ class ICChar():
 			loadString('ICChar.portrait', obj.get('portrait')))
 		return char
 
-class ICChatWidget(QtGui.QDockWidget):
+class ICChatWidget(QDockWidget):
 
 	def __init__(self, mainWindow):
-		super(QtGui.QDockWidget, self).__init__(mainWindow)
+		super(QDockWidget, self).__init__(mainWindow)
 		self.setToolTip(self.tr("A widget for in-character chat."))
 		self.setWindowTitle(self.tr("IC Chat"))
-		self.widgetEditor = QtGui.QTextBrowser(mainWindow)
+		self.widgetEditor = QTextBrowser(mainWindow)
 		self.widgetLineInput = chatLineEdit(mainWindow)
 		self.widgetLineInput.setToolTip(self.tr("Type text here and press Enter or Return to transmit it."))
-		self.widget = QtGui.QWidget(mainWindow)
+		self.widget = QWidget(mainWindow)
 		self.widgetEditor.setReadOnly(True)
 		self.widgetEditor.setOpenLinks(False)
-		self.characterPreview = QtGui.QLabel(mainWindow)
-		self.characterSelector = QtGui.QComboBox(mainWindow)
+		self.characterPreview = QLabel(mainWindow)
+		self.characterSelector = QComboBox(mainWindow)
 		self.characterSelector.setToolTip(self.tr("Select the character to be displayed as the speaker of entered text."))
-		self.characterAddButton = QtGui.QPushButton(self.tr("Add New"), mainWindow)
+		self.characterAddButton = QPushButton(self.tr("Add New"), mainWindow)
 		self.characterAddButton.setToolTip(self.tr("Add a new in-character chat character via a dialog box."))
-		self.characterDeleteButton = QtGui.QPushButton(self.tr("Delete"), mainWindow)
+		self.characterDeleteButton = QPushButton(self.tr("Delete"), mainWindow)
 		self.characterDeleteButton.setToolTip(self.tr("Delete the currently selected in-character chat character."))
-		self.characterClearButton = QtGui.QPushButton(self.tr("Clear"), mainWindow)
+		self.characterClearButton = QPushButton(self.tr("Clear"), mainWindow)
 		self.characterClearButton.setToolTip(self.tr("Deletes all in-character chat characters."))
-		self.layout = QtGui.QGridLayout()
+		self.layout = QGridLayout()
 		self.layout.addWidget(self.widgetEditor, 0, 0, 1, 4)
 		self.layout.addWidget(self.widgetLineInput, 1, 1, 1, 3)
 		self.layout.addWidget(self.characterPreview, 1, 0, 2, 1)
@@ -310,10 +326,10 @@ class ICChatWidget(QtGui.QDockWidget):
 			self.characters = []
 
 		self.widgetLineInput.returnPressed.connect(self.processInput)
-		self.connect(self.characterAddButton, QtCore.SIGNAL('clicked()'), self.newCharacter)
-		self.connect(self.characterDeleteButton, QtCore.SIGNAL('clicked()'), self.deleteCharacter)
-		self.connect(self.characterClearButton, QtCore.SIGNAL('clicked()'), self.clearCharacters)
-		self.connect(self.characterSelector, QtCore.SIGNAL('currentIndexChanged(int)'), self.setCharacterPreview)
+		self.characterAddButton.clicked.connect(self.newCharacter)
+		self.characterDeleteButton.clicked.connect(self.deleteCharacter)
+		self.characterClearButton.clicked.connect(self.clearCharacters)
+		self.characterSelector.currentIndexChanged.connect(self.setCharacterPreview)
 
 		self.updateDeleteButton()
 
@@ -333,20 +349,14 @@ class ICChatWidget(QtGui.QDockWidget):
 			self.widgetEditor.append(message)
 
 	def updateDeleteButton(self):
-		if len(self.characters) == 0:
-			self.characterDeleteButton.setEnabled(False)
-			self.characterClearButton.setEnabled(False)
-			self.characterSelector.setEnabled(False)
-			self.widgetLineInput.setEnabled(False)
-		else:
-			self.characterDeleteButton.setEnabled(True)
-			self.characterClearButton.setEnabled(True)
-			self.characterSelector.setEnabled(True)
-			self.widgetLineInput.setEnabled(True)
+		self.characterDeleteButton.setEnabled(self.hasCharacters())
+		self.characterClearButton.setEnabled(self.hasCharacters())
+		self.characterSelector.setEnabled(self.hasCharacters())
+		self.widgetLineInput.setEnabled(self.hasCharacters())
 
 	def setCharacterPreview(self, newIndex=-1):
 		try:
-			preview = QtGui.QPixmap(os.path.join(unicode(PORTRAIT_DIR), unicode(self.characters[self.characterSelector.currentIndex()].portrait)))
+			preview = QPixmap(os.path.join(UNICODE_STRING(PORTRAIT_DIR), UNICODE_STRING(self.characters[self.characterSelector.currentIndex()].portrait)))
 			if preview.isNull(): #Sadly, we have to check ahead, because Qt is dumb and prints an error about the scaling instead of raising one we can catch.
 				raise TypeError
 			preview = preview.scaled(min(preview.width(), 64), min(preview.height(), 64))
@@ -377,7 +387,7 @@ class ICChatWidget(QtGui.QDockWidget):
 	def dropEvent(self, event):
 		if event.mimeData().hasImage():
 			dat = event.mimeData().imageData()
-			img = QtGui.QImage(dat)
+			img = QImage(dat)
 			filename = promptSaveFile('Save Portrait', 'Portrait files (*.png)', PORTRAIT_DIR)
 			if filename is not None:
 				img.save(filename, "PNG")
@@ -408,7 +418,7 @@ class ICChatWidget(QtGui.QDockWidget):
 		jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
 
 	def deleteCharacter(self):
-		if len(self.characters) > 0:
+		if self.hasCharacters():
 			self.characters.pop(self.characterSelector.currentIndex())
 			self.characterSelector.removeItem(self.characterSelector.currentIndex())
 			jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
@@ -430,13 +440,13 @@ class ICChatWidget(QtGui.QDockWidget):
 		return message
 
 	def processInput(self):
-		self.newmes = unicode(self.widgetLineInput.text())
+		self.newmes = UNICODE_STRING(self.widgetLineInput.text())
 		self.newmes = self.processTags(self.newmes)
 		self.widgetLineInput.clear()
 		self.widgetLineInput.addMessage(self.newmes)
 		self.ICChatInput.emit(self.newmes,
-							unicode(self.characters[self.characterSelector.currentIndex()].name),
-							unicode(self.characters[self.characterSelector.currentIndex()].portrait))
+							UNICODE_STRING(self.characters[self.characterSelector.currentIndex()].name),
+							UNICODE_STRING(self.characters[self.characterSelector.currentIndex()].portrait))
 
 	def hasCharacters(self):
 		return len(self.characters) > 0
@@ -454,8 +464,8 @@ class ICChatWidget(QtGui.QDockWidget):
 		self.characterSelector.clear()
 
 		chars = loadObject('ICChatWidget.chars', obj.get('chars'))
-		chartemp = [None]*len(chars.keys())
-		for ID, char in chars.items():
+		chartemp = [None]*len(list(chars.keys()))
+		for ID, char in list(chars.items()):
 			chartemp[int(ID)] = char
 		for char in chartemp:
 			loaded = ICChar.load(char)
@@ -463,7 +473,7 @@ class ICChatWidget(QtGui.QDockWidget):
 		self.updateDeleteButton()
 		self.setCharacterPreview()
 
-	ICChatInput = signal(basestring, basestring, basestring, doc=
+	ICChatInput = signal(BASE_STRING, BASE_STRING, BASE_STRING, doc=
 		"""Called when in-character chat input is received.
 
 		charname -- the character name currently selected
@@ -472,32 +482,32 @@ class ICChatWidget(QtGui.QDockWidget):
 
 		""")
 
-class diceRoller(QtGui.QDockWidget):
+class diceRoller(QDockWidget):
 
 	def __init__(self, mainWindow):
-		super(QtGui.QDockWidget, self).__init__(mainWindow)
+		super(QDockWidget, self).__init__(mainWindow)
 		self.setWindowTitle(self.tr("Dice"))
-		self.realwidget = QtGui.QWidget(mainWindow) #I messed up on the initial setup and was too lazy to rename everything.
-		self.widget = QtGui.QGridLayout()
-		self.diceArea = QtGui.QListWidget(mainWindow)
+		self.realwidget = QWidget(mainWindow) #I messed up on the initial setup and was too lazy to rename everything.
+		self.widget = QGridLayout()
+		self.diceArea = QListWidget(mainWindow)
 		try:
 			self.load(jsonload(os.path.join(SAVE_DIR, "dice.rgd")))
 		except:
-			self.macros = [QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), "Sample: 2d6"),
-						   QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), "Sample: 4k2"),
-						   QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), "Sample: 1dn3")]
+			self.macros = [QListWidgetItem(QIcon('data/dice.png'), "Sample: 2d6"),
+						   QListWidgetItem(QIcon('data/dice.png'), "Sample: 4k2"),
+						   QListWidgetItem(QIcon('data/dice.png'), "Sample: 1dn3")]
 		for m in self.macros:
 			self.diceArea.addItem(m)
 		self.diceArea.currentRowChanged.connect(self.changeCurrentMacro)
-		self.rollbutton = QtGui.QPushButton(self.tr("Roll"), mainWindow)
+		self.rollbutton = QPushButton(self.tr("Roll"), mainWindow)
 		self.rollbutton.setToolTip(self.tr("Roll dice according to the selected macro."))
-		self.addmacrobutton = QtGui.QPushButton(self.tr("Add Macro"), mainWindow)
+		self.addmacrobutton = QPushButton(self.tr("Add Macro"), mainWindow)
 		self.addmacrobutton.setToolTip(self.tr("Add a new macro via a dialog box."))
-		self.removemacrobutton = QtGui.QPushButton(self.tr("Delete Macro"), mainWindow)
+		self.removemacrobutton = QPushButton(self.tr("Delete Macro"), mainWindow)
 		self.removemacrobutton.setToolTip(self.tr("Remove the currently selected macro."))
-		self.connect(self.rollbutton, QtCore.SIGNAL('clicked()'), self.rollDice)
-		self.connect(self.addmacrobutton, QtCore.SIGNAL('clicked()'), self.summonMacro)
-		self.connect(self.removemacrobutton, QtCore.SIGNAL('clicked()'), self.removeCurrentMacro)
+		self.rollbutton.clicked.connect(self.rollDice)
+		self.addmacrobutton.clicked.connect(self.summonMacro)
+		self.removemacrobutton.clicked.connect(self.removeCurrentMacro)
 		self.widget.addWidget(self.diceArea, 0, 0)
 		self.widget.addWidget(self.rollbutton, 1, 0)
 		self.widget.addWidget(self.addmacrobutton, 2, 0)
@@ -515,15 +525,15 @@ class diceRoller(QtGui.QDockWidget):
 	def rollDice(self):
 		current = self.diceArea.item(self.currentMacro)
 		if current is not None:
-			text = unicode(current.text())
+			text = UNICODE_STRING(current.text())
 			self.rollRequested.emit(text[text.rfind(':')+1:])
 
 	def _addMacro(self, macro):
-		self.macros.append(QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), macro))
+		self.macros.append(QListWidgetItem(QIcon('data/dice.png'), macro))
 		self.diceArea.addItem(self.macros[len(self.macros)-1])
 
 	def addMacro(self, mac, macname):
-		self.macros.append(QtGui.QListWidgetItem(QtGui.QIcon('data/dice.png'), macname + ': ' + mac))
+		self.macros.append(QListWidgetItem(QIcon('data/dice.png'), macname + ': ' + mac))
 		self.diceArea.addItem(self.macros[len(self.macros)-1])
 		jsondump(self.dump(), os.path.join(SAVE_DIR, "dice.rgd"))
 
@@ -541,7 +551,7 @@ class diceRoller(QtGui.QDockWidget):
 		 """Deserialize set of macros from a dictionary."""
 		 self.macros = []
 		 macroz = loadObject('diceRoller.macros', obj.get('macros'))
-		 for ID, macro in macroz.items():
+		 for ID, macro in list(macroz.items()):
 			 self._addMacro(macro)
 
 	def dump(self):
@@ -549,12 +559,12 @@ class diceRoller(QtGui.QDockWidget):
 
 		macroz = []
 		for i in range(0,self.diceArea.count()):
-			macroz.append(unicode(self.diceArea.item(i).text(), 'UTF-8'))
+			macroz.append(UNICODE_STRING(self.diceArea.item(i).text()))
 
 		return dict(
 			macros=dict([(i, macro) for i, macro in enumerate(macroz)]))
 
-	rollRequested = signal(basestring, doc=
+	rollRequested = signal(BASE_STRING, doc=
 		"""Called when the roll button is hit.
 
 		roll -- the dice to be rolled
@@ -566,35 +576,35 @@ class diceRoller(QtGui.QDockWidget):
 		"""Called when the add macro button is pressed."""
 	)
 
-class PogFileSystemModel(QtGui.QFileSystemModel):
+class PogFileSystemModel(QFileSystemModel):
 
 	def __init__(self):
-		super(QtGui.QFileSystemModel, self).__init__()
+		super(QFileSystemModel, self).__init__()
 		self.setRootPath(POG_DIR)
 		self.setNameFilters(IMAGE_NAME_FILTER)
 		self.setNameFilterDisables(False)
-		self.absRoot = os.path.abspath(unicode(POG_DIR))
+		self.absRoot = os.path.abspath(UNICODE_STRING(POG_DIR))
 
 	def data(self, index, role):
-		basedata = QtGui.QFileSystemModel.data(self, index, role)
+		basedata = QFileSystemModel.data(self, index, role)
 		if role == 1 and os.path.isfile(self.filePath(index)):
-			return QtGui.QIcon(self.filePath(index))
+			return QIcon(self.filePath(index))
 		return basedata
 
 	def mimeData(self, indices):
-		path = QtCore.QString(makePortableFilename(os.path.join(POG_DIR, unicode(self.filePath(indices[0])[len(self.absRoot)+1:]))))
+		path = makePortableFilename(os.path.join(POG_DIR, UNICODE_STRING(self.filePath(indices[0])[len(self.absRoot)+1:])))
 
 		if not os.path.isfile(path): return None
 
 		mime = QtCore.QMimeData()
-		mime.setText(unicode(path))
+		mime.setText(UNICODE_STRING(path))
 		return mime
 
-class pogTree(QtGui.QTreeView):
+class pogTree(QTreeView):
 
 	def startDrag(self, event):
 		for i in self.selectedIndexes():
-			drag = QtGui.QDrag(self)
+			drag = QDrag(self)
 
 			#Don't drag folders.
 			if not self.model().mimeData([i]): return
@@ -602,22 +612,22 @@ class pogTree(QtGui.QTreeView):
 			#print self.model().mimeData([i]).text()
 
 			drag.setMimeData(self.model().mimeData([i]))
-			basePixmap = QtGui.QPixmap(self.model().mimeData([i]).text())
+			basePixmap = QPixmap(self.model().mimeData([i]).text())
 			scaledPixmap = basePixmap.scaled(basePixmap.width()*mainWindow.glwidget.zoom, basePixmap.height()*mainWindow.glwidget.zoom)
 			drag.setPixmap(scaledPixmap)
 			drag.setHotSpot(QtCore.QPoint(0, 0))
-			drag.start()
+			drag.exec_()
 
-class pogPalette(QtGui.QDockWidget):
+class pogPalette(QDockWidget):
 	"""The list of loaded pogs."""
 
 	def __init__(self, mainWindow):
 		"""Initializes the pog palette."""
-		super(QtGui.QDockWidget, self).__init__(mainWindow)
+		super(QDockWidget, self).__init__(mainWindow)
 		self.setToolTip(self.tr("Drag a file from this widget into the game window to place a pog."))
 		self.setWindowTitle(self.tr("Pog Palette"))
-		self.widget = QtGui.QWidget(mainWindow)
-		self.mainLayout = QtGui.QBoxLayout(2)
+		self.widget = QWidget(mainWindow)
+		self.mainLayout = QBoxLayout(2)
 		self.pogsModel = PogFileSystemModel()
 		self.ROOT_LEN = len(self.pogsModel.absRoot)+1
 		self.pogArea = pogTree(mainWindow)
@@ -626,35 +636,35 @@ class pogPalette(QtGui.QDockWidget):
 		self.pogArea.setColumnHidden(1, True)
 		self.pogArea.setColumnHidden(2, True)
 		self.pogArea.setColumnHidden(3, True)
-		self.pogArea.setDragDropMode(QtGui.QAbstractItemView.DragDrop)
+		self.pogArea.setDragDropMode(QAbstractItemView.DragDrop)
 		self.mainLayout.addWidget(self.pogArea)
 		self.widget.setLayout(self.mainLayout)
 		self.setWidget(self.widget)
 		self.setObjectName("Pog Palette")
 		mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
 
-class userListList(QtGui.QListWidget):
+class userListList(QListWidget):
 
 	def __init__(self, parent, ulmain):
-		QtGui.QListWidget.__init__(self)
+		QListWidget.__init__(self)
 		self.ulmain = ulmain
 		self.itemActivated.connect(self.changeGM)
 
 	def changeGM(self, item):
 		self.ulmain.provideOptions(self.currentRow())
 
-class userListWidget(QtGui.QDockWidget):
+class userListWidget(QDockWidget):
 	"""The list of connected users."""
 
 	def __init__(self, mainWindow):
 		"""Initializes the user list."""
-		super(QtGui.QDockWidget, self).__init__(mainWindow)
+		super(QDockWidget, self).__init__(mainWindow)
 		self.setToolTip(self.tr("People presently playing."))
 		self.setWindowTitle(self.tr("Connected Users"))
-		self.widget = QtGui.QWidget(mainWindow)
+		self.widget = QWidget(mainWindow)
 		self.listOfUsers = userListList(mainWindow, self)
 		self.internalList = []
-		self.layout = QtGui.QGridLayout()
+		self.layout = QGridLayout()
 		self.layout.addWidget(self.listOfUsers, 0, 0, 1, 2)
 		self.widget.setLayout(self.layout)
 		self.widget.setMaximumWidth(200) #Arbitrary; keeps it from taking over 1/3 of the screen
@@ -669,11 +679,11 @@ class userListWidget(QtGui.QDockWidget):
 		nametmp = name
 		if host:
 			if name == self.localname:
-				self.kickbutton = QtGui.QPushButton(self.tr("Kick"))
+				self.kickbutton = QPushButton(self.tr("Kick"))
 				self.kickbutton.setToolTip(self.tr("Disconnect the selected user."))
 				self.layout.addWidget(self.kickbutton, 1, 0)
-				self.connect(self.kickbutton, QtCore.SIGNAL('clicked()'), self.requestKick)
-				self.banbutton = QtGui.QPushButton(self.tr("Manage Banlist"))
+				self.kickbutton.clicked.connect(self.requestKick)
+				self.banbutton = QPushButton(self.tr("Manage Banlist"))
 				self.banbutton.setToolTip(self.tr("View and edit a list of banned IPs."))
 				self.layout.addWidget(self.banbutton, 1, 1)
 				self.banbutton.clicked.connect(self.openBanDialog)
@@ -726,12 +736,12 @@ class userListWidget(QtGui.QDockWidget):
 		banDialog().exec_()
 		self.requestBanlistUpdate.emit()
 
-	selectGM = signal(basestring, doc=
+	selectGM = signal(BASE_STRING, doc=
 		"""Called to request a menu be summoned containing actions targeting the selected player.
 			Sorry for the misleading legacy name."""
 	)
 
-	kickPlayer = signal(basestring, doc=
+	kickPlayer = signal(BASE_STRING, doc=
 		"""Called to request player kicking."""
 	)
 
@@ -739,19 +749,19 @@ class userListWidget(QtGui.QDockWidget):
 		"""Called to request that the banlist be updated."""
 	)
 
-class fileItem(QtGui.QListWidgetItem):
+class fileItem(QListWidgetItem):
 
 	def __init__(self, file, dir, panel):
-		QtGui.QListWidgetItem.__init__(self)
+		QListWidgetItem.__init__(self)
 		self.file = file
 		self.dir = dir
 
 		self.setText(file[5:len(file)-3])
 
-class mapEditorLabel(QtGui.QLabel):
+class mapEditorLabel(QLabel):
 
 	def __init__(self, tilesize, width, height, par, currentTile=0):
-		super(QtGui.QLabel, self).__init__()
+		super(QLabel, self).__init__()
 		self.tilex, self.tiley = tilesize
 		self.wid = width
 		self.hei = height
@@ -768,10 +778,10 @@ class mapEditorLabel(QtGui.QLabel):
 		self.currentTileDimensions = (self.currentTile%(self.wid/self.tilex)*self.tilex, (self.hei - self.tiley) - (int((self.currentTile*self.tilex)/self.wid)*self.tiley), self.tilex, self.tiley)
 		self.par.updateCurrentTile()
 
-class mapEditor(QtGui.QDockWidget):
+class mapEditor(QDockWidget):
 
 	def __init__(self, mainWindow):
-		super(QtGui.QDockWidget, self).__init__(mainWindow)
+		super(QDockWidget, self).__init__(mainWindow)
 
 		#self.__eat = True
 		self.painting = True
@@ -779,20 +789,20 @@ class mapEditor(QtGui.QDockWidget):
 		self.rectStart = None
 
 		self.setWindowTitle(self.tr("Map Editor"))
-		self.widget = QtGui.QWidget(mainWindow)
-		self.layout = QtGui.QGridLayout()
-		self.currentTileLayout = QtGui.QBoxLayout(1)
-		self.scrollarea = QtGui.QScrollArea(mainWindow)
-		self.noPaintingButton = QtGui.QRadioButton(self.tr("Stop Painting"), mainWindow)
-		self.singlePaintingButton = QtGui.QRadioButton(self.tr("Single Tile Brush"), mainWindow)
+		self.widget = QWidget(mainWindow)
+		self.layout = QGridLayout()
+		self.currentTileLayout = QBoxLayout(1)
+		self.scrollarea = QScrollArea(mainWindow)
+		self.noPaintingButton = QRadioButton(self.tr("Stop Painting"), mainWindow)
+		self.singlePaintingButton = QRadioButton(self.tr("Single Tile Brush"), mainWindow)
 		self.noPaintingButton.setChecked(True)
-		self.rectPaintingButton = QtGui.QRadioButton(self.tr("Area (Rectangle) Brush"), mainWindow)
-		self.hollowRectPaintingButton = QtGui.QRadioButton(self.tr("Hollow Rectangle Brush"), mainWindow)
-		self.currentTileLabel = QtGui.QLabel()
-		self.currentTileLabelLabel = QtGui.QLabel(self.tr("Current tile: "))
-		self.undoButton = QtGui.QPushButton("Undo", mainWindow)
-		self.redoButton = QtGui.QPushButton("Redo", mainWindow)
-		self.moveMapButton = QtGui.QPushButton("Move Map", mainWindow)
+		self.rectPaintingButton = QRadioButton(self.tr("Area (Rectangle) Brush"), mainWindow)
+		self.hollowRectPaintingButton = QRadioButton(self.tr("Hollow Rectangle Brush"), mainWindow)
+		self.currentTileLabel = QLabel()
+		self.currentTileLabelLabel = QLabel(self.tr("Current tile: "))
+		self.undoButton = QPushButton("Undo", mainWindow)
+		self.redoButton = QPushButton("Redo", mainWindow)
+		self.moveMapButton = QPushButton("Move Map", mainWindow)
 		self.layout.addWidget(self.scrollarea, 0, 0, 1, 2)
 		self.layout.addWidget(self.noPaintingButton, 1, 0)
 		self.layout.addWidget(self.singlePaintingButton, 2, 0)
@@ -826,7 +836,10 @@ class mapEditor(QtGui.QDockWidget):
 		addMouseReleaseListener(self.mouseReleaseResponse, NORMAL_RESPONSE_LEVEL)
 
 	def _undo(self):
-		from rggViews import _sendTileUpdate
+		try:
+			from .rggViews import _sendTileUpdate
+		except ImportError:
+			from rggViews import _sendTileUpdate
 		redoTiles = []
 		for data in self.undo.pop():
 			redoTiles.append((data[0], data[1], _sendTileUpdate(data[0], data[1], data[2])))
@@ -836,7 +849,10 @@ class mapEditor(QtGui.QDockWidget):
 			self.undoButton.setEnabled(False)
 
 	def _redo(self):
-		from rggViews import _sendTileUpdate
+		try:
+			from .rggViews import _sendTileUpdate
+		except ImportError:
+			from rggViews import _sendTileUpdate
 		undoTiles = []
 		for data in self.redo.pop():
 			undoTiles.append((data[0], data[1], _sendTileUpdate(data[0], data[1], data[2])))
@@ -846,7 +862,7 @@ class mapEditor(QtGui.QDockWidget):
 			self.redoButton.setEnabled(False)
 
 	def updateCurrentTile(self):
-		self.tilepix = QtGui.QPixmap()
+		self.tilepix = QPixmap()
 		self.tilepix.load(self.currentMap.tileset)
 		self.tilepix = self.tilepix.copy(QtCore.QRect(*self.tilelabel.currentTileDimensions))
 		self.currentTileLabel.setPixmap(self.tilepix)
@@ -855,7 +871,10 @@ class mapEditor(QtGui.QDockWidget):
 		mapPosition = getMapPosition((x, y))
 
 		#This and similar things were a regrettable necessity in the plugin -> nonplugin conversion process.
-		from rggViews import topmap, _sendTileUpdate
+		try:
+			from .rggViews import topmap, _sendTileUpdate
+		except ImportError:
+			from rggViews import topmap, _sendTileUpdate
 
 		map = topmap(mapPosition)
 		if map == None:
@@ -912,7 +931,10 @@ class mapEditor(QtGui.QDockWidget):
 
 	def mouseMoveResponse(self, x, y):
 		if self.dragging and self.isVisible() and self.singlePaintingButton.isChecked():
-			from rggViews import topmap
+			try:
+				from .rggViews import topmap
+			except ImportError:
+				from rggViews import topmap
 			mapPosition = getMapPosition((x, y))
 			map = topmap(mapPosition)
 			if map == None:
@@ -922,14 +944,20 @@ class mapEditor(QtGui.QDockWidget):
 							int(((mapPosition[1] - map.drawOffset[1]) / self.tilelabel.tiley)))
 
 			if map.tilePosExists(clickedtile) and map.getTile(clickedtile) != self.tilelabel.currentTile:
-				from rggViews import _sendTileUpdate
+				try:
+					from .rggViews import _sendTileUpdate
+				except ImportError:
+					from rggViews import _sendTileUpdate
 				oldtile = _sendTileUpdate(map.ID, clickedtile, self.tilelabel.currentTile)
 				self.undo[-1].append((map.ID, clickedtile, oldtile))
 			return True
 
 	def mouseReleaseResponse(self, x, y, t):
 		if t == 0:
-			from rggViews import topmap, _sendTileUpdate, _sendMultipleTileUpdate
+			try:
+				from .rggViews import topmap, _sendTileUpdate, _sendMultipleTileUpdate
+			except ImportError:
+				from rggViews import topmap, _sendTileUpdate, _sendMultipleTileUpdate
 			if self.currentMap == None:
 				return
 			mapPosition = getMapPosition((x, y))
@@ -966,11 +994,11 @@ class mapEditor(QtGui.QDockWidget):
 				self.undoButton.setEnabled(True)
 				self.redo = []
 				self.redoButton.setEnabled(False)
-				if cmp(rectEnd[0], self.rectStart[0]) != 0:
-					for x in range(self.rectStart[0], rectEnd[0]+cmp(rectEnd[0], self.rectStart[0]), cmp(rectEnd[0], self.rectStart[0])):
-						if cmp(rectEnd[1], self.rectStart[1]) != 0:
+				if rectEnd[0] != self.rectStart[0]:
+					for x in range(self.rectStart[0], rectEnd[0]+(1*(rectEnd[0]-self.rectStart[0])), 1*(rectEnd[0]-self.rectStart[0])):
+						if rectEnd[1] != self.rectStart[1]:
 							#TODO: Less lazy and inefficient implementation for this case.
-							for y in range(self.rectStart[1], rectEnd[1]+cmp(rectEnd[1], self.rectStart[1]), cmp(rectEnd[1], self.rectStart[1])):
+							for y in range(self.rectStart[1], rectEnd[1]+1*(rectEnd[1]-self.rectStart[1]), 1*(rectEnd[1]-self.rectStart[1])):
 								if x == self.rectStart[0] or x == rectEnd[0] or y == self.rectStart[1] or y == rectEnd[1]:
 									if self.currentMap.tilePosExists((x, y)):
 										oldtile = _sendTileUpdate(self.currentMap.ID, (x, y), self.tilelabel.currentTile)
@@ -980,8 +1008,8 @@ class mapEditor(QtGui.QDockWidget):
 								oldtile = _sendTileUpdate(self.currentMap.ID, (x, self.rectStart[1]), self.tilelabel.currentTile)
 								self.undo[-1].append((map.ID, (x, self.rectStart[1]), oldtile))
 				else:
-					if cmp(rectEnd[1], self.rectStart[1]) != 0:
-						for y in range(self.rectStart[1], rectEnd[1]+cmp(rectEnd[1], self.rectStart[1]), cmp(rectEnd[1], self.rectStart[1])):
+					if rectEnd[1] != self.rectStart[1]:
+						for y in range(self.rectStart[1], rectEnd[1]+1*(rectEnd[1]-self.rectStart[1]), 1*(rectEnd[1], self.rectStart[1])):
 							if self.currentMap.tilePosExists((self.rectStart[0], y)):
 								oldtile = _sendTileUpdate(self.currentMap.ID, (self.rectStart[0], y), self.tilelabel.currentTile)
 								self.undo[-1].append((map.ID, (self.rectStart[0], y), oldtile))
@@ -992,7 +1020,10 @@ class mapEditor(QtGui.QDockWidget):
 				return True
 		elif t == 6:
 			if self.isVisible() and self.rectPaintingButton.isChecked() and self.copyData:
-				from rggViews import topmap, _sendTileUpdate
+				try:
+					from .rggViews import topmap, _sendTileUpdate
+				except ImportError:
+					from rggViews import topmap, _sendTileUpdate
 				if self.currentMap == None:
 					return
 				mapPosition = getMapPosition((x, y))
@@ -1008,13 +1039,16 @@ class mapEditor(QtGui.QDockWidget):
 					return
 				topleft = (min(self.rectStart[0], rectEnd[0]), min(self.rectStart[1], rectEnd[1]))
 				bottomright = (max(self.rectStart[0], rectEnd[0]), max(self.rectStart[1], rectEnd[1]))
-				for row in xrange(1+(bottomright[0]-topleft[0])):
-					for column in xrange(1+(bottomright[1]-topleft[1])):
+				for row in range(1+(bottomright[0]-topleft[0])):
+					for column in range(1+(bottomright[1]-topleft[1])):
 						_sendTileUpdate(self.currentMap.ID, (topleft[0]+row, topleft[1]+column), self.copyData[row%len(self.copyData)][column%len(self.copyData[row%len(self.copyData)])])
 				return True
 		elif t == 8:
 			if self.isVisible() and not self.noPaintingButton.isChecked():
-				from rggViews import topmap
+				try:
+					from .rggViews import topmap
+				except ImportError:
+					from rggViews import topmap
 				if self.currentMap == None:
 					return
 				mapPosition = getMapPosition((x, y))
@@ -1031,9 +1065,9 @@ class mapEditor(QtGui.QDockWidget):
 				topleft = (min(self.rectStart[0], rectEnd[0]), min(self.rectStart[1], rectEnd[1]))
 				bottomright = (max(self.rectStart[0], rectEnd[0]), max(self.rectStart[1], rectEnd[1]))
 				copypaste = []
-				for row in xrange(1+(bottomright[0]-topleft[0])):
+				for row in range(1+(bottomright[0]-topleft[0])):
 					copypaste.append([])
-					for column in xrange(1+(bottomright[1]-topleft[1])):
+					for column in range(1+(bottomright[1]-topleft[1])):
 						copypaste[row].append(map.getTile((topleft[0]+row, topleft[1]+column)))
 				self.copyData = copypaste
 				return True
@@ -1041,7 +1075,7 @@ class mapEditor(QtGui.QDockWidget):
 	def mapChangedResponse(self, newMap):
 		if newMap != None:
 			self.currentMap = newMap
-			self.tilepixmap = QtGui.QPixmap()
+			self.tilepixmap = QPixmap()
 			self.tilepixmap.load(newMap.tileset)
 			if self.tilelabel is None:
 				self.tilelabel = mapEditorLabel(newMap.tilesize, self.tilepixmap.width(), self.tilepixmap.height(), self)

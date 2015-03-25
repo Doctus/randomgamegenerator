@@ -18,12 +18,16 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
-
-import rggRemote
-from rggSystem import fake, translate
-from rggViews import say, announce, generateName, rollDice, reportCamera, storeChat, releaseChat
-from rggConstants import *
-import rggEvent
+try:
+	from .rggSystem import fake, translate
+	from .rggViews import say, announce, generateName, rollDice, reportCamera, storeChat, releaseChat
+	from .rggConstants import *
+	from . import rggEvent, rggRemote
+except ImportError:
+	from rggSystem import fake, translate
+	from rggViews import say, announce, generateName, rollDice, reportCamera, storeChat, releaseChat
+	from rggConstants import *
+	import rggEvent, rggRemote
 
 chatCommands = {}
 chatCommandNames = []
@@ -193,7 +197,7 @@ store.documentation = fake.translate('chatdoc',
 
 def chat(st):
 	"""Parses and executes chat commands."""
-	st = unicode(st)
+	st = UNICODE_STRING(st)
 
 	if (len(st) <= 0):
 		return
@@ -208,7 +212,7 @@ def chat(st):
 		message = st.strip()
 	else:
 		command, message = splitword(st[1:])
-		command = str(command).lower()
+		command = UNICODE_STRING(command).lower()
 	#print command, message
 
 	if command in chatCommands:
