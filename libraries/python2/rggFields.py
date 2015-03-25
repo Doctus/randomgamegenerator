@@ -18,9 +18,17 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
-
-from PyQt4 import QtGui, QtCore
-from rggSystem import translate, showErrorMessage, signal
+try:
+	from PyQt5 import QtCore
+	from PyQt5.QtGui import *
+	from PyQt5.QtWidgets import *
+	from .rggSystem import translate, showErrorMessage, signal
+	from .rggConstants import *
+except ImportError:
+	from PyQt4 import QtCore
+	from PyQt4.QtGui import *
+	from rggSystem import translate, showErrorMessage, signal
+	from rggConstants import *
 
 class validationError(Exception):
 	"""Error which occurs during input validation."""
@@ -90,7 +98,7 @@ class integerField(dialogField):
 					self.max or translate('integerField', 'infinity')))
 
 	def _createWidget(self, parent):
-		widget = QtGui.QSpinBox(parent)
+		widget = QSpinBox(parent)
 		if self.min is not None:
 			widget.setMinimum(self.min)
 		if self.max is not None:
@@ -139,7 +147,7 @@ class floatField(dialogField):
 					self.max or translate('floatField', 'infinity')))
 
 	def _createWidget(self, parent):
-		widget = QtGui.QDoubleSpinBox(parent)
+		widget = QDoubleSpinBox(parent)
 		widget.setDecimals(self.dec)
 		if self.min is not None:
 			widget.setMinimum(self.min)
@@ -175,7 +183,7 @@ class stringField(dialogField):
 	def _cleanValue(self, value):
 		if value is None and self.allowEmpty:
 			return ''
-		if isinstance(value, basestring):
+		if isinstance(value, BASE_STRING):
 			if self.allowEmpty or len(value) > 0:
 				return value
 		raise validationError(translate('stringField', 'You must enter text into the {0} field.').format(self.name))
@@ -186,12 +194,12 @@ class stringField(dialogField):
 			value = self._cleanValue(self.value)
 		except:
 			pass
-		widget = QtGui.QLineEdit(value, parent)
+		widget = QLineEdit(value, parent)
 		self.widgett = widget
 		return widget
 
 	def _getWidgetValue(self, widget):
-		return unicode(widget.text())
+		return UNICODE_STRING(widget.text())
 
 class dropDownField(dialogField):
 	"""A field made up of several independent choices."""
@@ -216,7 +224,7 @@ class dropDownField(dialogField):
 
 	def _createWidget(self, parent):
 		index = -1
-		widget = QtGui.QComboBox(parent)
+		widget = QComboBox(parent)
 		for choice in self.choices:
 			if choice == self.value:
 				index = widget.count()
@@ -230,7 +238,7 @@ class dropDownField(dialogField):
 		self.evil.emit()
 
 	def _getWidgetValue(self, widget):
-		return unicode(widget.currentText())
+		return UNICODE_STRING(widget.currentText())
 
 	evil = signal(doc=
 		"""Ponies!"""
@@ -259,13 +267,13 @@ class sliderField(dialogField):
 
 	def _createWidget(self, parent):
 		index = -1
-		widget = QtGui.QSlider(parent)
+		widget = QSlider(parent)
 		widget.setOrientation(QtCore.Qt.Horizontal)
 		widget.setMinimum(self.min)
 		widget.setMaximum(self.max)
 		widget.setValue(self.value)
 		widget.setTickInterval(1)
-		widget.setTickPosition(QtGui.QSlider.TicksAbove)
+		widget.setTickPosition(QSlider.TicksAbove)
 		widget.setPageStep(1)
 		widget.valueChanged.connect(self.emitEvil)
 		return widget

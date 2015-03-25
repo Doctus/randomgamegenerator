@@ -19,6 +19,8 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
+import sys
+
 # Version
 
 VERSION = "1.04"
@@ -79,3 +81,12 @@ MAGIC_SETTING_STRING = "Magic"
 ON_OFF_OPTIONS = ["Off", "On"]
 STANDARD_FILTER_OPTIONS = ["GL_NEAREST", "GL_LINEAR"]
 MIP_FILTER_OPTIONS = ["Off", "GL_NEAREST_MIPMAP_NEAREST", "GL_NEAREST_MIPMAP_LINEAR", "GL_LINEAR_MIPMAP_NEAREST", "GL_LINEAR_MIPMAP_LINEAR"]
+
+# Python 2 / 3 compatibility constants
+
+if sys.version_info >= (3,):
+	BASE_STRING = str
+	UNICODE_STRING = str
+else:
+	BASE_STRING = basestring
+	UNICODE_STRING = unicode
