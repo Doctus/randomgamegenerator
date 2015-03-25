@@ -1,20 +1,18 @@
 import sys, os
 
-if sys.version_info > (3, 0, 0):
+try:
 	from PyQt5.QtCore import *
 	from PyQt5.QtGui import *
 	from PyQt5.QtWidgets import *
 	from PyQt5.QtOpenGL import *
-	from libraries.python3.rggSystem import injectMain, SAVE_DIR
-	from libraries.python3.rggJson import loadString, jsonload
-	from libraries.python3.rggConstants import *
-else:
+except ImportError:
 	from PyQt4.QtCore import *
 	from PyQt4.QtGui import *
 	from PyQt4.QtOpenGL import *
-	from libraries.python2.rggSystem import injectMain, SAVE_DIR
-	from libraries.python2.rggJson import loadString, jsonload
-	from libraries.python2.rggConstants import *
+
+from libraries.rggSystem import injectMain, SAVE_DIR
+from libraries.rggJson import loadString, jsonload
+from libraries.rggConstants import *
 
 if __name__ == '__main__':
 	fieldtemp = ["English"]
@@ -45,25 +43,20 @@ if __name__ == '__main__':
 	QGLFormat.setDefaultFormat(qgf)
 
 	main = injectMain()
-	
-	if sys.version_info > (3, 0, 0):
-		from libraries.python3 import rggRPC, rggViews
-		from libraries.python3 import rggChat, rggICChat #bad, but necessary for now to initialize here
-		from libraries.python3.rggSignalConfig import connectEvents
-	else:
-		from libraries.python2 import rggRPC, rggViews
-		from libraries.python2 import rggChat, rggICChat #bad, but necessary for now to initialize here
-		from libraries.python2.rggSignalConfig import connectEvents
-	
+
+	from libraries import rggRPC, rggViews
+	from libraries import rggChat, rggICChat #bad, but necessary for now to initialize here
+	from libraries.rggSignalConfig import connectEvents
+
 	# Initialize view state.
 	s = rggViews._state
 	s.initialize(app)
-	
+
 	server = rggRPC.server
 	client = rggRPC.client
-	
+
 	connectEvents(client, server, s.menu, s.cwidget, s.icwidget, s.dwidget, s.uwidget, main.glwidget)
-	
+
 	# Start execution
 	try:
 		main.show()

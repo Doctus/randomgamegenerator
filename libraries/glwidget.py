@@ -37,13 +37,13 @@ import random, math, os, sys
 
 mod = False
 
-try:
+'''try:
 	print("Loading GLMod")
 	import glmod
 	mod = True
 except Exception as e:
 	print("Failed!", e)
-	pass
+	pass'''
 
 def nextPowerOfTwo(val):
 	val -= 1

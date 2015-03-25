@@ -16,10 +16,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
-from PyQt5 import QtGui
-from . import rggTile, rggResource, rggSystem
 import math, os
-from .rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
+try:
+	from . import rggTile, rggResource, rggSystem
+	from .rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
+except ImportError:
+	import rggTile, rggResource, rggSystem
+	from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
 class Sprite(object):
 
@@ -92,11 +95,10 @@ class Pog(object):
 		if self._showTooltip != show:
 			if self.tooltipText() == None or len(self.tooltipText()) == 0:
 				return
-			from .rggSystem import mainWindow
 			if show:
-				self.tooltipId = mainWindow.glwidget.addText(self.tooltipText(), self._position)
+				self.tooltipId = rggSystem.mainWindow.glwidget.addText(self.tooltipText(), self._position)
 			else:
-				mainWindow.glwidget.removeText(self.tooltipId)
+				rggSystem.mainWindow.glwidget.removeText(self.tooltipId)
 			self._showTooltip = show
 
 	@property
@@ -112,8 +114,7 @@ class Pog(object):
 				self._tile.setX(x)
 				self._tile.setY(y)
 			if self._showTooltip:
-				from .rggSystem import mainWindow
-				mainWindow.glwidget.setTextPos(self.tooltipId, position)
+				rggSystem.mainWindow.glwidget.setTextPos(self.tooltipId, position)
 
 	@property
 	def _tile(self):
@@ -151,9 +152,8 @@ class Pog(object):
 	def editProperty(self, key, value):
 		self._properties[key] = value
 		if self._showTooltip:
-			from .rggSystem import mainWindow
-			mainWindow.glwidget.removeText(self.tooltipId)
-			self.tooltipId = mainWindow.glwidget.addText(self.tooltipText(), self._position)
+			rggSystem.mainWindow.glwidget.removeText(self.tooltipId)
+			self.tooltipId = rggSystem.mainWindow.glwidget.addText(self.tooltipText(), self._position)
 
 	def setProperties(self, properties):
 		self._properties = properties
@@ -232,12 +232,11 @@ class Pog(object):
 		return " ".join(self.tmp)
 
 	def _makeTile(self):
-		from .rggSystem import mainWindow
 		src = rggResource.crm.translateFile(self._src, rggResource.RESOURCE_IMAGE)
 		textureRect = (0, 0, self.texturedimensions[0], self.texturedimensions[1])
 		drawRect = (self.position[0], self.position[1], self.size[0], self.size[1])
 		try:
-			return mainWindow.glwidget.createImage(src, self.layer, textureRect, drawRect)
+			return rggSystem.mainWindow.glwidget.createImage(src, self.layer, textureRect, drawRect)
 		except ZeroDivisionError:
 			print("FFFUUUUU ZERO DIVISION ERROR BLOW UP WORLD ETC.")
 			self._src = os.path.join("data", "invalid.png")
