@@ -189,10 +189,7 @@ whisper.documentation = fake.translate('chatdoc',
 
 def chat(st, chname, portrait):
 	"""Parses and executes chat commands."""
-	try:
-		st = unicode(st)
-	except UnicodeEncodeError:
-		st = str(st)
+	st = UNICODE_STRING(st)
 
 	if (len(st) <= 0):
 		return

@@ -10,6 +10,11 @@ from OpenGL.arrays import ArrayDatatype as ADT
 
 import numpy
 
+try:
+	from .rggConstants import UNICODE_STRING
+except ImportError:
+	from rggConstants import UNICODE_STRING
+
 class tile(object):
 	'''
 	Class for storing image data, position and some opengl stuff
@@ -190,4 +195,4 @@ class tile(object):
 
 	def __str__(self):
 		text = "Image(", self.imagepath, self.drawRect, self.textureRect, self.layer, self.offset, self.textureId, self._hidden, ")"
-		return str(text)
+		return UNICODE_STRING(text)

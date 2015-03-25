@@ -72,10 +72,7 @@ class BaseClient(object):
 		self.sentfile = None
 		self.receivedfile = None
 		# Doesn't need translation
-		try:
-			self.username = unicode(localUser())
-		except Exception:
-			self.username = str(localUser()) or 'localhost'
+		self.username = UNICODE_STRING(localUser()) or 'localhost'
 		assert(self.username)
 
 		self.timer = QtCore.QTimer()
@@ -466,51 +463,26 @@ class BaseClient(object):
 		"""Notify that the socket did not send the specified file."""
 		pass
 
-	try:
+	fileEvent = signal(object, BASE_STRING, BASE_STRING, doc=
+		"""Called when something happens relating to a file.
 
-		fileEvent = signal(object, str, str, doc=
-			"""Called when something happens relating to a file.
+		client -- this client
+		filename -- the filename of the file received
+		event -- a description of the event
 
-			client -- this client
-			filename -- the filename of the file received
-			event -- a description of the event
+		"""
+	)
 
-			"""
-		)
+	partialTransferEvent = signal(object, BASE_STRING, BASE_STRING, BASE_STRING, doc=
+		"""Called when part of a transfer occurs.
 
-		partialTransferEvent = signal(object, str, str, str, doc=
-			"""Called when part of a transfer occurs.
+		client -- this client
+		filename -- the filename of the file involved
+		size -- total size of the file
+		processed -- amount of the file transferred so far
 
-			client -- this client
-			filename -- the filename of the file involved
-			size -- total size of the file
-			processed -- amount of the file transferred so far
-
-			"""
-		)
-
-	except Exception:
-
-		fileEvent = signal(object, basestring, basestring, doc=
-			"""Called when something happens relating to a file.
-
-			client -- this client
-			filename -- the filename of the file received
-			event -- a description of the event
-
-			"""
-		)
-
-		partialTransferEvent = signal(object, basestring, basestring, basestring, doc=
-			"""Called when part of a transfer occurs.
-
-			client -- this client
-			filename -- the filename of the file involved
-			size -- total size of the file
-			processed -- amount of the file transferred so far
-
-			"""
-		)
+		"""
+	)
 
 
 class JsonClient(BaseClient):
@@ -592,139 +564,70 @@ class JsonClient(BaseClient):
 
 	# SIGNALS
 
-	try:
+	connected = signal(object, BASE_STRING, doc=
+		"""Called when the client is ready to start sending;
+		when isConnected becomes True.
 
-		connected = signal(object, basestring, doc=
-			"""Called when the client is ready to start sending;
-			when isConnected becomes True.
+		Never called when hosting; can send immediately in that case.
 
-			Never called when hosting; can send immediately in that case.
+		client -- this client
+		username -- the username the server is using
 
-			client -- this client
-			username -- the username the server is using
+		"""
+	)
 
-			"""
-		)
+	disconnected = signal(object, BASE_STRING, doc=
+		"""Called when the client disconnects or fails to connect.
 
-		disconnected = signal(object, basestring, doc=
-			"""Called when the client disconnects or fails to connect.
+		Not called when disconnected manually (through close()).
 
-			Not called when disconnected manually (through close()).
+		Never called when hosting; you will never be disconnected automatically.
 
-			Never called when hosting; you will never be disconnected automatically.
+		client -- this client
+		errorMessage -- the untranslated reason the connection failed
 
-			client -- this client
-			errorMessage -- the untranslated reason the connection failed
+		"""
+	)
 
-			"""
-		)
+	transferDisconnected = signal(object, BASE_STRING, doc=
+		"""Called when the transfer socket disconnects or fails to connect.
 
-		transferDisconnected = signal(object, basestring, doc=
-			"""Called when the transfer socket disconnects or fails to connect.
+		Not called when disconnected manually (through close()).
 
-			Not called when disconnected manually (through close()).
+		Never called when hosting; you will never be disconnected automatically.
 
-			Never called when hosting; you will never be disconnected automatically.
+		client -- this client
+		errorMessage -- the untranslated reason the connection failed
 
-			client -- this client
-			errorMessage -- the untranslated reason the connection failed
+		"""
+	)
 
-			"""
-		)
+	objectReceived = signal(object, dict, doc=
+		"""Called when an object is received over the wire.
 
-		objectReceived = signal(object, dict, doc=
-			"""Called when an object is received over the wire.
+		client -- this client
+		data -- the data received
 
-			client -- this client
-			data -- the data received
+		"""
+	)
 
-			"""
-		)
+	fileReceived = signal(object, BASE_STRING, doc=
+		"""Called when a file is received over the wire.
 
-		fileReceived = signal(object, basestring, doc=
-			"""Called when a file is received over the wire.
+		client -- this client
+		filename -- the filename of the file received
 
-			client -- this client
-			filename -- the filename of the file received
+		"""
+	)
 
-			"""
-		)
+	fileFailed = signal(object, BASE_STRING, doc=
+		"""Called when a file fails to come over the wire.
 
-		fileFailed = signal(object, basestring, doc=
-			"""Called when a file fails to come over the wire.
+		client -- this client
+		filename -- the filename of the file received
 
-			client -- this client
-			filename -- the filename of the file received
-
-			"""
-		)
-
-	except Exception:
-
-		connected = signal(object, basestring, doc=
-			"""Called when the client is ready to start sending;
-			when isConnected becomes True.
-
-			Never called when hosting; can send immediately in that case.
-
-			client -- this client
-			username -- the username the server is using
-
-			"""
-		)
-
-		disconnected = signal(object, basestring, doc=
-			"""Called when the client disconnects or fails to connect.
-
-			Not called when disconnected manually (through close()).
-
-			Never called when hosting; you will never be disconnected automatically.
-
-			client -- this client
-			errorMessage -- the untranslated reason the connection failed
-
-			"""
-		)
-
-		transferDisconnected = signal(object, basestring, doc=
-			"""Called when the transfer socket disconnects or fails to connect.
-
-			Not called when disconnected manually (through close()).
-
-			Never called when hosting; you will never be disconnected automatically.
-
-			client -- this client
-			errorMessage -- the untranslated reason the connection failed
-
-			"""
-		)
-
-		objectReceived = signal(object, dict, doc=
-			"""Called when an object is received over the wire.
-
-			client -- this client
-			data -- the data received
-
-			"""
-		)
-
-		fileReceived = signal(object, basestring, doc=
-			"""Called when a file is received over the wire.
-
-			client -- this client
-			filename -- the filename of the file received
-
-			"""
-		)
-
-		fileFailed = signal(object, basestring, doc=
-			"""Called when a file fails to come over the wire.
-
-			client -- this client
-			filename -- the filename of the file received
-
-			"""
-		)
+		"""
+	)
 
 
 	def setPassword(self, new):
@@ -941,10 +844,7 @@ class JsonServer(object):
 
 	def _processUsername(self, username):
 		"""Processes a username to lowercase."""
-		try:
-			return unicode(username).lower()
-		except UnicodeEncodeError:
-			return str(username).lower()
+		return UNICODE_STRING(username).lower()
 
 	def _addClient(self, client):
 		"""Adds a client to the list."""
@@ -984,10 +884,7 @@ class JsonServer(object):
 			raise RuntimeError("Invalid username {0}".format(username))
 		if self.clients[self._processUsername(username)] == self.client:
 			return "127.0.0.1"
-		try:
-			return unicode(self.clients[self._processUsername(username)].obj.socket.peerAddress())
-		except UnicodeEncodeError:
-			return str(self.clients[self._processUsername(username)].obj.socket.peerAddress())
+		return UNICODE_STRING(self.clients[self._processUsername(username)].obj.socket.peerAddress())
 
 	def baseUsername(server):
 		"""Replaceable hook for the base 'guest' username."""
@@ -1075,203 +972,102 @@ class JsonServer(object):
 		assert(client != self.client)
 		self.transferDisconnected.emit(self, client.username, errorMessage)
 
-	try:
+	connected = signal(object, BASE_STRING, doc=
+	"""Called when a client connects to the server.
 
-		connected = signal(object, basestring, doc=
-			"""Called when a client connects to the server.
+	server -- this server
+	username -- the username of the client
 
-			server -- this server
-			username -- the username of the client
+	"""
+	)
 
-			"""
-		)
+	disconnected = signal(object, BASE_STRING, BASE_STRING, doc=
+		"""Called when a client disconnects from the server.
 
-		disconnected = signal(object, basestring, basestring, doc=
-			"""Called when a client disconnects from the server.
+		Not called when disconnected manually (through close()).
 
-			Not called when disconnected manually (through close()).
+		Never called when hosting; you will never be disconnected automatically.
 
-			Never called when hosting; you will never be disconnected automatically.
+		server -- this server
+		username -- the username of the client
+		errorMessage -- the untranslated reason the connection failed
 
-			server -- this server
-			username -- the username of the client
-			errorMessage -- the untranslated reason the connection failed
+		"""
+	)
 
-			"""
-		)
+	transferDisconnected = signal(object, BASE_STRING, BASE_STRING, doc=
+		"""Called when a client transfer socket disconnects from the server.
 
-		transferDisconnected = signal(object, basestring, basestring, doc=
-			"""Called when a client transfer socket disconnects from the server.
+		Not called when disconnected manually (through close()).
 
-			Not called when disconnected manually (through close()).
+		Never called when hosting; you will never be disconnected automatically.
 
-			Never called when hosting; you will never be disconnected automatically.
+		server -- this server
+		username -- the username of the client
+		errorMessage -- the untranslated reason the connection failed
 
-			server -- this server
-			username -- the username of the client
-			errorMessage -- the untranslated reason the connection failed
+		"""
+	)
 
-			"""
-		)
-
-		kicked = signal(object, basestring, doc=
-			"""Called when a client is kicked from the server.
-
-			server -- this server
-			username -- the username of the client
-
-			"""
-		)
-
-		objectReceived = signal(object, basestring, dict, doc=
-			"""Called when an object is received from the client over the wire.
-
-			server -- this server
-			username -- the username of the client
-			data -- the data received
-
-			"""
-		)
-
-		fileReceived = signal(object, basestring, basestring, doc=
-			"""Called when a file is received over the wire.
-
-			server -- this server
-			username -- the username of the client
-			filename -- the filename of the file received
-
-			"""
-		)
-
-		fileFailed = signal(object, basestring, basestring, doc=
-			"""Called when a file fails to come over the wire.
-
-			server -- this server
-			username -- the username of the client
-			filename -- the filename of the file received
-
-			"""
-		)
-
-		fileEvent = signal(object, basestring, basestring, doc=
-			"""Called when a file fails to come over the wire.
-
-			username -- the username of the client
-			filename -- the filename of the file received
-			event -- a description of the event
-
-			"""
-		)
-
-		partialTransferEvent = signal(object, basestring, basestring, basestring, doc=
-			"""Called when part of a transfer occurs.
-
-			username -- the username of the client
-			filename -- the filename of the file involved
-			size -- total size of the file
-			processed -- amount of the file transferred so far
-
-			"""
-		)
-
-	except Exception:
-
-		connected = signal(object, str, doc=
-		"""Called when a client connects to the server.
+	kicked = signal(object, BASE_STRING, doc=
+		"""Called when a client is kicked from the server.
 
 		server -- this server
 		username -- the username of the client
 
 		"""
-		)
+	)
 
-		disconnected = signal(object, str, str, doc=
-			"""Called when a client disconnects from the server.
+	objectReceived = signal(object, BASE_STRING, dict, doc=
+		"""Called when an object is received from the client over the wire.
 
-			Not called when disconnected manually (through close()).
+		server -- this server
+		username -- the username of the client
+		data -- the data received
 
-			Never called when hosting; you will never be disconnected automatically.
+		"""
+	)
 
-			server -- this server
-			username -- the username of the client
-			errorMessage -- the untranslated reason the connection failed
+	fileReceived = signal(object, BASE_STRING, BASE_STRING, doc=
+		"""Called when a file is received over the wire.
 
-			"""
-		)
+		server -- this server
+		username -- the username of the client
+		filename -- the filename of the file received
 
-		transferDisconnected = signal(object, str, str, doc=
-			"""Called when a client transfer socket disconnects from the server.
+		"""
+	)
 
-			Not called when disconnected manually (through close()).
+	fileFailed = signal(object, BASE_STRING, BASE_STRING, doc=
+		"""Called when a file fails to come over the wire.
 
-			Never called when hosting; you will never be disconnected automatically.
+		server -- this server
+		username -- the username of the client
+		filename -- the filename of the file received
 
-			server -- this server
-			username -- the username of the client
-			errorMessage -- the untranslated reason the connection failed
+		"""
+	)
 
-			"""
-		)
+	fileEvent = signal(object, BASE_STRING, BASE_STRING, doc=
+		"""Called when a file fails to come over the wire.
 
-		kicked = signal(object, str, doc=
-			"""Called when a client is kicked from the server.
+		username -- the username of the client
+		filename -- the filename of the file received
+		event -- a description of the event
 
-			server -- this server
-			username -- the username of the client
+		"""
+	)
 
-			"""
-		)
+	partialTransferEvent = signal(object, BASE_STRING, BASE_STRING, BASE_STRING, doc=
+		"""Called when part of a transfer occurs.
 
-		objectReceived = signal(object, str, dict, doc=
-			"""Called when an object is received from the client over the wire.
+		username -- the username of the client
+		filename -- the filename of the file involved
+		size -- total size of the file
+		processed -- amount of the file transferred so far
 
-			server -- this server
-			username -- the username of the client
-			data -- the data received
-
-			"""
-		)
-
-		fileReceived = signal(object, str, str, doc=
-			"""Called when a file is received over the wire.
-
-			server -- this server
-			username -- the username of the client
-			filename -- the filename of the file received
-
-			"""
-		)
-
-		fileFailed = signal(object, str, str, doc=
-			"""Called when a file fails to come over the wire.
-
-			server -- this server
-			username -- the username of the client
-			filename -- the filename of the file received
-
-			"""
-		)
-
-		fileEvent = signal(object, str, str, doc=
-			"""Called when a file fails to come over the wire.
-
-			username -- the username of the client
-			filename -- the filename of the file received
-			event -- a description of the event
-
-			"""
-		)
-
-		partialTransferEvent = signal(object, str, str, str, doc=
-			"""Called when part of a transfer occurs.
-
-			username -- the username of the client
-			filename -- the filename of the file involved
-			size -- total size of the file
-			processed -- amount of the file transferred so far
-
-			"""
-		)
+		"""
+	)
 
 	def passFileEvent(self, clientName, filename, eventDescription):
 		self.fileEvent.emit(clientName, filename, eventDescription)
@@ -1398,15 +1194,9 @@ class JsonServer(object):
 
 def localHost():
 	"""Gets the name of the local machine."""
-	try:
-		return unicode(QtNetwork.QHostInfo.localHostName())
-	except UnicodeEncodeError:
-		return str(QtNetwork.QHostInfo.localHostName())
+	return UNICODE_STRING(QtNetwork.QHostInfo.localHostName())
 
 def localUser():
 	"""Gets the name of the local user."""
-	try:
-		return unicode(getpass.getuser())
-	except UnicodeEncodeError:
-		return str(getpass.getuser())
+	return UNICODE_STRING(getpass.getuser())
 

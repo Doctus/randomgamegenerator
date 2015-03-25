@@ -300,10 +300,7 @@ def getuser(username):
 	if isinstance(username, User):
 		assert(username in allusers())
 		return username
-	try: #Py2.7 support
-		username = unicode(username)
-	except Exception as e:
-		username = str(username)
+	username = UNICODE_STRING(username)
 	if server.userExists(username):
 		username = server.fullname(username)
 		assert(username in _state.users)
@@ -354,10 +351,7 @@ def playerOptions(playername):
 
 @serverRPC
 def respondSetMoveMode(newMode):
-	try:
-		_state.moveMode = unicode(newMode)
-	except Exception as e:
-		_state.moveMode = str(newMode)
+	_state.moveMode = UNICODE_STRING(newMode)
 
 @clientRPC
 def sendSetMoveMode(user, target, newMode):

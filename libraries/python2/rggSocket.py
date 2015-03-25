@@ -3,10 +3,12 @@ import re, hashlib, sys
 try:
 	from .rggJson import jsondumps, jsonloads
 	from .rggSystem import fake, translate, mainWindow, signal
+	from .rggConstants import UNICODE_STRING, BASE_STRING
 	from PyQt5 import QtCore, QtNetwork
 except ImportError as e:
 	from rggJson import jsondumps, jsonloads
 	from rggSystem import fake, translate, mainWindow, signal
+	from rggConstants import UNICODE_STRING, BASE_STRING
 	from PyQt4 import QtCore, QtNetwork
 
 # Major protocols used by the socket
@@ -371,10 +373,7 @@ class statefulSocket(object):
 				return
 			if not self._rawsend(data):
 				return
-			try:
-				self.filePartlySent.emit(self.sentfile.filename, unicode(self.sentfile.size), unicode(self.sentfile.processed))
-			except Exception as e:
-				self.filePartlySent.emit(self.sentfile.filename, str(self.sentfile.size), str(self.sentfile.processed))
+			self.filePartlySent.emit(self.sentfile.filename, UNICODE_STRING(self.sentfile.size), UNICODE_STRING(self.sentfile.processed))
 			if self.sentfile.file.atEnd():
 				sentfile = self.sentfile
 				self.sentfile = None
@@ -405,10 +404,7 @@ class statefulSocket(object):
 				if not self.receivedfile.write(self.context, data):
 					self._closeWithPrejudice()
 					return
-				try:
-					self.filePartlyReceived.emit(self.receivedfile.filename, unicode(self.receivedfile.size), unicode(self.receivedfile.processed))
-				except Exception as e:
-					self.filePartlyReceived.emit(self.receivedfile.filename, str(self.receivedfile.size), str(self.receivedfile.processed))
+				self.filePartlyReceived.emit(self.receivedfile.filename, UNICODE_STRING(self.receivedfile.size), UNICODE_STRING(self.receivedfile.processed))
 				if self.receivedfile.size == self.receivedfile.processed:
 					receivedfile = self.receivedfile
 					self.receivedfile = None
@@ -423,13 +419,10 @@ class statefulSocket(object):
 				if serial is None:
 					return
 				# Allow empty lines
-				if EMPTY_REGEX.match(str(serial)):
+				if EMPTY_REGEX.match(UNICODE_STRING(serial)):
 					continue
 				try:
-					try:
-						obj = jsonloads(unicode(serial))
-					except Exception as e:
-						obj = jsonloads(str(serial))
+					obj = jsonloads(UNICODE_STRING(serial))
 				except:
 					self._respondToSocketError("JSON Error", -1, text=serial)
 					return
@@ -460,7 +453,7 @@ class statefulSocket(object):
 		"""
 	)
 
-	disconnected = signal(object, str, doc=
+	disconnected = signal(object, BASE_STRING, doc=
 		"""Called when the socket disconnects or fails to connect.
 
 		Not called when disconnected manually (through close()).
@@ -480,7 +473,7 @@ class statefulSocket(object):
 		"""
 	)
 
-	commandReceived = signal(object, str, dict, doc=
+	commandReceived = signal(object, BASE_STRING, dict, doc=
 		"""Called when data is received over the wire.
 
 		socket -- this socket
@@ -490,7 +483,7 @@ class statefulSocket(object):
 		"""
 	)
 
-	fileSent = signal(object, str, doc=
+	fileSent = signal(object, BASE_STRING, doc=
 		"""Called when a file is done sending.
 
 		socket -- this socket
@@ -499,7 +492,7 @@ class statefulSocket(object):
 		"""
 	)
 
-	fileReceived = signal(object, str, doc=
+	fileReceived = signal(object, BASE_STRING, doc=
 		"""Called when a file is done receiving.
 
 		socket -- this socket
@@ -508,7 +501,7 @@ class statefulSocket(object):
 		"""
 	)
 
-	filePartlySent = signal(str, str, str, doc=
+	filePartlySent = signal(BASE_STRING, BASE_STRING, BASE_STRING, doc=
 		"""Called when a chunk of a file is sent.
 
 		filename -- the filename of the file sent
@@ -518,7 +511,7 @@ class statefulSocket(object):
 		"""
 	)
 
-	filePartlyReceived = signal(str, str, str, doc=
+	filePartlyReceived = signal(BASE_STRING, BASE_STRING, BASE_STRING, doc=
 		"""Called when a chunk of a file is received and written.
 
 		filename -- the filename of the file received

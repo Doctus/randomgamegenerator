@@ -53,10 +53,7 @@ class fake(object):
 
 # Real translation
 def translate(*args):
-	try:
-		return unicode(QCoreApplication.translate(*args))
-	except Exception as e:
-		return str(QCoreApplication.translate(*args))
+	return UNICODE_STRING(QCoreApplication.translate(*args))
 
 mainWindow = None
 
@@ -185,10 +182,7 @@ def promptString(prompt, title=translate('system', "Input", 'default string prom
 		text, ok = QInputDialog.getText(mainWindow, title, prompt)
 	if not ok:
 		return None
-	try:
-		return unicode(text)
-	except Exception as e:
-		return str(text)
+	return UNICODE_STRING(text)
 
 def promptInteger(prompt, title=translate('system', "Input", 'default integer prompt title'),
 		min=-sys.maxsize, max=sys.maxsize, default=0, step=1):
@@ -425,10 +419,7 @@ def checkVersion():
 
 def purgeEmptyFiles(rootpath):
 	'''Recursively deletes all empty files in rootpath and its subdirectories. Never deletes directories.'''
-	try:
-		rootpath = unicode(rootpath)
-	except Exception as e:
-		rootpath = str(rootpath)
+	rootpath = UNICODE_STRING(rootpath)
 	for (dirpath, dirnames, filenames) in os.walk(rootpath):
 		for filename in filenames:
 			path = os.path.join(dirpath, filename)
