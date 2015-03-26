@@ -28,7 +28,7 @@ try:
 	from . import rggMap
 	from .rggSystem import fake, translate, showErrorMessage, findFiles, makePortableFilename
 	from .rggFields import integerField, floatField, stringField, dropDownField, sliderField, validationError
-	from .rggNet import ConnectionData, localHost
+	from .rggNet import ConnectionData, localHost, localUser
 	from .rggJson import *
 	from .rggConstants import *
 except ImportError:
@@ -37,7 +37,7 @@ except ImportError:
 	import rggMap
 	from rggSystem import fake, translate, showErrorMessage, findFiles, makePortableFilename
 	from rggFields import integerField, floatField, stringField, dropDownField, sliderField, validationError
-	from rggNet import ConnectionData, localHost
+	from rggNet import ConnectionData, localHost, localUser
 	from rggJson import *
 	from rggConstants import *
 
@@ -592,7 +592,7 @@ class hostDialog(dialog):
 	def _createFields(self, data):
 		"""Create the fields used by this dialog."""
 
-		self.fieldtemp = [6812, translate('hostDialog', 'Anonymous')]
+		self.fieldtemp = [6812, localUser()]
 
 		try:
 			js = jsonload(os.path.join(SAVE_DIR, "net_server.rgs"))
@@ -752,7 +752,7 @@ class joinDialog(dialog):
 	def _createFields(self, data):
 		"""Create the fields used by this dialog."""
 
-		self.fieldtemp = [localHost(), 6812, translate('joinDialog', 'Anonymous')]
+		self.fieldtemp = [localHost(), 6812, localUser()]
 
 		try:
 			js = jsonload(os.path.join(SAVE_DIR, "net_settings.rgs"))

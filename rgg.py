@@ -1,14 +1,43 @@
 import sys, os
 
+def fatalError(error):
+	'''Displays a dialog about a fatal launch error and exits RGG.'''
+	try:
+		try:
+			import Tkinter as tkinter
+		except ImportError:
+			import tkinter
+		root = tkinter.Tk()
+		root.withdraw()
+		import tkMessageBox
+		tkMessageBox.showerror("RGG: Fatal Error", error)
+	except Exception:
+		#If even tk isn't available, just print the error to console.
+		print("RGG: Fatal Error: " + error)
+	sys.exit()
+
+if sys.path[0] != os.getcwd():
+	fatalError("Must be launched from the directory containing rgg.py.")
+
 try:
-	from PyQt5.QtCore import *
-	from PyQt5.QtGui import *
-	from PyQt5.QtWidgets import *
-	from PyQt5.QtOpenGL import *
+	try:
+		from PyQt5.QtCore import *
+		from PyQt5.QtGui import *
+		from PyQt5.QtWidgets import *
+		from PyQt5.QtOpenGL import *
+	except ImportError:
+		from PyQt4.QtCore import *
+		from PyQt4.QtGui import *
+		from PyQt4.QtOpenGL import *
 except ImportError:
-	from PyQt4.QtCore import *
-	from PyQt4.QtGui import *
-	from PyQt4.QtOpenGL import *
+	if sys.version_info >= (3,):
+		fatalError("PyQt5 not found. Please ensure it is installed and available.")
+	else:
+		fatalError("PyQt4 not found. Please ensure it is installed and available.")
+try:
+	import OpenGL
+except ImportError:
+	fatalError("PyOpenGL not found. Please ensure it is installed and available.")
 
 from libraries.rggSystem import injectMain, SAVE_DIR
 from libraries.rggJson import loadString, jsonload
@@ -16,13 +45,13 @@ from libraries.rggConstants import *
 
 if __name__ == '__main__':
 	fieldtemp = ["English"]
-	app = QApplication(['RGG in Space'])
+	app = QApplication(['RGG'])
 
 	try:
 		js = jsonload(os.path.join(SAVE_DIR, "lang_settings.rgs"))
 		fieldtemp[0] = loadString('lang.language', js.get('language'))
 	except:
-		print("no language settings detected")
+		pass
 
 	if fieldtemp[0] != "English":
 		transfile = ""
