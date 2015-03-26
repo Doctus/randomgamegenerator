@@ -69,10 +69,11 @@ def jsonappend(obj, filename):
 	"""Dump object to file. Merges with existing file if present."""
 	try:
 		dat = jsonload(filename)
-		newdat = dict(list(dat.items()) + list(obj.items()))
-		jsondump(newdat, filename)
 	except:
 		jsondump(obj, filename)
+		return
+	dat.update(obj)
+	jsondump(dat, filename)
 
 def loadString(name, value, allowEmpty=False):
 	if allowEmpty and value is None:

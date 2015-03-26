@@ -19,7 +19,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
-import os, os.path
+import os, os.path, time
 
 try:
 	from PyQt5 import QtCore
@@ -657,6 +657,23 @@ class hostDialog(dialog):
 		grandBox.addWidget(okayButton, 3, 0)
 		grandBox.addWidget(cancelButton, 3, 1)
 
+		try:
+			js = jsonload(os.path.join(SAVE_DIR, "net_server.rgs"))
+			timestamp = loadInteger('hostDialog.host', js.get('cached_ip_timestamp'))
+			ip = loadString('hostDialog.host', js.get('cached_ip'))
+			currentTime = time.time()
+			if currentTime >= timestamp + IP_CACHE_TIME:
+				raise Exception
+			with open(os.path.join("data", "2of12inf.txt"), "rt") as f:
+				dat = f.readlines()
+				ipdat = ip.split(".")
+				vals = ((int(ipdat[0])*256+int(ipdat[1])),(int(ipdat[2])*256+int(ipdat[3])))
+				wordresult = " ".join((dat[vals[0]][:-1], dat[vals[1]][:-1]))
+				self.checkIPLabel.setText(ip)
+				self.wordIPLabel.setText(wordresult)
+		except Exception:
+			pass
+
 		# Set up the widget
 		widget.setLayout(grandBox)
 		widget.setModal(True)
@@ -676,8 +693,25 @@ class hostDialog(dialog):
 		return (widget.exec_() == QDialog.Accepted)
 
 	def checkIP(self):
-		import urllib.request, urllib.error, urllib.parse
-		ip = str(urllib.request.urlopen('http://31.25.101.129/rgg_ip.php').read(), "UTF-8")
+		try:
+			js = jsonload(os.path.join(SAVE_DIR, "net_server.rgs"))
+			timestamp = loadInteger('hostDialog.host', js.get('cached_ip_timestamp'))
+			ip = loadString('hostDialog.host', js.get('cached_ip'))
+			currentTime = time.time()
+			if currentTime >= timestamp + IP_CACHE_TIME:
+				raise Exception
+		except Exception:
+			try:
+				import urllib.request as urllib
+			except ImportError:
+				import urllib2 as urllib
+			try:
+				ip = str(urllib.urlopen('http://ipecho.net/plain').read(), "UTF-8")
+			except TypeError:
+				ip = str(urllib.urlopen('http://ipecho.net/plain').read())
+			timestamp = time.time()
+			ipdict = {"cached_ip":ip, "cached_ip_timestamp":timestamp}
+			jsonappend(ipdict, os.path.join(SAVE_DIR, "net_server.rgs"))
 
 		with open(os.path.join("data", "2of12inf.txt"), "rt") as f:
 			dat = f.readlines()
@@ -701,7 +735,7 @@ class hostDialog(dialog):
 		"""Make a new map and return it."""
 		assert(self.cleanData)
 		try:
-			jsondump(self.dump(), os.path.join(SAVE_DIR, "net_server.rgs"))
+			jsonappend(self.dump(), os.path.join(SAVE_DIR, "net_server.rgs"))
 		except:
 			pass
 		return ConnectionData(localHost(), self.cleanData['port'],
@@ -824,7 +858,7 @@ class joinDialog(dialog):
 		"""Make a new map and return it."""
 		assert(self.cleanData)
 		try:
-			jsondump(self.dump(), os.path.join(SAVE_DIR, "net_settings.rgs"))
+			jsonappend(self.dump(), os.path.join(SAVE_DIR, "net_settings.rgs"))
 		except:
 			pass
 		return ConnectionData(self.cleanData['host'], self.cleanData['port'],

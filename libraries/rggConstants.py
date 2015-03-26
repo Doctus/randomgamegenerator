@@ -45,6 +45,7 @@ IMAGE_FILTER = 'Images ({imageList})'.format(imageList=','.join('*{ext}'.format(
 # Network settings
 
 PING_INTERVAL_SECONDS = 10
+IP_CACHE_TIME = 900 #15 minutes
 
 # Directory structure
 
