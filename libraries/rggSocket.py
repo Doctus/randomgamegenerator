@@ -283,8 +283,7 @@ class statefulSocket(object):
 
 	def _rawsend(self, serial):
 		"""Sends serialized data."""
-		if sys.version_info >= (3,):
-			serial = serial+"\n" #fix for new python behavior
+		serial = serial+"\n"
 		result = self.socket.write(serial)
 		if result == len(serial):
 			# I guess flush forces synchronous sending.
