@@ -22,9 +22,16 @@ import json, gzip, sys
 try:
 	from .rggFields import validationError
 	from .rggSystem import makeLocalFilename
+	from .rggConstants import BASE_STRING
 except ImportError:
 	from rggFields import validationError
 	from rggSystem import makeLocalFilename
+	from rggConstants import BASE_STRING
+	
+if sys.version_info >= (3,):
+	JSON_MODE = "t"
+else:
+	JSON_MODE = "b"
 
 def jsondumps(obj):
 	"""Dumps the object into a string. Contains no newlines."""
@@ -32,21 +39,14 @@ def jsondumps(obj):
 	#serial = json.dumps(obj, separators=(',',':'))
 	# pretty print
 	serial = json.dumps(obj, sort_keys=True)
-	if sys.version_info >= (3,):
-		assert(isinstance(serial, str))
-	else:
-		assert(isinstance(serial, basestring))
+	assert(isinstance(serial, BASE_STRING))
 	assert('\n' not in serial)
 	return serial
 
 def jsondump(obj, filename):
 	"""Dump object to file."""
-	try:
-		with gzip.open(makeLocalFilename(filename), 'wt') as file:
-			json.dump(obj, file, sort_keys=True, indent=4)
-	except AttributeError: #support for Python <2.7
-		with open(makeLocalFilename(filename), 'wt') as file:
-			json.dump(obj, file, sort_keys=True, indent=4)
+	with gzip.open(makeLocalFilename(filename), 'w'+JSON_MODE) as file:
+		json.dump(obj, file, sort_keys=True, indent=4)
 
 def jsonloads(str):
 	"""Loads the object from a string. May throw."""
@@ -57,10 +57,10 @@ def jsonloads(str):
 def jsonload(filename):
 	"""Loads the object from a file. May throw."""
 	try:
-		with gzip.open(makeLocalFilename(filename), 'rt') as file:
+		with gzip.open(makeLocalFilename(filename), 'r'+JSON_MODE) as file:
 			obj = json.load(file)
 	except: #might be an old uncompressed save
-		with open(makeLocalFilename(filename), 'rt') as file:
+		with open(makeLocalFilename(filename), 'r'+JSON_MODE) as file:
 			obj = json.load(file)
 	assert(isinstance(obj, list) or isinstance(obj, dict))
 	return obj
@@ -78,11 +78,7 @@ def jsonappend(obj, filename):
 def loadString(name, value, allowEmpty=False):
 	if allowEmpty and value is None:
 		return ''
-	if sys.version_info >= (3,):
-		strtype = str
-	else:
-		strtype = basestring
-	if isinstance(value, strtype):
+	if isinstance(value, BASE_STRING):
 		if allowEmpty or len(value) > 0:
 			return value
 	raise validationError('Validation expected {0} to be a string, found {1}.'.format(name, value))
