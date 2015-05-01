@@ -23,12 +23,15 @@ import os, os.path, sys, random, math
 
 try:
 	import urllib.request, urllib.error, urllib.parse
+except ImportError:
+	import urllib2 as urllib
+
+try:
 	from PyQt5.QtCore import *
 	from PyQt5.QtGui import *
 	from PyQt5.QtWidgets import *
 	from .rggConstants import *
 except ImportError:
-	import urllib2 as urllib
 	from PyQt4.QtCore import *
 	from PyQt4.QtGui import *
 	from rggConstants import *
