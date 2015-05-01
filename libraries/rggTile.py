@@ -11,7 +11,7 @@ from OpenGL.arrays import ArrayDatatype as ADT
 try:
 	import numpy
 except ImportError as e:
-	print "Numpy import error ({0}): {1}".format(e.errno, e.strerror)
+	print("Numpy import error ({0}): {1}".format(e.errno, e.strerror))
 
 try:
 	from .rggConstants import UNICODE_STRING

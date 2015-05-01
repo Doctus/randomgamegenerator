@@ -424,6 +424,7 @@ class GLWidget(QGLWidget):
 				for x in [0, 1, 2, 3]:
 					f_code = sys._getframe(x).f_code #really bad hack to get the filename and number
 					print("Doing it wrong in " + f_code.co_filename + ":" + str(f_code.co_firstlineno))
+					print("Error: " + e)
 
 			print("created texture", texture)
 
@@ -803,7 +804,10 @@ class GLWidget(QGLWidget):
 		oldCoord2[0] *= float(1)/self.zoom
 		oldCoord2[1] *= float(1)/self.zoom
 
-		delta = mouse.angleDelta().y() #let's not worry about 2-dimensional wheels.
+		try:
+			delta = mouse.angleDelta().y() #let's not worry about 2-dimensional wheels.
+		except AttributeError:
+			delta = mouse.delta()
 
 		if delta < 0:
 			self.zoom -= 0.5
