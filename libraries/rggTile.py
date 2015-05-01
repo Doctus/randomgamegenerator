@@ -8,7 +8,10 @@ from OpenGL.GL import *
 from OpenGL.GL.ARB.vertex_buffer_object import *
 from OpenGL.arrays import ArrayDatatype as ADT
 
-import numpy
+try:
+	import numpy
+except ImportError as e:
+	print "Numpy import error ({0}): {1}".format(e.errno, e.strerror)
 
 try:
 	from .rggConstants import UNICODE_STRING
