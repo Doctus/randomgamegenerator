@@ -316,10 +316,16 @@ class menuBar(object):
 			act.setEnabled(self.charExistenceCheck())
 
 	def updateInternetMenu(self):
-		for act in self.connectedActs:
-			act.setEnabled(client.isConnected)
-		for act in self.disconnectedActs:
-			act.setEnabled(not client.isConnected)
+		try:
+			for act in self.connectedActs:
+				act.setEnabled(client.isConnected)
+			for act in self.disconnectedActs:
+				act.setEnabled(not client.isConnected)
+		except TypeError: #implies client is in an intermediate state during connection; allow disconnect
+			for act in self.connectedActs:
+				act.setEnabled(True)
+			for act in self.disconnectedActs:
+				act.setEnabled(False)
 
 	def about(self):
 		msg = QMessageBox(mainWindow)
