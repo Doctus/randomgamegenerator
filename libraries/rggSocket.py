@@ -283,7 +283,6 @@ class statefulSocket(object):
 
 	def _rawsend(self, serial):
 		"""Sends serialized data."""
-		serial = serial+"\n"
 		result = self.socket.write(serial)
 		if result == len(serial):
 			# I guess flush forces synchronous sending.
@@ -334,7 +333,7 @@ class statefulSocket(object):
 			statefulSocket._memoizeKey = data
 			statefulSocket._memoizeData = serial
 
-		self._rawsend(serial)
+		self._rawsend(serial+"\n")
 
 	def sendMessage(self, command, **kwargs):
 		"""Sends a message across the wire."""

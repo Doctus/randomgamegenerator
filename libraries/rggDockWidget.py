@@ -770,7 +770,7 @@ class mapEditorLabel(QLabel):
 		self.par = par
 
 	def mousePressEvent(self, ev):
-		self.currentTile = (ev.x()/self.tilex) + abs((ev.y()/self.tiley)-self.openglfix)*self.wrap
+		self.currentTile = (int(ev.x()/self.tilex)) + abs(int(ev.y()/self.tiley)-self.openglfix)*self.wrap
 		self.updateTile()
 
 	def updateTile(self):

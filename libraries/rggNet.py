@@ -968,7 +968,8 @@ class JsonServer(object):
 	def _respondXferDisconnect(self, username, errorMessage):
 		"""Attempt to reestablish a lost transfer socket connection."""
 		assert(self.userExists(username))
-		assert(username in self.clients)
+		assert(username.lower() in self.clients)
+		client = self.clients[username.lower()]
 		assert(client != self.client)
 		self.transferDisconnected.emit(self, client.username, errorMessage)
 
