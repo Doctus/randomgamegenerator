@@ -3,12 +3,31 @@
 #Image convenience class
 #
 #By Oipo (kingoipo@gmail.com)
+'''
+    This file is part of RandomGameGenerator.
+
+    RandomGameGenerator is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    RandomGameGenerator is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
+'''
 
 from OpenGL.GL import *
 from OpenGL.GL.ARB.vertex_buffer_object import *
 from OpenGL.arrays import ArrayDatatype as ADT
 
-import numpy
+try:
+	import numpy
+except ImportError as e:
+	print("Numpy import error ({0}): {1}".format(e.errno, e.strerror))
 
 try:
 	from .rggConstants import UNICODE_STRING

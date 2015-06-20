@@ -4,19 +4,20 @@ By Doctus (kirikayuumura.noir@gmail.com)
 
 Menu bar and menu items.
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
+    This file is part of RandomGameGenerator.
 
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
+    RandomGameGenerator is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+    RandomGameGenerator is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
 import sys, os
 try:
@@ -233,25 +234,6 @@ class menuBar(object):
 		self.optionsMenu.addAction(self.gfxSettingsAct)
 		self.optionsMenu.addAction(self.drawTimerSettingsAct)
 
-
-		self.pluginsMenu = QMenu(translate("menubar", "&Plugins"), main)
-
-		self.pluginsModules = []
-		self.plugins = {}
-		sys.path.append(PLUGINS_DIR)
-		try:
-			for folder in os.listdir(PLUGINS_DIR):
-				if folder == ".svn":
-					continue
-				try:
-					self.pluginsModules.append(__import__(folder))
-					self.pluginsMenu.addAction(QAction(str(self.pluginsModules[-1].title()), main))
-					self.plugins[str(self.pluginsModules[-1].title())] = folder
-				except:
-					pass
-		except Exception as e:
-			pass
-
 		self.windowMenu = QMenu(translate("menubar", "Window"), main)
 
 		self.helpMenu = QMenu(translate("menubar", "&Help"), main)
@@ -263,7 +245,6 @@ class menuBar(object):
 		self.menubar.addMenu(self.internetMenu)
 		self.menubar.addMenu(drawMenu)
 		self.menubar.addMenu(self.optionsMenu)
-		self.pluginhide = self.menubar.addMenu(self.pluginsMenu)
 		if list(int(r) for r in PYQT_VERSION_STR.split(".")) < [4,  8,  0]:
 			warning = QMessageBox()
 			warning.setText("".join(("Your version of PyQt (", PYQT_VERSION_STR, ") is incompatible with RGG's Window menu, which requires 4.8.0 or newer. Right-click on the menu bar to get an alternate menu.")))
@@ -284,8 +265,6 @@ class menuBar(object):
 		self.moveIcon.triggered.connect(self.moveIconClicked)
 		self.drawIcon.triggered.connect(self.drawIconClicked)
 		self.deleteIcon.triggered.connect(self.deleteIconClicked)
-
-		self.pluginsMenu.triggered.connect(self.loadPlugin)
 
 		fileMenu.aboutToShow.connect(self.updateFileMenu)
 		self.internetMenu.aboutToShow.connect(self.updateInternetMenu)
@@ -319,13 +298,6 @@ class menuBar(object):
 		self.deleteIcon.setIcon(QIcon("./data/FAD-eraser-icon-selected.png"))
 		self.selectedIcon = ICON_DELETE
 
-	def loadPlugin(self, act):
-		exec("from " + (self.plugins[str(act.text())]) + " import " + (self.plugins[str(act.text())]))
-		exec(self.plugins[str(act.text())] + ".hajimaru(mainWindow)")
-		self.pluginsMenu.removeAction(act)
-		if len(self.pluginsMenu.actions()) == 0:
-			self.pluginhide.setVisible(False)
-
 	def changeStyle(self, styleName):
 		mainWindow.setStyleSheet(rggStyles.sheets[styleName][0])
 		jsonappend({'style':styleName}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
@@ -344,10 +316,16 @@ class menuBar(object):
 			act.setEnabled(self.charExistenceCheck())
 
 	def updateInternetMenu(self):
-		for act in self.connectedActs:
-			act.setEnabled(client.isConnected)
-		for act in self.disconnectedActs:
-			act.setEnabled(not client.isConnected)
+		try:
+			for act in self.connectedActs:
+				act.setEnabled(client.isConnected)
+			for act in self.disconnectedActs:
+				act.setEnabled(not client.isConnected)
+		except TypeError: #implies client is in an intermediate state during connection; allow disconnect
+			for act in self.connectedActs:
+				act.setEnabled(True)
+			for act in self.disconnectedActs:
+				act.setEnabled(False)
 
 	def about(self):
 		msg = QMessageBox(mainWindow)

@@ -3,6 +3,22 @@
 #glWidget - Takes care of drawing images, with optionally glmod to speed things up
 #
 #By Oipo (kingoipo@gmail.com)
+'''
+    This file is part of RandomGameGenerator.
+
+    RandomGameGenerator is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    RandomGameGenerator is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
+'''
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -424,6 +440,7 @@ class GLWidget(QGLWidget):
 				for x in [0, 1, 2, 3]:
 					f_code = sys._getframe(x).f_code #really bad hack to get the filename and number
 					print("Doing it wrong in " + f_code.co_filename + ":" + str(f_code.co_firstlineno))
+					print("Error: " + e)
 
 			print("created texture", texture)
 
@@ -803,7 +820,10 @@ class GLWidget(QGLWidget):
 		oldCoord2[0] *= float(1)/self.zoom
 		oldCoord2[1] *= float(1)/self.zoom
 
-		delta = mouse.angleDelta().y() #let's not worry about 2-dimensional wheels.
+		try:
+			delta = mouse.angleDelta().y() #let's not worry about 2-dimensional wheels.
+		except AttributeError:
+			delta = mouse.delta()
 
 		if delta < 0:
 			self.zoom -= 0.5

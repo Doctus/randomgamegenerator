@@ -3,18 +3,24 @@ RGG v1.04 "Fate and Chance cast lots"
 https://github.com/Doctus/randomgamegenerator
 
 Introduction
-  RGG is a whiteboad client, primarily designed to facilitate play of 
-  traditional pen-and-paper role-playing games online, although it's 
-  usable for a variety of other types of board games and similar purposes. 
 
-  You need an open port to host. Look up your firewall/router information
-  or search for tutorials on port forwarding. You don't need to worry
+  RGG is a whiteboad client, primarily designed to facilitate play of
+  traditional pen-and-paper role-playing games online, although it's
+  usable for a variety of other types of board games and similar
+  purposes.
+
+  Releases are generally stable. The current development snapshot
+  is not guaranteed to be stable, but often fixes bugs present in
+  the most recent release, so consider trying it out.
+
+  You need an open port to host. Make sure your firewall and router
+  allow inbound connections for RGG's port. You don't need to worry
   about this if you're just joining a friend's game; only one person
   has to have the port open so s/he can host. The default port is 6812.
 
   You'll probably want to place some of your own "pogs" (images) in
   the data/pogs folder for use during the game. Most file types are
-  supported, although jpg may not be under Windows. Similarly, you can 
+  supported, although jpg may not be under Windows. Similarly, you can
   put portrait images in data/portraits - the same disclaimer applies.
   Pogs you place and portraits you use will automatically be transferred
   to other players to whom you're connected.
@@ -25,29 +31,37 @@ Introduction
     http://www.daydreamspiral.com/forum/
     irc.darkmyst.org#attercop
 
-Coded by:
-  Doctus (kirikayuumura.noir@gmail.com)
-  NagelBagel (nagelbagel@gmail.com)
-  Oipo (kingoipo@gmail.com)
+Credits
 
-Art by:
-  Garrick (earthisthering@gmail.com)
-  Some portraits from:
-     http://www5f.biglobe.ne.jp/~itazu/etolier/index.html
-     Thank you!
+  Coded by:
+    Doctus (kirikayuumura.noir@gmail.com)
+    NagelBagel (nagelbagel@gmail.com)
+    Oipo (kingoipo@gmail.com)
 
-Special Thanks:
-  Kaijyuu and Antistone for suggestions and testing
-  Everyone from MoMM and #attercop
+  Art and Styles by:
+    Garrick (earthisthering@gmail.com)
+    Some portraits from:
+      http://www5f.biglobe.ne.jp/~itazu/etolier/index.html
+      Thank you!
 
-Changelog:
+  Special Thanks:
+    Kaijyuu, Bardum, Janra, Wallet, and Antistone for suggestions/testing
+    Everyone from MoMM and #attercop
+
+Licensing
+
+  RGG's libraries are licensed under the LGPL v3. For more information,
+  please see the notice at the top of each source file and the COPYING
+  and COPYING.LESSER files in the "doc" folder.
+
+Changelog
 
 v1.04 "Fate and Chance cast lots"               [in dev], 2015
 
    Fixes
     * Handle now defaults to local OS-level username instead
       of machine name.
-    * Authorship of maps now defaults to the current RGG 
+    * Authorship of maps now defaults to the current RGG
       handle.
     * Several menu options and buttons now disable themselves
       when appropriate.
@@ -57,13 +71,16 @@ v1.04 "Fate and Chance cast lots"               [in dev], 2015
       to fail to propagate session loads over the network.
 
    Features and Changes
-    * Added support for Python 3.x and PyQt5.
+    * Added experimental support for Python 3.x and PyQt5.
     * Substantially restructured the folder hierarchy to place
       rgg.py, data/, etc. at the top level.
     * Added option to set in-character portrait display size.
     * Added a "clear all" button for in-character characters.
     * Added "center everyone on pog" command.
     * Added a dark stylesheet.
+    * Added a fantasy stylesheet.
+
+  ---
 
 v1.03 "The King that was Not"                 January 29, 2013
 
@@ -131,7 +148,7 @@ v1.01c   "Overmuch magic"                     October 13, 2012
 v1.01b   "Overmuch magic"                     October 13, 2012
 
    Fixes
-    * The character creator now exports correctly to unicode file 
+    * The character creator now exports correctly to unicode file
       paths.
     * Lines, circles, and other shapes now synchronize properly
       over the network.
@@ -232,7 +249,7 @@ v1.01b   "Overmuch magic"                     October 13, 2012
     * Allowed pog images to be dragged directly into the main window
     * Likewise for portrait images and the IC Chat window
     * Pog editor now has a "save portrait" button
-    * Pogs without a name now display their file path in the pog 
+    * Pogs without a name now display their file path in the pog
       manager for easier identification.
     * All functions of the pog manager and the pog right-click menu
       are now accessible from both locations.
@@ -321,7 +338,7 @@ v1.01b   "Overmuch magic"                     October 13, 2012
     * Fixed a bug involving sending data to an empty group of users.
     * Added circles to show which pogs are selected.
     * Added support for stylesheets.
-    * Replaced the dubious plugin loading system with a different, 
+    * Replaced the dubious plugin loading system with a different,
       possibly more dubious system.
     * Line-drawing now has more thickness options. (Some may be buggy.)
     * Lines can now be drawn in colour.

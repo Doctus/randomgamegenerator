@@ -1,3 +1,19 @@
+'''
+    This file is part of RandomGameGenerator.
+
+    RandomGameGenerator is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    RandomGameGenerator is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
+'''
 
 import re, hashlib, sys
 try:
@@ -283,7 +299,6 @@ class statefulSocket(object):
 
 	def _rawsend(self, serial):
 		"""Sends serialized data."""
-		serial = serial+"\n"
 		result = self.socket.write(serial)
 		if result == len(serial):
 			# I guess flush forces synchronous sending.
@@ -334,7 +349,7 @@ class statefulSocket(object):
 			statefulSocket._memoizeKey = data
 			statefulSocket._memoizeData = serial
 
-		self._rawsend(serial)
+		self._rawsend(serial+"\n")
 
 	def sendMessage(self, command, **kwargs):
 		"""Sends a message across the wire."""
