@@ -21,12 +21,12 @@ Parse and execute chat commands.
 '''
 try:
 	from .rggSystem import fake, translate
-	from .rggViews import say, announce, generateName, rollDice, reportCamera, storeChat, releaseChat
+	from .rggViews import say, announce, generateName, rollDice, reportCamera, storeChat, releaseChat, incrementDreams, getDreams
 	from .rggConstants import *
 	from . import rggEvent, rggRemote
 except ImportError:
 	from rggSystem import fake, translate
-	from rggViews import say, announce, generateName, rollDice, reportCamera, storeChat, releaseChat
+	from rggViews import say, announce, generateName, rollDice, reportCamera, storeChat, releaseChat, incrementDreams, getDreams
 	from rggConstants import *
 	import rggEvent, rggRemote
 
@@ -194,6 +194,30 @@ def store(message):
 
 store.documentation = fake.translate('chatdoc',
 	"""release: display stored simultaneous messages.<br>
+	""")
+
+@chat('dream', 'd', 'adddream')
+def dream(message):
+	message = message.split()
+	target = message[0]
+	try:
+		amount = int(message[1])
+	except:
+		amount = 1
+	incrementDreams(target, amount)
+
+dream.documentation = fake.translate('chatdoc',
+	"""dream: add dreams to a player.<br>
+	""")
+
+@chat('dreams')
+def dreams(message):
+	dr = getDreams()
+	for user, amount in dr.items():
+		say("%s: %s"%(user, str(amount)))
+
+dreams.documentation = fake.translate('chatdoc',
+	"""dreams: list current dream amounts.<br>
 	""")
 
 def chat(st):

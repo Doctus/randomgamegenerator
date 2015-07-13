@@ -98,6 +98,20 @@ class _state(object):
 	cameraPog = None
 	pogmove = [0, 0]
 
+	dreams = {}
+
+	@staticmethod
+	def incrementDreams(target, amount):
+		if target not in _state.dreams:
+			_state.dreams[target] = 0
+		_state.dreams[target] += amount
+
+	@staticmethod
+	def getDreams(target):
+		if target not in _state.dreams:
+			return 0
+		return _state.dreams[target]
+
 	@staticmethod
 	def initialize(mainApp):
 		_state.menu = menuBar(mapExists, pogExists, charExists)
@@ -176,6 +190,27 @@ def autoMovePogs():
 	if _state.pogmove == [0, 0]:
 		return
 	movePogs(_state.pogmove)
+
+@serverRPC
+def respondDreamIncrement(source, target, amount):
+	_state.incrementDreams(target, amount)
+	if amount == 1:
+		say("%s gave %s a dream."%(source, target))
+	elif amount > 1:
+		say("%s gave %s %s dreams."%(source, target, str(amount)))
+	else:
+		say("%s removed %s dreams from %s."%(source, str(amount*-1), target))
+
+@clientRPC
+def sendDreamIncrement(user, target, amount):
+	respondDreamIncrement(allusers(), str(user), target, amount)
+
+def incrementDreams(target, amount):
+	if amount == 0: return
+	sendDreamIncrement(target, amount)
+
+def getDreams():
+	return _state.dreams
 
 def moveMap():
 	pass
