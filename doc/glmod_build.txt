@@ -1,6 +1,0 @@
-Found to be stable with:
-
-Python 2.7.2
-numpy-1.6.1
-PyOpenGL-3.0.2a1
-PyQt-Py2.7-4.9.1
