@@ -209,21 +209,25 @@ def promptLoadFile(title, filter, dir=''):
 	filename = QFileDialog.getOpenFileName(mainWindow,
 		title,
 		dir,
-		filter)[0]
+		filter)
 	if not filename:
 		return None
-	return filename
-	#return makePortableFilename(str(filename)) #does this really need to be portable?
+	if sys.version_info >= (3,):
+		return str(filename[0])
+	else:
+		return unicode(filename)
 
 def promptSaveFile(title, filter, dir=''):
 	filename = QFileDialog.getSaveFileName(mainWindow,
 		title,
 		dir,
-		filter)[0]
+		filter)
 	if not filename:
 		return None
-	return filename
-	#return makePortableFilename(str(filename)) #does this really need to be portable?
+	if sys.version_info >= (3,):
+		return str(filename[0])
+	else:
+		return unicode(filename)
 
 def promptButtonSelection(prompt, text=[], defaultButton = 0):
 	convertedText = ()
