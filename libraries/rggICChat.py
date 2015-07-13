@@ -22,12 +22,12 @@ Parse and execute chat commands.
 try:
 	from . import rggRemote, rggEvent
 	from .rggSystem import fake, translate
-	from .rggViews import ICSay, announce
+	from .rggViews import ICSay, announce, generateName, rollDice, reportCamera, storeChat, releaseChat
 	from .rggConstants import *
 except ImportError:
 	import rggRemote, rggEvent
 	from rggSystem import fake, translate
-	from rggViews import ICSay, announce
+	from rggViews import ICSay, announce, generateName, rollDice, reportCamera, storeChat, releaseChat
 	from rggConstants import *
 
 chatCommands = {}
@@ -77,7 +77,7 @@ def randomname(message, chname, portrait):
 		ICSay(translate('chat',
 			"Syntax: /generate NAMETYPE."))
 	else:
-		rggViews.generateName(*splitword(message.lower()))
+		generateName(*splitword(message.lower()))
 
 randomname.documentation = fake.translate('chatdoc',
 	"""/randomname: THIS DOCUMENTATION IS A LIE!!<dl>
@@ -92,7 +92,7 @@ randomname.documentation = fake.translate('chatdoc',
 
 @chat('techniquename', 'techname')
 def techname(message, chname, portrait):
-	rggViews.generateTechnique(message)
+	generateTechnique(message)
 
 techname.documentation = fake.translate('chatdoc',
 	"""/techniquename: Generate a technique name.<dl>
@@ -111,7 +111,7 @@ techname.documentation = fake.translate('chatdoc',
 
 @chat('advice')
 def advice(message, chname, portrait):
-	rggViews.generateAdvice()
+	generateAdvice()
 
 advice.documentation = fake.translate('chatdoc',
 	"""/advice: Generate some random, probably nonsensical advice.<dl>
@@ -127,7 +127,7 @@ def roll(message, chname, portrait):
 		dice = '2d6'
 	else:
 		dice = ' '.join(message.split())
-	rggViews.rollDice(dice)
+	rollDice(dice)
 
 roll.documentation = fake.translate('chatdoc',
 	"""/roll: Roll the dice. The dice can be in the form of macros or
@@ -168,7 +168,7 @@ def whisper(message, chname, portrait):
 			" Handle may be caps-sensitive."))
 	else:
 		target, rest = splitword(message)
-		if target.lower() == rggViews.localuser().username:
+		if target.lower() == localuser().username:
 			emote(translate('chat', "mutters something."))
 		elif not rest:
 			ICSay(translate('chat', "What do you want to tell {target}?").format(target=target))
