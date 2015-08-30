@@ -707,9 +707,9 @@ class hostDialog(dialog):
 			except ImportError:
 				import urllib2 as urllib
 			try:
-				ip = str(urllib.urlopen('http://ipecho.net/plain').read(), "UTF-8")
+				ip = str(urllib.urlopen('https://api.ipify.org').read(), "UTF-8")
 			except TypeError:
-				ip = str(urllib.urlopen('http://ipecho.net/plain').read())
+				ip = str(urllib.urlopen('https://api.ipify.org').read())
 			timestamp = time.time()
 			ipdict = {"cached_ip":ip, "cached_ip_timestamp":timestamp}
 			jsonappend(ipdict, os.path.join(SAVE_DIR, "net_server.rgs"))
