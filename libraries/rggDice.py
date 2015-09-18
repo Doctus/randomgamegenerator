@@ -24,10 +24,10 @@
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import random
+from random import randrange
 
 def _die(sides):
-	return random.randrange(1, sides+1)
+	return randrange(1, sides+1)
 
 def isRollValid(dice):
 	try:

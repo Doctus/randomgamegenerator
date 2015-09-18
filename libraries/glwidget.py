@@ -31,35 +31,17 @@ from OpenGL.arrays import ArrayDatatype as ADT
 OpenGL.ERROR_CHECKING = False
 OpenGL.ERROR_LOGGING = False
 
-try:
-	from PyQt5.QtCore import *
-	from PyQt5.QtGui import *
-	from PyQt5.QtWidgets import *
-	from PyQt5.QtOpenGL import *
-	from .rggTile import *
-	from .rggSystem import POG_DIR, SAVE_DIR, promptSaveFile, signal
-	from .rggJson import loadString, loadInteger, loadFloat, jsonload
-	from .rggConstants import BASE_STRING
-except ImportError:
-	from PyQt4.QtCore import *
-	from PyQt4.QtGui import *
-	from PyQt4.QtOpenGL import *
-	from rggTile import *
-	from rggSystem import POG_DIR, SAVE_DIR, promptSaveFile, signal
-	from rggJson import loadString, loadInteger, loadFloat, jsonload
-	from rggConstants import BASE_STRING
+from .rggQt import *
+from .rggTile import *
+from .rggSystem import POG_DIR, SAVE_DIR, promptSaveFile, signal
+from .rggJson import loadString, loadInteger, loadFloat, jsonload
+from .rggConstants import BASE_STRING
 
-import random, math, os, sys
+from math import cos, sin
+from os import path
+from sys import _getframe
 
 mod = False
-
-'''try:
-	print("Loading GLMod")
-	import glmod
-	mod = True
-except Exception as e:
-	print("Failed!", e)
-	pass'''
 
 def nextPowerOfTwo(val):
 	val -= 1
@@ -174,7 +156,7 @@ class GLWidget(QGLWidget):
 				for circle in self.selectionCircles[-1]:
 					glBegin(GL_LINE_LOOP)
 					for r in range(0, 360, 3):
-						glVertex2f(circle[0] + math.cos(r*0.01745329) * circle[2], circle[1] + math.sin(r*0.01745329) * circle[2])
+						glVertex2f(circle[0] + cos(r*0.01745329) * circle[2], circle[1] + sin(r*0.01745329) * circle[2])
 					glEnd()
 			for rectangle in self.rectangles[1]:
 				glLineWidth(2)
@@ -300,7 +282,7 @@ class GLWidget(QGLWidget):
 		self.fieldtemp = [1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", "On", "On", "Magic"]
 
 		try:
-			js = jsonload(os.path.join(SAVE_DIR, "gfx_settings.rgs"))
+			js = jsonload(path.join(SAVE_DIR, "gfx_settings.rgs"))
 			self.fieldtemp[0] = loadFloat('gfx.anifilt', js.get('anifilt'))
 			self.fieldtemp[1] = loadString('gfx.minfilter', js.get('minfilter'))
 			self.fieldtemp[2] = loadString('gfx.magfilter', js.get('magfilter'))
@@ -438,7 +420,7 @@ class GLWidget(QGLWidget):
 				print(e)
 				print("requested to create", qimagepath, layer, textureRect, drawRect, hidden)
 				for x in [0, 1, 2, 3]:
-					f_code = sys._getframe(x).f_code #really bad hack to get the filename and number
+					f_code = _getframe(x).f_code #really bad hack to get the filename and number
 					print("Doing it wrong in " + f_code.co_filename + ":" + str(f_code.co_firstlineno))
 					print("Error: " + e)
 

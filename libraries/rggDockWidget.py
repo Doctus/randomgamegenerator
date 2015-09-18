@@ -15,25 +15,16 @@
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import os, os.path, time, re
+from re import sub
+from time import strftime, localtime
+from os import path as ospath
 
-try:
-	from PyQt5 import QtCore
-	from PyQt5.QtGui import *
-	from PyQt5.QtWidgets import *
-	from .rggSystem import signal, findFiles, makePortableFilename, promptSaveFile, promptYesNo, getMapPosition, mainWindow
-	from .rggDialogs import newCharacterDialog, banDialog
-	from .rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
-	from .rggConstants import *
-	from .rggEvent import addMapChangedListener, addMousePressListener, addMouseMoveListener, addMouseReleaseListener
-except ImportError:
-	from PyQt4 import QtCore
-	from PyQt4.QtGui import *
-	from rggSystem import signal, findFiles, makePortableFilename, promptSaveFile, promptYesNo, getMapPosition, mainWindow
-	from rggDialogs import newCharacterDialog, banDialog
-	from rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
-	from rggConstants import *
-	from rggEvent import addMapChangedListener, addMousePressListener, addMouseMoveListener, addMouseReleaseListener
+from .rggQt import *
+from .rggSystem import signal, findFiles, makePortableFilename, promptSaveFile, promptYesNo, getMapPosition, mainWindow
+from .rggDialogs import newCharacterDialog, banDialog
+from .rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
+from .rggConstants import *
+from .rggEvent import addMapChangedListener, addMousePressListener, addMouseMoveListener, addMouseReleaseListener
 
 class transferMonitorWidget(QDockWidget):
 
@@ -53,7 +44,7 @@ class transferMonitorWidget(QDockWidget):
 		self.setWidget(self.widget)
 		self.setObjectName("Transfer Monitor")
 
-		mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
+		mainWindow.addDockWidget(Qt.BottomDockWidgetArea, self)
 
 	def updateItem(self, client, filename, status):
 		'''Update the status of a transfer, creating a new table row for it if it's new.'''
@@ -62,7 +53,7 @@ class transferMonitorWidget(QDockWidget):
 			self.transferTable.setRowCount(self.transferTable.rowCount() + 1)
 			for column in (0, 1, 2):
 				self.transferTable.setItem(self.transferTable.rowCount() - 1, column, QTableWidgetItem(""))
-				self.transferTable.item(self.transferTable.rowCount() - 1, column).setFlags(QtCore.Qt.NoItemFlags)
+				self.transferTable.item(self.transferTable.rowCount() - 1, column).setFlags(Qt.NoItemFlags)
 		self.transferTable.item(self.transferDict[client.username + filename], 0).setText(client.username)
 		self.transferTable.item(self.transferDict[client.username + filename], 1).setText(filename)
 		self.transferTable.item(self.transferDict[client.username + filename], 2).setText(status)
@@ -94,7 +85,7 @@ class debugConsoleWidget(QDockWidget):
 		self.widgetEditor.setOpenLinks(False)
 		self.logToFileToggle = QCheckBox(self.tr("Log to file"))
 		try:
-			if jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))["debuglog"] == "On":
+			if jsonload(ospath.join(SAVE_DIR, "ui_settings.rgs"))["debuglog"] == "On":
 				self.logToFileToggle.setChecked(True)
 			else:
 				self.logToFileToggle.setChecked(False)
@@ -110,13 +101,13 @@ class debugConsoleWidget(QDockWidget):
 
 		self.buffer = []
 
-		mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
+		mainWindow.addDockWidget(Qt.BottomDockWidgetArea, self)
 
 	def saveLogToggle(self, int):
 		if int == 0:
-			jsonappend({'debuglog':'Off'}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
+			jsonappend({'debuglog':'Off'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 		else:
-			jsonappend({'debuglog':'On'}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
+			jsonappend({'debuglog':'On'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 
 	def write(self, data):
 		try:
@@ -124,7 +115,7 @@ class debugConsoleWidget(QDockWidget):
 			if data.endswith('\n'):
 				self.widgetEditor.append(''.join(self.buffer))
 				if self.logToFileToggle.isChecked():
-					with open(os.path.join(LOG_DIR, time.strftime("%b_%d_%Y_debug.log", time.localtime())), 'a') as f:
+					with open(ospath.join(LOG_DIR, strftime("%b_%d_%Y_debug.log", localtime())), 'a') as f:
 						f.write(''.join(self.buffer))
 				self.buffer = []
 		except UnicodeEncodeError:
@@ -146,13 +137,13 @@ class chatLineEdit(QLineEdit):
 		self.position = len(self.messageHistory)
 
 	def keyPressEvent(self, event):
-		if event.key() == QtCore.Qt.Key_Up and self.position > 0:
+		if event.key() == Qt.Key_Up and self.position > 0:
 			#print "up!"
 			if self.position == len(self.messageHistory):
 				self.lastInput = self.text()
 			self.position -= 1
 			self.setText(self.messageHistory[self.position])
-		elif event.key() == QtCore.Qt.Key_Down:
+		elif event.key() == Qt.Key_Down:
 			#print "down!"
 			if self.position < len(self.messageHistory) - 1:
 				self.position += 1
@@ -185,7 +176,7 @@ class chatWidget(QDockWidget):
 		self.messageCache = []
 
 		try:
-			js = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
+			js = jsonload(ospath.join(SAVE_DIR, "ui_settings.rgs"))
 		except:
 			pass
 		try:
@@ -197,7 +188,7 @@ class chatWidget(QDockWidget):
 		except:
 			pass
 
-		mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
+		mainWindow.addDockWidget(Qt.BottomDockWidgetArea, self)
 
 		self.widgetEditor.anchorClicked.connect(self.anchorClicked)
 		self.widgetLineInput.returnPressed.connect(self.processInput)
@@ -220,7 +211,7 @@ class chatWidget(QDockWidget):
 		if "/tell" in UNICODE_STRING(url):
 			self.widgetLineInput.setText(url.toString())
 		else:
-			QDesktopServices.openUrl(QtCore.QUrl(url))
+			QDesktopServices.openUrl(QUrl(url))
 
 	def toggleTimestamp(self, newsetting):
 		if newsetting == "On":
@@ -232,7 +223,7 @@ class chatWidget(QDockWidget):
 		self.scroll = (self.widgetEditor.verticalScrollBar().value() ==
 				   self.widgetEditor.verticalScrollBar().maximum())
 		if self.timestamp:
-			message = " ".join((time.strftime(self.timestampformat, time.localtime()), mes))
+			message = " ".join((strftime(self.timestampformat, localtime()), mes))
 			self.messageCache.append(message)
 			self.widgetEditor.append(message)
 		else:
@@ -242,7 +233,7 @@ class chatWidget(QDockWidget):
 			self.widgetEditor.verticalScrollBar().setValue(self.widgetEditor.verticalScrollBar().maximum())
 		try:
 			try:
-				self.logfile = open(os.path.join(LOG_DIR, time.strftime("%b_%d_%Y.log", time.localtime())), 'a')
+				self.logfile = open(ospath.join(LOG_DIR, strftime("%b_%d_%Y.log", localtime())), 'a')
 				self.logfile.write(mes+"\n")
 			finally:
 				self.logfile.close()
@@ -254,7 +245,7 @@ class chatWidget(QDockWidget):
 		for validTag in ("i", "b", "u", "s"):
 			message = message.replace("".join(("[", validTag, "]")), "".join(("<", validTag, ">")))
 			message = message.replace("".join(("[", "/", validTag, "]")), "".join(("<", "/", validTag, ">")))
-		message = re.sub(r"\[url\](.*?)\[/url\]", r"<a href=\1>\1</a>", message)
+		message = sub(r"\[url\](.*?)\[/url\]", r"<a href=\1>\1</a>", message)
 		message = message.replace("/>", ">") #prevents anchor from closing with trailing slash in URL
 		return message
 
@@ -333,11 +324,11 @@ class ICChatWidget(QDockWidget):
 
 		self.setAcceptDrops(True)
 
-		mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self)
+		mainWindow.addDockWidget(Qt.LeftDockWidgetArea, self)
 
 		#TODO: Store and access characters in a better fashion.
 		try:
-			self.load(jsonload(os.path.join(CHAR_DIR, "autosave.rgc")))
+			self.load(jsonload(ospath.join(CHAR_DIR, "autosave.rgc")))
 		except:
 			self.characters = []
 
@@ -372,7 +363,7 @@ class ICChatWidget(QDockWidget):
 
 	def setCharacterPreview(self, newIndex=-1):
 		try:
-			preview = QPixmap(os.path.join(UNICODE_STRING(PORTRAIT_DIR), UNICODE_STRING(self.characters[self.characterSelector.currentIndex()].portrait)))
+			preview = QPixmap(ospath.join(UNICODE_STRING(PORTRAIT_DIR), UNICODE_STRING(self.characters[self.characterSelector.currentIndex()].portrait)))
 			if preview.isNull(): #Sadly, we have to check ahead, because Qt is dumb and prints an error about the scaling instead of raising one we can catch.
 				raise TypeError
 			preview = preview.scaled(min(preview.width(), 64), min(preview.height(), 64))
@@ -389,7 +380,7 @@ class ICChatWidget(QDockWidget):
 			self.widgetEditor.verticalScrollBar().setValue(self.widgetEditor.verticalScrollBar().maximum())
 		try:
 			try:
-				self.logfile = open(os.path.join(LOG_DIR, time.strftime("%b_%d_%Y.log", time.localtime())), 'a')
+				self.logfile = open(ospath.join(LOG_DIR, strftime("%b_%d_%Y.log", localtime())), 'a')
 				self.logfile.write(mes+"\n")
 			finally:
 				self.logfile.close()
@@ -423,7 +414,7 @@ class ICChatWidget(QDockWidget):
 			newchar = ICChar(*newchardat)
 			self.characterSelector.addItem(newchar.id)
 			self.characters.append(newchar)
-			jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
+			jsondump(self.dump(), ospath.join(CHAR_DIR, "autosave.rgc"))
 			self.characterSelector.setCurrentIndex(self.characterSelector.count()-1)
 			self.updateDeleteButton()
 			self.setCharacterPreview()
@@ -431,20 +422,20 @@ class ICChatWidget(QDockWidget):
 	def _newChar(self, char):
 		self.characterSelector.addItem(char.id)
 		self.characters.append(char)
-		jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
+		jsondump(self.dump(), ospath.join(CHAR_DIR, "autosave.rgc"))
 
 	def deleteCharacter(self):
 		if self.hasCharacters():
 			self.characters.pop(self.characterSelector.currentIndex())
 			self.characterSelector.removeItem(self.characterSelector.currentIndex())
-			jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
+			jsondump(self.dump(), ospath.join(CHAR_DIR, "autosave.rgc"))
 			self.updateDeleteButton()
 
 	def clearCharacters(self):
 		if promptYesNo('Really clear all characters?') == 16384:
 			self.characters = []
 			self.characterSelector.clear()
-			jsondump(self.dump(), os.path.join(CHAR_DIR, "autosave.rgc"))
+			jsondump(self.dump(), ospath.join(CHAR_DIR, "autosave.rgc"))
 			self.updateDeleteButton()
 			self.setCharacterPreview()
 
@@ -507,7 +498,7 @@ class diceRoller(QDockWidget):
 		self.widget = QGridLayout()
 		self.diceArea = QListWidget(mainWindow)
 		try:
-			self.load(jsonload(os.path.join(SAVE_DIR, "dice.rgd")))
+			self.load(jsonload(ospath.join(SAVE_DIR, "dice.rgd")))
 		except:
 			self.macros = [QListWidgetItem(QIcon('data/dice.png'), "Sample: 2d6"),
 						   QListWidgetItem(QIcon('data/dice.png'), "Sample: 4k2"),
@@ -531,7 +522,7 @@ class diceRoller(QDockWidget):
 		self.realwidget.setLayout(self.widget)
 		self.setWidget(self.realwidget)
 		self.setObjectName("Dice Widget")
-		mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
+		mainWindow.addDockWidget(Qt.BottomDockWidgetArea, self)
 		self.close()
 		self.currentMacro = -1
 
@@ -551,14 +542,14 @@ class diceRoller(QDockWidget):
 	def addMacro(self, mac, macname):
 		self.macros.append(QListWidgetItem(QIcon('data/dice.png'), macname + ': ' + mac))
 		self.diceArea.addItem(self.macros[len(self.macros)-1])
-		jsondump(self.dump(), os.path.join(SAVE_DIR, "dice.rgd"))
+		jsondump(self.dump(), ospath.join(SAVE_DIR, "dice.rgd"))
 
 	def removeCurrentMacro(self):
 		if self.diceArea.item(self.currentMacro) != self.diceArea.currentItem(): #This SHOULD, probably, only occur if there are two items and the first is deleted. Probably.
 			self.diceArea.takeItem(0)
 			return
 		self.diceArea.takeItem(self.currentMacro)
-		jsondump(self.dump(), os.path.join(SAVE_DIR, "dice.rgd"))
+		jsondump(self.dump(), ospath.join(SAVE_DIR, "dice.rgd"))
 
 	def summonMacro(self):
 		self.macroRequested.emit()
@@ -599,20 +590,20 @@ class PogFileSystemModel(QFileSystemModel):
 		self.setRootPath(POG_DIR)
 		self.setNameFilters(IMAGE_NAME_FILTER)
 		self.setNameFilterDisables(False)
-		self.absRoot = os.path.abspath(UNICODE_STRING(POG_DIR))
+		self.absRoot = ospath.abspath(UNICODE_STRING(POG_DIR))
 
 	def data(self, index, role):
 		basedata = QFileSystemModel.data(self, index, role)
-		if role == 1 and os.path.isfile(self.filePath(index)):
+		if role == 1 and ospath.isfile(self.filePath(index)):
 			return QIcon(self.filePath(index))
 		return basedata
 
 	def mimeData(self, indices):
-		path = makePortableFilename(os.path.join(POG_DIR, UNICODE_STRING(self.filePath(indices[0])[len(self.absRoot)+1:])))
+		path = makePortableFilename(ospath.join(POG_DIR, UNICODE_STRING(self.filePath(indices[0])[len(self.absRoot)+1:])))
 
-		if not os.path.isfile(path): return None
+		if not ospath.isfile(path): return None
 
-		mime = QtCore.QMimeData()
+		mime = QMimeData()
 		mime.setText(UNICODE_STRING(path))
 		return mime
 
@@ -631,7 +622,7 @@ class pogTree(QTreeView):
 			basePixmap = QPixmap(self.model().mimeData([i]).text())
 			scaledPixmap = basePixmap.scaled(basePixmap.width()*mainWindow.glwidget.zoom, basePixmap.height()*mainWindow.glwidget.zoom)
 			drag.setPixmap(scaledPixmap)
-			drag.setHotSpot(QtCore.QPoint(0, 0))
+			drag.setHotSpot(QPoint(0, 0))
 			drag.exec_()
 
 class pogPalette(QDockWidget):
@@ -657,7 +648,7 @@ class pogPalette(QDockWidget):
 		self.widget.setLayout(self.mainLayout)
 		self.setWidget(self.widget)
 		self.setObjectName("Pog Palette")
-		mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
+		mainWindow.addDockWidget(Qt.BottomDockWidgetArea, self)
 
 class userListList(QListWidget):
 
@@ -688,7 +679,7 @@ class userListWidget(QDockWidget):
 		self.setObjectName("User List Widget")
 		self.gmname = None
 		self.localname = None
-		mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self)
+		mainWindow.addDockWidget(Qt.BottomDockWidgetArea, self)
 
 	def addUser(self, name, host=False):
 		self.internalList.append((name, host))
@@ -833,7 +824,7 @@ class mapEditor(QDockWidget):
 		self.widget.setLayout(self.layout)
 		self.setWidget(self.widget)
 		self.setObjectName("Map Editor")
-		mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, self)
+		mainWindow.addDockWidget(Qt.RightDockWidgetArea, self)
 
 		self.currentMap = None
 		self.copyData = None
@@ -880,7 +871,7 @@ class mapEditor(QDockWidget):
 	def updateCurrentTile(self):
 		self.tilepix = QPixmap()
 		self.tilepix.load(self.currentMap.tileset)
-		self.tilepix = self.tilepix.copy(QtCore.QRect(*self.tilelabel.currentTileDimensions))
+		self.tilepix = self.tilepix.copy(QRect(*self.tilelabel.currentTileDimensions))
 		self.currentTileLabel.setPixmap(self.tilepix)
 
 	def mousePressResponse(self, x, y, t):

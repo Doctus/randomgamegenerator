@@ -19,16 +19,11 @@ Parse and execute chat commands.
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
-try:
-	from . import rggRemote, rggEvent
-	from .rggSystem import fake, translate
-	from .rggViews import ICSay, announce, generateName, rollDice, reportCamera, storeChat, releaseChat
-	from .rggConstants import *
-except ImportError:
-	import rggRemote, rggEvent
-	from rggSystem import fake, translate
-	from rggViews import ICSay, announce, generateName, rollDice, reportCamera, storeChat, releaseChat
-	from rggConstants import *
+from .rggEvent import addICChatInputListener
+from .rggRemote import sendICSay, sendICEmote, sendICWhisper
+from .rggSystem import fake, translate
+from .rggViews import ICSay, announce, generateName, rollDice, reportCamera, storeChat, releaseChat
+from .rggConstants import *
 
 chatCommands = {}
 chatCommandNames = []
@@ -61,7 +56,7 @@ def squish(message):
 
 @chat('say', hidden=True)
 def sayChat(message, chname, portrait):
-	rggRemote.sendICSay(message, chname, portrait)
+	sendICSay(message, chname, portrait)
 
 sayChat.documentation = fake.translate('chatdoc',
 	"""/say: Say a chat message. You do not need to write this as a command.<dl>
@@ -147,7 +142,7 @@ def emote(message, chname, portrait):
 		ICSay(translate('chat', "Syntax: /me DOES ACTION. Displays '[HANDLE] DOES "
 				"ACTION' in italic font."))
 	else:
-		rggRemote.sendICEmote(message, chname, portrait)
+		sendICEmote(message, chname, portrait)
 
 emote.documentation = fake.translate('chatdoc',
 	"""Display an emote in italics.<dl>
@@ -173,7 +168,7 @@ def whisper(message, chname, portrait):
 		elif not rest:
 			ICSay(translate('chat', "What do you want to tell {target}?").format(target=target))
 		else:
-			rggRemote.sendICWhisper(target, rest, chname, portrait)
+			sendICWhisper(target, rest, chname, portrait)
 
 whisper.documentation = fake.translate('chatdoc',
 	"""/whisper: Whisper a message to another user.<dl>
@@ -226,5 +221,5 @@ def chat(st, chname, portrait):
 					'Goes inbetween the commands in the commandList.').
 					join(chatCommandNames)))
 
-rggEvent.addICChatInputListener(chat, LATE_RESPONSE_LEVEL)
+addICChatInputListener(chat, LATE_RESPONSE_LEVEL)
 

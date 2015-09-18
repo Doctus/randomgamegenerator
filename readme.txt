@@ -79,6 +79,7 @@ v1.04 "Fate and Chance cast lots"               [in dev], 2015
     * Added "center everyone on pog" command.
     * Added a dark stylesheet.
     * Added a fantasy stylesheet.
+    * Missing dependencies should now be detected and warned about.
 
   ---
 

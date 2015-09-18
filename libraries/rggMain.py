@@ -37,7 +37,6 @@ except ImportError:
 	from rggConstants import *
 
 class MainWindow(QMainWindow):
-	'''Wrapper class for...well, the game? Maybe this needs to be called the game engine then'''
 
 	def __init__(self):
 		'''

@@ -19,50 +19,42 @@ Loading of JSON data.
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
-import json, gzip, sys
-try:
-	from .rggFields import validationError
-	from .rggSystem import makeLocalFilename
-	from .rggConstants import BASE_STRING
-except ImportError:
-	from rggFields import validationError
-	from rggSystem import makeLocalFilename
-	from rggConstants import BASE_STRING
 
-if sys.version_info >= (3,):
-	JSON_MODE = "t"
-else:
-	JSON_MODE = "b"
+from json import dump, dumps, load, loads
+from gzip import open as gzipopen
+from .rggFields import validationError
+from .rggSystem import makeLocalFilename
+from .rggConstants import BASE_STRING, JSON_MODE
 
 def jsondumps(obj):
 	"""Dumps the object into a string. Contains no newlines."""
 	# compact version
-	#serial = json.dumps(obj, separators=(',',':'))
+	#serial = dumps(obj, separators=(',',':'))
 	# pretty print
-	serial = json.dumps(obj, sort_keys=True)
+	serial = dumps(obj, sort_keys=True)
 	assert(isinstance(serial, BASE_STRING))
 	assert('\n' not in serial)
 	return serial
 
 def jsondump(obj, filename):
 	"""Dump object to file."""
-	with gzip.open(makeLocalFilename(filename), 'w'+JSON_MODE) as file:
-		json.dump(obj, file, sort_keys=True, indent=4)
+	with gzipopen(makeLocalFilename(filename), 'w'+JSON_MODE) as file:
+		dump(obj, file, sort_keys=True, indent=4)
 
 def jsonloads(str):
 	"""Loads the object from a string. May throw."""
-	obj = json.loads(str)
+	obj = loads(str)
 	assert(isinstance(obj, list) or isinstance(obj, dict))
 	return obj
 
 def jsonload(filename):
 	"""Loads the object from a file. May throw."""
 	try:
-		with gzip.open(makeLocalFilename(filename), 'r'+JSON_MODE) as file:
-			obj = json.load(file)
+		with gzipopen(makeLocalFilename(filename), 'r'+JSON_MODE) as file:
+			obj = load(file)
 	except: #might be an old uncompressed save
 		with open(makeLocalFilename(filename), 'r'+JSON_MODE) as file:
-			obj = json.load(file)
+			obj = load(file)
 	assert(isinstance(obj, list) or isinstance(obj, dict))
 	return obj
 

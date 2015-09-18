@@ -20,27 +20,16 @@ Design inspired by Django Forms.
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import os, os.path, time
+from os import path
+from time import time
 
-try:
-	from PyQt5 import QtCore
-	from PyQt5.QtGui import *
-	from PyQt5.QtWidgets import *
-	from . import rggMap
-	from .rggSystem import fake, translate, showErrorMessage, findFiles, makePortableFilename
-	from .rggFields import integerField, floatField, stringField, dropDownField, sliderField, validationError
-	from .rggNet import ConnectionData, localHost, localUser
-	from .rggJson import *
-	from .rggConstants import *
-except ImportError:
-	from PyQt4 import QtCore
-	from PyQt4.QtGui import *
-	import rggMap
-	from rggSystem import fake, translate, showErrorMessage, findFiles, makePortableFilename
-	from rggFields import integerField, floatField, stringField, dropDownField, sliderField, validationError
-	from rggNet import ConnectionData, localHost, localUser
-	from rggJson import *
-	from rggConstants import *
+from .rggQt import *
+from .rggMap import Map
+from .rggSystem import fake, translate, showErrorMessage, findFiles, makePortableFilename
+from .rggFields import integerField, floatField, stringField, dropDownField, sliderField, validationError
+from .rggNet import ConnectionData, localHost, localUser
+from .rggJson import jsonload, jsondump, jsonappend
+from .rggConstants import *
 
 class dialog(object):
 	"""A base class for dialogs.
@@ -439,7 +428,7 @@ class banDialog(QDialog):
 		"""Returns the currently saved bans, or a blank list if
 		   file access fails for any reason."""
 		try:
-			obj = jsonload(os.path.join(SAVE_DIR, "banlist.rgs"))
+			obj = jsonload(path.join(SAVE_DIR, "banlist.rgs"))
 			return obj["IPs"]
 		except:
 			return []
@@ -449,7 +438,7 @@ class banDialog(QDialog):
 		for i in range(self.list.count()):
 			ips.append(str(self.list.item(i).text()))
 		iplist = {"IPs":ips}
-		jsondump(iplist, os.path.join(SAVE_DIR, "banlist.rgs"))
+		jsondump(iplist, path.join(SAVE_DIR, "banlist.rgs"))
 
 	def add(self):
 		self.list.addItem(self.inputBox.text())
@@ -559,7 +548,7 @@ class newMapDialog(dialog):
 	def loadTilesize(self):
 		"""Attempt to load a stored tilesize for the current tileset, if it exists."""
 		try:
-			js = jsonload(os.path.join(SAVE_DIR, "tilesets.rgs"))
+			js = jsonload(path.join(SAVE_DIR, "tilesets.rgs"))
 			size = loadCoordinates('newMapDialog.'+self.clean()['tileset'], js.get(self.clean()['tileset']))
 			self.fields['tileWidth']._widget.setValue(size[0])
 			self.fields['tileHeight']._widget.setValue(size[1])
@@ -574,12 +563,12 @@ class newMapDialog(dialog):
 	def save(self):
 		"""Make a new map and return it."""
 		assert(self.cleanData)
-		jsonappend({self.cleanData['tileset']:[self.cleanData['tileWidth'], self.cleanData['tileHeight']]}, os.path.join(SAVE_DIR, "tilesets.rgs"))
-		return rggMap.Map(
+		jsonappend({self.cleanData['tileset']:[self.cleanData['tileWidth'], self.cleanData['tileHeight']]}, path.join(SAVE_DIR, "tilesets.rgs"))
+		return Map(
 			self.cleanData['mapName'],
 			self.cleanData['authName'],
 			(self.cleanData['mapWidth'], self.cleanData['mapHeight']),
-			makePortableFilename(os.path.join('data/tilesets', self.cleanData['tileset'])),
+			makePortableFilename(path.join('data/tilesets', self.cleanData['tileset'])),
 			(self.cleanData['tileWidth'], self.cleanData['tileHeight']))
 
 class hostDialog(dialog):
@@ -596,7 +585,7 @@ class hostDialog(dialog):
 		self.fieldtemp = [6812, localUser()]
 
 		try:
-			js = jsonload(os.path.join(SAVE_DIR, "net_server.rgs"))
+			js = jsonload(path.join(SAVE_DIR, "net_server.rgs"))
 			self.fieldtemp[0] = int(loadString('hostDialog.port', js.get('port')))
 			self.fieldtemp[1] = loadString('hostDialog.username', js.get('username'))
 		except:
@@ -659,13 +648,13 @@ class hostDialog(dialog):
 		grandBox.addWidget(cancelButton, 3, 1)
 
 		try:
-			js = jsonload(os.path.join(SAVE_DIR, "net_server.rgs"))
+			js = jsonload(path.join(SAVE_DIR, "net_server.rgs"))
 			timestamp = loadInteger('hostDialog.host', js.get('cached_ip_timestamp'))
 			ip = loadString('hostDialog.host', js.get('cached_ip'))
-			currentTime = time.time()
+			currentTime = time()
 			if currentTime >= timestamp + IP_CACHE_TIME:
 				raise Exception
-			with open(os.path.join("data", "2of12inf.txt"), "rt") as f:
+			with open(path.join("data", "2of12inf.txt"), "rt") as f:
 				dat = f.readlines()
 				ipdat = ip.split(".")
 				vals = ((int(ipdat[0])*256+int(ipdat[1])),(int(ipdat[2])*256+int(ipdat[3])))
@@ -695,10 +684,10 @@ class hostDialog(dialog):
 
 	def checkIP(self):
 		try:
-			js = jsonload(os.path.join(SAVE_DIR, "net_server.rgs"))
+			js = jsonload(path.join(SAVE_DIR, "net_server.rgs"))
 			timestamp = loadInteger('hostDialog.host', js.get('cached_ip_timestamp'))
 			ip = loadString('hostDialog.host', js.get('cached_ip'))
-			currentTime = time.time()
+			currentTime = time()
 			if currentTime >= timestamp + IP_CACHE_TIME:
 				raise Exception
 		except Exception:
@@ -710,11 +699,11 @@ class hostDialog(dialog):
 				ip = str(urllib.urlopen('https://api.ipify.org').read(), "UTF-8")
 			except TypeError:
 				ip = str(urllib.urlopen('https://api.ipify.org').read())
-			timestamp = time.time()
+			timestamp = time()
 			ipdict = {"cached_ip":ip, "cached_ip_timestamp":timestamp}
-			jsonappend(ipdict, os.path.join(SAVE_DIR, "net_server.rgs"))
+			jsonappend(ipdict, path.join(SAVE_DIR, "net_server.rgs"))
 
-		with open(os.path.join("data", "2of12inf.txt"), "rt") as f:
+		with open(path.join("data", "2of12inf.txt"), "rt") as f:
 			dat = f.readlines()
 			ipdat = ip.split(".")
 			vals = ((int(ipdat[0])*256+int(ipdat[1])),(int(ipdat[2])*256+int(ipdat[3])))
@@ -736,7 +725,7 @@ class hostDialog(dialog):
 		"""Make a new map and return it."""
 		assert(self.cleanData)
 		try:
-			jsonappend(self.dump(), os.path.join(SAVE_DIR, "net_server.rgs"))
+			jsonappend(self.dump(), path.join(SAVE_DIR, "net_server.rgs"))
 		except:
 			pass
 		return ConnectionData(localHost(), self.cleanData['port'],
@@ -756,7 +745,7 @@ class joinDialog(dialog):
 		self.fieldtemp = [localHost(), 6812, localUser()]
 
 		try:
-			js = jsonload(os.path.join(SAVE_DIR, "net_settings.rgs"))
+			js = jsonload(path.join(SAVE_DIR, "net_settings.rgs"))
 			self.fieldtemp[0] = loadString('joinDialog.host', js.get('host'))
 			self.fieldtemp[1] = int(loadString('joinDialog.port', js.get('port')))
 			self.fieldtemp[2] = loadString('joinDialog.username', js.get('username'))
@@ -841,7 +830,7 @@ class joinDialog(dialog):
 		"""Check for errors and return well-formatted data."""
 		self.cleanData = self._interpretFields(self.fields)
 		if len(self.cleanData['host'].split()) == 2:
-			with open(os.path.join("data", "2of12inf.txt"), "r") as f:
+			with open(path.join("data", "2of12inf.txt"), "r") as f:
 				inp = self.cleanData['host'].split()
 				_dat = f.readlines()
 				dat = [d.strip() for d in _dat]
@@ -859,7 +848,7 @@ class joinDialog(dialog):
 		"""Make a new map and return it."""
 		assert(self.cleanData)
 		try:
-			jsonappend(self.dump(), os.path.join(SAVE_DIR, "net_settings.rgs"))
+			jsonappend(self.dump(), path.join(SAVE_DIR, "net_settings.rgs"))
 		except:
 			pass
 		return ConnectionData(self.cleanData['host'], self.cleanData['port'],
@@ -872,11 +861,11 @@ class PortraitFileSystemModel(QFileSystemModel):
 		self.setRootPath(PORTRAIT_DIR)
 		self.setNameFilters(IMAGE_NAME_FILTER)
 		self.setNameFilterDisables(False)
-		self.absRoot = os.path.abspath(str(PORTRAIT_DIR))
+		self.absRoot = path.abspath(str(PORTRAIT_DIR))
 
 	def data(self, index, role):
 		basedata = QFileSystemModel.data(self, index, role)
-		if role == 1 and os.path.isfile(self.filePath(index)):
+		if role == 1 and path.isfile(self.filePath(index)):
 			return QIcon(self.filePath(index))
 		return basedata
 
@@ -985,7 +974,7 @@ class newCharacterDialog(dialog):
 		#portraits = findFiles(PORTRAIT_DIR, IMAGE_EXTENSIONS)
 		#portraits.sort(cmp=lambda x,y: cmp(x.lower(), y.lower()))
 		#for greatJustice in portraits:
-		#	icon = QIcon(os.path.join(PORTRAIT_DIR, greatJustice))
+		#	icon = QIcon(path.join(PORTRAIT_DIR, greatJustice))
 		#	self.portraitArea.addItem(QListWidgetItem(icon, greatJustice))
 
 		# Show to user
@@ -1030,7 +1019,7 @@ class gfxSettingsDialog(dialog):
 		self.fields = {}
 
 		try:
-			js = jsonload(os.path.join(SAVE_DIR, GFX_SETTINGS_FILE))
+			js = jsonload(path.join(SAVE_DIR, GFX_SETTINGS_FILE))
 			for field in [ANI_FILTER_STRING,]:
 				self.fields[field] = loadFloat(GFX_PREFIX + field, js.get(field))
 			for field in [MIN_FILTER_STRING, MAG_FILTER_STRING, MIPMIN_FILTER_STRING, FSAA_SETTING_STRING, VBO_SETTING_STRING]:

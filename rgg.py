@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 	This file is part of RandomGameGenerator.
 
@@ -15,7 +16,8 @@
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import sys, os
+from sys import exit, version_info
+from os import path
 
 def fatalError(error):
 	'''Displays a dialog about a fatal launch error and exits RGG.'''
@@ -31,23 +33,12 @@ def fatalError(error):
 	except Exception:
 		#If even tk isn't available, just print the error to console.
 		print("RGG: Fatal Error: " + error)
-	sys.exit()
-
-if sys.path[0] != os.getcwd():
-	fatalError("Must be launched from the directory containing rgg.py.")
+	exit()
 
 try:
-	try:
-		from PyQt5.QtCore import *
-		from PyQt5.QtGui import *
-		from PyQt5.QtWidgets import *
-		from PyQt5.QtOpenGL import *
-	except ImportError:
-		from PyQt4.QtCore import *
-		from PyQt4.QtGui import *
-		from PyQt4.QtOpenGL import *
+	from libraries.rggQt import QApplication, QTranslator, QGLFormat
 except ImportError:
-	if sys.version_info >= (3,):
+	if version_info >= (3,):
 		fatalError("PyQt5 not found. Please ensure it is installed and available.")
 	else:
 		fatalError("PyQt4 not found. Please ensure it is installed and available.")
@@ -65,7 +56,7 @@ if __name__ == '__main__':
 	app = QApplication(['RGG'])
 
 	try:
-		js = jsonload(os.path.join(SAVE_DIR, "lang_settings.rgs"))
+		js = jsonload(path.join(SAVE_DIR, "lang_settings.rgs"))
 		fieldtemp[0] = loadString('lang.language', js.get('language'))
 	except:
 		pass

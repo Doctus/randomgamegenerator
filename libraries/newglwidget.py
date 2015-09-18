@@ -1,3 +1,21 @@
+# -*- coding: utf-8 -*-
+'''
+	This file is part of RandomGameGenerator.
+
+    RandomGameGenerator is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    RandomGameGenerator is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
+'''
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from .rggTile import *
 from .rggSystem import POG_DIR, promptSaveFile, signal
@@ -50,7 +68,7 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 		self.setAcceptDrops(True)
 		self.setFocusPolicy(QtCore.Qt.StrongFocus)
 		self.setMouseTracking(True)
-	
+
 	def initializeGL(self):
 		self.context = QtGui.QOpenGLContext.currentContext()
 		version = QtGui.QOpenGLVersionProfile()
@@ -126,7 +144,7 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 			for t in split:
 				if len(t) == 0:
 					continue
-				
+
 				self.renderText(float(text[2][0]), float(text[2][1])+pos, 0, t)
 				pos += 16
 
@@ -135,18 +153,18 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 	def addSelectionCircle(self, splasifarcity, x, y, radius):
 		if not splasifarcity in self.selectionCircles:
 			self.selectionCircles[splasifarcity] = []
-			
+
 		self.selectionCircles[splasifarcity].append((float(x), float(y), float(radius)))
-		
+
 	def clearSelectionCircles(self):
 		self.selectionCircles.clear()
-		
+
 	def addLine(self, thickness, x, y, w, h, r, g, b):
 		if not thickness in self.lines:
 			self.lines[thickness] = []
-			
+
 		self.lines[thickness].append((float(x), float(y), float(w), float(h), float(r), float(g), float(b)))
-		
+
 	def deleteLine(self, thickness, x, y, w, h):
 		for thickness in self.lines:
 			new_list = []
@@ -155,26 +173,26 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 					   and not self.pointIntersectRect((line[2], line[3]), (x, y, w, h)):
 				   new_list.append(line)
 			self.lines[thickness] = new_list
-			
+
 	def addPreviewLine(self, thickness, x, y, w, h, r, g, b):
 		if not thickness in self.previewLines:
 			self.previewLines[thickness] = []
-			
+
 		self.previewLines[thickness].append((float(x), float(y), float(w), float(h), float(r), float(g), float(b)))
-						
+
 	def clearLines(self):
 		self.lines.clear()
-		
+
 	def clearPreviewLines(self):
 		self.previewLines.clear()
-		
+
 	def addRectangle(self, x, y, w, h, r, g, b):
 		self.rectangles[1].append((float(x), float(y), float(w), float(h), float(r), float(g), float(b)))
-		
+
 	def clearRectangles(self):
 		self.rectangles = {1:[]}
-					
-	def pointIntersectRect(self, point, rect): 
+
+	def pointIntersectRect(self, point, rect):
 	#point: (x, y)
 	#rect:  (x, y, w, h)
 		if point[0] < rect[0] or point[0] > rect[0] + rect[2]:
@@ -185,7 +203,7 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 
 	def resizeGL(self, w, h):
 		'''
-		Resize the GL window 
+		Resize the GL window
 		'''
 
 		self.functions.glViewport(0, 0, w, h)
@@ -196,15 +214,15 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 		self.functions.glHint(self.functions.GL_PERSPECTIVE_CORRECTION_HINT, self.functions.GL_NICEST)
 		self.w = w
 		self.h = h
-		
+
 	def mouseMoveEvent(self, mouse):
 		self.mouseMoveSignal.emit(mouse.pos().x(), mouse.pos().y())
-		
+
 		mouse.accept()
 
 	def mousePressEvent(self, mouse):
 		button = 0
-		
+
 		if self.ctrl:
 			print("ctrl pressed1")
 			button += 3
@@ -220,10 +238,10 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 		self.mousePressSignal.emit(mouse.pos().x(), mouse.pos().y(), button)
 
 		mouse.accept()
-		
+
 	def mouseReleaseEvent(self, mouse):
 		button = 0
-		
+
 		if self.ctrl:
 			button += 3
 		if self.shift:
@@ -264,7 +282,7 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 			self.camera[0] -= (50 * self.zoom)
 		else:
 			self.keyPressSignal.emit(event.key())
-			
+
 	def keyReleaseEvent(self, event):
 		if event.key() == QtCore.Qt.Key_Control:
 			self.ctrl = False
@@ -281,7 +299,7 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 		oldCoord2 = self.camera
 		oldCoord2[0] *= float(1)/self.zoom
 		oldCoord2[1] *= float(1)/self.zoom
-		
+
 		delta = mouse.angleDelta().y() #let's not worry about 2-dimensional wheels.
 
 		if delta < 0:
@@ -299,11 +317,11 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 
 
 		mouse.accept()
-		
+
 	def leaveEvent(self, event):
 		self.ctrl = False
 		self.shift = False
-		
+
 	def dragEnterEvent(self, event):
 		if event.mimeData().hasImage():
 			event.acceptProposedAction()
@@ -320,7 +338,7 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 			event.acceptProposedAction()
 		elif event.mimeData().hasText():
 			self.pogPlace.emit(event.pos().x(), event.pos().y(), str(event.mimeData().text()))
-			
+
 	def getImageSize(self, image):
 		qimg = None
 
@@ -330,23 +348,23 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 			qimg = QtGui.QImage(image)
 
 		return qimg.size()
-		
+
 	def addText(self, text, pos):
 		self.texts.append([self.textid, text, pos])
 		self.textid += 1
 		return self.textid - 1
-		
+
 	def removeText(self, id):
 		for i, t in enumerate(self.texts):
 			if t[0] == id:
 				self.texts.pop(i)
 				return
-			
+
 	def setTextPos(self, id, pos):
 		for t in self.texts:
 			if t[0] == id:
 				t[2] = pos
-				
+
 	def createImage(self, qimagepath, layer, textureRect, drawRect, hidden = False, dynamicity = "!default"):
 		'''
 		Creates an rggTile instance, uploads the correct image to GPU if not in cache, and some other helpful things.
@@ -403,7 +421,7 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 				for x in [0, 1, 2, 3]:
 					f_code = sys._getframe(x).f_code #really bad hack to get the filename and number
 					print("Doing it wrong in " + f_code.co_filename + ":" + str(f_code.co_firstlineno))
-			
+
 			print("created texture", texture)
 
 			self.functions.glBindTexture(self.texext, texture)
@@ -420,7 +438,7 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 			else:
 				self.functions.glTexParameteri(self.texext, self.functions.GL_TEXTURE_MIN_FILTER, self.minfilter)
 				self.functions.glTexParameteri(self.texext, self.functions.GL_TEXTURE_MAG_FILTER, self.magfilter)
-			
+
 			self.functions.glTexParameteri(self.texext, self.functions.GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
 			self.functions.glTexParameteri(self.texext, self.functions.GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE)
 			self.functions.glTexParameteri(self.texext, self.functions.GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
@@ -430,7 +448,7 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 			if self.npot == 3 and self.mipminfilter != -1:
 				self.functions.glEnable(self.functions.GL_TEXTURE_2D)
 				self.functions.glGenerateMipmap(self.functions.GL_TEXTURE_2D)
-			
+
 			self.qimages[qimagepath] = [qimg, texture, 1] #texture, reference count
 		else:
 			self.qimages[qimagepath][2] += 1
@@ -505,7 +523,7 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 		'''
 
 		self.functions.glBindTexture(self.texext, texture)
-		
+
 		self.functions.glPushMatrix()
 		self.functions.glTranslatef(dx+dw/2, dy+dh/2, 0)
 		self.functions.glRotatef(r, 0, 0, 1.0)
@@ -528,7 +546,7 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 		self.functions.glTexCoord2f(x, y)
 		self.functions.glVertex3f(dx, (dy+dh), 0)
 		self.functions.glEnd()
-		
+
 		self.functions.glPopMatrix()
 
 	def hideImage(self, image, hide):
@@ -537,7 +555,7 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 		Use Image.hide() instead.
 		'''
 		pass
-			
+
 	def setLayer(self, image, newLayer):
 		'''
 		This function should only be called from image.py

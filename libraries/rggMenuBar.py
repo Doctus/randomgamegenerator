@@ -334,6 +334,6 @@ class menuBar(object):
 		else:
 			aboutText = " ".join(("RGG", VERSION, "Release", "\nPython", ".".join(str(x) for x in sys.version_info[:3]), "\nPyQt", PYQT_VERSION_STR, "(Qt", QT_VERSION_STR+")"))
 		msg.setText(aboutText)
-		msg.setInformativeText(REPOSITORY_LINK)
+		msg.setInformativeText("\n\n".join((REPOSITORY_LINK, LICENSING_INFO)))
 		msg.setWindowTitle("About")
 		msg.exec_()
