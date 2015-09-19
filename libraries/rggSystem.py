@@ -19,23 +19,20 @@ Qt and C++ services.
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
+from sys import maxsize
+from os import walk, stat, path, remove
+from random import choice, random
+from math import hypot, cos, sin, pi
 
-import os, os.path, sys, random, math
+from .rggQt import PYQT5
 
 try:
 	import urllib.request, urllib.error, urllib.parse
 except ImportError:
 	import urllib2 as urllib
 
-try:
-	from PyQt5.QtCore import *
-	from PyQt5.QtGui import *
-	from PyQt5.QtWidgets import *
-	from .rggConstants import *
-except ImportError:
-	from PyQt4.QtCore import *
-	from PyQt4.QtGui import *
-	from rggConstants import *
+from .rggQt import *
+from .rggConstants import *
 
 class wAction(QAction):
 
@@ -189,14 +186,14 @@ def promptString(prompt, title=translate('system', "Input", 'default string prom
 	return UNICODE_STRING(text)
 
 def promptInteger(prompt, title=translate('system', "Input", 'default integer prompt title'),
-		min=-sys.maxsize, max=sys.maxsize, default=0, step=1):
+		min=-maxsize, max=maxsize, default=0, step=1):
 	value, ok = QInputDialog.getInt(mainWindow, title, prompt, default, min, max, step)
 	if not ok:
 		return None
 	return int(value)
 
 def promptCoordinates(prompt1, prompt2, title=translate('system', "Input", 'default coordinate prompt title'),
-		min=-sys.maxsize, max=sys.maxsize, step=1):
+		min=-maxsize, max=maxsize, step=1):
 	value1 = promptInteger(prompt1, title, min, max, step)
 	if value1 is None:
 		return None
@@ -212,10 +209,10 @@ def promptLoadFile(title, filter, dir=''):
 		filter)
 	if not filename:
 		return None
-	if sys.version_info >= (3,):
-		return str(filename[0])
+	if PYQT5:
+		return UNICODE_STRING(filename[0])
 	else:
-		return unicode(filename)
+		return UNICODE_STRING(filename)
 
 def promptSaveFile(title, filter, dir=''):
 	filename = QFileDialog.getSaveFileName(mainWindow,
@@ -224,10 +221,10 @@ def promptSaveFile(title, filter, dir=''):
 		filter)
 	if not filename:
 		return None
-	if sys.version_info >= (3,):
-		return str(filename[0])
+	if PYQT5:
+		return UNICODE_STRING(filename[0])
 	else:
-		return unicode(filename)
+		return UNICODE_STRING(filename)
 
 def promptButtonSelection(prompt, text=[], defaultButton = 0):
 	convertedText = ()
@@ -271,15 +268,15 @@ def promptYesNo(prompt):
 def findFiles(dir, extensions):
 	"""Get the list of files with one of the given extensions."""
 	files = []
-	for dirpath, dirnames, filenames in os.walk(dir):
+	for dirpath, dirnames, filenames in walk(dir):
 		if ".svn" in dirpath:
 			continue
 		#filenames.sort()
 		for filename in filenames:
-			if os.path.splitext(filename)[1] in extensions:
-				name = os.path.join(dirpath, filename)[len(dir) + 1:]
+			if path.splitext(filename)[1] in extensions:
+				name = path.join(dirpath, filename)[len(dir) + 1:]
 				#print "found file:", name, makePortableFilename(name)
-				if os.stat(os.path.join(dirpath, filename))[6] == 0: continue
+				if stat(path.join(dirpath, filename))[6] == 0: continue
 				files.append(makePortableFilename(name))
 	#files.sort()
 	return files
@@ -299,11 +296,11 @@ def setCameraPosition(position):
 	mainWindow.glwidget.camera = list(position)
 
 def findRandomAppend():
-	"""Gives a random character to append to string to make it random."""
+	"""Gives a random character to append to string to make it """
 	# Can't spell swear words without vowels
 	# Left out l and v because they look enough like i and u
 	letters = '256789bcdfghjkmnpqrstwxz'
-	return random.choice(letters)
+	return choice(letters)
 
 
 def makeLocalFilename(filename):
@@ -373,11 +370,11 @@ def drawRectangleMadeOfLines(x, y, w, h, colour, thickness, preview=False):
 def drawCircle(centre, edge, colour, thickness, preview=False):
 	'''Draws lines to form an approximate circle.'''
 	lines = set()
-	radius = math.hypot(edge[0]-centre[0], edge[1]-centre[1])
+	radius = hypot(edge[0]-centre[0], edge[1]-centre[1])
 	vert = [centre[0]+radius, centre[1], 0, 0]
 	for r in range(3, 363, 3):
-		vert[2] = centre[0]+math.cos(r*0.01745329)*radius
-		vert[3] = centre[1]+math.sin(r*0.01745329)*radius
+		vert[2] = centre[0]+cos(r*0.01745329)*radius
+		vert[3] = centre[1]+sin(r*0.01745329)*radius
 		lines.update(drawSegmentedLine(vert[0], vert[1], vert[2], vert[3], thickness, colour[0], colour[1], colour[2], preview))
 		vert[0] = vert[2]
 		vert[1] = vert[3]
@@ -388,14 +385,14 @@ def drawRegularPolygon(sides, centre, size, colour, thickness, rainbow = False, 
 	vertices = []
 	lines = set()
 	for i in range(sides):
-		vertices.append((centre[0]+size*math.cos(2*math.pi*i/sides), centre[1]+size*math.sin(2*math.pi*i/sides)))
+		vertices.append((centre[0]+size*cos(2*pi*i/sides), centre[1]+size*sin(2*pi*i/sides)))
 	for p in range(sides):
 		for q in range(sides):
 			if sides%2 == 1 or p%(sides/2) != q%(sides/2):
 				if not rainbow:
 					lines.update(drawSegmentedLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, colour[0], colour[1], colour[2], preview))
 				else:
-					lines.update(drawSegmentedLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, random.random(), random.random(), random.random(), preview))
+					lines.update(drawSegmentedLine(vertices[p][0], vertices[p][1], vertices[q][0], vertices[q][1], thickness, random(), random(), random(), preview))
 	return lines
 
 def addText(text, pos):
@@ -428,11 +425,11 @@ def checkVersion():
 def purgeEmptyFiles(rootpath):
 	'''Recursively deletes all empty files in rootpath and its subdirectories. Never deletes directories.'''
 	rootpath = UNICODE_STRING(rootpath)
-	for (dirpath, dirnames, filenames) in os.walk(rootpath):
+	for (dirpath, dirnames, filenames) in walk(rootpath):
 		for filename in filenames:
-			path = os.path.join(dirpath, filename)
+			fullpath = path.join(dirpath, filename)
 			try:
-				if os.stat(path).st_size == 0:
-					os.remove(path)
+				if stat(fullpath).st_size == 0:
+					remove(fullpath)
 			except WindowsError:
 				print("Warning: pog locale error.")

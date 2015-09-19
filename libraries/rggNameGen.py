@@ -19,22 +19,13 @@
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
-
-import random, os
+from random import choice
 
 GENERATOR_DIR = "generators"
 KAIJYUUKEYS = ("technique", "dwarf", "japanese", "food", "weapon", "artifood", "french", "macguffin")
 
 generators = {}
-try:
-	for file in os.listdir(GENERATOR_DIR):
-		if ".py" in file and "__init__" not in file and ".pyc" not in file:
-			#This is kind of bad, but since we have to use the "from generators"
-			#syntax I don't know a cleaner way to do this.
-			exec("from generators import "+file[:-3])
-			exec("generators[file[:-3]] = "+file[:-3]+".getName")
-except Exception as e:
-	pass
+from libraries.generators import *
 
 def getName(generator, args):
 	'''Return a random name by passing generator args.'''
@@ -49,8 +40,8 @@ def getName(generator, args):
 			return "Key Error: no generator named " + str(args) + ". For a list of available generators, see /generate keys."
 	elif generator == "kaijyuu":
 		result = []
-		for x in range(0, random.choice((3, 4, 5))):
-			result.append(getName(random.choice(KAIJYUUKEYS), "exalted full"))
+		for x in range(0, choice((3, 4, 5))):
+			result.append(getName(choice(KAIJYUUKEYS), "exalted full"))
 		return " ".join(result)
 	try:
 		return generators[generator](args)

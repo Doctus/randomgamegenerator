@@ -31,15 +31,16 @@ from OpenGL.arrays import ArrayDatatype as ADT
 OpenGL.ERROR_CHECKING = False
 OpenGL.ERROR_LOGGING = False
 
-from .rggQt import *
-from .rggTile import *
-from .rggSystem import POG_DIR, SAVE_DIR, promptSaveFile, signal
-from .rggJson import loadString, loadInteger, loadFloat, jsonload
-from .rggConstants import BASE_STRING
-
 from math import cos, sin
 from os import path
 from sys import _getframe
+from numpy import zeros
+
+from .rggQt import *
+from .rggTile import tile
+from .rggSystem import POG_DIR, SAVE_DIR, promptSaveFile, signal
+from .rggJson import loadString, loadInteger, loadFloat, jsonload
+from .rggConstants import BASE_STRING
 
 mod = False
 
@@ -91,7 +92,7 @@ class GLWidget(QGLWidget):
 		self.error = False
 		self.texts = []
 		self.textid = 0
-		self.vertByteCount = ADT.arrayByteCount(numpy.zeros((8, 2), 'f'))
+		self.vertByteCount = ADT.arrayByteCount(zeros((8, 2), 'f'))
 		self.logoon = "Off"
 
 		self.setAcceptDrops(True)
@@ -364,7 +365,7 @@ class GLWidget(QGLWidget):
 				self.vbos = True
 				print("VBO support initialised succesfully")
 				self.VBO = int(glGenBuffersARB(1))
-				glmod.initVBO(self.VBO, ADT.arrayByteCount(numpy.zeros((2, 2), 'f')))
+				glmod.initVBO(self.VBO, ADT.arrayByteCount(zeros((2, 2), 'f')))
 			else:
 				print("VBO support initialisation failed, continuing without")
 

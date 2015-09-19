@@ -19,22 +19,18 @@ Remote views.
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
+from os import path
 
-import re, os
-try:
-	from . import rggViews, rggRPC, rggResource
-	from .rggSystem import translate, fake, makePortableFilename
-	from .rggViews import say, ICSay, announce, linkedName, getmap, allmaps, getPortraitSize
-	from .rggViews import localhandle, localuser, getuser, allusers, allusersbut, usernames, User, addUserToList, getNetUserList, respondUserRemove, clearUserList, reconnectTransferSocket
-	from .rggRPC import clientRPC, serverRPC
-	from .rggConstants import *
-except ImportError:
-	import rggViews, rggRPC, rggResource
-	from rggSystem import translate, fake, makePortableFilename
-	from rggViews import say, ICSay, announce, linkedName, getmap, allmaps, getPortraitSize
-	from rggViews import localhandle, localuser, getuser, allusers, allusersbut, usernames, User, addUserToList, getNetUserList, respondUserRemove, clearUserList, reconnectTransferSocket
-	from rggRPC import clientRPC, serverRPC
-	from rggConstants import *
+from .rggResource import crm, srm, RESOURCE_IMAGE
+from .rggSystem import translate, fake, makePortableFilename
+from .rggViews import say, ICSay, announce, linkedName, getmap, allmaps, getPortraitSize
+from .rggViews import localhandle, localuser, getuser, allusers, allusersbut
+from .rggViews import usernames, User, addUserToList, getNetUserList, respondUserRemove
+from .rggViews import clearUserList, reconnectTransferSocket, renameuser
+from .rggViews import _closeAllMaps, setUwidgetLocal, adduser, respondSession
+from .rggViews import getSession, respondChangeGM, getGM, respondUserList, removeuser
+from .rggRPC import clientRPC, serverRPC, client, receiveClientRPC, receiveServerRPC
+from .rggConstants import *
 
 @serverRPC
 def respondError(message, *args, **kwargs):
@@ -73,8 +69,8 @@ def sendSay(user, message):
 @serverRPC
 def respondICSay(chname, message, portrait):
 	if len(portrait) > 1:
-		portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
-		IAMTHEDOOMPHANTOM = rggResource.crm.translateFile(makePortableFilename(os.path.join(PORTRAIT_DIR, portrait)), rggResource.RESOURCE_IMAGE)
+		portfile = makePortableFilename(path.join(PORTRAIT_DIR, portrait))
+		IAMTHEDOOMPHANTOM = crm.translateFile(makePortableFilename(path.join(PORTRAIT_DIR, portrait)), RESOURCE_IMAGE)
 		#^ Don't remember whether this is still needed for transfer etc.
 		ICSay(translate('remote', '<table><tr><td><img src="{port}" width="{size}" height="{size}"></td><td>{name}: {sayText}</td></tr></table><br />').format(
 			port=portfile,
@@ -88,9 +84,9 @@ def respondICSay(chname, message, portrait):
 
 @clientRPC
 def sendICSay(user, message, chname, portrait):
-	rggResource.crm.listen(portrait, rggResource.RESOURCE_IMAGE, rggResource.crm, doNothing)
+	crm.listen(portrait, RESOURCE_IMAGE, crm, doNothing)
 	if len(portrait) > 1:
-		rggResource.srm.processFile(user, makePortableFilename(os.path.join(PORTRAIT_DIR, portrait)))
+		srm.processFile(user, makePortableFilename(path.join(PORTRAIT_DIR, portrait)))
 	respondICSay(allusers(), chname, message, portrait)
 
 def doNothing(blah, bleh, bloh):
@@ -109,7 +105,7 @@ def sendEmote(user, message):
 @serverRPC
 def respondICEmote(chname, message, portrait):
 	if len(portrait) > 1:
-		portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
+		portfile = makePortableFilename(path.join(PORTRAIT_DIR, portrait))
 		ICSay(translate('remote', '<table><tr><td><img src="{port}" width="{size}" height="{size}"></td><td><i>{name} {emote}</i></td></tr></table><br />').format(
 			port=portfile,
 			size=getPortraitSize(),
@@ -124,13 +120,13 @@ def respondICEmote(chname, message, portrait):
 @clientRPC
 def sendICEmote(user, message, chname, portrait):
 	if len(portrait) > 1:
-		rggResource.srm.processFile(user, makePortableFilename(os.path.join(PORTRAIT_DIR, portrait)))
+		srm.processFile(user, makePortableFilename(path.join(PORTRAIT_DIR, portrait)))
 	respondICEmote(allusers(), chname, message, portrait)
 
 @serverRPC
 def respondICWhisperSender(target, message, chname, portrait):
 	if len(portrait) > 1:
-		portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
+		portfile = makePortableFilename(path.join(PORTRAIT_DIR, portrait))
 		ICSay(translate('remote', '<table><tr><td><img src="{port}" width="{size}" height="{size}"></td><td>To {name}: {message}</td></tr></table><br />').format(
 			port=portfile,
 			size=getPortraitSize(),
@@ -144,7 +140,7 @@ def respondICWhisperSender(target, message, chname, portrait):
 @serverRPC
 def respondICWhisperTarget(sender, message, chname, portrait):
 	if len(portrait) > 1:
-		portfile = makePortableFilename(os.path.join(PORTRAIT_DIR, portrait))
+		portfile = makePortableFilename(path.join(PORTRAIT_DIR, portrait))
 		ICSay(translate('remote', '<table><tr><td><img src="{port}" width="{size}" height="{size}"></td><td>{name} whispers: {message}</td></tr></table><br />').format(
 			port=portfile,
 			size=getPortraitSize(),
@@ -197,11 +193,11 @@ def respondUserJoin(username):
 def clientConnect(client, username):
 	"""Occurs when the client is ready to start sending data."""
 	#print "Client connected."
-	rggViews.renameuser(localhandle(), username)
-	rggViews._closeAllMaps()
-	rggViews.setUwidgetLocal()
+	renameuser(localhandle(), username)
+	_closeAllMaps()
+	setUwidgetLocal()
 	say(translate('remote', "Welcome, {name}!").format(name=username))
-	rggRPC.client.preemptivelyOpenTransferSocket()
+	client.preemptivelyOpenTransferSocket()
 
 def clientDisconnect(client, errorMessage):
 	"""Occurs when the client connection disconnects without being told to.
@@ -220,7 +216,7 @@ def clientReceive(client, data):
 
 	"""
 	#print "client received"
-	rggRPC.receiveClientRPC(data)
+	receiveClientRPC(data)
 
 def clientFileReceive(client, filename):
 	"""Occurs when the client receives data.
@@ -238,13 +234,11 @@ def serverConnect(server, username):
 	"""
 	#print "Server found user."
 	user = User(username)
-	rggViews.adduser(user)
+	adduser(user)
 	respondUserJoin(allusersbut(user), username)
-	rggViews.respondSession(user, rggViews.getSession().dump())
-	rggViews.respondChangeGM(user, rggViews.getGM(), localhandle())
-	#for ID, map in allmaps():
-	#	rggViews.respondMapCreate(user, ID, map.dump())
-	rggViews.respondUserList(user, getNetUserList())
+	respondSession(user, getSession().dump())
+	respondChangeGM(user, getGM(), localhandle())
+	respondUserList(user, getNetUserList())
 
 @serverRPC
 def disconnectionMessage(message, error, *args, **kwargs):
@@ -260,7 +254,7 @@ def serverDisconnect(server, username, errorMessage):
 	errorMessage -- a human-readable error message for why the connection failed
 
 	"""
-	user = rggViews.removeuser(username)
+	user = removeuser(username)
 	respondError(allusers(),
 		fake.translate('remote', '{username} has left the game. {error}'),
 			username=user.username, error=errorMessage)
@@ -281,7 +275,7 @@ def serverKick(server, username):
 	username -- a username for the client
 
 	"""
-	user = rggViews.removeuser(username)
+	user = removeuser(username)
 	respondError(allusers(),
 		fake.translate('remote', '{username} was kicked by the host.'),
 			username=user.username)
@@ -297,7 +291,7 @@ def serverReceive(server, username, data):
 	#print username, getuser(username), usernames(), allusers()
 	assert(getuser(username))
 	#print "server received"
-	rggRPC.receiveServerRPC(getuser(username), data)
+	receiveServerRPC(getuser(username), data)
 
 
 def serverFileReceive(server, username, filename):

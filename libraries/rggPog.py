@@ -17,13 +17,12 @@
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
-import math, os
-try:
-	from . import rggTile, rggResource, rggSystem
-	from .rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
-except ImportError:
-	import rggTile, rggResource, rggSystem
-	from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
+from os import path
+from math import sqrt
+
+from .rggResource import crm, RESOURCE_IMAGE, STATE_DONE
+from .rggSystem import mainWindow
+from .rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
 class Sprite(object):
 
@@ -36,7 +35,7 @@ class Sprite(object):
 		self.pos = loc
 		self.textrect = (0, 0, framesize[0], framesize[1])
 		self.drawrect = (loc[0], loc[1], framesize[0], framesize[1])
-		self.img = rggSystem.mainWindow.glwidget.createImage(src, 1, self.textrect, self.drawrect)
+		self.img = mainWindow.glwidget.createImage(src, 1, self.textrect, self.drawrect)
 		self.setAnim(initialanim, initialspeed)
 
 	def setAnim(self, anim, speed):
@@ -68,7 +67,7 @@ class Pog(object):
 		self.tooltipId = -1
 		self.alpha = alph
 		self._locked = locked #locked only works for mouse movements. This means that scripts may actually be able to move the pog.
-		rggResource.crm.listen(srcfile, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
+		crm.listen(srcfile, RESOURCE_IMAGE, self, self._updateSrc)
 		if status > 0:
 			self.hide()
 
@@ -76,7 +75,7 @@ class Pog(object):
 		if self._tileStore:
 			self._tileStore.destroy()
 			self._tileStore = None
-		rggResource.crm.destroy(self)
+		crm.destroy(self)
 
 	@property
 	def hidden(self):
@@ -97,9 +96,9 @@ class Pog(object):
 			if self.tooltipText() == None or len(self.tooltipText()) == 0:
 				return
 			if show:
-				self.tooltipId = rggSystem.mainWindow.glwidget.addText(self.tooltipText(), self._position)
+				self.tooltipId = mainWindow.glwidget.addText(self.tooltipText(), self._position)
 			else:
-				rggSystem.mainWindow.glwidget.removeText(self.tooltipId)
+				mainWindow.glwidget.removeText(self.tooltipId)
 			self._showTooltip = show
 
 	@property
@@ -115,7 +114,7 @@ class Pog(object):
 				self._tile.setX(x)
 				self._tile.setY(y)
 			if self._showTooltip:
-				rggSystem.mainWindow.glwidget.setTextPos(self.tooltipId, position)
+				mainWindow.glwidget.setTextPos(self.tooltipId, position)
 
 	@property
 	def _tile(self):
@@ -153,8 +152,8 @@ class Pog(object):
 	def editProperty(self, key, value):
 		self._properties[key] = value
 		if self._showTooltip:
-			rggSystem.mainWindow.glwidget.removeText(self.tooltipId)
-			self.tooltipId = rggSystem.mainWindow.glwidget.addText(self.tooltipText(), self._position)
+			mainWindow.glwidget.removeText(self.tooltipId)
+			self.tooltipId = mainWindow.glwidget.addText(self.tooltipText(), self._position)
 
 	def setProperties(self, properties):
 		self._properties = properties
@@ -233,27 +232,27 @@ class Pog(object):
 		return " ".join(self.tmp)
 
 	def _makeTile(self):
-		src = rggResource.crm.translateFile(self._src, rggResource.RESOURCE_IMAGE)
+		src = crm.translateFile(self._src, RESOURCE_IMAGE)
 		textureRect = (0, 0, self.texturedimensions[0], self.texturedimensions[1])
 		drawRect = (self.position[0], self.position[1], self.size[0], self.size[1])
 		try:
-			return rggSystem.mainWindow.glwidget.createImage(src, self.layer, textureRect, drawRect)
+			return mainWindow.glwidget.createImage(src, self.layer, textureRect, drawRect)
 		except ZeroDivisionError:
 			print("FFFUUUUU ZERO DIVISION ERROR BLOW UP WORLD ETC.")
-			self._src = os.path.join("data", "invalid.png")
+			self._src = path.join("data", "invalid.png")
 			self.texturedimensions = (64, 64)
 			self._size = (64, 64)
 			return self._makeTile()
 
 	def _updateSrc(self, crm, filename, translation):
-		if filename == self._src and crm._status[filename] == rggResource.STATE_DONE:
+		if filename == self._src and crm._status[filename] == STATE_DONE:
 			self._tile = self._makeTile()
 
 	def getSelectionCircleData(self):
 		if self.alpha:
 			return ((self.position[0]+self.size[0]/2, self.position[1]+self.size[1]/2, -1, (max(self.size[0], self.size[1])*1.2)/2))
 		else:
-			return ((self.position[0]+self.size[0]/2, self.position[1]+self.size[1]/2, -1, math.sqrt((self.size[0]**2)+(self.size[1]**2))/2))
+			return ((self.position[0]+self.size[0]/2, self.position[1]+self.size[1]/2, -1, sqrt((self.size[0]**2)+(self.size[1]**2))/2))
 
 	def forceUpdate(self):
 		self._tile = self._makeTile()

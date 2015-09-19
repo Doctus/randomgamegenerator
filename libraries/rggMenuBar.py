@@ -19,27 +19,16 @@ Menu bar and menu items.
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
-import sys, os
-try:
-	from PyQt5 import QtCore
-	from PyQt5.QtGui import *
-	from PyQt5.QtWidgets import *
-	from PyQt5.Qt import PYQT_VERSION_STR
-	from PyQt5.QtCore import QT_VERSION_STR
-	from . import rggStyles
-	from .rggSystem import translate, mainWindow
-	from .rggJson import loadString, jsonload, jsonappend
-	from .rggRPC import client
-	from .rggConstants import *
-except ImportError:
-	from PyQt4 import QtCore
-	from PyQt4.QtGui import *
-	from PyQt4.QtCore import PYQT_VERSION_STR, QT_VERSION_STR
-	import rggStyles
-	from rggSystem import translate, mainWindow
-	from rggJson import loadString, jsonload, jsonappend
-	from rggRPC import client
-	from rggConstants import *
+from sys import version_info
+from os import path
+
+from .rggQt import *
+from .rggStyles import sheets
+from .rggSystem import translate, mainWindow
+from .rggJson import loadString, jsonload, jsonappend
+from .rggRPC import client
+from .rggConstants import *
+
 
 ICON_SELECT = 0
 ICON_MOVE = 1
@@ -122,7 +111,7 @@ class menuBar(object):
 		self.toggleTimestampsAct.setChecked(False)
 
 		try:
-			js = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
+			js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
 			if loadString('chatWidget.timestamp', js.get('timestamp')) == "On":
 				self.toggleTimestampsAct.setChecked(True)
 		except:
@@ -204,9 +193,9 @@ class menuBar(object):
 		drawMenu.addMenu(self.colourMenu)
 
 		self.stylesMenu = QMenu(translate("menubar", "&Styles"), main)
-		for style in list(rggStyles.sheets.keys()):
+		for style in list(sheets.keys()):
 			act = QAction(style, main)
-			act.isDark = rggStyles.sheets[style][1]
+			act.isDark = sheets[style][1]
 			self.stylesMenu.addAction(act)
 
 		self.langMenu = QMenu(translate("menubar", "&Language"), main)
@@ -299,8 +288,8 @@ class menuBar(object):
 		self.selectedIcon = ICON_DELETE
 
 	def changeStyle(self, styleName):
-		mainWindow.setStyleSheet(rggStyles.sheets[styleName][0])
-		jsonappend({'style':styleName}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
+		mainWindow.setStyleSheet(sheets[styleName][0])
+		jsonappend({'style':styleName}, path.join(SAVE_DIR, "ui_settings.rgs"))
 
 	def updateWidgetMenu(self):
 		self.windowMenu.clear()
@@ -330,9 +319,9 @@ class menuBar(object):
 	def about(self):
 		msg = QMessageBox(mainWindow)
 		if DEV:
-			aboutText = " ".join(("RGG", VERSION, "Development Version", "\nPython", ".".join(str(x) for x in sys.version_info[:3]), "\nPyQt", PYQT_VERSION_STR, "(Qt", QT_VERSION_STR+")"))
+			aboutText = " ".join(("RGG", VERSION, "Development Version", "\nPython", ".".join(str(x) for x in version_info[:3]), "\nPyQt", PYQT_VERSION_STR, "(Qt", QT_VERSION_STR+")"))
 		else:
-			aboutText = " ".join(("RGG", VERSION, "Release", "\nPython", ".".join(str(x) for x in sys.version_info[:3]), "\nPyQt", PYQT_VERSION_STR, "(Qt", QT_VERSION_STR+")"))
+			aboutText = " ".join(("RGG", VERSION, "Release", "\nPython", ".".join(str(x) for x in version_info[:3]), "\nPyQt", PYQT_VERSION_STR, "(Qt", QT_VERSION_STR+")"))
 		msg.setText(aboutText)
 		msg.setInformativeText("\n\n".join((REPOSITORY_LINK, LICENSING_INFO)))
 		msg.setWindowTitle("About")

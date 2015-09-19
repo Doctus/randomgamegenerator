@@ -19,28 +19,27 @@ Actions which occur in response to user commands.
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
-import time, random, os, base64, sys
-try:
-	from . import rggDice, rggDockWidget, rggEvent, rggMap, rggNameGen, rggPog, rggResource, rggSession, rggStyles, rggTile
-	from .rggRPC import server, client, serverRPC, clientRPC
-	from .rggJson import jsondump, jsonload, jsonappend
-	from .rggMenuBar import ICON_SELECT, ICON_MOVE, ICON_DRAW, ICON_DELETE, menuBar
-	from .rggSystem import *
-	from .rggDialogs import *
-	from .rggConstants import *
-	from PyQt5.QtCore import *
-	from PyQt5.QtGui import *
-	from PyQt5.QtWidgets import *
-except ImportError:
-	import rggDice, rggDockWidget, rggEvent, rggMap, rggNameGen, rggPog, rggResource, rggSession, rggStyles, rggTile
-	from rggRPC import server, client, serverRPC, clientRPC
-	from rggJson import jsondump, jsonload, jsonappend
-	from rggMenuBar import ICON_SELECT, ICON_MOVE, ICON_DRAW, ICON_DELETE, menuBar
-	from rggSystem import *
-	from rggDialogs import *
-	from rggConstants import *
-	from PyQt4.QtCore import *
-	from PyQt4.QtGui import *
+from os import path as ospath
+from sys import stdout, stderr
+
+from .rggConstants import *
+from .rggDialogs import *
+from .rggDice import isRollValid, roll
+from .rggDockWidget import debugConsoleWidget, diceRoller, pogPalette, chatWidget
+from .rggDockWidget import ICChatWidget, userListWidget, mapEditor, transferMonitorWidget
+from .rggEvent import addMouseMoveListener, addMousePressListener, addMouseReleaseListener
+from .rggEvent import addKeyPressListener, addKeyReleaseListener, pogUpdateEvent, pogSelectionChangedEvent
+from .rggJson import jsondump, jsonload, jsonappend
+from .rggMap import Map
+from .rggMenuBar import ICON_SELECT, ICON_MOVE, ICON_DRAW, ICON_DELETE, menuBar
+from .rggNameGen import getName
+from .rggPog import Pog
+from .rggQt import *
+from .rggResource import crm, srm
+from .rggRPC import server, client, serverRPC, clientRPC
+from .rggSession import Session
+from .rggStyles import sheets
+from .rggSystem import *
 
 # Button enum
 BUTTON_LEFT = 0
@@ -68,7 +67,7 @@ class User(object):
 class _state(object):
 	"""A state class build to avoid all these global statements."""
 
-	session = rggSession.Session()
+	session = Session()
 
 	alert = True
 
@@ -116,17 +115,17 @@ class _state(object):
 	def initialize(mainApp):
 		_state.menu = menuBar(mapExists, pogExists, charExists)
 
-		_state.twidget = rggDockWidget.debugConsoleWidget(mainWindow)
-		sys.stdout = _state.twidget
-		sys.stderr = _state.twidget
+		_state.twidget = debugConsoleWidget(mainWindow)
+		stdout = _state.twidget
+		stderr = _state.twidget
 
-		_state.dwidget = rggDockWidget.diceRoller(mainWindow)
-		_state.pwidget = rggDockWidget.pogPalette(mainWindow)
-		_state.cwidget = rggDockWidget.chatWidget(mainWindow)
-		_state.icwidget = rggDockWidget.ICChatWidget(mainWindow)
-		_state.uwidget = rggDockWidget.userListWidget(mainWindow)
-		_state.mwidget = rggDockWidget.mapEditor(mainWindow)
-		_state.fwidget = rggDockWidget.transferMonitorWidget(mainWindow)
+		_state.dwidget = diceRoller(mainWindow)
+		_state.pwidget = pogPalette(mainWindow)
+		_state.cwidget = chatWidget(mainWindow)
+		_state.icwidget = ICChatWidget(mainWindow)
+		_state.uwidget = userListWidget(mainWindow)
+		_state.mwidget = mapEditor(mainWindow)
+		_state.fwidget = transferMonitorWidget(mainWindow)
 		_state.users = {}
 		_state.localuser = User(client.username)
 		_state.users[client.username] = _state.localuser
@@ -145,13 +144,13 @@ class _state(object):
 		_state.dialogs_keepalive = []
 
 		try:
-			_state.portraitSize = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))['portraitsize']
+			_state.portraitSize = jsonload(ospath.join(SAVE_DIR, "ui_settings.rgs"))['portraitsize']
 		except:
 			_state.portraitSize = "64"
 
 		try:
-			obj = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
-			setStyle(obj["style"], rggStyles.sheets[obj["style"]][1])
+			obj = jsonload(ospath.join(SAVE_DIR, "ui_settings.rgs"))
+			setStyle(obj["style"], sheets[obj["style"]][1])
 		except:
 			setStyle("Default", False)
 
@@ -167,11 +166,11 @@ class _state(object):
 		_state.pogMoveTimer.timeout.connect(autoMovePogs)
 		_state.pogMoveTimer.start(40)
 
-		rggEvent.addMouseMoveListener(mouseMoveResponse, LATE_RESPONSE_LEVEL)
-		rggEvent.addMousePressListener(mousePressResponse, LATE_RESPONSE_LEVEL)
-		rggEvent.addMouseReleaseListener(mouseReleaseResponse, LATE_RESPONSE_LEVEL)
-		rggEvent.addKeyPressListener(keyPressResponse, LATE_RESPONSE_LEVEL)
-		rggEvent.addKeyReleaseListener(keyReleaseResponse, LATE_RESPONSE_LEVEL)
+		addMouseMoveListener(mouseMoveResponse, LATE_RESPONSE_LEVEL)
+		addMousePressListener(mousePressResponse, LATE_RESPONSE_LEVEL)
+		addMouseReleaseListener(mouseReleaseResponse, LATE_RESPONSE_LEVEL)
+		addKeyPressListener(keyPressResponse, LATE_RESPONSE_LEVEL)
+		addKeyReleaseListener(keyReleaseResponse, LATE_RESPONSE_LEVEL)
 
 def mapExists():
 	if len(list(_state.session.maps.values())) > 0:
@@ -260,13 +259,13 @@ def toggleTimestamps(newValue=None):
 	else:
 		_state.cwidget.timestamp = newValue
 	if _state.cwidget.timestamp:
-		jsonappend({'timestamp':'On'}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
+		jsonappend({'timestamp':'On'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 	else:
-		jsonappend({'timestamp':'Off'}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
+		jsonappend({'timestamp':'Off'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 
 def setTimestampFormat(newFormat):
 	_state.cwidget.timestampformat = newFormat
-	jsonappend({'timestampformat':newFormat}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
+	jsonappend({'timestampformat':newFormat}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 
 def promptTimestampFormat():
 	prompt = translate("views", "Please enter a new timestamp format; the default is [%H:%M:%S]")
@@ -281,14 +280,14 @@ def getPortraitSize():
 def setPortraitSize():
 	prompt = translate("views", "Please enter a portrait size.")
 	try:
-		defaultsize = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))['portraitsize']
+		defaultsize = jsonload(ospath.join(SAVE_DIR, "ui_settings.rgs"))['portraitsize']
 	except:
 		defaultsize = 64
 	newSize = promptInteger(prompt, default=defaultsize)
 	if newSize is None:
 		return
 	_state.portraitSize = newSize
-	jsonappend({'portraitsize':newSize}, os.path.join(SAVE_DIR, "ui_settings.rgs"))
+	jsonappend({'portraitsize':newSize}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 
 # MESSAGES
 
@@ -511,7 +510,7 @@ def updateBanlist():
 	"""Update server banlist based on banlist.rgs file."""
 	server.clearBanlist()
 	try:
-		obj = jsonload(os.path.join(SAVE_DIR, "banlist.rgs"))
+		obj = jsonload(ospath.join(SAVE_DIR, "banlist.rgs"))
 		for IP in obj["IPs"]:
 			try:
 				server.addBan(IP)
@@ -636,7 +635,7 @@ def internalAddMap(map):
 def respondSession(sess):
 	if _state.session is not None:
 		_state.session.clear()
-	_state.session = rggSession.Session.load(sess)
+	_state.session = Session.load(sess)
 
 @clientRPC
 def sendSession(user, session):
@@ -665,7 +664,7 @@ def loadMap():
 		return
 	try:
 		obj = jsonload(filename)
-		map = rggMap.Map.load(obj, True)
+		map = Map.load(obj, True)
 		internalAddMap(map)
 	except Exception as e:
 		showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
@@ -726,8 +725,8 @@ def closeMap():
 
 def autoloadSession():
 	try:
-		obj = jsonload(os.path.join(MAP_DIR, "autosave.rgg"))
-		sess = rggSession.Session.load(obj)
+		obj = jsonload(ospath.join(MAP_DIR, "autosave.rgg"))
+		sess = Session.load(obj)
 		_state.session = sess
 		#Don't bother sending since we shouldn't be connected to anything yet.
 	except:
@@ -746,7 +745,7 @@ def loadSession():
 		if _state.session is not None:
 			_state.session.clear()
 		obj = jsonload(filename)
-		sess = rggSession.Session.load(obj)
+		sess = Session.load(obj)
 		_state.session = sess
 		sendSession(_state.session.dump())
 	except Exception as e:
@@ -763,7 +762,7 @@ def saveSession():
 	jsondump(_state.session.dump(), checkFileExtension(filename, ".rgg"))
 
 def autosaveSession():
-	jsondump(_state.session.dump(), os.path.join(MAP_DIR, "autosave.rgg"))
+	jsondump(_state.session.dump(), ospath.join(MAP_DIR, "autosave.rgg"))
 
 @serverRPC
 def respondSurveyAnswers(surveyData, origin):
@@ -821,7 +820,7 @@ def configureDrawTimer():
 	if selectedButton != -1:
 		val = [13, 20, 35, 45, 60][selectedButton]
 		sav = dict(drawtimer=val)
-		jsonappend(sav, os.path.join(SAVE_DIR, "ui_settings.rgs"))
+		jsonappend(sav, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 
 def configureGfx():
 	"""Allows the user to change the opengl settings."""
@@ -835,10 +834,10 @@ def configureGfx():
 
 	if dialog.exec_(mainWindow, accept):
 		settings = dialog.save()
-		jsondump(settings,  os.path.join(SAVE_DIR, "gfx_settings.rgs"))
+		jsondump(settings,  ospath.join(SAVE_DIR, "gfx_settings.rgs"))
 
 def setLanguage(new):
-	jsondump(dict(language=str(new.iconText())), os.path.join(SAVE_DIR, "lang_settings.rgs"))
+	jsondump(dict(language=str(new.iconText())), ospath.join(SAVE_DIR, "lang_settings.rgs"))
 	#This should ideally be translated into the newly selected language, but I have no idea how to accomplish that.
 	info = QMessageBox(QMessageBox.Information, "Language Changed", "".join(('Your new language setting "', str(new.iconText()), '" will take effect the next time you start RGG.')), QMessageBox.Ok)
 	info.exec_()
@@ -869,7 +868,7 @@ def respondMapCreate(ID, mapDump):
 def sendMapCreate(user, ID, map, tileset):
 	"""Creates or updates the specified map."""
 
-	rggResource.srm.processFile(user, tileset)
+	srm.processFile(user, tileset)
 
 	respondMapCreate(allusersbut(user), ID, map)
 
@@ -953,7 +952,7 @@ def storeChat(message):
 def respondArbitraryFile(filepath):
 	"""Requests a file that another client requested the client to request. We heard you like file requests?"""
 	if promptYesNo(translate('views', "".join(('Do you wish to save the binary file ', filepath, ', overwriting any existing file with that name?')))) == 16384:
-		rggResource.crm._request(filepath)
+		crm._request(filepath)
 
 @clientRPC
 def sendArbitraryFile(user, filepath):
@@ -967,13 +966,13 @@ def promptSendFile():
 		".")
 	if not filename:
 		return
-	sendArbitraryFile(os.path.relpath(filename))
+	sendArbitraryFile(ospath.relpath(filename))
 
 @serverRPC
 def respondCharacterSheet(data, title):
 	"""Prompts user to save incoming character sheet."""
 	if promptYesNo(translate('views', "".join(('Do you wish to save the character sheet ', title, ', overwriting any existing sheet with that name?')))) == 16384:
-		jsondump(data, os.path.join(CHARSHEETS_DIR, title))
+		jsondump(data, ospath.join(CHARSHEETS_DIR, title))
 
 @clientRPC
 def sendCharacterSheet(user, data, title):
@@ -1021,9 +1020,9 @@ def placePog(x, y, pogpath):
 	"""Places a pog on the map."""
 	infograb = QPixmap(pogpath)
 	mapPosition = getMapPosition((x, y))
-	assert os.path.exists(pogpath)
+	assert ospath.exists(pogpath)
 	assert POG_DIR in pogpath
-	pog = rggPog.Pog(
+	pog = Pog(
 		mapPosition,
 		(infograb.width(), infograb.height()),
 		(infograb.width(), infograb.height()),
@@ -1057,7 +1056,7 @@ def movePogs(displacement):
 @serverRPC
 def respondUpdatePog(pogID, pogDump):
 	"""Creates or updates a pog on the client."""
-	pog = rggPog.Pog.load(pogDump)
+	pog = Pog.load(pogDump)
 	pog.ID = pogID
 	if pogID in list(_state.session.pogs.keys()):
 		old = _state.session.pogs[pogID]
@@ -1076,7 +1075,7 @@ def sendUpdatePog(user, pogID, pogDump):
 	"""Creates or updates a pog on the server."""
 
 	# Upload (or check that we already have) the image resource from the client
-	rggResource.srm.processFile(user, pogDump['src'])
+	srm.processFile(user, pogDump['src'])
 	respondUpdatePog(allusersbut(user), pogID, pogDump)
 
 @serverRPC
@@ -1157,13 +1156,12 @@ def respondPogAttributes(pogID, name, layer, properties):
 		pog.name = name
 		pog.layer = layer
 		pog.properties = properties
-		from . import rggEvent
-		rggEvent.pogUpdateEvent(pog)
+		pogUpdateEvent(pog)
 
 @clientRPC
 def sendPogAttributes(user, pogID, name, layer, properties):
 	'''Sends various attributes of a pog over the wire.'''
-	rggEvent.pogUpdateEvent(_state.session.pogs[pogID])
+	pogUpdateEvent(_state.session.pogs[pogID])
 	respondPogAttributes(allusersbut(user), pogID, name, layer, properties)
 
 @serverRPC
@@ -1189,7 +1187,7 @@ def sendResizePog(user, pogID, newW, newH):
 	respondResizePog(allusersbut(user), pogID, newW, newH)
 
 def duplicatePog(pog):
-	createPog(rggPog.Pog.load(pog.dump()))
+	createPog(Pog.load(pog.dump()))
 
 # DRAWING
 
@@ -1274,7 +1272,7 @@ def clearLines():
 
 def rollDice(dice, private=False):
 	"""Rolls the specified dice."""
-	if not rggDice.isRollValid(dice):
+	if not isRollValid(dice):
 		say(translate('views', "Invalid dice roll. See /roll documentation for help."))
 	else:
 		try:
@@ -1283,7 +1281,7 @@ def rollDice(dice, private=False):
 			import rggRemote
 		text = translate('views', "{name} rolls {roll}").format(
 			name=linkedName(localuser().username),
-			roll=rggDice.roll(dice))
+			roll=roll(dice))
 		if private:
 			say(text)
 			ICSay(text)
@@ -1296,7 +1294,7 @@ def addMacro():
 	dice = promptString(translate('views', "What dice should be rolled?"))
 	if dice is None:
 		return
-	if rggDice.isRollValid(dice):
+	if isRollValid(dice):
 		name = promptString(translate('views', "What should the macro be called?"))
 		if name is None:
 			return
@@ -1308,7 +1306,7 @@ def addMacro():
 
 def generateName(generator, args):
 	"""Generates a random name of the specified type."""
-	say(rggNameGen.getName(generator, args))
+	say(getName(generator, args))
 
 # MISC
 
@@ -1376,7 +1374,7 @@ def processPogRightclick(selection, pogs):
 			return
 		gentype = splitword(gentype.lower())
 		for pog in pogs:
-			renamePog(pog, rggNameGen.getName(*gentype))
+			renamePog(pog, getName(*gentype))
 	elif selection == 3:
 		prompt = translate('views', "Enter a layer. Pogs on higher layers are displayed over those on lower layers. Should be a positive integer. Multi-pog compatible.")
 		newlayer = promptInteger(prompt, min=-150, max=800, default=(mainpog.layer-200))
@@ -1533,7 +1531,7 @@ def mousePress(screenPosition, mapPosition, button):
 		if button == BUTTON_LEFT + BUTTON_CONTROL:
 			if _state.pogPlacement:
 				infograb = QPixmap(_state.pogPath)
-				pog = rggPog.Pog(
+				pog = Pog(
 					mapPosition,
 					(infograb.width(), infograb.height()),
 					(infograb.width(), infograb.height()),
@@ -1552,12 +1550,12 @@ def mousePress(screenPosition, mapPosition, button):
 				removePogSelection(pog)
 			else:
 				addPogSelection(pog)
-			rggEvent.pogSelectionChangedEvent()
+			pogSelectionChangedEvent()
 		elif button == BUTTON_LEFT:
 			if _state.pogPlacement:
 				_state.pogPlacement = False
 				infograb = QPixmap(_state.pogPath)
-				pog = rggPog.Pog(
+				pog = Pog(
 					mapPosition,
 					(infograb.width(), infograb.height()),
 					(infograb.width(), infograb.height()),
@@ -1575,7 +1573,7 @@ def mousePress(screenPosition, mapPosition, button):
 				return
 			if pog not in _state.pogSelection:
 				setPogSelection(pog)
-			rggEvent.pogSelectionChangedEvent()
+			pogSelectionChangedEvent()
 		elif button == BUTTON_RIGHT:
 			pog = _state.session.findTopPog(mapPosition)
 			if pog is not None:

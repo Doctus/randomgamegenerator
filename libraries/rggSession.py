@@ -20,15 +20,13 @@ By Doctus (kirikayuumura.noir@gmail.com)
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
-import random, sys
-try:
-	from . import rggTile, rggPog, rggMap, rggSystem, rggResource, rggEvent
-	from .rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
-	from .rggSystem import mainWindow, clearLines
-except ImportError:
-	import rggTile, rggPog, rggMap, rggSystem, rggResource, rggEvent
-	from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
-	from rggSystem import mainWindow, clearLines
+from sys import maxsize
+
+from .rggPog import Pog
+from .rggMap import Map
+from .rggEvent import pogUpdateEvent, pogDeleteEvent
+from .rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
+from .rggSystem import mainWindow, clearLines, drawLine, findRandomAppend
 
 class Session(object):
 
@@ -57,16 +55,16 @@ class Session(object):
 
 	def _findUniqueMapID(self, src):
 		'''Get a unique id for a map.'''
-		id = src or rggSystem.findRandomAppend()
+		id = src or findRandomAppend()
 		while id in list(self.maps.keys()):
-			id += rggSystem.findRandomAppend()
+			id += findRandomAppend()
 		return id
 
 	def _findUniquePogID(self, src):
 		'''Get a unique id for a pog.'''
-		id = src or rggSystem.findRandomAppend()
+		id = src or findRandomAppend()
 		while id in list(self.pogs.keys()):
-			id += rggSystem.findRandomAppend()
+			id += findRandomAppend()
 		return id
 
 	def addPog(self, pog):
@@ -74,20 +72,20 @@ class Session(object):
 		assert(pog.ID is not None)
 		#rggResource.srm.processFile(localuser(), pog._src)
 		self.pogs[pog.ID] = pog
-		rggEvent.pogUpdateEvent(pog)
+		pogUpdateEvent(pog)
 		self.hideAllHiddenPogs()
 
 	def removePog(self, pog):
 		'''Deletes a pog.'''
 		assert(pog.ID is not None)
-		rggEvent.pogDeleteEvent(self.pogs[pog.ID])
+		pogDeleteEvent(self.pogs[pog.ID])
 		self.pogs[pog.ID].destroy()
 		del self.pogs[pog.ID]
 
 	def removeAllPogs(self):
 		'''Deletes all pogs in the session.'''
 		for pog in list(self.pogs.values()):
-			rggEvent.pogDeleteEvent(pog)
+			pogDeleteEvent(pog)
 			pog.destroy()
 		self.pogs = {}
 
@@ -142,7 +140,7 @@ class Session(object):
 
 	def findTopPog(self, position):
 		'''Returns the top pog at a given position, or None.'''
-		layer = -sys.maxsize
+		layer = -maxsize
 		locked = True
 		top = None
 		for pog in list(self.pogs.values()):
@@ -171,7 +169,7 @@ class Session(object):
 		'''Draws all lines of which the session is aware.'''
 		for thickness, lines in list(self.linesDict.items()):
 			for item in lines:
-				rggSystem.drawLine(item[0], item[1], item[2], item[3], thickness, item[4], item[5], item[6])
+				drawLine(item[0], item[1], item[2], item[3], thickness, item[4], item[5], item[6])
 
 	def _pointIntersectRect(self, point, rect):
 		'''Check used by deleteLine.'''
@@ -248,7 +246,7 @@ class Session(object):
 
 		pogs = loadObject('Session.pogs', obj.get('pogs'))
 		for ID, pog in list(pogs.items()):
-			loaded = rggPog.Pog.load(pog)
+			loaded = Pog.load(pog)
 			loaded.ID = ID
 			sess._addPog(loaded)
 
@@ -258,7 +256,7 @@ class Session(object):
 
 		maps = loadObject('Session.maps', obj.get('maps'))
 		for ID, mappe in list(maps.items()):
-			loaded = rggMap.Map.load(mappe)
+			loaded = Map.load(mappe)
 			loaded.ID = ID
 			sess._addMap(loaded)
 

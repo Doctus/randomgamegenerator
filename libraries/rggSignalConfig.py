@@ -14,11 +14,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
-
-try:
-	from . import rggRemote, rggViews, rggEvent
-except ImportError:
-	import rggRemote, rggViews, rggEvent
+#waaaaay too many things imported here so I'm not gonna touch this line
+from . import rggRemote, rggViews, rggEvent
 
 def connectChatWidgetEvents(widget):
 	widget.chatInput.connect(rggEvent.chatInputEvent)

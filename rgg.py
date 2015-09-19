@@ -47,6 +47,11 @@ try:
 except ImportError:
 	fatalError("PyOpenGL not found. Please ensure it is installed and available.")
 
+try:
+	from numpy import zeros
+except ImportError:
+	fatalError("NumPy not found. Please ensure it is installed and available.")
+
 from libraries.rggSystem import injectMain, SAVE_DIR
 from libraries.rggJson import loadString, jsonload
 from libraries.rggConstants import *

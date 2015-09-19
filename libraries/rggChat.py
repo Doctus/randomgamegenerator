@@ -22,7 +22,8 @@ Parse and execute chat commands.
 from .rggSystem import fake, translate
 from .rggViews import say, announce, generateName, rollDice, reportCamera, storeChat, releaseChat, incrementDreams, getDreams
 from .rggConstants import *
-from . import rggEvent, rggRemote
+from .rggEvent import addChatInputListener
+from .rggRemote import sendSay, sendEmote, sendWhisper
 
 chatCommands = {}
 chatCommandNames = []
@@ -55,7 +56,7 @@ def squish(message):
 
 @chat('say', hidden=True)
 def sayChat(message):
-	rggRemote.sendSay(message)
+	sendSay(message)
 
 sayChat.documentation = fake.translate('chatdoc',
 	"""/say: Say a chat message. You do not need to write this as a command.<dl>
@@ -122,7 +123,7 @@ def emote(message):
 		say(translate('chat', "Syntax: /me DOES ACTION. Displays '[HANDLE] DOES "
 				"ACTION' in italic font."))
 	else:
-		rggRemote.sendEmote(message)
+		sendEmote(message)
 
 emote.documentation = fake.translate('chatdoc',
 	"""Display an emote in italics.<dl>
@@ -148,7 +149,7 @@ def whisper(message):
 		elif not rest:
 			say(translate('chat', "What do you want to tell {target}?").format(target=target))
 		else:
-			rggRemote.sendWhisper(target, rest)
+			sendWhisper(target, rest)
 
 whisper.documentation = fake.translate('chatdoc',
 	"""/whisper: Whisper a message to another user.<dl>
@@ -252,5 +253,5 @@ def chat(st):
 					'Goes inbetween the commands in the commandList.').
 					join(chatCommandNames)))
 
-rggEvent.addChatInputListener(chat, LATE_RESPONSE_LEVEL)
+addChatInputListener(chat, LATE_RESPONSE_LEVEL)
 

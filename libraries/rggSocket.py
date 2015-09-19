@@ -14,18 +14,14 @@
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
+from re import compile as recompile
+from hashlib import md5
+from sys import version_info
 
-import re, hashlib, sys
-try:
-	from .rggJson import jsondumps, jsonloads
-	from .rggSystem import fake, translate, mainWindow, signal
-	from .rggConstants import UNICODE_STRING, BASE_STRING
-	from PyQt5 import QtCore, QtNetwork
-except ImportError as e:
-	from rggJson import jsondumps, jsonloads
-	from rggSystem import fake, translate, mainWindow, signal
-	from rggConstants import UNICODE_STRING, BASE_STRING
-	from PyQt4 import QtCore, QtNetwork
+from .rggQt import * #QAbstractSocket, QTcpSocket
+from .rggJson import jsondumps, jsonloads
+from .rggSystem import fake, translate, mainWindow, signal
+from .rggConstants import UNICODE_STRING, BASE_STRING
 
 # Major protocols used by the socket
 PROTOCOL_UNKNOWN = 'RGG_UNKNOWN' # unidentified protocol
@@ -36,7 +32,7 @@ PROTOCOLS = (PROTOCOL_UNKNOWN, PROTOCOL_USER, PROTOCOL_TRANSFER)
 
 # Sent in 4kb chunks
 CHUNK_SIZE = 4 * 1024
-EMPTY_REGEX = re.compile('^\s*$')
+EMPTY_REGEX = recompile('^\s*$')
 
 PARM_COMMAND = '-command'
 PARM_INTERNAL = '-internal'
@@ -47,7 +43,7 @@ def generateChecksum(file):
 	if not seeked or file.pos() != 0:
 		raise IOError("Unable to make file seek.")
 
-	hash = hashlib.md5()
+	hash = md5()
 	MD5_CHUNK_SIZE = 4096
 	totalsize = 0
 	size = file.size()
@@ -73,7 +69,7 @@ class fileData(object):
 		self.size = size
 		self.digest = digest
 		self.processed = 0
-		self.checkHash = hashlib.md5()
+		self.checkHash = md5()
 
 	def generateDigest(self):
 		return generateChecksum(self.file)
@@ -132,7 +128,7 @@ class statefulSocket(object):
 		"""Initializes the socket, connecting or wrapping a connection."""
 
 		self.clientside = bool(hostname)
-		self.state = QtNetwork.QAbstractSocket.UnconnectedState
+		self.state = QAbstractSocket.UnconnectedState
 		self.debugid = statefulSocket._debugcounter
 		statefulSocket._debugcounter += 1
 		self.imbueName(name)
@@ -147,15 +143,15 @@ class statefulSocket(object):
 			assert(hostname and port)
 			assert(not socket)
 
-			self.socket = QtNetwork.QTcpSocket(mainWindow)
+			self.socket = QTcpSocket(mainWindow)
 
 		else:
 			assert(not hostname and not port)
 			assert(socket)
-			assert(socket.state() == QtNetwork.QAbstractSocket.ConnectedState)
+			assert(socket.state() == QAbstractSocket.ConnectedState)
 
 			self.socket = socket
-			self.state = QtNetwork.QAbstractSocket.ConnectedState
+			self.state = QAbstractSocket.ConnectedState
 
 		# Attach signals
 		self.socket.error.connect(self._error)
@@ -188,13 +184,13 @@ class statefulSocket(object):
 	@property
 	def closed(self):
 		"""Whether the socket is already closed."""
-		return (self.state == QtNetwork.QAbstractSocket.UnconnectedState)
+		return (self.state == QAbstractSocket.UnconnectedState)
 
 	def close(self):
 		"""Disconnect all network activity."""
 		if not self.closed:
 			self.ready = False
-			self.state = QtNetwork.QAbstractSocket.UnconnectedState
+			self.state = QAbstractSocket.UnconnectedState
 			if self.sentfile:
 				self.sentfile.file.close()
 				self.sentfile = None
@@ -248,7 +244,7 @@ class statefulSocket(object):
 	def disconnectionError(self, previousState, err):
 		"""Find a human-readable error message for when the connection fails."""
 
-		s = QtNetwork.QAbstractSocket
+		s = QAbstractSocket
 
 		# Messages for what happens when we weren't yet connected
 		if self.clientside:
@@ -312,7 +308,7 @@ class statefulSocket(object):
 		"""Reads a line from the socket."""
 		assert(self.socket.canReadLine())
 		data = self.socket.readLine()
-		if sys.version_info >= (3,):
+		if version_info >= (3,):
 			data = str(data, "UTF-8")
 		if len(data) > 0:
 			assert(data[-1] == '\n')
@@ -561,7 +557,7 @@ class statefulSocket(object):
 		if oldState == newState:
 			return
 
-		s = QtNetwork.QAbstractSocket
+		s = QAbstractSocket
 
 		if self.clientside:
 			if newState == s.HostLookupState:

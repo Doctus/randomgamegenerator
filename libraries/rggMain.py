@@ -20,21 +20,12 @@
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import os
+from os import path
 
-try:
-	from PyQt5.QtCore import *
-	from PyQt5.QtGui import *
-	from PyQt5.QtWidgets import *
-	from .glwidget import GLWidget
-	from .rggJson import loadInteger, jsonload
-	from .rggConstants import *
-except ImportError:
-	from PyQt4.QtCore import *
-	from PyQt4.QtGui import *
-	from glwidget import GLWidget
-	from rggJson import loadInteger, jsonload
-	from rggConstants import *
+from .rggQt import *
+from .glwidget import GLWidget
+from .rggJson import loadInteger, jsonload
+from .rggConstants import *
 
 class MainWindow(QMainWindow):
 
@@ -46,7 +37,7 @@ class MainWindow(QMainWindow):
 
 		self.setWindowTitle("RandomGameGenerator")
 		self.setObjectName("MainWindow")
-		try: self.setWindowIcon(QIcon(os.path.join("data", "rgglogo2.png")))
+		try: self.setWindowIcon(QIcon(path.join("data", "rgglogo2.png")))
 		except: pass
 
 		self.glwidget = GLWidget(self)
@@ -55,7 +46,7 @@ class MainWindow(QMainWindow):
 		self.drawTimer = QTimer()
 		self.drawTimer.timeout.connect(self.drawTimerTimeout)
 		try:
-			js = jsonload(os.path.join(SAVE_DIR, "ui_settings.rgs"))
+			js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
 			drawtimer = loadInteger('init.drawtimer', js.get('drawtimer'))
 			self.drawTimer.start(drawtimer)
 		except:

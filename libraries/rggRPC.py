@@ -19,12 +19,9 @@ Remote procedure calls.
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
+from sys import exc_info
 
-import sys
-try:
-	from .rggNet import JsonServer, JsonClient
-except ImportError:
-	from rggNet import JsonServer, JsonClient
+from .rggNet import JsonServer, JsonClient
 
 # Base server and client implementations
 client = JsonClient()
@@ -227,7 +224,7 @@ def receiveClientRPC(data):
 		excepting = False
 	finally:
 		if excepting:
-			print("Client: error processing data: {0}; {1}".format(repr(data), sys.exc_info()[:2]))
+			print("Client: error processing data: {0}; {1}".format(repr(data), exc_info()[:2]))
 
 def receiveServerRPC(user, data):
 	"""Occurs when the server receives data.
@@ -248,4 +245,4 @@ def receiveServerRPC(user, data):
 		excepting = False
 	finally:
 		if excepting:
-			print("Server: error processing data for user ({0}): {1}; {2}".format(id, repr(data), sys.exc_info()[:2]))
+			print("Server: error processing data for user ({0}): {1}; {2}".format(id, repr(data), exc_info()[:2]))

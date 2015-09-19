@@ -2,8 +2,6 @@
 resource mapping - for the Random Game Generator project
 By Doctus (kirikayuumura.noir@gmail.com)
 
-Qt and C++ servces.
-
     This file is part of RandomGameGenerator.
 
     RandomGameGenerator is free software: you can redistribute it and/or modify
@@ -19,15 +17,11 @@ Qt and C++ servces.
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
-
-import sys, random, weakref, os, os.path
+from os import path
+from weakref import ref as weakref
 from collections import defaultdict
-try:
-	from PyQt5 import QtCore
-	from .rggRPC import client, server, clientRPC, serverRPC
-except ImportError:
-	from PyQt4 import QtCore
-	from rggRPC import client, server, clientRPC, serverRPC
+
+from .rggRPC import client, server, clientRPC, serverRPC
 
 RESOURCE_IMAGE = "image"
 RESOURCE_SOUND = "sound"
@@ -92,7 +86,7 @@ class clientResourceMapper(object):
 			setattr(root, KEEP_ALIVE_FIELD, [])
 		getattr(root, KEEP_ALIVE_FIELD).append(response)
 		self._listeners[filename] = [listener for listener in self._listeners[filename] if listener()]
-		self._listeners[filename].append(weakref.ref(response))
+		self._listeners[filename].append(weakref(response))
 		current = self._status[filename]
 		if current == STATE_UNKNOWN:
 			self._update(filename, STATE_READY)
@@ -305,7 +299,7 @@ def _sendStatusRequest(user, fileList):
 
 def fileExists(filename):
 	# TODO: Implement file existence test.
-	if os.path.exists(filename):
+	if path.exists(filename):
 		return True
 	return False
 

@@ -25,14 +25,11 @@ from OpenGL.GL.ARB.vertex_buffer_object import *
 from OpenGL.arrays import ArrayDatatype as ADT
 
 try:
-	import numpy
+	from numpy import zeros
 except ImportError as e:
 	print("Numpy import error ({0}): {1}".format(e.errno, e.strerror))
 
-try:
-	from .rggConstants import UNICODE_STRING
-except ImportError:
-	from rggConstants import UNICODE_STRING
+from .rggConstants import UNICODE_STRING
 
 class tile(object):
 	'''
@@ -52,7 +49,7 @@ class tile(object):
 		self.glwidget = glwidget
 		self.createLayer = False
 		self.destroyed = False
-		self.VBOData = numpy.zeros((8, 2), 'f')
+		self.VBOData = zeros((8, 2), 'f')
 		self.origtextrect = textureRect
 		self.rotation = 0.0
 

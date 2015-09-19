@@ -18,15 +18,9 @@ By Doctus (kirikayuumura.noir@gmail.com)
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
-import sys, random
-try:
-	from . import rggTile, rggSystem, rggResource
-	from .rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
-	from .rggSystem import mainWindow
-except ImportError:
-	import rggTile, rggSystem, rggResource
-	from rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
-	from rggSystem import mainWindow
+from .rggResource import crm, RESOURCE_IMAGE, STATE_DONE
+from .rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
+from .rggSystem import mainWindow
 
 class Map(object):
 
@@ -48,7 +42,7 @@ class Map(object):
 
 		#self._createTiles()
 
-		rggResource.crm.listen(tileset, rggResource.RESOURCE_IMAGE, self, self._updateSrc)
+		crm.listen(tileset, RESOURCE_IMAGE, self, self._updateSrc)
 
 	@property
 	def pixelSize(self):
@@ -99,12 +93,12 @@ class Map(object):
 	def _deleteTiles(self):
 		mainWindow.glwidget.deleteImages(self.tiles)
 		self.tiles = None
-		rggResource.crm.destroy(self)
+		crm.destroy(self)
 
 	def _createTiles(self):
 		"""Show all the tiles of this map."""
-		src = rggResource.crm.translateFile(self.tileset, rggResource.RESOURCE_IMAGE)
-		imgsize = mainWindow.glwidget.getImageSize(rggResource.crm.translateFile(src, rggResource.RESOURCE_IMAGE))
+		src = crm.translateFile(self.tileset, RESOURCE_IMAGE)
+		imgsize = mainWindow.glwidget.getImageSize(crm.translateFile(src, RESOURCE_IMAGE))
 
 		if self.tiles != None:
 			mainWindow.glwidget.deleteImages(self.tiles)
@@ -126,7 +120,7 @@ class Map(object):
 		print("created tiles")
 
 	def _updateSrc(self, crm, filename, translation):
-		if filename == self.tileset and crm._status[filename] == rggResource.STATE_DONE:
+		if filename == self.tileset and crm._status[filename] == STATE_DONE:
 			self._createTiles()
 		print("update src", self.ID, filename, self.tileset, crm._status[filename])
 
@@ -145,7 +139,7 @@ class Map(object):
 		assert(0 <= y <= self.mapsize[1])
 		t = x + self.mapsize[0] * y
 		self.tileindexes[t] = index
-		imgsize = mainWindow.glwidget.getImageSize(rggResource.crm.translateFile(self.tileset, rggResource.RESOURCE_IMAGE))
+		imgsize = mainWindow.glwidget.getImageSize(crm.translateFile(self.tileset, RESOURCE_IMAGE))
 
 		x = index%(imgsize.width()/self.tilesize[0])*self.tilesize[0]
 		y = int((index*self.tilesize[0])/imgsize.width())*self.tilesize[1]

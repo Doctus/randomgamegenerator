@@ -19,18 +19,14 @@ Handling of network connections.
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
+from re import compile as recompile
+from os import path, stat, makedirs, remove
+from getpass import getuser
 
-import re, os, getpass
-try:
-	from PyQt5 import QtCore, QtNetwork
-	from .rggSocket import statefulSocket, generateChecksum, fileData
-	from .rggSystem import translate, mainWindow, signal, makeLocalFilename, findRandomAppend
-	from .rggConstants import *
-except ImportError:
-	from PyQt4 import QtCore, QtNetwork
-	from rggSocket import statefulSocket, generateChecksum, fileData
-	from rggSystem import translate, mainWindow, signal, makeLocalFilename, findRandomAppend
-	from rggConstants import *
+from .rggQt import *
+from .rggSocket import statefulSocket, generateChecksum, fileData
+from .rggSystem import translate, mainWindow, signal, makeLocalFilename, findRandomAppend
+from .rggConstants import *
 
 MESSAGE_IDENTIFY = "IDENTIFY" # Identify this client
 MESSAGE_ACTIVATE = "ACTIVATE" # Assign username
@@ -43,7 +39,7 @@ MESSAGE_REJECT = "REJECT" # Reject the specified file
 PROTOCOL_OBJECT = "OBJECT" # Object-based protocol
 PROTOCOL_TRANSFER = "TRANSFER" # Transfer-based protocol
 
-VALID_USERNAME = re.compile('^[\w\-]+$')
+VALID_USERNAME = recompile('^[\w\-]+$')
 
 class ConnectionData(object):
 	"""Data used to create a network connection."""
@@ -76,11 +72,11 @@ class BaseClient(object):
 		self.username = UNICODE_STRING(localUser()) or 'localhost'
 		assert(self.username)
 
-		self.timer = QtCore.QTimer()
+		self.timer = QTimer()
 		self.timer.timeout.connect(self._updatetransfer)
 		self.timer.start(1000)
 
-		#self.timer = QtCore.QTimer()
+		#self.timer = QTimer()
 		#self.timer.timeout.connect(self.transferHack)
 		#self.timer.start(3600000)
 
@@ -156,13 +152,13 @@ class BaseClient(object):
 			# NOTE: could update checksum here (for refreshing the file when updated locally)
 			return False
 		try:
-			file = QtCore.QFile(makeLocalFilename(filename))
-			if not file.open(QtCore.QFile.ReadWrite):
+			file = QFile(makeLocalFilename(filename))
+			if not file.open(QFile.ReadWrite):
 				try:
-					os.makedirs(os.path.dirname(filename))
+					makedirs(path.dirname(filename))
 				except:
 					pass
-				if not file.open(QtCore.QFile.ReadWrite):
+				if not file.open(QFile.ReadWrite):
 					return False
 			try:
 				size = file.size()
@@ -172,8 +168,8 @@ class BaseClient(object):
 				file.close()
 		except IOError:
 			return False
-		if os.stat(filename).st_size == 0:
-			os.remove(filename)
+		if stat(filename).st_size == 0:
+			remove(filename)
 		self.getList.add(filename)
 		self.obj.sendMessage(MESSAGE_GET,
 			filename=filedata.filename,
@@ -270,7 +266,7 @@ class BaseClient(object):
 		filename = fileData.filename
 		try:
 			# Can we open the file?
-			if not fileData.file.open(QtCore.QFile.ReadOnly):
+			if not fileData.file.open(QFile.ReadOnly):
 				self.fileEvent.emit(self, filename, "SENDFILE Could not open")
 				print("SENDFILE Could not open")
 				return False
@@ -317,7 +313,7 @@ class BaseClient(object):
 			return False
 		try:
 			# Can we open the file?
-			if not file.open(QtCore.QFile.ReadWrite):
+			if not file.open(QFile.ReadWrite):
 				self.fileEvent.emit(self, filename, "RECVFILE Could not open")
 				print("RECVFILE Could not open")
 				return False
@@ -409,7 +405,7 @@ class BaseClient(object):
 	def _getFile(self, socket, filename, size, checksum):
 		"""Responds to a file request."""
 		self.fileEvent.emit(self, filename, "Requested by client")
-		self.sendList.add(fileData(QtCore.QFile(makeLocalFilename(filename)), filename, size, checksum))
+		self.sendList.add(fileData(QFile(makeLocalFilename(filename)), filename, size, checksum))
 		self._updatetransfer()
 
 	def _putFile(self, socket, filename, size, digest):
@@ -419,7 +415,7 @@ class BaseClient(object):
 			message = "[{0}] Remote duplicate PUT; ignoring {filename}"
 			print(message.format(socket.context, filename=self.receivedfile.filename))
 
-		self.receivedfile = fileData(QtCore.QFile(makeLocalFilename(filename)), filename, size, digest)
+		self.receivedfile = fileData(QFile(makeLocalFilename(filename)), filename, size, digest)
 		self._updatetransfer()
 
 	def _ignoreFile(self, socket, filename):
@@ -773,10 +769,10 @@ class JsonServer(object):
 		self.clients = {}
 		self._addClient(self.client)
 
-		tcp = QtNetwork.QTcpServer(mainWindow)
+		tcp = QTcpServer(mainWindow)
 		tcp.newConnection.connect(self._newConnection)
 
-		result = tcp.listen(QtNetwork.QHostAddress("0.0.0.0"), port)
+		result = tcp.listen(QHostAddress("0.0.0.0"), port)
 		if result:
 			print("[SERVER] Listening on {0}:{1}".format(tcp.serverAddress().toString(), tcp.serverPort()))
 			self.tcp = tcp
@@ -1196,9 +1192,9 @@ class JsonServer(object):
 
 def localHost():
 	"""Gets the name of the local machine."""
-	return UNICODE_STRING(QtNetwork.QHostInfo.localHostName())
+	return UNICODE_STRING(QHostInfo.localHostName())
 
 def localUser():
 	"""Gets the name of the local user."""
-	return UNICODE_STRING(getpass.getuser())
+	return UNICODE_STRING(getuser())
 
