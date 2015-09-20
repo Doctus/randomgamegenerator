@@ -271,7 +271,7 @@ class serverResourceMapper(object):
 	def _broadcast(self, filename, status):
 		"""Broadcasts the status of a file."""
 		# HACK: inverted import flow
-		from rggViews import allusers
+		from .rggViews import allusers
 		_broadcastStatus(allusers(), filename, status)
 
 crm = clientResourceMapper(client)
