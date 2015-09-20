@@ -31,6 +31,17 @@ Introduction
     http://www.daydreamspiral.com/forum/
     irc.darkmyst.org#attercop
 
+Requirements
+
+  Python2 or Python3
+  PyQt4 or PyQt5
+  NumPy
+  PyOpenGL
+
+  Optional:
+    automodinit
+    pillow
+
 Credits
 
   Coded by:

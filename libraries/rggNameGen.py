@@ -24,8 +24,7 @@ from random import choice
 GENERATOR_DIR = "generators"
 KAIJYUUKEYS = ("technique", "dwarf", "japanese", "food", "weapon", "artifood", "french", "macguffin")
 
-generators = {}
-from libraries.generators import *
+from . import generators
 
 def getName(generator, args):
 	'''Return a random name by passing generator args.'''
@@ -44,6 +43,6 @@ def getName(generator, args):
 			result.append(getName(choice(KAIJYUUKEYS), "exalted full"))
 		return " ".join(result)
 	try:
-		return generators[generator](args)
+		return getattr(generators, generator).getName(args)
 	except KeyError:
 		return "Key Error: no generator named " + str(generator) + ". For a list of available generators, see /generate keys."
