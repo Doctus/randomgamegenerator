@@ -58,7 +58,7 @@ from libraries.rggConstants import *
 
 if __name__ == '__main__':
 	fieldtemp = ["English"]
-	app = QApplication(['RGG'])
+	application = QApplication(['RGG'])
 
 	try:
 		js = jsonload(path.join(SAVE_DIR, "lang_settings.rgs"))
@@ -78,7 +78,7 @@ if __name__ == '__main__':
 		trans = QTranslator()
 		if not trans.load(transfile):
 			print(transfile + " not found")
-		app.installTranslator(trans)
+		application.installTranslator(trans)
 
 	qgf = QGLFormat.defaultFormat()
 	qgf.setSampleBuffers(True)
@@ -86,23 +86,23 @@ if __name__ == '__main__':
 
 	main = injectMain()
 
-	from libraries import rggRPC, rggViews
+	from libraries import rggRPC, rggState, rggViews
 	from libraries import rggChat, rggICChat #bad, but necessary for now to initialize here
 	from libraries.rggSignalConfig import connectEvents
 
 	# Initialize view state.
-	s = rggViews._state
-	s.initialize(app)
+	rggState.GlobalState.initialize(application)
+	rggViews.initialize()
 
 	server = rggRPC.server
 	client = rggRPC.client
 
-	connectEvents(client, server, s.menu, s.cwidget, s.icwidget, s.dwidget, s.uwidget, main.glwidget)
+	connectEvents(client, server, main.glwidget)
 
 	# Start execution
 	try:
 		main.show()
-		app.exec_()
+		application.exec_()
 	finally:
 		rggViews.autosaveSession()
 		client.close()

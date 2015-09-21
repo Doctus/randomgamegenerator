@@ -38,6 +38,7 @@ from .rggQt import *
 from .rggResource import crm, srm
 from .rggRPC import server, client, serverRPC, clientRPC
 from .rggSession import Session
+from .rggState import GlobalState
 from .rggStyles import sheets
 from .rggSystem import *
 
@@ -47,6 +48,64 @@ BUTTON_MIDDLE = 1
 BUTTON_RIGHT = 2
 BUTTON_CONTROL = 3
 BUTTON_SHIFT = 6
+
+def initialize():
+	GlobalState.menu = menuBar(mapExists, pogExists, charExists)
+
+	GlobalState.twidget = debugConsoleWidget(mainWindow)
+	stdout = GlobalState.twidget
+	stderr = GlobalState.twidget
+
+	GlobalState.dwidget = diceRoller(mainWindow)
+	GlobalState.pwidget = pogPalette(mainWindow)
+	GlobalState.cwidget = chatWidget(mainWindow)
+	GlobalState.icwidget = ICChatWidget(mainWindow)
+	GlobalState.uwidget = userListWidget(mainWindow)
+	GlobalState.mwidget = mapEditor(mainWindow)
+	GlobalState.fwidget = transferMonitorWidget(mainWindow)
+	GlobalState.users = {}
+	GlobalState.localuser = User(client.username)
+	GlobalState.users[client.username] = GlobalState.localuser
+	GlobalState.keepalive = 4
+
+	GlobalState.mwidget.moveMapButton.clicked.connect(moveMap)
+
+	purgeEmptyImages()
+
+	GlobalState.pingTimer = QTimer()
+	GlobalState.pingTimer.timeout.connect(keepAlive)
+	GlobalState.pingTimer.start(PING_INTERVAL_SECONDS*1000)
+
+	GlobalState.dialogs_keepalive = []
+
+	try:
+		GlobalState.portraitSize = jsonload(ospath.join(SAVE_DIR, "ui_settings.rgs"))['portraitsize']
+	except:
+		GlobalState.portraitSize = "64"
+
+	try:
+		obj = jsonload(ospath.join(SAVE_DIR, "ui_settings.rgs"))
+		setStyle(obj["style"], sheets[obj["style"]][1])
+	except:
+		setStyle("Default", False)
+
+	try:
+		mainWindow.readGeometry()
+	except:
+		pass
+
+	#Kind of a hack, but the GUI is not ready to display pogs at this point in execution, and I couldn't think of a convenient way to figure out when that happens.
+	GlobalState.autoloadTimer = QTimer.singleShot(5, autoloadSession)
+
+	GlobalState.pogMoveTimer = QTimer()
+	GlobalState.pogMoveTimer.timeout.connect(autoMovePogs)
+	GlobalState.pogMoveTimer.start(40)
+
+	addMouseMoveListener(mouseMoveResponse, LATE_RESPONSE_LEVEL)
+	addMousePressListener(mousePressResponse, LATE_RESPONSE_LEVEL)
+	addMouseReleaseListener(mouseReleaseResponse, LATE_RESPONSE_LEVEL)
+	addKeyPressListener(keyPressResponse, LATE_RESPONSE_LEVEL)
+	addKeyReleaseListener(keyReleaseResponse, LATE_RESPONSE_LEVEL)
 
 # Feel free to add fields to the user object
 class User(object):
@@ -64,135 +123,27 @@ class User(object):
 	def __str__(self):
 		return self.__unicode__()
 
-class _state(object):
-	"""A state class build to avoid all these global statements."""
-
-	session = Session()
-
-	alert = True
-
-	pogSelection = set()
-	pogHover = None
-
-	mouseButton = None
-	mousePosition = (0, 0)
-
-	pogPlacement = False
-	pogPath = "path"
-
-	previousLinePlacement = None #(0, 0) expected
-	nextLinePlacement = None
-
-	thickness = 1
-	linecolour = [1.0, 1.0, 1.0]
-	drawmode = "Freehand"
-
-	GM = None
-
-	storedMessages = []
-
-	moveMode = "free"
-	moveablePogs = []
-
-	cameraPog = None
-	pogmove = [0, 0]
-
-	dreams = {}
-
-	@staticmethod
-	def incrementDreams(target, amount):
-		if target not in _state.dreams:
-			_state.dreams[target] = 0
-		_state.dreams[target] += amount
-
-	@staticmethod
-	def getDreams(target):
-		if target not in _state.dreams:
-			return 0
-		return _state.dreams[target]
-
-	@staticmethod
-	def initialize(mainApp):
-		_state.menu = menuBar(mapExists, pogExists, charExists)
-
-		_state.twidget = debugConsoleWidget(mainWindow)
-		stdout = _state.twidget
-		stderr = _state.twidget
-
-		_state.dwidget = diceRoller(mainWindow)
-		_state.pwidget = pogPalette(mainWindow)
-		_state.cwidget = chatWidget(mainWindow)
-		_state.icwidget = ICChatWidget(mainWindow)
-		_state.uwidget = userListWidget(mainWindow)
-		_state.mwidget = mapEditor(mainWindow)
-		_state.fwidget = transferMonitorWidget(mainWindow)
-		_state.users = {}
-		_state.localuser = User(client.username)
-		_state.users[client.username] = _state.localuser
-		_state.keepalive = 4
-
-		_state.mwidget.moveMapButton.clicked.connect(moveMap)
-
-		purgeEmptyImages()
-
-		_state.pingTimer = QTimer()
-		_state.pingTimer.timeout.connect(keepAlive)
-		_state.pingTimer.start(PING_INTERVAL_SECONDS*1000)
-
-		_state.App = mainApp
-
-		_state.dialogs_keepalive = []
-
-		try:
-			_state.portraitSize = jsonload(ospath.join(SAVE_DIR, "ui_settings.rgs"))['portraitsize']
-		except:
-			_state.portraitSize = "64"
-
-		try:
-			obj = jsonload(ospath.join(SAVE_DIR, "ui_settings.rgs"))
-			setStyle(obj["style"], sheets[obj["style"]][1])
-		except:
-			setStyle("Default", False)
-
-		try:
-			mainWindow.readGeometry()
-		except:
-			pass
-
-		#Kind of a hack, but the GUI is not ready to display pogs at this point in execution, and I couldn't think of a convenient way to figure out when that happens.
-		_state.autoloadTimer = QTimer.singleShot(5, autoloadSession)
-
-		_state.pogMoveTimer = QTimer()
-		_state.pogMoveTimer.timeout.connect(autoMovePogs)
-		_state.pogMoveTimer.start(40)
-
-		addMouseMoveListener(mouseMoveResponse, LATE_RESPONSE_LEVEL)
-		addMousePressListener(mousePressResponse, LATE_RESPONSE_LEVEL)
-		addMouseReleaseListener(mouseReleaseResponse, LATE_RESPONSE_LEVEL)
-		addKeyPressListener(keyPressResponse, LATE_RESPONSE_LEVEL)
-		addKeyReleaseListener(keyReleaseResponse, LATE_RESPONSE_LEVEL)
-
 def mapExists():
-	if len(list(_state.session.maps.values())) > 0:
+	if len(list(GlobalState.session.maps.values())) > 0:
 		return True
 	return False
 
 def pogExists():
-	if len(list(_state.session.pogs.values())) > 0:
+	if len(list(GlobalState.session.pogs.values())) > 0:
 		return True
 	return False
 
 def charExists():
-	return _state.icwidget.hasCharacters()
+	return GlobalState.icwidget.hasCharacters()
 
 def autoMovePogs():
-	if _state.pogmove == [0, 0]:
+	if GlobalState.pogmove == [0, 0]:
 		return
-	movePogs(_state.pogmove)
+	movePogs(GlobalState.pogmove)
 
 @serverRPC
 def respondDreamIncrement(source, target, amount):
-	_state.incrementDreams(target, amount)
+	GlobalState.incrementDreams(target, amount)
 	if amount == 1:
 		say("%s gave %s a dream."%(source, target))
 	elif amount > 1:
@@ -209,7 +160,7 @@ def incrementDreams(target, amount):
 	sendDreamIncrement(target, amount)
 
 def getDreams():
-	return _state.dreams
+	return GlobalState.dreams
 
 def moveMap():
 	pass
@@ -218,9 +169,9 @@ def changeStyle(act):
 	setStyle(str(act.text()), act.isDark)
 
 def setStyle(styleName, isDark):
-	_state.menu.changeStyle(styleName)
-	_state.cwidget.toggleDarkBackgroundSupport(isDark)
-	_state.icwidget.toggleDarkBackgroundSupport(isDark)
+	GlobalState.menu.changeStyle(styleName)
+	GlobalState.cwidget.toggleDarkBackgroundSupport(isDark)
+	GlobalState.icwidget.toggleDarkBackgroundSupport(isDark)
 
 @serverRPC
 def reconnectTransferSocket():
@@ -228,54 +179,54 @@ def reconnectTransferSocket():
 
 def drawPogCircles():
 	clearSelectionCircles()
-	for pog in _state.pogSelection:
+	for pog in GlobalState.pogSelection:
 		drawSelectionCircle(*pog.getSelectionCircleData())
 
 def addPogSelection(pog):
-	_state.pogSelection.add(pog)
+	GlobalState.pogSelection.add(pog)
 	drawPogCircles()
 
 def removePogSelection(pog):
-	_state.pogSelection.remove(pog)
+	GlobalState.pogSelection.remove(pog)
 	drawPogCircles()
 
 def setPogSelection(pog):
-	_state.pogSelection = set()
+	GlobalState.pogSelection = set()
 	addPogSelection(pog)
 
 def addUserToList(name, host=False):
-	_state.uwidget.addUser(name, host)
+	GlobalState.uwidget.addUser(name, host)
 
 def toggleAlerts(newValue=None):
 	"""Toggles messages containing the user's handle causing an alert."""
 	if newValue is None:
-		_state.alert = not _state.alert
+		GlobalState.alert = not GlobalState.alert
 	else:
-		_state.alert = newValue
+		GlobalState.alert = newValue
 
 def toggleTimestamps(newValue=None):
 	if newValue is None:
-		_state.cwidget.timestamp = not _state.cwidget.timestamp
+		GlobalState.cwidget.timestamp = not GlobalState.cwidget.timestamp
 	else:
-		_state.cwidget.timestamp = newValue
-	if _state.cwidget.timestamp:
+		GlobalState.cwidget.timestamp = newValue
+	if GlobalState.cwidget.timestamp:
 		jsonappend({'timestamp':'On'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 	else:
 		jsonappend({'timestamp':'Off'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 
 def setTimestampFormat(newFormat):
-	_state.cwidget.timestampformat = newFormat
+	GlobalState.cwidget.timestampformat = newFormat
 	jsonappend({'timestampformat':newFormat}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 
 def promptTimestampFormat():
 	prompt = translate("views", "Please enter a new timestamp format; the default is [%H:%M:%S]")
-	newFormat = promptString(prompt, inittext = _state.cwidget.timestampformat)
+	newFormat = promptString(prompt, inittext = GlobalState.cwidget.timestampformat)
 	if newFormat is None:
 		return
 	setTimestampFormat(newFormat)
 
 def getPortraitSize():
-	return _state.portraitSize
+	return GlobalState.portraitSize
 
 def setPortraitSize():
 	prompt = translate("views", "Please enter a portrait size.")
@@ -286,7 +237,7 @@ def setPortraitSize():
 	newSize = promptInteger(prompt, default=defaultsize)
 	if newSize is None:
 		return
-	_state.portraitSize = newSize
+	GlobalState.portraitSize = newSize
 	jsonappend({'portraitsize':newSize}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 
 # MESSAGES
@@ -301,16 +252,16 @@ def splitword(message):
 
 def say(message):
 	"""Say an IC message. This documentation is a lie."""
-	if _state.alert and localhandle().lower() in message.lower():
-		_state.App.alert(mainWindow)
-	_state.cwidget.insertMessage(message)
+	if GlobalState.alert and localhandle().lower() in message.lower():
+		GlobalState.App.alert(mainWindow)
+	GlobalState.cwidget.insertMessage(message)
 
 def announce(message):
 	"""Say an OOC message. This documentation is a lie."""
-	_state.cwidget.insertMessage(message)
+	GlobalState.cwidget.insertMessage(message)
 
 def ICSay(message):
-	_state.icwidget.insertMessage(message)
+	GlobalState.icwidget.insertMessage(message)
 
 def linkedName(name):
 	return translate('views', '<a href="/tell {name}" title="{name}">{name}</a>').format(name=name)
@@ -319,7 +270,7 @@ def linkedName(name):
 
 def allusers():
 	"""Get a list of all users."""
-	return list(_state.users.values())
+	return list(GlobalState.users.values())
 
 def allusersbut(usernameOrUser):
 	user = getuser(usernameOrUser)
@@ -338,31 +289,31 @@ def getuser(username):
 	username = UNICODE_STRING(username)
 	if server.userExists(username):
 		username = server.fullname(username)
-		assert(username in _state.users)
-		return _state.users[username]
+		assert(username in GlobalState.users)
+		return GlobalState.users[username]
 	return None
 
 def usernames():
 	"""Returns all the usernames."""
-	return list(_state.users.keys())
+	return list(GlobalState.users.keys())
 
 def getNetUserList():
 	"""Returns the user names formatted for transfer over net."""
-	return _state.uwidget.getUsers()
+	return GlobalState.uwidget.getUsers()
 
 def getGM():
-	return _state.GM
+	return GlobalState.GM
 
 def isGM():
 	return getGM() == localhandle()
 
 def changeGM(username):
-	_state.GM = username
-	_state.uwidget.setGM(username)
+	GlobalState.GM = username
+	GlobalState.uwidget.setGM(username)
 
 @serverRPC
 def respondChangeGM(username, origin):
-	if _state.GM is None or origin == _state.GM:
+	if GlobalState.GM is None or origin == GlobalState.GM:
 		changeGM(username)
 
 @clientRPC
@@ -386,7 +337,7 @@ def playerOptions(playername):
 
 @serverRPC
 def respondSetMoveMode(newMode):
-	_state.moveMode = UNICODE_STRING(newMode)
+	GlobalState.moveMode = UNICODE_STRING(newMode)
 
 @clientRPC
 def sendSetMoveMode(user, target, newMode):
@@ -394,10 +345,10 @@ def sendSetMoveMode(user, target, newMode):
 
 @serverRPC
 def respondToggleMoveMode():
-	if _state.moveMode == "free":
-		_state.moveMode = "fixed"
+	if GlobalState.moveMode == "free":
+		GlobalState.moveMode = "fixed"
 	else:
-		_state.moveMode = "free"
+		GlobalState.moveMode = "free"
 
 @clientRPC
 def sendToggleMoveMode(user, target):
@@ -405,28 +356,28 @@ def sendToggleMoveMode(user, target):
 
 @serverRPC
 def respondAddMoveablePog(pogID):
-	_state.moveablePogs.append(pogID)
+	GlobalState.moveablePogs.append(pogID)
 
 @clientRPC
 def sendAddMoveablePog(user, target, pogID):
 	respondAddMoveablePog(getuser(target), pogID)
 
 def setUwidgetLocal():
-	_state.uwidget.localname = localhandle()
+	GlobalState.uwidget.localname = localhandle()
 
 @serverRPC
 def respondPing():
-	_state.keepalive = 4
+	GlobalState.keepalive = 4
 
 @clientRPC
 def sendPing(user):
 	respondPing(user)
 
 def keepAlive():
-	_state.keepalive -= 1
-	if _state.keepalive == 1:
+	GlobalState.keepalive -= 1
+	if GlobalState.keepalive == 1:
 		say(translate('views', '<font color="red">Warning:</font> Connection may have been lost.'))
-	if _state.keepalive == 0:
+	if GlobalState.keepalive == 0:
 		respondPossibleDisconnect()
 	sendPing()
 
@@ -437,17 +388,17 @@ def respondPossibleDisconnect():
 # TODO: Name changing needs to be synched across the wire
 # The workaround is to log out and back in.
 #def changeName(user, name):
-#	assert(name not in _state.usernames)
+#	assert(name not in GlobalState.usernames)
 #	if user.unnamed:
 #		user.unnamed = False
-#	if user.username in _state.usernames:
-#		del _state.usernames[user.username]
-#	_state.usernames[name] = user
+#	if user.username in GlobalState.usernames:
+#		del GlobalState.usernames[user.username]
+#	GlobalState.usernames[name] = user
 #	user.username = name
 
 def localuser():
 	"""The user for the local player."""
-	return _state.localuser
+	return GlobalState.localuser
 
 def localhandle():
 	return localuser().username
@@ -455,8 +406,8 @@ def localhandle():
 def adduser(user):
 	"""Add a user to the list locally."""
 	#print "ADD", user.username
-	assert(user.username not in _state.users)
-	_state.users[user.username] = user
+	assert(user.username not in GlobalState.users)
+	GlobalState.users[user.username] = user
 	return user
 
 def renameuser(oldname, newname):
@@ -472,9 +423,9 @@ def renameuser(oldname, newname):
 def removeuser(username):
 	"""Remove a user from the list locally."""
 	#print "REMOVE", username
-	assert(username in _state.users)
-	user = _state.users[username]
-	del _state.users[username]
+	assert(username in GlobalState.users)
+	user = GlobalState.users[username]
+	del GlobalState.users[username]
 	return user
 
 def hostGame():
@@ -565,26 +516,26 @@ def kick(username):
 	server.kick(username)
 
 def getSession():
-	return _state.session
+	return GlobalState.session
 
 def transferFileResponse(responsibleClient, filename, eventDescription):
-	_state.fwidget.processFileEvent(responsibleClient, filename, eventDescription)
+	GlobalState.fwidget.processFileEvent(responsibleClient, filename, eventDescription)
 
 def partialTransferResponse(responsibleClient, filename, size, processed):
-	_state.fwidget.processPartialTransferEvent(responsibleClient, filename, size, processed)
+	GlobalState.fwidget.processPartialTransferEvent(responsibleClient, filename, size, processed)
 
 # MAPS
 def topmap(mapPosition):
-	return _state.session.findTopMap(mapPosition)
+	return GlobalState.session.findTopMap(mapPosition)
 
 def getmap(mapID):
-	return _state.session.getMap(mapID)
+	return GlobalState.session.getMap(mapID)
 
 def allmaps():
-	return list(_state.session.maps.items())
+	return list(GlobalState.session.maps.items())
 
 def getAllMaps():
-	return list(_state.session.maps.values())
+	return list(GlobalState.session.maps.values())
 
 def chooseMap():
 	say(translate('views', 'This function is deprecated. Use the view controller.'))
@@ -600,7 +551,7 @@ def sendCloseAllMaps(user):
 
 def _closeAllMaps():
 	clearPogSelection()
-	_state.session.closeAllMaps()
+	GlobalState.session.closeAllMaps()
 
 def closeAllMaps():
 	if promptYesNo(translate('views', 'Are you sure you want to close all maps for all connected players?')) == 16384:
@@ -617,10 +568,10 @@ def sendClearSession(user):
 
 def _clearSession():
 	clearPogSelection()
-	_state.cameraPog = None
-	_state.pogmove = [0, 0]
-	_state.moveablePogs = []
-	_state.session.clear()
+	GlobalState.cameraPog = None
+	GlobalState.pogmove = [0, 0]
+	GlobalState.moveablePogs = []
+	GlobalState.session.clear()
 
 def clearSession():
 	if promptYesNo(translate('views', 'Are you sure you want to clear the current session completely for all connected players?')) == 16384:
@@ -628,14 +579,14 @@ def clearSession():
 		sendClearSession()
 
 def internalAddMap(map):
-	_state.session.addMap(map)
+	GlobalState.session.addMap(map)
 	sendMapCreate(map.ID, map.dump(), map.tileset)
 
 @serverRPC
 def respondSession(sess):
-	if _state.session is not None:
-		_state.session.clear()
-	_state.session = Session.load(sess)
+	if GlobalState.session is not None:
+		GlobalState.session.clear()
+	GlobalState.session = Session.load(sess)
 
 @clientRPC
 def sendSession(user, session):
@@ -675,13 +626,13 @@ def saveMap():
 	mapNames = []
 	mapIDs = []
 
-	for ID, map in list(_state.session.maps.items()):
+	for ID, map in list(GlobalState.session.maps.items()):
 		mapNames.append("".join((map.mapname, " (", str(ID), ")")))
 		mapIDs.append(ID)
 
 	selectedButton = promptButtonSelection("Which map do you want to save?", mapNames, 0)
 	try:
-		map = _state.session.maps[mapIDs[selectedButton]]
+		map = GlobalState.session.maps[mapIDs[selectedButton]]
 	except IndexError:
 		print("Error: no maps exist to save.")
 		return
@@ -703,7 +654,7 @@ def sendCloseSpecificMap(user, ID):
 	respondCloseSpecificMap(allusersbut(user), ID)
 
 def _closeSpecificMap(ID):
-	_state.session.closeMap(ID)
+	GlobalState.session.closeMap(ID)
 
 def closeSpecificMap(ID):
 	_closeSpecificMap(ID)
@@ -714,7 +665,7 @@ def closeMap():
 	mapNames = []
 	mapIDs = []
 
-	for ID, map in list(_state.session.maps.items()):
+	for ID, map in list(GlobalState.session.maps.items()):
 		mapNames.append("".join((map.mapname, " (", str(ID), ")")))
 		mapIDs.append(ID)
 
@@ -727,7 +678,7 @@ def autoloadSession():
 	try:
 		obj = jsonload(ospath.join(MAP_DIR, "autosave.rgg"))
 		sess = Session.load(obj)
-		_state.session = sess
+		GlobalState.session = sess
 		#Don't bother sending since we shouldn't be connected to anything yet.
 	except:
 		pass
@@ -742,12 +693,12 @@ def loadSession():
 	if not filename:
 		return
 	try:
-		if _state.session is not None:
-			_state.session.clear()
+		if GlobalState.session is not None:
+			GlobalState.session.clear()
 		obj = jsonload(filename)
 		sess = Session.load(obj)
-		_state.session = sess
-		sendSession(_state.session.dump())
+		GlobalState.session = sess
+		sendSession(GlobalState.session.dump())
 	except Exception as e:
 		showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
 		print(e)
@@ -759,15 +710,15 @@ def saveSession():
 	if not filename:
 		return
 
-	jsondump(_state.session.dump(), checkFileExtension(filename, ".rgg"))
+	jsondump(GlobalState.session.dump(), checkFileExtension(filename, ".rgg"))
 
 def autosaveSession():
-	jsondump(_state.session.dump(), ospath.join(MAP_DIR, "autosave.rgg"))
+	jsondump(GlobalState.session.dump(), ospath.join(MAP_DIR, "autosave.rgg"))
 
 @serverRPC
 def respondSurveyAnswers(surveyData, origin):
 	d = surveyResultsDialog(surveyData, str(origin), mainWindow)
-	_state.dialogs_keepalive.append(d)
+	GlobalState.dialogs_keepalive.append(d)
 	d.show()
 
 @clientRPC
@@ -798,7 +749,7 @@ def saveChars():
 	if not filename:
 		return
 
-	jsondump(_state.icwidget.dump(), checkFileExtension(filename, ".rgc"))
+	jsondump(GlobalState.icwidget.dump(), checkFileExtension(filename, ".rgc"))
 
 def loadChars():
 
@@ -809,7 +760,7 @@ def loadChars():
 		return
 	try:
 		obj = jsonload(filename)
-		_state.icwidget.load(obj)
+		GlobalState.icwidget.load(obj)
 	except Exception as e:
 		showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
 	return
@@ -849,20 +800,20 @@ def respondUserList(list):
 
 @serverRPC
 def respondUserRemove(name):
-	_state.uwidget.removeUser(name)
+	GlobalState.uwidget.removeUser(name)
 
 def clearUserList():
-	_state.uwidget.clearUserList()
+	GlobalState.uwidget.clearUserList()
 
 @serverRPC
 def respondMapCreate(ID, mapDump):
 	"""Creates <s>or updates</s> the map with the given ID."""
 	print("map create: " + str(ID))
-	existed = _state.session.getMapExists(ID)
+	existed = GlobalState.session.getMapExists(ID)
 	if existed:
 		print("ignoring map create")
 		return
-	_state.session.addDumpedMap(mapDump, ID)
+	GlobalState.session.addDumpedMap(mapDump, ID)
 
 @clientRPC
 def sendMapCreate(user, ID, map, tileset):
@@ -923,9 +874,9 @@ def _sendMultipleTileUpdate(mapID, topLeftTile, bottomRightTile, newTileIndex):
 
 @serverRPC
 def respondReleaseChat():
-	for message in _state.storedMessages:
+	for message in GlobalState.storedMessages:
 		say(message)
-	_state.storedMessages = []
+	GlobalState.storedMessages = []
 
 @clientRPC
 def sendReleaseChat(user):
@@ -936,7 +887,7 @@ def releaseChat():
 
 @serverRPC
 def respondStoreChat(message, username):
-	_state.storedMessages.append(message)
+	GlobalState.storedMessages.append(message)
 	say(" ".join((username, "has stored a message.")))
 
 @clientRPC
@@ -980,16 +931,16 @@ def sendCharacterSheet(user, data, title):
 	respondCharacterSheet(allusersbut(user), data, title)
 
 def clearPogSelection():
-	_state.pogSelection = set()
-	if _state.pogHover != None:
-		_state.pogHover.showTooltip = False
-		_state.pogHover = None
+	GlobalState.pogSelection = set()
+	if GlobalState.pogHover != None:
+		GlobalState.pogHover.showTooltip = False
+		GlobalState.pogHover = None
 	drawPogCircles()
 
 def createPog(pog):
 	"""Creates a new pog."""
-	pog.ID = _state.session._findUniquePogID(pog.src)
-	_state.session.addPog(pog)
+	pog.ID = GlobalState.session._findUniquePogID(pog.src)
+	GlobalState.session.addPog(pog)
 	sendUpdatePog(pog.ID, pog.dump())
 
 def modifyPog(pog):
@@ -1010,7 +961,7 @@ def sendDeleteAllPogs(user):
 
 def _deleteAllPogs():
 	clearPogSelection()
-	_state.session.removeAllPogs()
+	GlobalState.session.removeAllPogs()
 
 def deleteAllPogs():
 	_deleteAllPogs()
@@ -1036,14 +987,14 @@ def placePog(x, y, pogpath):
 
 def movePogs(displacement):
 	"""Moves pogs by a specified displacement."""
-	if _state.moveMode != "free" and not isGM():
+	if GlobalState.moveMode != "free" and not isGM():
 		selection = set()
-		for pog in _state.pogSelection:
-			if pog.ID in _state.moveablePogs:
+		for pog in GlobalState.pogSelection:
+			if pog.ID in GlobalState.moveablePogs:
 				selection.add(pog)
 		if not selection: return
 	else:
-		selection = _state.pogSelection.copy()
+		selection = GlobalState.pogSelection.copy()
 	pogids = []
 	poglocs = []
 	for pog in selection:
@@ -1058,16 +1009,16 @@ def respondUpdatePog(pogID, pogDump):
 	"""Creates or updates a pog on the client."""
 	pog = Pog.load(pogDump)
 	pog.ID = pogID
-	if pogID in list(_state.session.pogs.keys()):
-		old = _state.session.pogs[pogID]
-		if old in _state.pogSelection:
-			_state.pogSelection.discard(old)
+	if pogID in list(GlobalState.session.pogs.keys()):
+		old = GlobalState.session.pogs[pogID]
+		if old in GlobalState.pogSelection:
+			GlobalState.pogSelection.discard(old)
 			addPogSelection(pog)
-		if old == _state.pogHover:
-			_state.pogHover.showTooltip = False
-			_state.pogHover = None
+		if old == GlobalState.pogHover:
+			GlobalState.pogHover.showTooltip = False
+			GlobalState.pogHover = None
 		old.destroy()
-	_state.session.addPog(pog)
+	GlobalState.session.addPog(pog)
 	drawPogCircles()
 
 @clientRPC
@@ -1081,16 +1032,16 @@ def sendUpdatePog(user, pogID, pogDump):
 @serverRPC
 def respondDeletePog(pogID):
 	"""Deletes a pog on the client."""
-	if pogID in list(_state.session.pogs.keys()):
-		old = _state.session.pogs[pogID]
-		if old in _state.pogSelection:
-			_state.pogSelection.discard(old)
-		if old == _state.pogHover:
-			_state.pogHover.showTooltip = False
-			_state.pogHover = None
-		_state.session.removePog(old)
-	if _state.cameraPog and _state.cameraPog.ID == pogID:
-		_state.cameraPog = None
+	if pogID in list(GlobalState.session.pogs.keys()):
+		old = GlobalState.session.pogs[pogID]
+		if old in GlobalState.pogSelection:
+			GlobalState.pogSelection.discard(old)
+		if old == GlobalState.pogHover:
+			GlobalState.pogHover.showTooltip = False
+			GlobalState.pogHover = None
+		GlobalState.session.removePog(old)
+	if GlobalState.cameraPog and GlobalState.cameraPog.ID == pogID:
+		GlobalState.cameraPog = None
 	drawPogCircles()
 
 @clientRPC
@@ -1103,39 +1054,39 @@ def sendDeletePog(user, pogID):
 def respondMovementPog(pogids, displacement):
 	"""Creates or updates a pog on the client."""
 	for pogID in pogids:
-		if pogID in list(_state.session.pogs.keys()):
-			pog = _state.session.pogs[pogID]
+		if pogID in list(GlobalState.session.pogs.keys()):
+			pog = GlobalState.session.pogs[pogID]
 			pog.displace(displacement)
-	if _state.cameraPog:
-		centerOnPog(_state.cameraPog)
+	if GlobalState.cameraPog:
+		centerOnPog(GlobalState.cameraPog)
 	drawPogCircles()
 
 @clientRPC
 def sendMovementPog(user, pogids, displacement):
 	"""Creates or updates a pog on the server."""
-	centerOnPog(_state.cameraPog)
+	centerOnPog(GlobalState.cameraPog)
 	respondMovementPog(allusersbut(user), pogids, displacement)
 
 @serverRPC
 def respondAbsoluteMovementPog(pogids, newloc):
 	for i, pogID in enumerate(pogids):
-		if pogID in list(_state.session.pogs.keys()):
-			pog = _state.session.pogs[pogID]
+		if pogID in list(GlobalState.session.pogs.keys()):
+			pog = GlobalState.session.pogs[pogID]
 			pog.move(newloc[i])
-	if _state.cameraPog:
-		centerOnPog(_state.cameraPog)
+	if GlobalState.cameraPog:
+		centerOnPog(GlobalState.cameraPog)
 	drawPogCircles()
 
 @clientRPC
 def sendAbsoluteMovementPog(user, pogids, newloc):
-	centerOnPog(_state.cameraPog)
+	centerOnPog(GlobalState.cameraPog)
 	respondAbsoluteMovementPog(allusersbut(user), pogids, newloc)
 
 @serverRPC
 def respondHidePog(pogID, hidden):
 	"""Hides or shows a pog on the client."""
-	if pogID in list(_state.session.pogs.keys()):
-		pog = _state.session.pogs[pogID]
+	if pogID in list(GlobalState.session.pogs.keys()):
+		pog = GlobalState.session.pogs[pogID]
 		if hidden:
 			pog.hide()
 		else:
@@ -1150,8 +1101,8 @@ def sendHidePog(user, pogID, hidden):
 @serverRPC
 def respondPogAttributes(pogID, name, layer, properties):
 	'''Sends various attributes of a pog over the wire.'''
-	if pogID in list(_state.session.pogs.keys()):
-		pog = _state.session.pogs[pogID]
+	if pogID in list(GlobalState.session.pogs.keys()):
+		pog = GlobalState.session.pogs[pogID]
 		if not pog: return
 		pog.name = name
 		pog.layer = layer
@@ -1161,14 +1112,14 @@ def respondPogAttributes(pogID, name, layer, properties):
 @clientRPC
 def sendPogAttributes(user, pogID, name, layer, properties):
 	'''Sends various attributes of a pog over the wire.'''
-	pogUpdateEvent(_state.session.pogs[pogID])
+	pogUpdateEvent(GlobalState.session.pogs[pogID])
 	respondPogAttributes(allusersbut(user), pogID, name, layer, properties)
 
 @serverRPC
 def respondLockPog(pogID, locked):
 	"""Locks or unlocks a pog on the client."""
-	if pogID in list(_state.session.pogs.keys()):
-		pog = _state.session.pogs[pogID]
+	if pogID in list(GlobalState.session.pogs.keys()):
+		pog = GlobalState.session.pogs[pogID]
 		pog._locked = locked
 
 @clientRPC
@@ -1178,8 +1129,8 @@ def sendLockPog(user, pogID, locked):
 
 @serverRPC
 def respondResizePog(pogID, newW, newH):
-	if pogID in list(_state.session.pogs.keys()):
-		pog = _state.session.pogs[pogID]
+	if pogID in list(GlobalState.session.pogs.keys()):
+		pog = GlobalState.session.pogs[pogID]
 		pog.size = (newW, newH)
 
 @clientRPC
@@ -1194,7 +1145,7 @@ def duplicatePog(pog):
 @serverRPC
 def respondLine(x, y, w, h, thickness, r, g, b):
 	drawLine(x, y, w, h, thickness, r, g, b)
-	_state.session.addLine((float(x), float(y), float(w), float(h), thickness, float(r), float(g), float(b)))
+	GlobalState.session.addLine((float(x), float(y), float(w), float(h), thickness, float(r), float(g), float(b)))
 
 @clientRPC
 def sendLine(user, x, y, w, h, thickness, r, g, b):
@@ -1204,7 +1155,7 @@ def sendLine(user, x, y, w, h, thickness, r, g, b):
 def respondSegmentedLine(x, y, w, h, thickness, r, g, b):
 	lines = drawSegmentedLine(x, y, w, h, thickness, r, g, b)
 	for line in lines:
-		_state.session.addLine(line)
+		GlobalState.session.addLine(line)
 
 @clientRPC
 def sendSegmentedLine(user, x, y, w, h, thickness, r, g, b):
@@ -1214,7 +1165,7 @@ def sendSegmentedLine(user, x, y, w, h, thickness, r, g, b):
 def respondCircle(centre, edge, colour, thickness):
 	lines = drawCircle(centre, edge, colour, thickness)
 	for line in lines:
-		_state.session.addLine(line)
+		GlobalState.session.addLine(line)
 
 @clientRPC
 def sendCircle(user, centre, edge, colour, thickness):
@@ -1224,7 +1175,7 @@ def sendCircle(user, centre, edge, colour, thickness):
 def respondRectangle(x, y, w, h, colour, thickness):
 	lines = drawRectangleMadeOfLines(x, y, w, h, colour, thickness)
 	for line in lines:
-		_state.session.addLine(line)
+		GlobalState.session.addLine(line)
 
 @clientRPC
 def sendRectangle(user, x, y, w, h, colour, thickness):
@@ -1234,7 +1185,7 @@ def sendRectangle(user, x, y, w, h, colour, thickness):
 def respondPolygon(sides, centre, edge, colour, thickness):
 	lines = drawRegularPolygon(sides, centre, edge, colour, thickness)
 	for line in lines:
-		_state.session.addLine(line)
+		GlobalState.session.addLine(line)
 
 @clientRPC
 def sendPolygon(user, sides, centre, edge, colour, thickness):
@@ -1250,13 +1201,13 @@ def sendDeleteLine(user, x, y, w, h):
 	respondDeleteLine(allusers(), x, y, w, h)
 
 def _setThickness(new):
-	_state.thickness = new
+	GlobalState.thickness = new
 
 def setThickness(new):
 	_setThickness(int(new.text()))
 
 def _setLineColour(new):
-	_state.linecolour = [new[0], new[1], new[2]]
+	GlobalState.linecolour = [new[0], new[1], new[2]]
 
 def setLineColour(menuselection):
 	if menuselection.text() == "Custom...":
@@ -1298,7 +1249,7 @@ def addMacro():
 		name = promptString(translate('views', "What should the macro be called?"))
 		if name is None:
 			return
-		_state.dwidget.addMacro(dice, name)
+		GlobalState.dwidget.addMacro(dice, name)
 	else:
 		say(translate('views', 'Malformed dice macro. Formatting help is available in "/roll" command.'))
 
@@ -1312,8 +1263,8 @@ def generateName(generator, args):
 
 @serverRPC
 def respondCenterOnPog(pogID):
-	if pogID in list(_state.session.pogs.keys()):
-		pog = _state.session.pogs[pogID]
+	if pogID in list(GlobalState.session.pogs.keys()):
+		pog = GlobalState.session.pogs[pogID]
 		centerOnPog(pog)
 
 @clientRPC
@@ -1413,10 +1364,10 @@ def processPogRightclick(selection, pogs):
 		for pog in pogs:
 			deletePog(pog)
 	elif selection == 9:
-		if _state.cameraPog and _state.cameraPog == mainpog:
-			_state.cameraPog = None
+		if GlobalState.cameraPog and GlobalState.cameraPog == mainpog:
+			GlobalState.cameraPog = None
 		else:
-			_state.cameraPog = mainpog
+			GlobalState.cameraPog = mainpog
 			centerOnPog(mainpog)
 	elif selection == 10:
 		for pog in pogs:
@@ -1440,7 +1391,7 @@ def pogActionList(pog):
 	else: hidebutton = "Hide"
 	if pog._locked: lockbutton = "Unlock"
 	else: lockbutton = "Lock"
-	if _state.cameraPog and _state.cameraPog == pog: followbutton = "Unlock Camera"
+	if GlobalState.cameraPog and GlobalState.cameraPog == pog: followbutton = "Unlock Camera"
 	else: followbutton = "Lock Camera to Pog"
 	options = [translate('views', 'Center on pog'),
 			translate('views', 'Set name'),
@@ -1461,166 +1412,166 @@ def pogActionList(pog):
 # MOUSE ACTIONS
 
 def mouseDrag(screenPosition, mapPosition, displacement):
-	if _state.pogSelection and _state.mouseButton == BUTTON_LEFT:
+	if GlobalState.pogSelection and GlobalState.mouseButton == BUTTON_LEFT:
 		movePogs(displacement)
 		return
-	elif _state.mouseButton == BUTTON_LEFT:
+	elif GlobalState.mouseButton == BUTTON_LEFT:
 		setCameraPosition(list(map(lambda c, d,  z: c + d*z, cameraPosition(), displacement, (getZoom(), getZoom()))))
 		return
-	if _state.mouseButton == BUTTON_RIGHT:
+	if GlobalState.mouseButton == BUTTON_RIGHT:
 		setCameraPosition(list(map(lambda c, d,  z: c + d*z, cameraPosition(), displacement, (getZoom(), getZoom()))))
 
 def mouseMove(screenPosition, mapPosition, displacement):
-	icon = _state.menu.selectedIcon
+	icon = GlobalState.menu.selectedIcon
 	if icon == ICON_MOVE: # moveIcon
-		if _state.mouseButton == BUTTON_LEFT:
+		if GlobalState.mouseButton == BUTTON_LEFT:
 			setCameraPosition(list(map(lambda c, d,  z: c + d*z, cameraPosition(), displacement, (getZoom(), getZoom()))))
 	if icon == ICON_SELECT: #selectIcon
-		if _state.mouseButton is None:
-			tooltipPog = _state.session.findTopPog(mapPosition)
-			if _state.pogHover == tooltipPog:
+		if GlobalState.mouseButton is None:
+			tooltipPog = GlobalState.session.findTopPog(mapPosition)
+			if GlobalState.pogHover == tooltipPog:
 				return
-			elif _state.pogHover != None:
-				_state.pogHover.showTooltip = False
-			_state.pogHover = tooltipPog
+			elif GlobalState.pogHover != None:
+				GlobalState.pogHover.showTooltip = False
+			GlobalState.pogHover = tooltipPog
 			if tooltipPog is None:
 				return
 
 			tooltipPog.showTooltip = True
-		elif _state.mouseButton == BUTTON_LEFT:
+		elif GlobalState.mouseButton == BUTTON_LEFT:
 			return mouseDrag(screenPosition, mapPosition, displacement)
-		elif _state.mouseButton == BUTTON_RIGHT:
+		elif GlobalState.mouseButton == BUTTON_RIGHT:
 			return mouseDrag(screenPosition, mapPosition, displacement)
 	elif icon == ICON_DRAW: #drawIcon
-		if _state.mouseButton == BUTTON_LEFT:
-			if _state.drawmode == "Freehand":
-				if _state.previousLinePlacement != None:
-					sendLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.thickness, _state.linecolour[0], _state.linecolour[1], _state.linecolour[2])
-				_state.previousLinePlacement = mapPosition
-			elif _state.drawmode == "Rectangle":
+		if GlobalState.mouseButton == BUTTON_LEFT:
+			if GlobalState.drawmode == "Freehand":
+				if GlobalState.previousLinePlacement != None:
+					sendLine(GlobalState.previousLinePlacement[0], GlobalState.previousLinePlacement[1], mapPosition[0], mapPosition[1], GlobalState.thickness, GlobalState.linecolour[0], GlobalState.linecolour[1], GlobalState.linecolour[2])
+				GlobalState.previousLinePlacement = mapPosition
+			elif GlobalState.drawmode == "Rectangle":
 				clearPreviewLines()
-				if _state.previousLinePlacement != None:
-					drawRectangleMadeOfLines(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.linecolour, _state.thickness, True)
-			elif _state.drawmode == "Circle":
+				if GlobalState.previousLinePlacement != None:
+					drawRectangleMadeOfLines(GlobalState.previousLinePlacement[0], GlobalState.previousLinePlacement[1], mapPosition[0], mapPosition[1], GlobalState.linecolour, GlobalState.thickness, True)
+			elif GlobalState.drawmode == "Circle":
 				clearPreviewLines()
-				drawCircle(_state.previousLinePlacement, mapPosition, _state.linecolour, _state.thickness, True)
-			elif _state.drawmode == "Line":
+				drawCircle(GlobalState.previousLinePlacement, mapPosition, GlobalState.linecolour, GlobalState.thickness, True)
+			elif GlobalState.drawmode == "Line":
 				clearPreviewLines()
-				drawSegmentedLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.thickness, _state.linecolour[0], _state.linecolour[1], _state.linecolour[2], True)
-			elif _state.drawmode == "Pentagram" or _state.drawmode == "Hexagram":
-				if _state.previousLinePlacement != None:
+				drawSegmentedLine(GlobalState.previousLinePlacement[0], GlobalState.previousLinePlacement[1], mapPosition[0], mapPosition[1], GlobalState.thickness, GlobalState.linecolour[0], GlobalState.linecolour[1], GlobalState.linecolour[2], True)
+			elif GlobalState.drawmode == "Pentagram" or GlobalState.drawmode == "Hexagram":
+				if GlobalState.previousLinePlacement != None:
 					clearPreviewLines()
-					displacement = max(abs(mapPosition[0]-_state.previousLinePlacement[0]), abs(mapPosition[1]-_state.previousLinePlacement[1]))
-					drawRegularPolygon(14-len(_state.drawmode), _state.previousLinePlacement, displacement, _state.linecolour, _state.thickness, False, True)
+					displacement = max(abs(mapPosition[0]-GlobalState.previousLinePlacement[0]), abs(mapPosition[1]-GlobalState.previousLinePlacement[1]))
+					drawRegularPolygon(14-len(GlobalState.drawmode), GlobalState.previousLinePlacement, displacement, GlobalState.linecolour, GlobalState.thickness, False, True)
 	elif icon == ICON_DELETE: #deleteIcon
-		if _state.mouseButton == BUTTON_LEFT:
-			if _state.previousLinePlacement != None:
+		if GlobalState.mouseButton == BUTTON_LEFT:
+			if GlobalState.previousLinePlacement != None:
 				clearRectangles()
-				_state.nextLinePlacement = mapPosition #this is bottomRight of the square that we want to delete.
-				drawRectangle(_state.previousLinePlacement[0], _state.previousLinePlacement[1],
-									  _state.nextLinePlacement[0], _state.nextLinePlacement[1], 0.8, 0.8, 1.0)
+				GlobalState.nextLinePlacement = mapPosition #this is bottomRight of the square that we want to delete.
+				drawRectangle(GlobalState.previousLinePlacement[0], GlobalState.previousLinePlacement[1],
+									  GlobalState.nextLinePlacement[0], GlobalState.nextLinePlacement[1], 0.8, 0.8, 1.0)
 			else:
 				clearRectangles()
-				_state.previousLinePlacement = mapPosition #We only do this so that we have a topLeft
+				GlobalState.previousLinePlacement = mapPosition #We only do this so that we have a topLeft
 
 def mousePress(screenPosition, mapPosition, button):
-	icon = _state.menu.selectedIcon
+	icon = GlobalState.menu.selectedIcon
 	if icon == ICON_MOVE:
 		return
 	if icon == ICON_SELECT:
 		if button == BUTTON_LEFT + BUTTON_CONTROL:
-			if _state.pogPlacement:
-				infograb = QPixmap(_state.pogPath)
+			if GlobalState.pogPlacement:
+				infograb = QPixmap(GlobalState.pogPath)
 				pog = Pog(
 					mapPosition,
 					(infograb.width(), infograb.height()),
 					(infograb.width(), infograb.height()),
 					200,
-					_state.pogPath,
+					GlobalState.pogPath,
 					0,
 					0,
 					{},
 					infograb.hasAlpha())
 				createPog(pog)
 				return
-			pog = _state.session.findTopPog(mapPosition)
+			pog = GlobalState.session.findTopPog(mapPosition)
 			if not pog:
 				return
-			if pog in _state.pogSelection:
+			if pog in GlobalState.pogSelection:
 				removePogSelection(pog)
 			else:
 				addPogSelection(pog)
 			pogSelectionChangedEvent()
 		elif button == BUTTON_LEFT:
-			if _state.pogPlacement:
-				_state.pogPlacement = False
-				infograb = QPixmap(_state.pogPath)
+			if GlobalState.pogPlacement:
+				GlobalState.pogPlacement = False
+				infograb = QPixmap(GlobalState.pogPath)
 				pog = Pog(
 					mapPosition,
 					(infograb.width(), infograb.height()),
 					(infograb.width(), infograb.height()),
 					200,
-					_state.pogPath,
+					GlobalState.pogPath,
 					0,
 					0,
 					{},
 					infograb.hasAlpha())
 				createPog(pog)
 				return
-			pog = _state.session.findTopPog(mapPosition)
+			pog = GlobalState.session.findTopPog(mapPosition)
 			if not pog:
 				clearPogSelection()
 				return
-			if pog not in _state.pogSelection:
+			if pog not in GlobalState.pogSelection:
 				setPogSelection(pog)
 			pogSelectionChangedEvent()
 		elif button == BUTTON_RIGHT:
-			pog = _state.session.findTopPog(mapPosition)
+			pog = GlobalState.session.findTopPog(mapPosition)
 			if pog is not None:
-				if pog not in _state.pogSelection:
+				if pog not in GlobalState.pogSelection:
 					setPogSelection(pog)
-				_state.mouseButton = None
+				GlobalState.mouseButton = None
 				selected = showPopupMenuAt((screenPosition[0], screenPosition[1]), pogActionList(pog))
-				processPogRightclick(selected, list(set([pog] + list(_state.pogSelection))))
+				processPogRightclick(selected, list(set([pog] + list(GlobalState.pogSelection))))
 	elif icon == ICON_DRAW:
 		if button == BUTTON_LEFT:
-			_state.previousLinePlacement = mapPosition
+			GlobalState.previousLinePlacement = mapPosition
 		elif button == BUTTON_RIGHT:
 			modes = ['Freehand', 'Line', 'Circle', 'Rectangle', 'Pentagram', 'Hexagram']
 			selected = showPopupMenuAt((screenPosition[0], screenPosition[1]), modes)
-			_state.drawmode = modes[selected]
+			GlobalState.drawmode = modes[selected]
 	elif icon == ICON_DELETE:
 		if button == BUTTON_LEFT:
-			_state.previousLinePlacement = mapPosition
+			GlobalState.previousLinePlacement = mapPosition
 
 
 def mouseRelease(screenPosition, mapPosition, button):
-	_state.mouseButton = None
+	GlobalState.mouseButton = None
 
-	icon = _state.menu.selectedIcon
+	icon = GlobalState.menu.selectedIcon
 	if icon == ICON_DRAW:
 		clearPreviewLines()
-		if _state.drawmode == "Rectangle":
-			if _state.previousLinePlacement != None:
-				sendRectangle(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.linecolour, _state.thickness)
-		elif _state.drawmode == "Circle":
-			sendCircle(_state.previousLinePlacement, mapPosition, _state.linecolour, _state.thickness)
-		elif _state.drawmode == "Line":
-			sendSegmentedLine(_state.previousLinePlacement[0], _state.previousLinePlacement[1], mapPosition[0], mapPosition[1], _state.thickness, _state.linecolour[0], _state.linecolour[1], _state.linecolour[2])
-		elif _state.drawmode == "Pentagram" or _state.drawmode == "Hexagram":
-			if _state.previousLinePlacement != None:
-				displacement = max(abs(mapPosition[0]-_state.previousLinePlacement[0]), abs(mapPosition[1]-_state.previousLinePlacement[1]))
-				sendPolygon(14-len(_state.drawmode), _state.previousLinePlacement, displacement, _state.linecolour, _state.thickness)
-		_state.previousLinePlacement = None
+		if GlobalState.drawmode == "Rectangle":
+			if GlobalState.previousLinePlacement != None:
+				sendRectangle(GlobalState.previousLinePlacement[0], GlobalState.previousLinePlacement[1], mapPosition[0], mapPosition[1], GlobalState.linecolour, GlobalState.thickness)
+		elif GlobalState.drawmode == "Circle":
+			sendCircle(GlobalState.previousLinePlacement, mapPosition, GlobalState.linecolour, GlobalState.thickness)
+		elif GlobalState.drawmode == "Line":
+			sendSegmentedLine(GlobalState.previousLinePlacement[0], GlobalState.previousLinePlacement[1], mapPosition[0], mapPosition[1], GlobalState.thickness, GlobalState.linecolour[0], GlobalState.linecolour[1], GlobalState.linecolour[2])
+		elif GlobalState.drawmode == "Pentagram" or GlobalState.drawmode == "Hexagram":
+			if GlobalState.previousLinePlacement != None:
+				displacement = max(abs(mapPosition[0]-GlobalState.previousLinePlacement[0]), abs(mapPosition[1]-GlobalState.previousLinePlacement[1]))
+				sendPolygon(14-len(GlobalState.drawmode), GlobalState.previousLinePlacement, displacement, GlobalState.linecolour, GlobalState.thickness)
+		GlobalState.previousLinePlacement = None
 	elif icon == ICON_DELETE:
-		if(_state.previousLinePlacement != None and _state.nextLinePlacement != None):
+		if(GlobalState.previousLinePlacement != None and GlobalState.nextLinePlacement != None):
 
 			clearRectangles()
 
-			x = _state.previousLinePlacement[0]
-			y = _state.previousLinePlacement[1]
-			w = _state.nextLinePlacement[0]
-			h = _state.nextLinePlacement[1]
+			x = GlobalState.previousLinePlacement[0]
+			y = GlobalState.previousLinePlacement[1]
+			w = GlobalState.nextLinePlacement[0]
+			h = GlobalState.nextLinePlacement[1]
 			if(x > w):
 				x, w = w, x
 			if(y > h):
@@ -1632,21 +1583,21 @@ def mouseRelease(screenPosition, mapPosition, button):
 
 			sendDeleteLine(x, y, w, h)
 
-			_state.nextLinePlacement = mapPosition
+			GlobalState.nextLinePlacement = mapPosition
 
 def mouseMoveResponse(x, y):
 	#print 'move', x, y
 
 	screenPosition = (x, y)
 	mapPosition = getMapPosition(screenPosition)
-	displacement = list(map(lambda p,m,d: p/d - m/d, screenPosition, _state.mousePosition,  (getZoom(), getZoom())))
+	displacement = list(map(lambda p,m,d: p/d - m/d, screenPosition, GlobalState.mousePosition,  (getZoom(), getZoom())))
 
 	#print mapPosition
 	#print cameraPosition()
 
 	mouseMove(screenPosition, mapPosition, displacement)
 
-	_state.mousePosition = screenPosition
+	GlobalState.mousePosition = screenPosition
 
 def mousePressResponse(x, y, t):
 	#print 'press', x, y, t
@@ -1654,8 +1605,8 @@ def mousePressResponse(x, y, t):
 	screenPosition = (x, y)
 	mapPosition = getMapPosition(screenPosition)
 
-	_state.mousePosition = screenPosition
-	_state.mouseButton = t
+	GlobalState.mousePosition = screenPosition
+	GlobalState.mouseButton = t
 
 	mousePress(screenPosition, mapPosition, t)
 
@@ -1665,29 +1616,29 @@ def mouseReleaseResponse(x, y, t):
 	screenPosition = (x, y)
 	mapPosition = getMapPosition(screenPosition)
 
-	_state.mousePosition = screenPosition
-	_state.mouseButton = t
+	GlobalState.mousePosition = screenPosition
+	GlobalState.mouseButton = t
 
 	mouseRelease(screenPosition, mapPosition, t)
 
 def keyPressResponse(k):
 	if k == Qt.Key_Delete:
-		for pog in list(_state.pogSelection):
+		for pog in list(GlobalState.pogSelection):
 			deletePog(pog)
-	if not _state.cameraPog: return
-	setPogSelection(_state.cameraPog)
+	if not GlobalState.cameraPog: return
+	setPogSelection(GlobalState.cameraPog)
 	if k == Qt.Key_W:
-		_state.pogmove[1] = -5
+		GlobalState.pogmove[1] = -5
 	elif k == Qt.Key_S:
-		_state.pogmove[1] = 5
+		GlobalState.pogmove[1] = 5
 	elif k == Qt.Key_A:
-		_state.pogmove[0] = -5
+		GlobalState.pogmove[0] = -5
 	elif k == Qt.Key_D:
-		_state.pogmove[0] = 5
+		GlobalState.pogmove[0] = 5
 
 def keyReleaseResponse(k):
-	if not _state.cameraPog: return
+	if not GlobalState.cameraPog: return
 	if k == Qt.Key_W or k == Qt.Key_S:
-		_state.pogmove[1] = 0
+		GlobalState.pogmove[1] = 0
 	elif k == Qt.Key_A or k == Qt.Key_D:
-		_state.pogmove[0] = 0
+		GlobalState.pogmove[0] = 0

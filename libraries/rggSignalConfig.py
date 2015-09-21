@@ -16,6 +16,7 @@
 '''
 #waaaaay too many things imported here so I'm not gonna touch this line
 from . import rggRemote, rggViews, rggEvent
+from .rggState import GlobalState
 
 def connectChatWidgetEvents(widget):
 	widget.chatInput.connect(rggEvent.chatInputEvent)
@@ -86,12 +87,12 @@ def connectGLWidgetEvents(glwidget):
 	glwidget.keyReleaseSignal.connect(rggEvent.keyReleaseEvent)
 	glwidget.pogPlace.connect(rggViews.placePog)
 
-def connectEvents(client, server, menu, chatWidget, ICChatWidget, diceWidget, userListWidget, glWidget):
+def connectEvents(client, server, glWidget):
 	connectServerEvents(server)
 	connectClientEvents(client)
-	connectMenuEvents(menu)
-	connectChatWidgetEvents(chatWidget)
-	connectICChatWidgetEvents(ICChatWidget)
-	connectDiceWidgetEvents(diceWidget)
-	connectUserListWidgetEvents(userListWidget)
+	connectMenuEvents(GlobalState.menu)
+	connectChatWidgetEvents(GlobalState.cwidget)
+	connectICChatWidgetEvents(GlobalState.icwidget)
+	connectDiceWidgetEvents(GlobalState.dwidget)
+	connectUserListWidgetEvents(GlobalState.uwidget)
 	connectGLWidgetEvents(glWidget)
