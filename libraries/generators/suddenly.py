@@ -15,7 +15,11 @@ def _getSuddenly():
 			thing = random.choice(random.choice([PROFESSIONS, ANIMALS])) + " riding a " + random.choice(thing_type)
 		sentence = "a " + random.choice(random.choice([ADJECTIVES, COLORS])) + " " + thing + " bursts through the " + random.choice(["wall","ceiling", "floor"]) + "!"
 	elif type == 1:
-		sentence = "you " + random.choice(ENTRANCE_TYPE) + " a " + random.choice(PORTALS) + " that appears before you in the " + random.choice(["wall","floor"]) + "!"
+		if random.randint(0,1) == 0:
+			entrance = random.choice(ENTRANCE_TYPE)
+		else:
+			entrance = random.choice(["hop aboard","ride","are forced to board","are guilt tripped onto"]) + " a " + random.choice(random.choice([VEHICLES, ANIMALS])) + " through"
+		sentence = "you " + entrance + " a " + random.choice(random.choice([ADJECTIVES, COLORS])) + " " + random.choice(PORTALS) + " that appears before you in the " + random.choice(["wall","floor"]) + "!"
 	elif type == 2:
 		if random.randint(0,1) == 0:
 			thing = random.choice(random.choice([ADJECTIVES, COLORS])) + " " + random.choice(random.choice([PROFESSIONS, ANIMALS, VEHICLES]))
