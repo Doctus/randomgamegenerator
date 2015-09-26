@@ -18,6 +18,7 @@
 from re import sub
 from time import strftime, localtime
 from os import path as ospath
+from sys import stdout, stderr
 
 from .rggQt import *
 from .rggSystem import signal, findFiles, makePortableFilename, promptSaveFile, promptYesNo, getMapPosition, mainWindow
@@ -25,6 +26,7 @@ from .rggDialogs import newCharacterDialog, banDialog
 from .rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
 from .rggConstants import *
 from .rggEvent import addMapChangedListener, addMousePressListener, addMouseMoveListener, addMouseReleaseListener
+from .rggState import GlobalState
 
 class transferMonitorWidget(QDockWidget):
 
@@ -1090,3 +1092,15 @@ class mapEditor(QDockWidget):
 				self.tilelabel = mapEditorLabel(newMap.tilesize, self.tilepixmap.width(), self.tilepixmap.height(), self, self.tilelabel.currentTile)
 			self.tilelabel.setPixmap(self.tilepixmap)
 			self.scrollarea.setWidget(self.tilelabel)
+
+def initialize(mainWindow):
+	GlobalState.twidget = debugConsoleWidget(mainWindow)
+	stdout = GlobalState.twidget
+	stderr = GlobalState.twidget
+	GlobalState.dwidget = diceRoller(mainWindow)
+	GlobalState.pwidget = pogPalette(mainWindow)
+	GlobalState.cwidget = chatWidget(mainWindow)
+	GlobalState.icwidget = ICChatWidget(mainWindow)
+	GlobalState.uwidget = userListWidget(mainWindow)
+	GlobalState.mwidget = mapEditor(mainWindow)
+	GlobalState.fwidget = transferMonitorWidget(mainWindow)

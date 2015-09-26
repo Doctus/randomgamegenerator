@@ -20,13 +20,10 @@ Actions which occur in response to user commands.
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
 from os import path as ospath
-from sys import stdout, stderr
 
 from .rggConstants import *
 from .rggDialogs import *
 from .rggDice import isRollValid, roll
-from .rggDockWidget import debugConsoleWidget, diceRoller, pogPalette, chatWidget
-from .rggDockWidget import ICChatWidget, userListWidget, mapEditor, transferMonitorWidget
 from .rggEvent import addMouseMoveListener, addMousePressListener, addMouseReleaseListener
 from .rggEvent import addKeyPressListener, addKeyReleaseListener, pogUpdateEvent, pogSelectionChangedEvent
 from .rggJson import jsondump, jsonload, jsonappend
@@ -52,17 +49,6 @@ BUTTON_SHIFT = 6
 def initialize():
 	GlobalState.menu = menuBar(mapExists, pogExists, charExists)
 
-	GlobalState.twidget = debugConsoleWidget(mainWindow)
-	stdout = GlobalState.twidget
-	stderr = GlobalState.twidget
-
-	GlobalState.dwidget = diceRoller(mainWindow)
-	GlobalState.pwidget = pogPalette(mainWindow)
-	GlobalState.cwidget = chatWidget(mainWindow)
-	GlobalState.icwidget = ICChatWidget(mainWindow)
-	GlobalState.uwidget = userListWidget(mainWindow)
-	GlobalState.mwidget = mapEditor(mainWindow)
-	GlobalState.fwidget = transferMonitorWidget(mainWindow)
 	GlobalState.users = {}
 	GlobalState.localuser = User(client.username)
 	GlobalState.users[client.username] = GlobalState.localuser

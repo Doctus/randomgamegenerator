@@ -86,12 +86,13 @@ if __name__ == '__main__':
 
 	main = injectMain()
 
-	from libraries import rggRPC, rggState, rggViews
+	from libraries import rggRPC, rggState, rggViews, rggDockWidget
 	from libraries import rggChat, rggICChat #bad, but necessary for now to initialize here
 	from libraries.rggSignalConfig import connectEvents
 
 	# Initialize view state.
 	rggState.GlobalState.initialize(application)
+	rggDockWidget.initialize(main)
 	rggViews.initialize()
 
 	server = rggRPC.server
