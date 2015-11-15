@@ -105,7 +105,7 @@ class Session(object):
 
 	def addDumpedMap(self, dump, ID):
 		'''Adds a map from a JSON dump with the specified ID.'''
-		mappe = rggMap.Map.load(dump)
+		mappe = Map.load(dump)
 		mappe.ID = ID
 		self._addMap(mappe)
 

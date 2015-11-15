@@ -35,15 +35,15 @@ class GlobalState(object):
 
 	@staticmethod
 	def incrementDreams(target, amount):
-		if target not in _state.dreams:
-			_state.dreams[target] = 0
-		_state.dreams[target] += amount
+		if target not in GlobalState.dreams:
+			GlobalState.dreams[target] = 0
+		GlobalState.dreams[target] += amount
 
 	@staticmethod
 	def getDreams(target):
-		if target not in _state.dreams:
+		if target not in GlobalState.dreams:
 			return 0
-		return _state.dreams[target]
+		return GlobalState.dreams[target]
 
 	@staticmethod
 	def initialize(mainApp):
