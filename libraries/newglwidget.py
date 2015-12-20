@@ -383,7 +383,7 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 				found = True
 		else:
 			qimg = QtGui.QImage(qimagepath)
-			print("created", qimagepath)
+			#print("created", qimagepath)
 
 		if textureRect[2] == -1:
 			textureRect[2] = qimg.width()
@@ -422,7 +422,7 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 					f_code = sys._getframe(x).f_code #really bad hack to get the filename and number
 					print("Doing it wrong in " + f_code.co_filename + ":" + str(f_code.co_firstlineno))
 
-			print("created texture", texture)
+			#print("created texture", texture)
 
 			self.functions.glBindTexture(self.texext, texture)
 

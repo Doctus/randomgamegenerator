@@ -15,7 +15,6 @@
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
-
 from sys import exit, version_info
 from os import path
 
@@ -36,7 +35,7 @@ def fatalError(error):
 	exit()
 
 try:
-	from libraries.rggQt import QApplication, QTranslator, QGLFormat
+	from libraries.rggQt import QApplication, QTranslator, QGLFormat, QTimer
 except ImportError:
 	if version_info >= (3,):
 		fatalError("PyQt5 not found. Please ensure it is installed and available.")
@@ -85,25 +84,19 @@ if __name__ == '__main__':
 	QGLFormat.setDefaultFormat(qgf)
 
 	main = injectMain()
-
-	from libraries import rggRPC, rggState, rggViews, rggDockWidget
-	from libraries import rggChat, rggICChat #bad, but necessary for now to initialize here
-	from libraries.rggSignalConfig import connectEvents
-
-	# Initialize view state.
-	rggState.GlobalState.initialize(application)
-	rggDockWidget.initialize(main)
-	rggViews.initialize()
-
-	server = rggRPC.server
-	client = rggRPC.client
-
-	connectEvents(client, server, main.glwidget)
+	
+	from libraries.rggLoadMain import loadMain, APPLICATION, MAIN, CLIENT
+	
+	APPLICATION[0] = application
+	MAIN[0] = main
+	
+	loadTimer = QTimer.singleShot(10, loadMain)
 
 	# Start execution
 	try:
 		main.show()
 		application.exec_()
 	finally:
-		rggViews.autosaveSession()
-		client.close()
+		from libraries.rggViews import autosaveSession
+		autosaveSession()
+		CLIENT[0].close()

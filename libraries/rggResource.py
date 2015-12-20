@@ -182,7 +182,7 @@ class clientResourceMapper(object):
 
 	def _onFileReceived(self, client, filename):
 		"""Responds to a file being successfully transferred."""
-		print("file", filename, "received")
+		#print("file", filename, "received")
 		self._update(filename, STATE_DONE)
 
 	def _onFileFailed(self, client, filename):
@@ -192,7 +192,7 @@ class clientResourceMapper(object):
 			# Could either have verified correctly or failed to transfer
 			# Either way, call it present
 			status = STATE_DONE
-			print("file", filename, "assumed received")
+			#print("file", filename, "assumed received")
 		else:
 			# Missing on server or failed to transfer
 			# Call it missing

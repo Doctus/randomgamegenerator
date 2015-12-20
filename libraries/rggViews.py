@@ -75,14 +75,11 @@ def initialize():
 	except:
 		setStyle("Default", False)
 
-	try:
-		mainWindow.readGeometry()
-	except:
-		pass
-
-	#Kind of a hack, but the GUI is not ready to display pogs at this point in execution, and I couldn't think of a convenient way to figure out when that happens.
-	GlobalState.autoloadTimer = QTimer.singleShot(5, autoloadSession)
-
+	#try:
+	#	mainWindow.readGeometry()
+	#except:
+	#	pass
+	
 	GlobalState.pogMoveTimer = QTimer()
 	GlobalState.pogMoveTimer.timeout.connect(autoMovePogs)
 	GlobalState.pogMoveTimer.start(40)

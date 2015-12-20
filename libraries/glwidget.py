@@ -386,7 +386,7 @@ class GLWidget(QGLWidget):
 				found = True
 		else:
 			qimg = QImage(qimagepath)
-			print("created", qimagepath)
+			#print("created", qimagepath)
 
 		if textureRect[2] == -1:
 			textureRect[2] = qimg.width()
@@ -425,7 +425,7 @@ class GLWidget(QGLWidget):
 					print("Doing it wrong in " + f_code.co_filename + ":" + str(f_code.co_firstlineno))
 					print("Error: " + e)
 
-			print("created texture", texture)
+			#print("created texture", texture)
 
 			glBindTexture(self.texext, texture)
 

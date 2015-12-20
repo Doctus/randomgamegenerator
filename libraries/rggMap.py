@@ -103,7 +103,7 @@ class Map(object):
 		if self.tiles != None:
 			mainWindow.glwidget.deleteImages(self.tiles)
 
-		print("deleted tiles")
+		#print("deleted tiles")
 
 		self.tiles = [None]*self.mapsize[0]*self.mapsize[1]
 		mainWindow.glwidget.reserveVBOSize(self.mapsize[0] * self.mapsize[1])
@@ -117,12 +117,12 @@ class Map(object):
 				temptile = mainWindow.glwidget.createImage(src, 0, textureRect, drawRect, self.hidden)
 				self.tiles[x+y*self.mapsize[0]] = temptile
 
-		print("created tiles")
+		#print("created tiles")
 
 	def _updateSrc(self, crm, filename, translation):
 		if filename == self.tileset and crm._status[filename] == STATE_DONE:
 			self._createTiles()
-		print("update src", self.ID, filename, self.tileset, crm._status[filename])
+		#print("update src", self.ID, filename, self.tileset, crm._status[filename])
 
 	def getTile(self, tile):
 		"""Change the specified tile."""
