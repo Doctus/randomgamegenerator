@@ -19,6 +19,7 @@ from re import sub
 from time import strftime, localtime
 from os import path as ospath
 from sys import stdout, stderr
+from random import shuffle
 
 from .rggQt import *
 from .rggSystem import signal, findFiles, makePortableFilename, promptSaveFile, promptYesNo, getMapPosition, mainWindow
@@ -27,6 +28,79 @@ from .rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
 from .rggConstants import *
 from .rggEvent import addMapChangedListener, addMousePressListener, addMouseMoveListener, addMouseReleaseListener
 from .rggState import GlobalState
+
+class deckWidget(QDockWidget):
+
+	def __init__(self, mainWindow):
+		super(QDockWidget, self).__init__(mainWindow)
+		self.setToolTip(self.tr("Allows for drawing from a virtual deck of cards."))
+		self.setWindowTitle(self.tr("Deck"))
+		#self.pristineCards = []
+		self.cards = []
+		
+		self.deckDisplay = QListWidget()
+		self.deckDisplay.itemActivated.connect(self.removeCard)
+		self.cardNameField = QLineEdit()
+		self.addCardButton = QPushButton("Add")
+		self.addCardButton.clicked.connect(self.addCard)
+		self.peekAmountField = QSpinBox()
+		self.drawCardButton = QPushButton("Draw")
+		self.drawCardButton.clicked.connect(self.drawCard)
+		self.drawPlaceField = QSpinBox()
+		self.peekCardButton = QPushButton("Peek")
+		self.peekCardButton.clicked.connect(self.peekCard)
+		self.refreshDeckButton = QPushButton("Initialize Deck")
+		self.refreshDeckButton.clicked.connect(self.refreshDeck)
+		self.shuffleDeckButton = QPushButton("Shuffle Deck")
+		self.shuffleDeckButton.clicked.connect(self.shuffleDeck)
+		
+		self.widget = QWidget(mainWindow)
+		self.layout = QGridLayout()
+		self.layout.addWidget(self.deckDisplay, 1, 0, 1, 2)
+		self.layout.addWidget(self.cardNameField, 0, 0)
+		self.layout.addWidget(self.addCardButton, 0, 1)
+		self.layout.addWidget(self.drawCardButton, 2, 0)
+		self.layout.addWidget(self.drawPlaceField, 2, 1)
+		self.layout.addWidget(self.peekAmountField, 3, 0)
+		self.layout.addWidget(self.peekCardButton, 3, 1)
+		self.layout.addWidget(self.shuffleDeckButton, 4, 0)
+		self.layout.addWidget(self.refreshDeckButton, 4, 1)
+		self.widget.setLayout(self.layout)
+		self.setWidget(self.widget)
+		self.setObjectName("Deck")
+
+		mainWindow.addDockWidget(Qt.BottomDockWidgetArea, self)
+		
+	def addCard(self, *args, **kwargs):
+		self.deckDisplay.addItem(str(self.cardNameField.text()))
+		
+	def removeCard(self, card):
+		self.deckDisplay.takeItem(self.deckDisplay.currentRow())
+		
+	def drawCard(self):
+		if len(self.cards) <= 0:
+			GlobalState.cwidget.insertMessage("No cards to draw!")
+		else:
+			card = self.cards.pop(self.drawPlaceField.value())
+			GlobalState.cwidget.insertMessage(card)
+
+	def peekCard(self):
+		for i in range(self.peekAmountField.value()):
+			try:
+				GlobalState.cwidget.insertMessage(str(i)+": "+self.cards[i])
+			except:
+				GlobalState.cwidget.insertMessage(str(i)+": "+"Too few cards to peek on!")
+		
+	@property
+	def pristineCards(self):
+		return [str(self.deckDisplay.item(i).text()) for i in range(self.deckDisplay.count())]
+		
+	def refreshDeck(self):
+		self.cards = self.pristineCards[:]
+		self.shuffleDeck()
+	
+	def shuffleDeck(self):
+		shuffle(self.cards)
 
 class transferMonitorWidget(QDockWidget):
 
@@ -1104,3 +1178,4 @@ def initialize(mainWindow):
 	GlobalState.uwidget = userListWidget(mainWindow)
 	GlobalState.mwidget = mapEditor(mainWindow)
 	GlobalState.fwidget = transferMonitorWidget(mainWindow)
+	GlobalState.deckwidget = deckWidget(mainWindow)
