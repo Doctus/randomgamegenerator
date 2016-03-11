@@ -22,7 +22,7 @@ from sys import stdout, stderr
 from random import shuffle
 
 from .rggQt import *
-from .rggSystem import signal, findFiles, makePortableFilename, promptSaveFile, promptYesNo, getMapPosition, mainWindow
+from .rggSystem import signal, findFiles, makePortableFilename, promptSaveFile, promptYesNo, getMapPosition, mainWindow, promptLoadFile
 from .rggDialogs import newCharacterDialog, banDialog
 from .rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
 from .rggConstants import *
@@ -53,6 +53,8 @@ class deckWidget(QDockWidget):
 		self.refreshDeckButton.clicked.connect(self.refreshDeck)
 		self.shuffleDeckButton = QPushButton("Shuffle Deck")
 		self.shuffleDeckButton.clicked.connect(self.shuffleDeck)
+		self.loadButton = QPushButton("Load from file")
+		self.loadButton.clicked.connect(self.loadFromFile)
 		
 		self.widget = QWidget(mainWindow)
 		self.layout = QGridLayout()
@@ -65,6 +67,7 @@ class deckWidget(QDockWidget):
 		self.layout.addWidget(self.peekCardButton, 3, 1)
 		self.layout.addWidget(self.shuffleDeckButton, 4, 0)
 		self.layout.addWidget(self.refreshDeckButton, 4, 1)
+		self.layout.addWidget(self.loadButton, 5, 0, 1, 2)
 		self.widget.setLayout(self.layout)
 		self.setWidget(self.widget)
 		self.setObjectName("Deck")
@@ -101,6 +104,18 @@ class deckWidget(QDockWidget):
 	
 	def shuffleDeck(self):
 		shuffle(self.cards)
+		
+	def loadFromFile(self):
+		filename = promptLoadFile('Open Deck File',
+			'Text-formatted deck file (*.txt)')
+		if not filename:
+			return
+		with open(filename) as f:
+			data = f.read()
+		for item in data.split("\n"):
+			if len(item) > 0:
+				for i in range(int(item.split()[0])):
+					self.deckDisplay.addItem(" ".join(item.split()[1:]))
 
 class transferMonitorWidget(QDockWidget):
 
