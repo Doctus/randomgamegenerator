@@ -686,7 +686,9 @@ class PogFileSystemModel(QFileSystemModel):
 	def data(self, index, role):
 		basedata = QFileSystemModel.data(self, index, role)
 		if role == 1 and ospath.isfile(self.filePath(index)):
-			return QIcon(self.filePath(index))
+			initial = QPixmap(self.filePath(index))
+			if not initial.isNull():
+				return QIcon(initial.scaled(16, 16))
 		return basedata
 
 	def mimeData(self, indices):
