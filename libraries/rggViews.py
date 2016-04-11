@@ -26,7 +26,7 @@ from .rggDialogs import *
 from .rggDice import isRollValid, roll
 from .rggEvent import addMouseMoveListener, addMousePressListener, addMouseReleaseListener
 from .rggEvent import addKeyPressListener, addKeyReleaseListener, pogUpdateEvent, pogSelectionChangedEvent
-from .rggJson import jsondump, jsonload, jsonappend
+from .rggJson import jsondump, jsonload, jsonappend, loadString
 from .rggMap import Map
 from .rggMenuBar import ICON_SELECT, ICON_MOVE, ICON_DRAW, ICON_DELETE, menuBar
 from .rggNameGen import getName
@@ -74,6 +74,20 @@ def initialize():
 		setStyle(obj["style"], sheets[obj["style"]][1])
 	except:
 		setStyle("Default", False)
+		
+	try:
+		js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
+		if loadString('chatWidget.notify', js.get('notify')) == "Off":
+			GlobalState.alert = False
+	except:
+		pass
+		
+	try:
+		js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
+		if loadString('chatWidget.rightclick', js.get('rightclick')) == "Off":
+			GlobalState.rightclickmode = False
+	except:
+		pass
 
 	#try:
 	#	mainWindow.readGeometry()
@@ -186,6 +200,10 @@ def toggleAlerts(newValue=None):
 		GlobalState.alert = not GlobalState.alert
 	else:
 		GlobalState.alert = newValue
+	if GlobalState.alert:
+		jsonappend({'notify':'On'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
+	else:
+		jsonappend({'notify':'Off'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 
 def toggleTimestamps(newValue=None):
 	if newValue is None:
@@ -196,6 +214,16 @@ def toggleTimestamps(newValue=None):
 		jsonappend({'timestamp':'On'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 	else:
 		jsonappend({'timestamp':'Off'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
+		
+def toggleRightclick(newValue=None):
+	if newValue is None:
+		GlobalState.rightclickmode = not GlobalState.rightclickmode
+	else:
+		GlobalState.rightclickmode = newValue
+	if GlobalState.rightclickmode:
+		jsonappend({'rightclick':'On'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
+	else:
+		jsonappend({'rightclick':'Off'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 
 def setTimestampFormat(newFormat):
 	GlobalState.cwidget.timestampformat = newFormat
@@ -1446,6 +1474,8 @@ def mouseMove(screenPosition, mapPosition, displacement):
 					clearPreviewLines()
 					displacement = max(abs(mapPosition[0]-GlobalState.previousLinePlacement[0]), abs(mapPosition[1]-GlobalState.previousLinePlacement[1]))
 					drawRegularPolygon(14-len(GlobalState.drawmode), GlobalState.previousLinePlacement, displacement, GlobalState.linecolour, GlobalState.thickness, False, True)
+		elif GlobalState.mouseButton == BUTTON_RIGHT:
+			return mouseDrag(screenPosition, mapPosition, displacement)
 	elif icon == ICON_DELETE: #deleteIcon
 		if GlobalState.mouseButton == BUTTON_LEFT:
 			if GlobalState.previousLinePlacement != None:
@@ -1462,7 +1492,7 @@ def mousePress(screenPosition, mapPosition, button):
 	if icon == ICON_MOVE:
 		return
 	if icon == ICON_SELECT:
-		if button == BUTTON_LEFT + BUTTON_CONTROL:
+		if button == BUTTON_LEFT + BUTTON_SHIFT:
 			if GlobalState.pogPlacement:
 				infograb = QPixmap(GlobalState.pogPath)
 				pog = Pog(
@@ -1485,6 +1515,19 @@ def mousePress(screenPosition, mapPosition, button):
 			else:
 				addPogSelection(pog)
 			pogSelectionChangedEvent()
+		elif button == BUTTON_RIGHT and GlobalState.rightclickmode:
+			pog = GlobalState.session.findTopPog(mapPosition)
+			if pog is not None:
+				if pog not in GlobalState.pogSelection:
+					setPogSelection(pog)
+				GlobalState.mouseButton = None
+				selected = showPopupMenuAt((screenPosition[0]+25, screenPosition[1]), pogActionList(pog))
+				processPogRightclick(selected, list(set([pog] + list(GlobalState.pogSelection))))
+		elif button == BUTTON_LEFT + BUTTON_CONTROL:
+			pog = GlobalState.session.findTopPog(mapPosition)
+			if pog is not None:
+				GlobalState.pogSelectionCandidate = set()
+				GlobalState.pogSelectionCandidate.add(pog)
 		elif button == BUTTON_LEFT:
 			if GlobalState.pogPlacement:
 				GlobalState.pogPlacement = False
@@ -1508,20 +1551,12 @@ def mousePress(screenPosition, mapPosition, button):
 			if pog not in GlobalState.pogSelection:
 				setPogSelection(pog)
 			pogSelectionChangedEvent()
-		elif button == BUTTON_RIGHT:
-			pog = GlobalState.session.findTopPog(mapPosition)
-			if pog is not None:
-				if pog not in GlobalState.pogSelection:
-					setPogSelection(pog)
-				GlobalState.mouseButton = None
-				selected = showPopupMenuAt((screenPosition[0], screenPosition[1]), pogActionList(pog))
-				processPogRightclick(selected, list(set([pog] + list(GlobalState.pogSelection))))
 	elif icon == ICON_DRAW:
 		if button == BUTTON_LEFT:
 			GlobalState.previousLinePlacement = mapPosition
-		elif button == BUTTON_RIGHT:
+		elif button == BUTTON_LEFT + BUTTON_CONTROL:
 			modes = ['Freehand', 'Line', 'Circle', 'Rectangle', 'Pentagram', 'Hexagram']
-			selected = showPopupMenuAt((screenPosition[0], screenPosition[1]), modes)
+			selected = showPopupMenuAt((screenPosition[0]+25, screenPosition[1]), modes)
 			GlobalState.drawmode = modes[selected]
 	elif icon == ICON_DELETE:
 		if button == BUTTON_LEFT:
@@ -1532,7 +1567,17 @@ def mouseRelease(screenPosition, mapPosition, button):
 	GlobalState.mouseButton = None
 
 	icon = GlobalState.menu.selectedIcon
-	if icon == ICON_DRAW:
+	if icon == ICON_SELECT:
+		if button == BUTTON_LEFT + BUTTON_CONTROL:
+			if len(GlobalState.pogSelectionCandidate) > 0:
+				pog = GlobalState.session.findTopPog(mapPosition)
+				if pog is not None and pog in GlobalState.pogSelectionCandidate:
+					if pog not in GlobalState.pogSelection:
+						setPogSelection(pog)
+					GlobalState.mouseButton = None
+					selected = showPopupMenuAt((screenPosition[0]+25, screenPosition[1]), pogActionList(pog))
+					processPogRightclick(selected, list(set([pog] + list(GlobalState.pogSelection))))
+	elif icon == ICON_DRAW:
 		clearPreviewLines()
 		if GlobalState.drawmode == "Rectangle":
 			if GlobalState.previousLinePlacement != None:

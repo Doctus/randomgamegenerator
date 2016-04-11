@@ -6,7 +6,10 @@ class GlobalState(object):
 	alert = True
 
 	pogSelection = set()
+	pogSelectionCandidate = set()
 	pogHover = None
+	
+	rightclickmode = True
 
 	mouseButton = None
 	mousePosition = (0, 0)

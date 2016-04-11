@@ -109,6 +109,24 @@ class menuBar(object):
 		self.toggleTimestampsAct = QAction(translate("menubar", "OOC Chat Timestamps"), main)
 		self.toggleTimestampsAct.setCheckable(True)
 		self.toggleTimestampsAct.setChecked(False)
+		
+		self.toggleRightclickAct = QAction(translate("menubar", "Right-Click Opens Pog Ctrl-Click Menu"), main)
+		self.toggleRightclickAct.setCheckable(True)
+		self.toggleRightclickAct.setChecked(True)
+		
+		try:
+			js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
+			if loadString('chatWidget.notify', js.get('notify')) == "Off":
+				self.toggleAlertsAct.setChecked(False)
+		except:
+			pass
+			
+		try:
+			js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
+			if loadString('chatWidget.rightclick', js.get('rightclick')) == "Off":
+				self.toggleRightclickAct.setChecked(False)
+		except:
+			pass
 
 		try:
 			js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
@@ -218,6 +236,7 @@ class menuBar(object):
 		self.optionsMenu.addSeparator()
 		self.optionsMenu.addAction(self.toggleAlertsAct)
 		self.optionsMenu.addAction(self.toggleTimestampsAct)
+		self.optionsMenu.addAction(self.toggleRightclickAct)
 		self.optionsMenu.addAction(self.setTimestampFormatAct)
 		self.optionsMenu.addAction(self.portraitMenu)
 		self.optionsMenu.addAction(self.gfxSettingsAct)

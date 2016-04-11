@@ -54,6 +54,7 @@ def connectMenuEvents(menu):
 	menu.sendFileAct.triggered.connect(rggViews.promptSendFile)
 	menu.toggleAlertsAct.triggered.connect(rggViews.toggleAlerts)
 	menu.toggleTimestampsAct.triggered.connect(rggViews.toggleTimestamps)
+	menu.toggleRightclickAct.triggered.connect(rggViews.toggleRightclick)
 	menu.setTimestampFormatAct.triggered.connect(rggViews.promptTimestampFormat)
 	menu.thicknessMenu.triggered.connect(rggViews.setThickness)
 	menu.colourMenu.triggered.connect(rggViews.setLineColour)
