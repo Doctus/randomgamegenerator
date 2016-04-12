@@ -727,7 +727,6 @@ class GLWidget(QGLWidget):
 		button = 0
 
 		if self.ctrl:
-			print("ctrl pressed1")
 			button += 3
 		if self.shift:
 			button += 6
