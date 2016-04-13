@@ -55,6 +55,7 @@ def connectMenuEvents(menu):
 	menu.toggleAlertsAct.triggered.connect(rggViews.toggleAlerts)
 	menu.toggleTimestampsAct.triggered.connect(rggViews.toggleTimestamps)
 	menu.toggleRightclickAct.triggered.connect(rggViews.toggleRightclick)
+	menu.lockToGridAct.triggered.connect(rggViews.toggleGridlock)
 	menu.setTimestampFormatAct.triggered.connect(rggViews.promptTimestampFormat)
 	menu.thicknessMenu.triggered.connect(rggViews.setThickness)
 	menu.colourMenu.triggered.connect(rggViews.setLineColour)

@@ -88,6 +88,13 @@ def initialize():
 			GlobalState.rightclickmode = False
 	except:
 		pass
+		
+	try:
+		js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
+		if loadString('chatWidget.gridlock', js.get('gridlock')) == "On":
+			GlobalState.gridMode = True
+	except:
+		pass
 
 	#try:
 	#	mainWindow.readGeometry()
@@ -224,6 +231,16 @@ def toggleRightclick(newValue=None):
 		jsonappend({'rightclick':'On'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 	else:
 		jsonappend({'rightclick':'Off'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
+		
+def toggleGridlock(newValue=None):
+	if newValue is None:
+		GlobalState.gridMode = not GlobalState.gridMode
+	else:
+		GlobalState.gridMode = newValue
+	if GlobalState.gridMode:
+		jsonappend({'gridlock':'On'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
+	else:
+		jsonappend({'gridlock':'Off'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 
 def setTimestampFormat(newFormat):
 	GlobalState.cwidget.timestampformat = newFormat
@@ -1015,6 +1032,17 @@ def movePogs(displacement):
 		poglocs.append(pog.position)
 	sendAbsoluteMovementPog(pogids, poglocs)
 	drawPogCircles()
+	
+def movePogsAbsolute(newPosition):
+	selection = GlobalState.pogSelection.copy()
+	pogids = []
+	poglocs = []
+	for pog in selection:
+		pog.move(newPosition)
+		pogids.append(pog.ID)
+		poglocs.append(pog.position)
+	sendAbsoluteMovementPog(pogids, poglocs)
+	drawPogCircles()
 
 @serverRPC
 def respondUpdatePog(pogID, pogDump):
@@ -1437,7 +1465,13 @@ def pogActionList(pog):
 
 def mouseDrag(screenPosition, mapPosition, displacement):
 	if GlobalState.pogSelection and GlobalState.mouseButton == BUTTON_LEFT:
-		movePogs(displacement)
+		if not GlobalState.gridMode:
+			movePogs(displacement)
+		else:
+			try:
+				movePogsAbsolute(GlobalState.session.findTopMap(mapPosition).nearestGridPoint(mapPosition))
+			except:
+				movePogs(displacement)
 		return
 	elif GlobalState.mouseButton == BUTTON_LEFT:
 		setCameraPosition(list(map(lambda c, d,  z: c + d*z, cameraPosition(), displacement, (getZoom(), getZoom()))))

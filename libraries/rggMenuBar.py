@@ -114,6 +114,10 @@ class menuBar(object):
 		self.toggleRightclickAct.setCheckable(True)
 		self.toggleRightclickAct.setChecked(True)
 		
+		self.lockToGridAct = QAction(translate("menubar", "Lock Pogs to Map Grid"), main)
+		self.lockToGridAct.setCheckable(True)
+		self.lockToGridAct.setChecked(False)
+		
 		try:
 			js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
 			if loadString('chatWidget.notify', js.get('notify')) == "Off":
@@ -132,6 +136,13 @@ class menuBar(object):
 			js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
 			if loadString('chatWidget.timestamp', js.get('timestamp')) == "On":
 				self.toggleTimestampsAct.setChecked(True)
+		except:
+			pass
+			
+		try:
+			js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
+			if loadString('chatWidget.gridlock', js.get('gridlock')) == "On":
+				self.lockToGridAct.setChecked(True)
 		except:
 			pass
 
@@ -237,6 +248,7 @@ class menuBar(object):
 		self.optionsMenu.addAction(self.toggleAlertsAct)
 		self.optionsMenu.addAction(self.toggleTimestampsAct)
 		self.optionsMenu.addAction(self.toggleRightclickAct)
+		self.optionsMenu.addAction(self.lockToGridAct)
 		self.optionsMenu.addAction(self.setTimestampFormatAct)
 		self.optionsMenu.addAction(self.portraitMenu)
 		self.optionsMenu.addAction(self.gfxSettingsAct)

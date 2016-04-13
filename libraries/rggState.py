@@ -10,6 +10,7 @@ class GlobalState(object):
 	pogHover = None
 	
 	rightclickmode = True
+	gridMode = False
 
 	mouseButton = None
 	mousePosition = (0, 0)
