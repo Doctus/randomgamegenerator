@@ -1137,6 +1137,16 @@ def respondLockPog(pogID, locked):
 def sendLockPog(user, pogID, locked):
 	"""Locks or unlocks a pog on the server."""
 	respondLockPog(allusers(), pogID, locked)
+	
+@serverRPC
+def respondPogRotation(pogID, newRotation):
+	if pogID in list(GlobalState.session.pogs.keys()):
+		pog = GlobalState.session.pogs[pogID]
+		pog.setRotation(newRotation)
+
+@clientRPC
+def sendPogRotation(user, pogID, newRotation):
+	respondPogRotation(allusers(), pogID, newRotation)
 
 @serverRPC
 def respondResizePog(pogID, newW, newH):
@@ -1317,7 +1327,9 @@ def processPogRightclick(selection, pogs):
 	#8 DELETE
 	#9 LOCK CAMERA
 	#10 DUPLICATE
-	#11 SET MOVEABLE
+	#11 ROTATE
+	#12 CENTER EVERYONE
+	#13 SET MOVEABLE
 
 	mainpog = pogs[0]
 
@@ -1383,14 +1395,14 @@ def processPogRightclick(selection, pogs):
 	elif selection == 10:
 		for pog in pogs:
 			duplicatePog(pog)
-	#elif selection == 11:
-	#	rotation = promptInteger("Enter a rotation angle.", min=0, max=359, default=0)
-	#	if rotation is None: return
-	#	for pog in pogs:
-	#		pog.setRotation(rotation)
 	elif selection == 11:
-		sendCenterOnPog(mainpog.ID)
+		rotation = promptInteger("Enter a rotation angle.", min=0, max=359, default=0)
+		if rotation is None: return
+		for pog in pogs:
+			sendPogRotation(pog.ID, rotation)
 	elif selection == 12:
+		sendCenterOnPog(mainpog.ID)
+	elif selection == 13:
 		username = promptString(translate('views', "Enter the name of the user who may move this pog (must be exact)."), inittext = "username")
 		if username is None:
 			return
@@ -1415,8 +1427,8 @@ def pogActionList(pog):
 			translate('views', 'Delete'),
 			translate('views', followbutton),
 			translate('views', 'Duplicate'),
-			translate('views', 'Center Everyone')]#,
-			#translate('views', 'Rotate')]
+			translate('views', 'Rotate'),
+			translate('views', 'Center Everyone')]
 	if isGM(): options.append(translate('views', 'Set as moveable for player'))
 	return options
 
