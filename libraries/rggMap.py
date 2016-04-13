@@ -66,6 +66,10 @@ class Map(object):
 		if self.tiles != None:
 			for t in self.tiles:
 				t.displaceDrawRect(displacement)
+				
+	def nearestGridPoint(self, position):
+		nearestX = self._drawOffset[0] + (position/self.tilesize[0] - self._drawOffset[0])
+		nearestX = self._drawOffset[0] + (position/self.tilesize[0] - self._drawOffset[0])
 
 	def hide(self, hidden=True):
 		"""Hide or show all tiles."""

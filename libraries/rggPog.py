@@ -52,7 +52,7 @@ class Sprite(object):
 
 class Pog(object):
 
-	def __init__(self, position, texturedimensions, size, layer, srcfile, status, locked, properties, alph):
+	def __init__(self, position, texturedimensions, size, layer, srcfile, status, locked, properties, rotation, alph):
 		self.ID = None
 		self._position = position
 		self.texturedimensions = texturedimensions
@@ -66,6 +66,7 @@ class Pog(object):
 		self._showTooltip = False
 		self.tooltipId = -1
 		self.alpha = alph
+		self.rotation = rotation
 		self._locked = locked #locked only works for mouse movements. This means that scripts may actually be able to move the pog.
 		crm.listen(srcfile, RESOURCE_IMAGE, self, self._updateSrc)
 		if status > 0:
@@ -146,6 +147,7 @@ class Pog(object):
 			self._tileStore.setDrawH(size[1])
 
 	def setRotation(self, rotation):
+		self.rotation = rotation
 		if self._tileStore:
 			self._tileStore.setRotation(rotation)
 
@@ -247,6 +249,7 @@ class Pog(object):
 	def _updateSrc(self, crm, filename, translation):
 		if filename == self._src and crm._status[filename] == STATE_DONE:
 			self._tile = self._makeTile()
+			self._tile.setRotation(self.rotation)
 
 	def getSelectionCircleData(self):
 		if self.alpha:
@@ -269,6 +272,7 @@ class Pog(object):
 			status=self.status,
 			locked=self._locked,
 			properties=self.properties,
+			rotation=self.rotation,
 			alpha=self.alpha)
 
 	@staticmethod
@@ -283,6 +287,7 @@ class Pog(object):
 			loadInteger('Pog.status', obj.get('status')),
 			loadInteger('Pog.locked', obj.get('locked')),
 			loadObject('Pog.properties', obj.get('properties')),
+			loadInteger('Pog.rotation', obj.get('rotation')),
 			loadInteger('Pog.alpha', obj.get('alpha')))
 		pog.name = loadString('Pog.name', obj.get('name'), allowEmpty=True)
 		return pog

@@ -692,7 +692,7 @@ def autoloadSession():
 		GlobalState.session = sess
 		#Don't bother sending since we shouldn't be connected to anything yet.
 	except:
-		pass
+		GlobalState.session = Session()
 
 
 
@@ -993,6 +993,7 @@ def placePog(x, y, pogpath):
 		0,
 		0,
 		{},
+		0,
 		infograb.hasAlpha())
 	createPog(pog)
 
