@@ -29,7 +29,6 @@ from .rggEvent import addKeyPressListener, addKeyReleaseListener, pogUpdateEvent
 from .rggJson import jsondump, jsonload, jsonappend, loadString
 from .rggMap import Map
 from .rggMenuBar import ICON_SELECT, ICON_MOVE, ICON_DRAW, ICON_DELETE, menuBar
-from .rggNameGen import getName
 from .rggPog import Pog
 from .rggQt import *
 from .rggResource import crm, srm
@@ -1307,6 +1306,7 @@ def addMacro():
 
 def generateName(generator, args):
 	"""Generates a random name of the specified type."""
+	from .rggNameGen import getName
 	say(getName(generator, args))
 
 # MISC
@@ -1376,6 +1376,7 @@ def processPogRightclick(selection, pogs):
 		if gentype is None:
 			return
 		gentype = splitword(gentype.lower())
+		from .rggNameGen import getName
 		for pog in pogs:
 			renamePog(pog, getName(*gentype))
 	elif selection == 3:

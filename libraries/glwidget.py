@@ -42,8 +42,6 @@ from .rggSystem import POG_DIR, SAVE_DIR, promptSaveFile, signal
 from .rggJson import loadString, loadInteger, loadFloat, jsonload
 from .rggConstants import BASE_STRING
 
-mod = False
-
 def nextPowerOfTwo(val):
 	val -= 1
 	val = (val >> 1) | val
@@ -128,47 +126,41 @@ class GLWidget(QGLWidget):
 				for img in self.images[layer]:
 					self.drawImage(img)
 
-		if mod:
-			glmod.drawLines(self.lines)
-			glmod.drawLines(self.previewLines)
-			glmod.drawSelectionCircles(self.selectionCircles)
-			glmod.drawRectangles(self.rectangles)
-		else:
-			glDisable(self.texext)
-			for layer in self.lines:
-				glLineWidth(layer)
-				glBegin(GL_LINES)
-				for line in self.lines[layer]:
-					glColor3f(line[4], line[5], line[6])
-					glVertex2f(line[0], line[1])
-					glVertex2f(line[2], line[3])
-				glEnd()
-			for layer in self.previewLines:
-				glLineWidth(layer)
-				glBegin(GL_LINES)
-				for line in self.previewLines[layer]:
-					glColor3f(line[4], line[5], line[6])
-					glVertex2f(line[0], line[1])
-					glVertex2f(line[2], line[3])
-				glEnd()
-			if -1 in self.selectionCircles:
-				glLineWidth(3)
-				glColor3f(0.0, 1.0, 0.0)
-				for circle in self.selectionCircles[-1]:
-					glBegin(GL_LINE_LOOP)
-					for r in range(0, 360, 3):
-						glVertex2f(circle[0] + cos(r*0.01745329) * circle[2], circle[1] + sin(r*0.01745329) * circle[2])
-					glEnd()
-			for rectangle in self.rectangles[1]:
-				glLineWidth(2)
-				glColor3f(rectangle[4], rectangle[5], rectangle[6])
+		glDisable(self.texext)
+		for layer in self.lines:
+			glLineWidth(layer)
+			glBegin(GL_LINES)
+			for line in self.lines[layer]:
+				glColor3f(line[4], line[5], line[6])
+				glVertex2f(line[0], line[1])
+				glVertex2f(line[2], line[3])
+			glEnd()
+		for layer in self.previewLines:
+			glLineWidth(layer)
+			glBegin(GL_LINES)
+			for line in self.previewLines[layer]:
+				glColor3f(line[4], line[5], line[6])
+				glVertex2f(line[0], line[1])
+				glVertex2f(line[2], line[3])
+			glEnd()
+		if -1 in self.selectionCircles:
+			glLineWidth(3)
+			glColor3f(0.0, 1.0, 0.0)
+			for circle in self.selectionCircles[-1]:
 				glBegin(GL_LINE_LOOP)
-				glVertex2d(rectangle[0], rectangle[1])
-				glVertex2d(rectangle[2], rectangle[1])
-				glVertex2d(rectangle[2], rectangle[3])
-				glVertex2d(rectangle[0], rectangle[3])
+				for r in range(0, 360, 3):
+					glVertex2f(circle[0] + cos(r*0.01745329) * circle[2], circle[1] + sin(r*0.01745329) * circle[2])
 				glEnd()
-			glEnable(self.texext)
+		for rectangle in self.rectangles[1]:
+			glLineWidth(2)
+			glColor3f(rectangle[4], rectangle[5], rectangle[6])
+			glBegin(GL_LINE_LOOP)
+			glVertex2d(rectangle[0], rectangle[1])
+			glVertex2d(rectangle[2], rectangle[1])
+			glVertex2d(rectangle[2], rectangle[3])
+			glVertex2d(rectangle[0], rectangle[3])
+			glEnd()
+		glEnable(self.texext)
 
 		glColor4f(1.0, 1.0, 1.0, 1.0)
 		for text in self.texts:
@@ -278,7 +270,6 @@ class GLWidget(QGLWidget):
 		'''
 		Initialize GL
 		'''
-		global mod
 
 		self.fieldtemp = [1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", "On", "On", "Magic"]
 
@@ -341,33 +332,6 @@ class GLWidget(QGLWidget):
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 		glViewport(0, 0, self.width(), self.height())
 		glClearColor(0.0, 0.0, 0.0, 0.0)
-
-		initok = False
-		if mod:
-			ret = glmod.init(self.texext)
-			if ret == -1:
-				print("Something terrible went wrong in initializing glmod")
-				mod = False
-			elif ret == -2:
-				if self.fieldtemp[5] == "On":
-					print("using gl module, VBO support requested but not available")
-				else:
-					print("using gl module, VBO support not requested")
-			else:
-				initok = True
-				if self.fieldtemp[5] == "On":
-					print("using gl module, VBO support requested and available")
-				else:
-					print("using gl module, VBO support not requested")
-
-		if mod and initok and self.fieldtemp[5] == "On":
-			if glInitVertexBufferObjectARB() and bool(glBindBufferARB):
-				self.vbos = True
-				print("VBO support initialised succesfully")
-				self.VBO = int(glGenBuffersARB(1))
-				glmod.initVBO(self.VBO, ADT.arrayByteCount(zeros((2, 2), 'f')))
-			else:
-				print("VBO support initialisation failed, continuing without")
 
 	#util functions
 	def createImage(self, qimagepath, layer, textureRect, drawRect, hidden = False, dynamicity = GL_STATIC_DRAW_ARB):
@@ -568,7 +532,6 @@ class GLWidget(QGLWidget):
 			self.calculateVBOList()
 
 	def drawImage(self, image):
-		global mod
 
 		if image.hidden:
 			return
@@ -583,10 +546,7 @@ class GLWidget(QGLWidget):
 		if (dx * self.zoom > self.w - cx) or (dy * self.zoom > self.h - cy) or ((dx + dw) * self.zoom < 0-cx) or ((dy + dh) * self.zoom < 0-cy):
 			return
 
-		if mod:
-			glmod.drawTexture(image.textureId, dx, dy, dw, dh, x, y, w, h)
-		else:
-			self.drawTexture(image.textureId, dx, dy, dw, dh, x, y, w, h, r)
+		self.drawTexture(image.textureId, dx, dy, dw, dh, x, y, w, h, r)
 
 	def drawTexture(self, texture, dx, dy, dw, dh, x, y, w, h, r):
 		'''
