@@ -474,7 +474,7 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 		self.qimages[image.imagepath][2] -= 1
 
 		if self.qimages[image.imagepath][2] <= 0:
-			print("deleting texture", image.textureId)
+			#print("deleting texture", image.textureId)
 			self.functions.glDeleteTextures(image.textureId)
 			del self.qimages[image.imagepath]
 
@@ -492,7 +492,7 @@ class GLWidget(QtWidgets.QOpenGLWidget):
 			self.qimages[image.imagepath][2] -= 1
 
 			if self.qimages[image.imagepath][2] <= 0:
-				print("deleting texture", image.textureId)
+				#print("deleting texture", image.textureId)
 				self.functions.glDeleteTextures(image.textureId)
 				del self.qimages[image.imagepath]
 

@@ -15,49 +15,72 @@
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from sys import exit, version_info
-from os import path
+if __name__ == '__main__':
 
-def fatalError(error):
-	'''Displays a dialog about a fatal launch error and exits RGG.'''
+	def fatalError(error):
+		'''Displays a dialog about a fatal launch error and exits RGG.'''
+		try:
+			try:
+				import Tkinter as tkinter
+			except ImportError:
+				import tkinter
+			root = tkinter.Tk()
+			root.withdraw()
+			import tkMessageBox
+			tkMessageBox.showerror("RGG: Fatal Error", error)
+		except Exception:
+			#If even tk isn't available, just print the error to console.
+			print("RGG: Fatal Error: " + error)
+		from sys import exit
+		exit()
+
 	try:
 		try:
-			import Tkinter as tkinter
-		except ImportError:
-			import tkinter
-		root = tkinter.Tk()
-		root.withdraw()
-		import tkMessageBox
-		tkMessageBox.showerror("RGG: Fatal Error", error)
-	except Exception:
-		#If even tk isn't available, just print the error to console.
-		print("RGG: Fatal Error: " + error)
-	exit()
+			from PyQt5.QtWidgets import QProgressDialog, QApplication
+		except:
+			from PyQt4.QtGui import QProgressDialog, QApplication
+		application = QApplication(['RGG'])
+		progress = QProgressDialog("Loading...", "Exit", 0, 9)
+		progress.setWindowTitle("RGG Loading")
+		progress.setWindowModality(2)
 
-try:
-	from libraries.rggQt import QApplication, QTranslator, QGLFormat, QTimer
-except ImportError:
-	if version_info >= (3,):
-		fatalError("PyQt5 not found. Please ensure it is installed and available.")
-	else:
-		fatalError("PyQt4 not found. Please ensure it is installed and available.")
-try:
-	import OpenGL
-except ImportError:
-	fatalError("PyOpenGL not found. Please ensure it is installed and available.")
+		progress.setMinimumDuration(250)
 
-try:
-	from numpy import zeros
-except ImportError:
-	fatalError("NumPy not found. Please ensure it is installed and available.")
+		progress.setValue(1)
 
-from libraries.rggSystem import injectMain, SAVE_DIR
-from libraries.rggJson import loadString, jsonload
-from libraries.rggConstants import *
+		progress.setLabelText("Loading internals...")
+	except:
+		from sys import version_info
+		if version_info >= (3,):
+			fatalError("PyQt5 not found. Please ensure it is installed and available.")
+		else:
+			fatalError("PyQt4 not found. Please ensure it is installed and available.")
 
-if __name__ == '__main__':
+	from sys import exit, version_info
+	from os import path
+
+	try:
+		from libraries.rggQt import QTranslator, QGLFormat, QTimer
+	except ImportError:
+		if version_info >= (3,):
+			fatalError("PyQt5 not found. Please ensure it is installed and available.")
+		else:
+			fatalError("PyQt4 not found. Please ensure it is installed and available.")
+	try:
+		import OpenGL
+	except ImportError:
+		fatalError("PyOpenGL not found. Please ensure it is installed and available.")
+
+	try:
+		from numpy import zeros
+	except ImportError:
+		fatalError("NumPy not found. Please ensure it is installed and available.")
+
+	from libraries.rggSystem import injectMain, SAVE_DIR
+	from libraries.rggJson import loadString, jsonload
+	from libraries.rggConstants import *
+
 	fieldtemp = ["English"]
-	application = QApplication(['RGG'])
 
 	try:
 		js = jsonload(path.join(SAVE_DIR, "lang_settings.rgs"))
@@ -84,12 +107,14 @@ if __name__ == '__main__':
 	QGLFormat.setDefaultFormat(qgf)
 
 	main = injectMain()
-	
-	from libraries.rggLoadMain import loadMain, APPLICATION, MAIN, CLIENT
-	
+
+	from libraries.rggLoadMain import loadMain, APPLICATION, MAIN, CLIENT, PROGRESS
+
 	APPLICATION[0] = application
 	MAIN[0] = main
-	
+	PROGRESS[0] = progress
+	progress = None
+
 	loadTimer = QTimer.singleShot(10, loadMain)
 
 	# Start execution

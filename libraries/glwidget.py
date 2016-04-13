@@ -282,7 +282,7 @@ class GLWidget(QGLWidget):
 			self.fieldtemp[4] = loadString('gfx.FSAA', js.get('FSAA'))
 			self.fieldtemp[5] = loadString('gfx.VBO', js.get('VBO'))
 		except:
-			print("no settings detected")
+			#print("no settings detected")
 			pass
 
 		try:
@@ -296,35 +296,36 @@ class GLWidget(QGLWidget):
 
 		#mipmap support and NPOT texture support block
 		if not hasGLExtension("GL_ARB_framebuffer_object"):
-			print("GL_ARB_framebuffer_object not supported, switching to GL_GENERATE_MIPMAP")
+			#print("GL_ARB_framebuffer_object not supported, switching to GL_GENERATE_MIPMAP")
 			self.npot = 2
 		version = glGetString(GL_VERSION)
 		if int(version[0]) == 1 and int(version[2]) < 4: #no opengl 1.4 support
-			print("GL_GENERATE_MIPMAP not supported, not using mipmapping")
+			#print("GL_GENERATE_MIPMAP not supported, not using mipmapping")
 			self.npot = 1
 		if not hasGLExtension("GL_ARB_texture_non_power_of_two"):
-			print("GL_ARB_texture_non_power_of_two not supported, switching to GL_ARB_texture_rectangle")
+			#print("GL_ARB_texture_non_power_of_two not supported, switching to GL_ARB_texture_rectangle")
 			self.texext = GL_TEXTURE_RECTANGLE_ARB
 			self.npot = 1
 		if not hasGLExtension("GL_ARB_texture_rectangle"):
-			print("GL_TEXTURE_RECTANGLE_ARB not supported, switching to GL_TEXTURE_2D")
+			#print("GL_TEXTURE_RECTANGLE_ARB not supported, switching to GL_TEXTURE_2D")
 			self.texext = GL_TEXTURE_2D
 			self.npot = 0
 
 		#assorted settings block
 		if hasGLExtension("GL_EXT_texture_filter_anisotropic") and self.fieldtemp[0] > 1.0:
 			self.anifilt = self.fieldtemp[0]
-			print("using " + str(self.fieldtemp[0]) + "x anisotropic texture filtering. max: " + str(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT)))
+			#print("using " + str(self.fieldtemp[0]) + "x anisotropic texture filtering. max: " + str(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT)))
 		self.minfilter = self.interpretString(self.fieldtemp[1])
 		self.magfilter = self.interpretString(self.fieldtemp[2])
 		self.mipminfilter = self.interpretString(self.fieldtemp[3])
 		if self.mipminfilter == "Off":
 			self.mipminfilter = -1
 		if self.format().sampleBuffers() and self.fieldtemp[4] == "On":
-			print("enabling "  + str(self.format().samples()) + "x FSAA")
+			#print("enabling "  + str(self.format().samples()) + "x FSAA")
 			glEnable(GL_MULTISAMPLE)
 		else:
-			print("FSAA not supported and/or disabled")
+			pass
+			#print("FSAA not supported and/or disabled")
 
 		glEnable(self.texext)
 		glEnable(GL_BLEND)
@@ -446,7 +447,7 @@ class GLWidget(QGLWidget):
 		'''
 		if self.vbos and size > self.VBOBuffer:
 			self.VBOBuffer = nextPowerOfTwo(size+1)
-			print("reserving size", self.VBOBuffer)
+			#print("reserving size", self.VBOBuffer)
 
 			self.fillBuffers(None, False) #Automatically does a calculateVBOList()
 
@@ -463,7 +464,7 @@ class GLWidget(QGLWidget):
 
 		if self.VBOBuffer <= size or image == None or self.offset + self.vertByteCount >= self.VBOBuffer*self.vertByteCount:
 			if resize and self.VBOBuffer <= size:
-				print("resizing from", size, "to", nextPowerOfTwo(size+1))
+				#print("resizing from", size, "to", nextPowerOfTwo(size+1))
 				self.VBOBuffer = nextPowerOfTwo(size+1)
 
 			glBufferDataARB(GL_ARRAY_BUFFER_ARB, self.VBOBuffer*self.vertByteCount, None, GL_STATIC_DRAW_ARB)
@@ -500,7 +501,7 @@ class GLWidget(QGLWidget):
 		self.qimages[image.imagepath][2] -= 1
 
 		if self.qimages[image.imagepath][2] <= 0:
-			print("deleting texture", image.textureId)
+			#print("deleting texture", image.textureId)
 			glDeleteTextures(image.textureId)
 			del self.qimages[image.imagepath]
 
@@ -521,7 +522,7 @@ class GLWidget(QGLWidget):
 			self.qimages[image.imagepath][2] -= 1
 
 			if self.qimages[image.imagepath][2] <= 0:
-				print("deleting texture", image.textureId)
+				#print("deleting texture", image.textureId)
 				glDeleteTextures(image.textureId)
 				del self.qimages[image.imagepath]
 
