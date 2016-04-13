@@ -43,6 +43,7 @@ if __name__ == '__main__':
 		progress = QProgressDialog("Loading...", "Exit", 0, 9)
 		progress.setWindowTitle("RGG Loading")
 		progress.setWindowModality(2)
+		progress.setWindowFlags(progress.windowFlags() | 262144)
 
 		progress.setMinimumDuration(250)
 
@@ -76,9 +77,13 @@ if __name__ == '__main__':
 	except ImportError:
 		fatalError("NumPy not found. Please ensure it is installed and available.")
 
+	QApplication.processEvents()
+
 	from libraries.rggSystem import injectMain, SAVE_DIR
 	from libraries.rggJson import loadString, jsonload
 	from libraries.rggConstants import *
+
+	QApplication.processEvents()
 
 	fieldtemp = ["English"]
 
@@ -102,18 +107,28 @@ if __name__ == '__main__':
 			print(transfile + " not found")
 		application.installTranslator(trans)
 
+	QApplication.processEvents()
+
 	qgf = QGLFormat.defaultFormat()
 	qgf.setSampleBuffers(True)
 	QGLFormat.setDefaultFormat(qgf)
 
+	QApplication.processEvents()
+
 	main = injectMain()
 
+	QApplication.processEvents()
+
 	from libraries.rggLoadMain import loadMain, APPLICATION, MAIN, CLIENT, PROGRESS
+
+	QApplication.processEvents()
 
 	APPLICATION[0] = application
 	MAIN[0] = main
 	PROGRESS[0] = progress
 	progress = None
+
+	QApplication.processEvents()
 
 	loadTimer = QTimer.singleShot(10, loadMain)
 
