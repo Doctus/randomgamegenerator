@@ -67,7 +67,7 @@ Licensing
 
 Changelog
 
-v1.04 "Fate and Chance cast lots"               [in dev], 2015
+v1.04 "Fate and Chance cast lots"               April 14, 2016
 
    Fixes
     * Handle now defaults to local OS-level username instead
@@ -80,6 +80,10 @@ v1.04 "Fate and Chance cast lots"               [in dev], 2015
       clicked.
     * Fixed an issue that caused non-hosting instances of RGG
       to fail to propagate session loads over the network.
+	* Fixed several issues that could lead to slow startup.
+	* Fixed an issue that occurred when many large images were
+	  present in the pog folder.
+	* Fixed a critical bug resulting from corrupted session data.
 
    Features and Changes
     * Added experimental support for Python 3.x and PyQt5.
@@ -88,6 +92,10 @@ v1.04 "Fate and Chance cast lots"               [in dev], 2015
     * Added option to set in-character portrait display size.
     * Added a "clear all" button for in-character characters.
     * Added "center everyone on pog" command.
+	* Pogs may be rotated.
+	* Pogs may be locked to the map grid.
+	* Right-click functionality in the main GL view is customizable.
+	* Added a very simple card deck simulator.
     * Added a dark stylesheet.
     * Added a fantasy stylesheet.
     * Missing dependencies should now be detected and warned about.
