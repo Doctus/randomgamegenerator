@@ -209,7 +209,7 @@ dream.documentation = fake.translate('chatdoc',
 def dreams(message):
 	dr = getDreams()
 	for user, amount in dr.items():
-		say("%s: %s"%(user, str(amount)))
+		say("%s: %s"%(user, BASE_STRING(amount)))
 
 dreams.documentation = fake.translate('chatdoc',
 	"""dreams: list current dream amounts.<br>

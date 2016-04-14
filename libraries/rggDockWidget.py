@@ -18,7 +18,6 @@
 from re import sub
 from time import strftime, localtime
 from os import path as ospath
-from sys import stdout, stderr
 from random import shuffle
 
 from .rggQt import *
@@ -37,7 +36,7 @@ class deckWidget(QDockWidget):
 		self.setWindowTitle(self.tr("Deck"))
 		#self.pristineCards = []
 		self.cards = []
-		
+
 		self.deckDisplay = QListWidget()
 		self.deckDisplay.itemActivated.connect(self.removeCard)
 		self.cardNameField = QLineEdit()
@@ -55,7 +54,7 @@ class deckWidget(QDockWidget):
 		self.shuffleDeckButton.clicked.connect(self.shuffleDeck)
 		self.loadButton = QPushButton("Load from file")
 		self.loadButton.clicked.connect(self.loadFromFile)
-		
+
 		self.widget = QWidget(mainWindow)
 		self.layout = QGridLayout()
 		self.layout.addWidget(self.deckDisplay, 1, 0, 1, 2)
@@ -73,13 +72,13 @@ class deckWidget(QDockWidget):
 		self.setObjectName("Deck")
 
 		mainWindow.addDockWidget(Qt.BottomDockWidgetArea, self)
-		
+
 	def addCard(self, *args, **kwargs):
 		self.deckDisplay.addItem(str(self.cardNameField.text()))
-		
+
 	def removeCard(self, card):
 		self.deckDisplay.takeItem(self.deckDisplay.currentRow())
-		
+
 	def drawCard(self):
 		if len(self.cards) <= 0:
 			GlobalState.cwidget.insertMessage("No cards to draw!")
@@ -93,18 +92,18 @@ class deckWidget(QDockWidget):
 				GlobalState.cwidget.insertMessage(str(i)+": "+self.cards[i])
 			except:
 				GlobalState.cwidget.insertMessage(str(i)+": "+"Too few cards to peek on!")
-		
+
 	@property
 	def pristineCards(self):
 		return [str(self.deckDisplay.item(i).text()) for i in range(self.deckDisplay.count())]
-		
+
 	def refreshDeck(self):
 		self.cards = self.pristineCards[:]
 		self.shuffleDeck()
-	
+
 	def shuffleDeck(self):
 		shuffle(self.cards)
-		
+
 	def loadFromFile(self):
 		filename = promptLoadFile('Open Deck File',
 			'Text-formatted deck file (*.txt)')
@@ -164,56 +163,8 @@ class transferMonitorWidget(QDockWidget):
 		processedAmount = "".join((UNICODE_STRING(round(float(processed)/float(size)*100, 1)), "%"))
 		self.updateItem(client, filename, processedAmount)
 
-class debugConsoleWidget(QDockWidget):
-
-	def __init__(self, mainWindow):
-		super(QDockWidget, self).__init__(mainWindow)
-		self.setToolTip(self.tr("A console that prints debug information regarding the program."))
-		self.setWindowTitle(self.tr("Debug Console"))
-		self.widgetEditor = QTextBrowser(mainWindow)
-		self.widget = QWidget(mainWindow)
-		self.widgetEditor.setReadOnly(True)
-		self.widgetEditor.setOpenLinks(False)
-		self.logToFileToggle = QCheckBox(self.tr("Log to file"))
-		try:
-			if jsonload(ospath.join(SAVE_DIR, "ui_settings.rgs"))["debuglog"] == "On":
-				self.logToFileToggle.setChecked(True)
-			else:
-				self.logToFileToggle.setChecked(False)
-		except:
-			self.logToFileToggle.setChecked(True)
-		self.logToFileToggle.stateChanged.connect(self.saveLogToggle)
-		self.layout = QBoxLayout(2)
-		self.layout.addWidget(self.widgetEditor)
-		self.layout.addWidget(self.logToFileToggle)
-		self.widget.setLayout(self.layout)
-		self.setWidget(self.widget)
-		self.setObjectName("Debug Console")
-
-		self.buffer = []
-
-		mainWindow.addDockWidget(Qt.BottomDockWidgetArea, self)
-
-	def saveLogToggle(self, int):
-		if int == 0:
-			jsonappend({'debuglog':'Off'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
-		else:
-			jsonappend({'debuglog':'On'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
-
-	def write(self, data):
-		try:
-			self.buffer.append(data)
-			if data.endswith('\n'):
-				self.widgetEditor.append(''.join(self.buffer))
-				if self.logToFileToggle.isChecked():
-					with open(ospath.join(LOG_DIR, strftime("%b_%d_%Y_debug.log", localtime())), 'a') as f:
-						f.write(''.join(self.buffer))
-				self.buffer = []
-		except UnicodeEncodeError:
-			return
-
-	def flush(self):
-		pass
+#					with open(ospath.join(LOG_DIR, strftime("%b_%d_%Y_debug.log", localtime())), 'a') as f:
+#						f.write(''.join(self.buffer))
 
 class chatLineEdit(QLineEdit):
 
@@ -1185,9 +1136,8 @@ class mapEditor(QDockWidget):
 			self.scrollarea.setWidget(self.tilelabel)
 
 def initialize(mainWindow):
-	GlobalState.twidget = debugConsoleWidget(mainWindow)
-	stdout = GlobalState.twidget
-	stderr = GlobalState.twidget
+	#stdout = GlobalState.twidget
+	#stderr = GlobalState.twidget
 	GlobalState.dwidget = diceRoller(mainWindow)
 	GlobalState.pwidget = pogPalette(mainWindow)
 	GlobalState.cwidget = chatWidget(mainWindow)

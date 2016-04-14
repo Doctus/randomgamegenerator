@@ -46,6 +46,11 @@ def loadMain():
 
 	connectEvents(CLIENT[0], SERVER[0], MAIN[0].glwidget)
 
+	try:
+		MAIN[0].readGeometry()
+	except:
+		pass
+
 	progress.setValue(9)
 	QApplication.processEvents()
 

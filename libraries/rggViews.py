@@ -73,21 +73,21 @@ def initialize():
 		setStyle(obj["style"], sheets[obj["style"]][1])
 	except:
 		setStyle("Default", False)
-		
+
 	try:
 		js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
 		if loadString('chatWidget.notify', js.get('notify')) == "Off":
 			GlobalState.alert = False
 	except:
 		pass
-		
+
 	try:
 		js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
 		if loadString('chatWidget.rightclick', js.get('rightclick')) == "Off":
 			GlobalState.rightclickmode = False
 	except:
 		pass
-		
+
 	try:
 		js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
 		if loadString('chatWidget.gridlock', js.get('gridlock')) == "On":
@@ -95,11 +95,6 @@ def initialize():
 	except:
 		pass
 
-	#try:
-	#	mainWindow.readGeometry()
-	#except:
-	#	pass
-	
 	GlobalState.pogMoveTimer = QTimer()
 	GlobalState.pogMoveTimer.timeout.connect(autoMovePogs)
 	GlobalState.pogMoveTimer.start(40)
@@ -220,7 +215,7 @@ def toggleTimestamps(newValue=None):
 		jsonappend({'timestamp':'On'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 	else:
 		jsonappend({'timestamp':'Off'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
-		
+
 def toggleRightclick(newValue=None):
 	if newValue is None:
 		GlobalState.rightclickmode = not GlobalState.rightclickmode
@@ -230,7 +225,7 @@ def toggleRightclick(newValue=None):
 		jsonappend({'rightclick':'On'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
 	else:
 		jsonappend({'rightclick':'Off'}, ospath.join(SAVE_DIR, "ui_settings.rgs"))
-		
+
 def toggleGridlock(newValue=None):
 	if newValue is None:
 		GlobalState.gridMode = not GlobalState.gridMode
@@ -709,8 +704,8 @@ def autoloadSession():
 		#Don't bother sending since we shouldn't be connected to anything yet.
 	except:
 		GlobalState.session = Session()
-
-
+	if GlobalState.session is None: #catch a few further edge cases
+		GlobalState.session = Session()
 
 def loadSession():
 	"""Allows the user to load a new map."""
@@ -1031,7 +1026,7 @@ def movePogs(displacement):
 		poglocs.append(pog.position)
 	sendAbsoluteMovementPog(pogids, poglocs)
 	drawPogCircles()
-	
+
 def movePogsAbsolute(newPosition):
 	selection = GlobalState.pogSelection.copy()
 	pogids = []
@@ -1165,7 +1160,7 @@ def respondLockPog(pogID, locked):
 def sendLockPog(user, pogID, locked):
 	"""Locks or unlocks a pog on the server."""
 	respondLockPog(allusers(), pogID, locked)
-	
+
 @serverRPC
 def respondPogRotation(pogID, newRotation):
 	if pogID in list(GlobalState.session.pogs.keys()):

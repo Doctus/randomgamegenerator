@@ -157,17 +157,17 @@ class createSurveyDialog(QDialog):
 
 	def addNewItem(self):
 		if self.types.currentText() == "Multiple choice":
-			self.addedItems.append({"type":"Multiple choice", "prompt":str(self.multiChoicePrompt.text()), "options":list(str(self.multiChoiceOptions.toPlainText()).split("\n"))})
+			self.addedItems.append({"type":"Multiple choice", "prompt":BASE_STRING(self.multiChoicePrompt.text()), "options":list(BASE_STRING(self.multiChoiceOptions.toPlainText()).split("\n"))})
 			self.multiChoicePrompt.clear()
 			self.multiChoiceOptions.clear()
 		elif self.types.currentText() == "Fill-in":
-			self.addedItems.append({"type":"Fill-in", "prompt":str(self.fillInPrompt.text())})
+			self.addedItems.append({"type":"Fill-in", "prompt":BASE_STRING(self.fillInPrompt.text())})
 			self.fillInPrompt.clear()
 		elif self.types.currentText() == "Yes/no":
-			self.addedItems.append({"type":"Yes/no", "prompt":str(self.YesNoPrompt.text())})
+			self.addedItems.append({"type":"Yes/no", "prompt":BASE_STRING(self.YesNoPrompt.text())})
 			self.YesNoPrompt.clear()
 		elif self.types.currentText() == "Check all that apply":
-			self.addedItems.append({"type":"Check all that apply", "prompt":str(self.allThatApplyPrompt.text()), "options":list(str(self.allThatApplyOptions.toPlainText()).split("\n"))})
+			self.addedItems.append({"type":"Check all that apply", "prompt":BASE_STRING(self.allThatApplyPrompt.text()), "options":list(BASE_STRING(self.allThatApplyOptions.toPlainText()).split("\n"))})
 			self.allThatApplyPrompt.clear()
 			self.allThatApplyOptions.clear()
 
@@ -258,14 +258,14 @@ class respondSurveyDialog(QDialog):
 		answers = {}
 		for key, value in list(self.responseAssociation.items()):
 			if value[0] == "M" or value[0] == "Y":
-				answers[key] = str(value[1].checkedButton().text())
+				answers[key] = BASE_STRING(value[1].checkedButton().text())
 			elif value[0] == "F":
-				answers[key] = str(value[1].text())
+				answers[key] = BASE_STRING(value[1].text())
 			elif value[0] == "C":
 				results = []
 				for item in value[1]:
 					if item.isChecked():
-						results.append(str(item.text()))
+						results.append(BASE_STRING(item.text()))
 				answers[key] = "; ".join(results)
 		return answers
 
@@ -299,8 +299,8 @@ class resizeDialog(QDialog):
 		QDialog.__init__(self, mainWindow)
 		self.owlabel = QLabel("Current Width:")
 		self.ohlabel = QLabel("Current Height:")
-		self.owlabel2 = QLabel(str(origx))
-		self.ohlabel2 = QLabel(str(origy))
+		self.owlabel2 = QLabel(BASE_STRING(origx))
+		self.ohlabel2 = QLabel(BASE_STRING(origy))
 		self.setWindowTitle("Resize Pog")
 
 		self.wlabel = QLabel("New Width:")
@@ -373,16 +373,16 @@ class modifyPogAttributesDialog(QDialog):
 		self.currentProperties = {}
 		for tableRow in range(self.table.rowCount() + 1):
 			try:
-				assert len(str(self.table.item(tableRow, 0).text())) > 0
-				assert len(str(self.table.item(tableRow, 1).text())) > 0
-				self.currentProperties[str(self.table.item(tableRow, 0).text())] = str(self.table.item(tableRow, 1).text())
+				assert len(BASE_STRING(self.table.item(tableRow, 0).text())) > 0
+				assert len(BASE_STRING(self.table.item(tableRow, 1).text())) > 0
+				self.currentProperties[BASE_STRING(self.table.item(tableRow, 0).text())] = BASE_STRING(self.table.item(tableRow, 1).text())
 			except AttributeError:
 				pass
 			except KeyError:
 				pass
 			except AssertionError:
 				pass
-		if row == self.table.rowCount() - 1 and self.table.item(row, 0) and len(str(self.table.item(row, 0).text())) > 0:
+		if row == self.table.rowCount() - 1 and self.table.item(row, 0) and len(BASE_STRING(self.table.item(row, 0).text())) > 0:
 			self.table.setRowCount(self.table.rowCount() + 1)
 
 	def okPressed(self, checked):
