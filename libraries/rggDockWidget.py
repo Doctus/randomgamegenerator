@@ -163,9 +163,6 @@ class transferMonitorWidget(QDockWidget):
 		processedAmount = "".join((UNICODE_STRING(round(float(processed)/float(size)*100, 1)), "%"))
 		self.updateItem(client, filename, processedAmount)
 
-#					with open(ospath.join(LOG_DIR, strftime("%b_%d_%Y_debug.log", localtime())), 'a') as f:
-#						f.write(''.join(self.buffer))
-
 class chatLineEdit(QLineEdit):
 
 	def __init__(self, mainWindow):
@@ -1136,8 +1133,6 @@ class mapEditor(QDockWidget):
 			self.scrollarea.setWidget(self.tilelabel)
 
 def initialize(mainWindow):
-	#stdout = GlobalState.twidget
-	#stderr = GlobalState.twidget
 	GlobalState.dwidget = diceRoller(mainWindow)
 	GlobalState.pwidget = pogPalette(mainWindow)
 	GlobalState.cwidget = chatWidget(mainWindow)

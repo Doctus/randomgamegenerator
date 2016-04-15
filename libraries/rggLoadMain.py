@@ -1,3 +1,25 @@
+'''
+rggLoadMain - for the Random Game Generator project
+By Doctus (kirikayuumura.noir@gmail.com)
+
+Deferred loading and progress display for main components.
+
+    This file is part of RandomGameGenerator.
+
+    RandomGameGenerator is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    RandomGameGenerator is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
+'''
+
 APPLICATION = [None,]
 MAIN = [None,]
 SERVER = [None,]
@@ -15,23 +37,17 @@ def loadMain():
 	progress.setValue(3)
 	QApplication.processEvents()
 
-	progress.setLabelText("Connecting events...")
-
-	from .rggSignalConfig import connectEvents
-	progress.setValue(4)
-	QApplication.processEvents()
-
 	# Initialize view state.
 	progress.setLabelText("Initializing widgets...")
 	rggState.GlobalState.initialize(APPLICATION[0])
-	progress.setValue(5)
+	progress.setValue(4)
 	QApplication.processEvents()
 	rggDockWidget.initialize(MAIN[0])
-	progress.setValue(6)
+	progress.setValue(5)
 	QApplication.processEvents()
 	rggViews.initialize()
 
-	progress.setValue(7)
+	progress.setValue(6)
 	QApplication.processEvents()
 
 	progress.setLabelText("Initializing network capabilities...")
@@ -39,26 +55,31 @@ def loadMain():
 	SERVER[0] = rggRPC.server
 	CLIENT[0] = rggRPC.client
 
-	progress.setValue(8)
+	progress.setValue(7)
 	QApplication.processEvents()
 
 	progress.setLabelText("Finalizing GUI...")
-
-	connectEvents(CLIENT[0], SERVER[0], MAIN[0].glwidget)
 
 	try:
 		MAIN[0].readGeometry()
 	except:
 		pass
 
-	progress.setValue(9)
+	progress.setValue(8)
 	QApplication.processEvents()
 
 	progress.setLabelText("Loading autosaved session...")
 
 	rggViews.autoloadSession()
 
+	progress.setValue(9)
+	QApplication.processEvents()
+
+	progress.setLabelText("Connecting events...")
+
+	from .rggSignalConfig import connectEvents
 	progress.setValue(10)
+	connectEvents(CLIENT[0], SERVER[0], MAIN[0].glwidget)
 	QApplication.processEvents()
 
 	PROGRESS[0] = None
