@@ -16,7 +16,7 @@
 '''
 #waaaaay too many things imported here so I'm not gonna touch this line
 from . import rggRemote, rggViews, rggEvent
-from .rggState import GlobalState
+from libraries.rggState import GlobalState
 
 def connectChatWidgetEvents(widget):
 	widget.chatInput.connect(rggEvent.chatInputEvent)

@@ -18,10 +18,10 @@ from re import compile as recompile
 from hashlib import md5
 from sys import version_info
 
-from .rggQt import * #QAbstractSocket, QTcpSocket
-from .rggJson import jsondumps, jsonloads
-from .rggSystem import fake, translate, mainWindow, signal
-from .rggConstants import UNICODE_STRING, BASE_STRING
+from libraries.rggQt import * #QAbstractSocket, QTcpSocket
+from libraries.rggJson import jsondumps, jsonloads
+from libraries.rggSystem import fake, translate, mainWindow, signal
+from libraries.rggConstants import UNICODE_STRING, BASE_STRING
 
 # Major protocols used by the socket
 PROTOCOL_UNKNOWN = 'RGG_UNKNOWN' # unidentified protocol

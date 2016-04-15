@@ -29,7 +29,7 @@ try:
 except ImportError as e:
 	print("Numpy import error ({0}): {1}".format(e.errno, e.strerror))
 
-from .rggConstants import UNICODE_STRING
+from libraries.rggConstants import UNICODE_STRING
 
 class tile(object):
 	'''

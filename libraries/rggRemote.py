@@ -21,16 +21,16 @@ Remote views.
 '''
 from os import path
 
-from .rggResource import crm, srm, RESOURCE_IMAGE
-from .rggSystem import translate, fake, makePortableFilename
-from .rggViews import say, ICSay, announce, linkedName, getmap, allmaps, getPortraitSize
-from .rggViews import localhandle, localuser, getuser, allusers, allusersbut
-from .rggViews import usernames, User, addUserToList, getNetUserList, respondUserRemove
-from .rggViews import clearUserList, reconnectTransferSocket, renameuser
-from .rggViews import _closeAllMaps, setUwidgetLocal, adduser, respondSession
-from .rggViews import getSession, respondChangeGM, getGM, respondUserList, removeuser
-from .rggRPC import clientRPC, serverRPC, client, receiveClientRPC, receiveServerRPC
-from .rggConstants import *
+from libraries.rggResource import crm, srm, RESOURCE_IMAGE
+from libraries.rggSystem import translate, fake, makePortableFilename
+from libraries.rggViews import say, ICSay, announce, linkedName, getmap, allmaps, getPortraitSize
+from libraries.rggViews import localhandle, localuser, getuser, allusers, allusersbut
+from libraries.rggViews import usernames, User, addUserToList, getNetUserList, respondUserRemove
+from libraries.rggViews import clearUserList, reconnectTransferSocket, renameuser
+from libraries.rggViews import _closeAllMaps, setUwidgetLocal, adduser, respondSession
+from libraries.rggViews import getSession, respondChangeGM, getGM, respondUserList, removeuser
+from libraries.rggRPC import clientRPC, serverRPC, client, receiveClientRPC, receiveServerRPC
+from libraries.rggConstants import *
 
 @serverRPC
 def respondError(message, *args, **kwargs):

@@ -21,7 +21,7 @@ Remote procedure calls.
 '''
 from sys import exc_info
 
-from .rggNet import JsonServer, JsonClient
+from libraries.rggNet import JsonServer, JsonClient
 
 # Base server and client implementations
 client = JsonClient()

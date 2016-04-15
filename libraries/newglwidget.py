@@ -17,8 +17,8 @@
 '''
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from .rggTile import *
-from .rggSystem import POG_DIR, promptSaveFile, signal
+from libraries.rggTile import *
+from libraries.rggSystem import POG_DIR, promptSaveFile, signal
 import random
 
 def nextPowerOfTwo(val):

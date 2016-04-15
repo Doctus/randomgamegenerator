@@ -22,12 +22,12 @@ Menu bar and menu items.
 from sys import version_info
 from os import path
 
-from .rggQt import *
-from .rggStyles import sheets
-from .rggSystem import translate, mainWindow
-from .rggJson import loadString, jsonload, jsonappend
-from .rggRPC import client
-from .rggConstants import *
+from libraries.rggQt import *
+from libraries.rggStyles import sheets
+from libraries.rggSystem import translate, mainWindow
+from libraries.rggJson import loadString, jsonload, jsonappend
+from libraries.rggRPC import client
+from libraries.rggConstants import *
 
 
 ICON_SELECT = 0
@@ -109,22 +109,22 @@ class menuBar(object):
 		self.toggleTimestampsAct = QAction(translate("menubar", "OOC Chat Timestamps"), main)
 		self.toggleTimestampsAct.setCheckable(True)
 		self.toggleTimestampsAct.setChecked(False)
-		
+
 		self.toggleRightclickAct = QAction(translate("menubar", "Right-Click Opens Pog Ctrl-Click Menu"), main)
 		self.toggleRightclickAct.setCheckable(True)
 		self.toggleRightclickAct.setChecked(True)
-		
+
 		self.lockToGridAct = QAction(translate("menubar", "Lock Pogs to Map Grid"), main)
 		self.lockToGridAct.setCheckable(True)
 		self.lockToGridAct.setChecked(False)
-		
+
 		try:
 			js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
 			if loadString('chatWidget.notify', js.get('notify')) == "Off":
 				self.toggleAlertsAct.setChecked(False)
 		except:
 			pass
-			
+
 		try:
 			js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
 			if loadString('chatWidget.rightclick', js.get('rightclick')) == "Off":
@@ -138,7 +138,7 @@ class menuBar(object):
 				self.toggleTimestampsAct.setChecked(True)
 		except:
 			pass
-			
+
 		try:
 			js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
 			if loadString('chatWidget.gridlock', js.get('gridlock')) == "On":

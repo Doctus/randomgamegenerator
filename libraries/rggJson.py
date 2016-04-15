@@ -22,9 +22,9 @@ Loading of JSON data.
 
 from json import dump, dumps, load, loads
 from gzip import open as gzipopen
-from .rggFields import validationError
-from .rggSystem import makeLocalFilename
-from .rggConstants import BASE_STRING, JSON_MODE
+from libraries.rggFields import validationError
+from libraries.rggSystem import makeLocalFilename
+from libraries.rggConstants import BASE_STRING, JSON_MODE
 
 def jsondumps(obj):
 	"""Dumps the object into a string. Contains no newlines."""

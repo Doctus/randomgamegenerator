@@ -21,7 +21,7 @@ from os import path
 from weakref import ref as weakref
 from collections import defaultdict
 
-from .rggRPC import client, server, clientRPC, serverRPC
+from libraries.rggRPC import client, server, clientRPC, serverRPC
 
 RESOURCE_IMAGE = "image"
 RESOURCE_SOUND = "sound"
@@ -271,7 +271,7 @@ class serverResourceMapper(object):
 	def _broadcast(self, filename, status):
 		"""Broadcasts the status of a file."""
 		# HACK: inverted import flow
-		from .rggViews import allusers
+		from libraries.rggViews import allusers
 		_broadcastStatus(allusers(), filename, status)
 
 crm = clientResourceMapper(client)

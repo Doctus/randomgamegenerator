@@ -21,22 +21,22 @@ Actions which occur in response to user commands.
 '''
 from os import path as ospath
 
-from .rggConstants import *
-from .rggDialogs import *
-from .rggDice import isRollValid, roll
-from .rggEvent import addMouseMoveListener, addMousePressListener, addMouseReleaseListener
-from .rggEvent import addKeyPressListener, addKeyReleaseListener, pogUpdateEvent, pogSelectionChangedEvent
-from .rggJson import jsondump, jsonload, jsonappend, loadString
-from .rggMap import Map
-from .rggMenuBar import ICON_SELECT, ICON_MOVE, ICON_DRAW, ICON_DELETE, menuBar
-from .rggPog import Pog
-from .rggQt import *
-from .rggResource import crm, srm
-from .rggRPC import server, client, serverRPC, clientRPC
-from .rggSession import Session
-from .rggState import GlobalState
-from .rggStyles import sheets
-from .rggSystem import *
+from libraries.rggConstants import *
+from libraries.rggDialogs import *
+from libraries.rggDice import isRollValid, roll
+from libraries.rggEvent import addMouseMoveListener, addMousePressListener, addMouseReleaseListener
+from libraries.rggEvent import addKeyPressListener, addKeyReleaseListener, pogUpdateEvent, pogSelectionChangedEvent
+from libraries.rggJson import jsondump, jsonload, jsonappend, loadString
+from libraries.rggMap import Map
+from libraries.rggMenuBar import ICON_SELECT, ICON_MOVE, ICON_DRAW, ICON_DELETE, menuBar
+from libraries.rggPog import Pog
+from libraries.rggQt import *
+from libraries.rggResource import crm, srm
+from libraries.rggRPC import server, client, serverRPC, clientRPC
+from libraries.rggSession import Session
+from libraries.rggState import GlobalState
+from libraries.rggStyles import sheets
+from libraries.rggSystem import *
 
 # Button enum
 BUTTON_LEFT = 0
@@ -1301,7 +1301,7 @@ def addMacro():
 
 def generateName(generator, args):
 	"""Generates a random name of the specified type."""
-	from .rggNameGen import getName
+	from libraries.rggNameGen import getName
 	say(getName(generator, args))
 
 # MISC
@@ -1371,7 +1371,7 @@ def processPogRightclick(selection, pogs):
 		if gentype is None:
 			return
 		gentype = splitword(gentype.lower())
-		from .rggNameGen import getName
+		from libraries.rggNameGen import getName
 		for pog in pogs:
 			renamePog(pog, getName(*gentype))
 	elif selection == 3:

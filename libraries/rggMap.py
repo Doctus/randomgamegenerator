@@ -18,9 +18,9 @@ By Doctus (kirikayuumura.noir@gmail.com)
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from .rggResource import crm, RESOURCE_IMAGE, STATE_DONE
-from .rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
-from .rggSystem import mainWindow
+from libraries.rggResource import crm, RESOURCE_IMAGE, STATE_DONE
+from libraries.rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
+from libraries.rggSystem import mainWindow
 
 class Map(object):
 
@@ -66,7 +66,7 @@ class Map(object):
 		if self.tiles != None:
 			for t in self.tiles:
 				t.displaceDrawRect(displacement)
-				
+
 	def nearestGridPoint(self, position):
 		nearestX = self._drawOffset[0] + int((position[0] - self._drawOffset[0])/self.tilesize[0])*self.tilesize[0]
 		nearestY = self._drawOffset[1] + int((position[1] - self._drawOffset[1])/self.tilesize[1])*self.tilesize[1]

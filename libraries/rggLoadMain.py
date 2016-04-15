@@ -27,10 +27,11 @@ CLIENT = [None,]
 PROGRESS = [None,]
 
 def loadMain():
-	from .rggQt import Qt, QApplication
+	from libraries.rggQt import Qt, QApplication
 	progress = PROGRESS[0]
 
-	from . import rggRPC, rggState, rggViews, rggDockWidget
+	from . import rggRPC, rggState, rggViews
+	from libraries.rggDockWidget import initialize as dockInitialize
 	progress.setValue(2)
 	QApplication.processEvents()
 	from . import rggChat, rggICChat #bad, but necessary for now to initialize here
@@ -42,7 +43,7 @@ def loadMain():
 	rggState.GlobalState.initialize(APPLICATION[0])
 	progress.setValue(4)
 	QApplication.processEvents()
-	rggDockWidget.initialize(MAIN[0])
+	dockInitialize(MAIN[0])
 	progress.setValue(5)
 	QApplication.processEvents()
 	rggViews.initialize()
@@ -77,7 +78,7 @@ def loadMain():
 
 	progress.setLabelText("Connecting events...")
 
-	from .rggSignalConfig import connectEvents
+	from libraries.rggSignalConfig import connectEvents
 	progress.setValue(10)
 	connectEvents(CLIENT[0], SERVER[0], MAIN[0].glwidget)
 	QApplication.processEvents()

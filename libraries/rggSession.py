@@ -22,11 +22,11 @@ By Doctus (kirikayuumura.noir@gmail.com)
 '''
 from sys import maxsize
 
-from .rggPog import Pog
-from .rggMap import Map
-from .rggEvent import pogUpdateEvent, pogDeleteEvent
-from .rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
-from .rggSystem import mainWindow, clearLines, drawLine, findRandomAppend
+from libraries.rggPog import Pog
+from libraries.rggMap import Map
+from libraries.rggEvent import pogUpdateEvent, pogDeleteEvent
+from libraries.rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
+from libraries.rggSystem import mainWindow, clearLines, drawLine, findRandomAppend
 
 class Session(object):
 

@@ -20,9 +20,9 @@
 from os import path
 from math import sqrt
 
-from .rggResource import crm, RESOURCE_IMAGE, STATE_DONE
-from .rggSystem import mainWindow
-from .rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
+from libraries.rggResource import crm, RESOURCE_IMAGE, STATE_DONE
+from libraries.rggSystem import mainWindow
+from libraries.rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
 
 class Sprite(object):
 

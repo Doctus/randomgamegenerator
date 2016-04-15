@@ -24,15 +24,15 @@ from os import walk, stat, path, remove
 from random import choice, random
 from math import hypot, cos, sin, pi
 
-from .rggQt import PYQT5
+from libraries.rggQt import PYQT5
 
 try:
 	import urllib.request, urllib.error, urllib.parse
 except ImportError:
 	import urllib2 as urllib
 
-from .rggQt import *
-from .rggConstants import *
+from libraries.rggQt import *
+from libraries.rggConstants import *
 
 class wAction(QAction):
 
@@ -132,7 +132,7 @@ def injectMain():
 	assert(not mainWindow)
 
 	try:
-		from .rggMain import MainWindow
+		from libraries.rggMain import MainWindow
 	except ImportError as e:
 		from rggMain import MainWindow
 	mainWindow = MainWindow()

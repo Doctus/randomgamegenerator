@@ -22,10 +22,10 @@
 
 from os import path
 
-from .rggQt import *
+from libraries.rggQt import *
 from .glwidget import GLWidget
-from .rggJson import loadInteger, jsonload
-from .rggConstants import *
+from libraries.rggJson import loadInteger, jsonload
+from libraries.rggConstants import *
 
 class MainWindow(QMainWindow):
 

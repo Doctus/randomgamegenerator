@@ -19,9 +19,9 @@ Design inspired by Django Forms.
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from .rggQt import *
-from .rggSystem import translate, showErrorMessage, signal
-from .rggConstants import *
+from libraries.rggQt import *
+from libraries.rggSystem import translate, showErrorMessage, signal
+from libraries.rggConstants import *
 
 class validationError(Exception):
 	"""Error which occurs during input validation."""

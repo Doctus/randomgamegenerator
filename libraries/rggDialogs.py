@@ -23,13 +23,13 @@ Design inspired by Django Forms.
 from os import path
 from time import time
 
-from .rggQt import *
-from .rggMap import Map
-from .rggSystem import fake, translate, showErrorMessage, findFiles, makePortableFilename
-from .rggFields import integerField, floatField, stringField, dropDownField, sliderField, validationError
-from .rggNet import ConnectionData, localHost, localUser
-from .rggJson import jsonload, jsondump, jsonappend
-from .rggConstants import *
+from libraries.rggQt import *
+from libraries.rggMap import Map
+from libraries.rggSystem import fake, translate, showErrorMessage, findFiles, makePortableFilename
+from libraries.rggFields import integerField, floatField, stringField, dropDownField, sliderField, validationError
+from libraries.rggNet import ConnectionData, localHost, localUser
+from libraries.rggJson import jsonload, jsondump, jsonappend
+from libraries.rggConstants import *
 
 class dialog(object):
 	"""A base class for dialogs.

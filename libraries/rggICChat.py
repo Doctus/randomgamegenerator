@@ -19,11 +19,11 @@ Parse and execute chat commands.
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from .rggEvent import addICChatInputListener
-from .rggRemote import sendICSay, sendICEmote, sendICWhisper
-from .rggSystem import fake, translate
-from .rggViews import ICSay, announce, generateName, rollDice, reportCamera, storeChat, releaseChat
-from .rggConstants import *
+from libraries.rggEvent import addICChatInputListener
+from libraries.rggRemote import sendICSay, sendICEmote, sendICWhisper
+from libraries.rggSystem import fake, translate
+from libraries.rggViews import ICSay, announce, generateName, rollDice, reportCamera, storeChat, releaseChat
+from libraries.rggConstants import *
 
 chatCommands = {}
 chatCommandNames = []
