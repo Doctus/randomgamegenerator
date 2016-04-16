@@ -61,7 +61,6 @@ class Map(object):
 		displacement[0] = drawOffset[0] - self._drawOffset[0]
 		displacement[1] = drawOffset[1] - self._drawOffset[1]
 		self._drawOffset = drawOffset
-		print("drawOffset:", drawOffset)
 
 		if self.tiles != None:
 			for t in self.tiles:

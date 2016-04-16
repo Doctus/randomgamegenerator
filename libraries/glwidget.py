@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-#glWidget - Takes care of drawing images, with optionally glmod to speed things up
+#glWidget - Takes care of drawing images
 #
 #By Oipo (kingoipo@gmail.com)
 '''
@@ -20,11 +20,24 @@
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from OpenGL.GL import *
-from OpenGL.GLU import *
+from OpenGL.GL import GL_TEXTURE_2D, GL_NEAREST, GL_NEAREST_MIPMAP_NEAREST, glClear, GL_COLOR_BUFFER_BIT
+from OpenGL.GL import glPushMatrix, glTranslatef, glScaled, glColor4f, glDisable, glLineWidth
+from OpenGL.GL import glBegin, GL_LINES, glColor3f, glVertex2f, glEnd, glVertex2d, glPopMatrix
+from OpenGL.GL import glViewport, glMatrixMode, GL_PROJECTION, glLoadIdentity, glOrtho, GL_MODELVIEW
+from OpenGL.GL import glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST, GL_LINEAR, GL_NEAREST_MIPMAP_LINEAR
+from OpenGL.GL import GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_LINEAR, glGetString, GL_VERSION
+from OpenGL.GL import OpenGL, GL_LINE_LOOP, glEnable, GL_MULTISAMPLE, GL_TRUE
+from OpenGL.GL import GL_BLEND, GL_DEPTH_TEST, glBlendFunc, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA
+from OpenGL.GL import glClearColor, glGenTextures, glBindTexture, glTexParameterf
+from OpenGL.GL import GL_TEXTURE_MIN_FILTER, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_WRAP_S
+from OpenGL.GL import GL_GENERATE_MIPMAP, GL_CLAMP_TO_EDGE, GL_TEXTURE_WRAP_R, GL_TEXTURE_WRAP_T, GL_RGBA
+from OpenGL.GL import GL_UNSIGNED_BYTE, GL_QUADS, glVertex3f, glTexCoord2f, glTexParameteri
+from OpenGL.GL import glTexImage2D, glGenerateMipmap, glDeleteTextures, glRotatef
+#from OpenGL.GLU import
+from OpenGL.GL.EXT.texture_filter_anisotropic import GL_TEXTURE_MAX_ANISOTROPY_EXT
 from OpenGL.extensions import hasGLExtension
-from OpenGL.GL.ARB.vertex_buffer_object import *
-from OpenGL.GL.ARB.framebuffer_object import *
+from OpenGL.GL.ARB.vertex_buffer_object import GL_STATIC_DRAW_ARB
+#from OpenGL.GL.ARB.framebuffer_object import
 from OpenGL.arrays import ArrayDatatype as ADT
 
 #Only set these when creating non-development code
@@ -36,10 +49,10 @@ from os import path
 from sys import _getframe
 from numpy import zeros
 
-from libraries.rggQt import *
+from libraries.rggQt import QGLWidget, pyqtSignal, Qt, QImage
 from libraries.rggTile import tile
 from libraries.rggSystem import promptSaveFile, signal
-from libraries.rggJson import loadString, loadInteger, loadFloat, jsonload
+from libraries.rggJson import loadString, loadFloat, jsonload
 from libraries.rggConstants import BASE_STRING, POG_DIR, SAVE_DIR
 
 def nextPowerOfTwo(val):
@@ -302,10 +315,6 @@ class GLWidget(QGLWidget):
 		if int(version[0]) == 1 and int(version[2]) < 4: #no opengl 1.4 support
 			#print("GL_GENERATE_MIPMAP not supported, not using mipmapping")
 			self.npot = 1
-		if not hasGLExtension("GL_ARB_texture_non_power_of_two"):
-			#print("GL_ARB_texture_non_power_of_two not supported, switching to GL_ARB_texture_rectangle")
-			self.texext = GL_TEXTURE_RECTANGLE_ARB
-			self.npot = 1
 		if not hasGLExtension("GL_ARB_texture_rectangle"):
 			#print("GL_TEXTURE_RECTANGLE_ARB not supported, switching to GL_TEXTURE_2D")
 			self.texext = GL_TEXTURE_2D
@@ -410,8 +419,6 @@ class GLWidget(QGLWidget):
 			glTexParameteri(self.texext, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
 			glTexParameteri(self.texext, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE)
 			glTexParameteri(self.texext, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-
-			format = GL_RGBA
 
 			glTexImage2D(self.texext, 0, GL_RGBA, img.width(), img.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imgdata);
 
