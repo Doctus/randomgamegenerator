@@ -27,7 +27,7 @@ CLIENT = [None,]
 PROGRESS = [None,]
 
 def loadMain():
-	from libraries.rggQt import Qt, QApplication
+	from libraries.rggQt import QApplication
 	progress = PROGRESS[0]
 
 	from . import rggRPC, rggState, rggViews

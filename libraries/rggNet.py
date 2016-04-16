@@ -23,10 +23,10 @@ from re import compile as recompile
 from os import path, stat, makedirs, remove
 from getpass import getuser
 
-from libraries.rggQt import *
+from libraries.rggQt import QTimer, QFile, QTcpServer, QHostAddress, QHostInfo
 from libraries.rggSocket import statefulSocket, generateChecksum, fileData
 from libraries.rggSystem import translate, mainWindow, signal, makeLocalFilename, findRandomAppend
-from libraries.rggConstants import *
+from libraries.rggConstants import UNICODE_STRING, BASE_STRING
 
 MESSAGE_IDENTIFY = "IDENTIFY" # Identify this client
 MESSAGE_ACTIVATE = "ACTIVATE" # Assign username

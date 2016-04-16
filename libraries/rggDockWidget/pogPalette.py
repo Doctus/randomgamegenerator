@@ -15,18 +15,11 @@
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from re import sub
-from time import strftime, localtime
 from os import path as ospath
-from random import shuffle
 
-from libraries.rggQt import *
-from libraries.rggSystem import signal, findFiles, makePortableFilename, promptSaveFile, promptYesNo, getMapPosition, mainWindow, promptLoadFile
-from libraries.rggDialogs import newCharacterDialog, banDialog
-from libraries.rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
-from libraries.rggConstants import *
-from libraries.rggEvent import addMapChangedListener, addMousePressListener, addMouseMoveListener, addMouseReleaseListener
-from libraries.rggState import GlobalState
+from libraries.rggQt import QFileSystemModel, QPixmap, QIcon, QMimeData, QTreeView, QDrag, QPoint, QWidget, QBoxLayout, QDockWidget, Qt, QAbstractItemView
+from libraries.rggSystem import makePortableFilename, mainWindow
+from libraries.rggConstants import POG_DIR, IMAGE_NAME_FILTER, UNICODE_STRING
 
 class PogFileSystemModel(QFileSystemModel):
 

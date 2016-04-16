@@ -38,9 +38,9 @@ from numpy import zeros
 
 from libraries.rggQt import *
 from libraries.rggTile import tile
-from libraries.rggSystem import POG_DIR, SAVE_DIR, promptSaveFile, signal
+from libraries.rggSystem import promptSaveFile, signal
 from libraries.rggJson import loadString, loadInteger, loadFloat, jsonload
-from libraries.rggConstants import BASE_STRING
+from libraries.rggConstants import BASE_STRING, POG_DIR, SAVE_DIR
 
 def nextPowerOfTwo(val):
 	val -= 1

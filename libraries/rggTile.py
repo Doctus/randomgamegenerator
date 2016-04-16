@@ -20,9 +20,8 @@
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from OpenGL.GL import *
-from OpenGL.GL.ARB.vertex_buffer_object import *
-from OpenGL.arrays import ArrayDatatype as ADT
+from OpenGL.GL import GL_TEXTURE_2D, glBindBuffer, glBufferSubData
+from OpenGL.GL.ARB.vertex_buffer_object import GL_ARRAY_BUFFER_ARB
 
 try:
 	from numpy import zeros

@@ -23,13 +23,20 @@ Design inspired by Django Forms.
 from os import path
 from time import time
 
-from libraries.rggQt import *
+from libraries.rggQt import QDialog, QPushButton, QComboBox, QLabel, QLineEdit, QTextEdit, QCheckBox
+from libraries.rggQt import QGridLayout, QButtonGroup, QGroupBox, QVBoxLayout, QRadioButton, QSpinBox
+from libraries.rggQt import QTableWidget, QTableWidgetItem, QListWidget, QListWidgetItem, QBoxLayout
+from libraries.rggQt import QFormLayout, QIcon, QTreeView, QFileSystemModel, QPixmap
 from libraries.rggMap import Map
-from libraries.rggSystem import fake, translate, showErrorMessage, findFiles, makePortableFilename
-from libraries.rggFields import integerField, floatField, stringField, dropDownField, sliderField, validationError
+from libraries.rggSystem import translate, findFiles, makePortableFilename
+from libraries.rggFields import integerField, floatField, stringField, dropDownField, validationError
 from libraries.rggNet import ConnectionData, localHost, localUser
-from libraries.rggJson import jsonload, jsondump, jsonappend
-from libraries.rggConstants import *
+from libraries.rggJson import jsonload, jsondump, jsonappend, loadString, loadFloat, loadCoordinates, loadInteger
+from libraries.rggConstants import BASE_STRING, SAVE_DIR, IP_CACHE_TIME, PORTRAIT_DIR, IMAGE_NAME_FILTER
+from libraries.rggConstants import GFX_SETTINGS_FILE, ANI_FILTER_STRING, GFX_PREFIX, MIN_FILTER_STRING, MAG_FILTER_STRING
+from libraries.rggConstants import MIPMIN_FILTER_STRING, FSAA_SETTING_STRING, VBO_SETTING_STRING, ON_OFF_OPTIONS
+from libraries.rggConstants import TILESET_DIR, IMAGE_EXTENSIONS, STANDARD_FILTER_OPTIONS, MIP_FILTER_OPTIONS
+
 
 class dialog(object):
 	"""A base class for dialogs.

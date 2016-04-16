@@ -19,9 +19,9 @@ Design inspired by Django Forms.
     You should have received a copy of the GNU Lesser General Public License
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from libraries.rggQt import *
-from libraries.rggSystem import translate, showErrorMessage, signal
-from libraries.rggConstants import *
+from libraries.rggQt import QSpinBox, QDoubleSpinBox, QLineEdit, QComboBox, QSlider, Qt
+from libraries.rggSystem import translate, signal
+from libraries.rggConstants import BASE_STRING, UNICODE_STRING
 
 class validationError(Exception):
 	"""Error which occurs during input validation."""
@@ -259,7 +259,6 @@ class sliderField(dialogField):
 		raise validationError(translate('sliderField', 'You must enter a valid choice for the {0} field.').format(self.name))
 
 	def _createWidget(self, parent):
-		index = -1
 		widget = QSlider(parent)
 		widget.setOrientation(Qt.Horizontal)
 		widget.setMinimum(self.min)

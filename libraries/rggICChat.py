@@ -22,8 +22,8 @@ Parse and execute chat commands.
 from libraries.rggEvent import addICChatInputListener
 from libraries.rggRemote import sendICSay, sendICEmote, sendICWhisper
 from libraries.rggSystem import fake, translate
-from libraries.rggViews import ICSay, announce, generateName, rollDice, reportCamera, storeChat, releaseChat
-from libraries.rggConstants import *
+from libraries.rggViews import ICSay, localuser, generateName, rollDice
+from libraries.rggConstants import UNICODE_STRING, LATE_RESPONSE_LEVEL
 
 chatCommands = {}
 chatCommandNames = []
@@ -82,37 +82,6 @@ randomname.documentation = fake.translate('chatdoc',
 	<dt>Example:</dt>
 		<dd>/randomname JAPANESEFEMALEFULL</dd>
 		<dd>/randomname DwArF M aLe</dd>
-	</dl><br>
-	""")
-
-@chat('techniquename', 'techname')
-def techname(message, chname, portrait):
-	generateTechnique(message)
-
-techname.documentation = fake.translate('chatdoc',
-	"""/techniquename: Generate a technique name.<dl>
-	<dt>Alternate spelling:</dt>
-		<dd>/techname</dd>
-
-	<dt>Syntax:</dt>
-		<dd>/techniquename</dd>
-		<dd>/techniquename arguments...</dd>
-
-	<dt>Examples:</dt>
-		<dd>/techniquename</dd>
-		<dd>/techniquename ...</dd>
-	</dl><br>
-	""")
-
-@chat('advice')
-def advice(message, chname, portrait):
-	generateAdvice()
-
-advice.documentation = fake.translate('chatdoc',
-	"""/advice: Generate some random, probably nonsensical advice.<dl>
-
-	<dt>Syntax:</dt>
-		<dd>/advice</dd>
 	</dl><br>
 	""")
 

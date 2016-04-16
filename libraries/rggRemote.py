@@ -23,14 +23,14 @@ from os import path
 
 from libraries.rggResource import crm, srm, RESOURCE_IMAGE
 from libraries.rggSystem import translate, fake, makePortableFilename
-from libraries.rggViews import say, ICSay, announce, linkedName, getmap, allmaps, getPortraitSize
-from libraries.rggViews import localhandle, localuser, getuser, allusers, allusersbut
-from libraries.rggViews import usernames, User, addUserToList, getNetUserList, respondUserRemove
+from libraries.rggViews import say, ICSay, linkedName, getPortraitSize
+from libraries.rggViews import localhandle, getuser, allusers, allusersbut
+from libraries.rggViews import User, addUserToList, getNetUserList, respondUserRemove
 from libraries.rggViews import clearUserList, reconnectTransferSocket, renameuser
 from libraries.rggViews import _closeAllMaps, setUwidgetLocal, adduser, respondSession
 from libraries.rggViews import getSession, respondChangeGM, getGM, respondUserList, removeuser
-from libraries.rggRPC import clientRPC, serverRPC, client, receiveClientRPC, receiveServerRPC
-from libraries.rggConstants import *
+from libraries.rggRPC import clientRPC, serverRPC, receiveClientRPC, receiveServerRPC
+from libraries.rggConstants import PORTRAIT_DIR
 
 @serverRPC
 def respondError(message, *args, **kwargs):

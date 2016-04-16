@@ -22,10 +22,10 @@
 
 from os import path
 
-from libraries.rggQt import *
+from libraries.rggQt import QMainWindow, QIcon, QTimer, QSettings
 from .glwidget import GLWidget
 from libraries.rggJson import loadInteger, jsonload
-from libraries.rggConstants import *
+from libraries.rggConstants import SAVE_DIR
 
 class MainWindow(QMainWindow):
 

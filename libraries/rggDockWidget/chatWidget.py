@@ -18,15 +18,11 @@
 from re import sub
 from time import strftime, localtime
 from os import path as ospath
-from random import shuffle
 
-from libraries.rggQt import *
-from libraries.rggSystem import signal, findFiles, makePortableFilename, promptSaveFile, promptYesNo, getMapPosition, mainWindow, promptLoadFile
-from libraries.rggDialogs import newCharacterDialog, banDialog
-from libraries.rggJson import loadObject, loadString, jsondump, jsonload, jsonappend
-from libraries.rggConstants import *
-from libraries.rggEvent import addMapChangedListener, addMousePressListener, addMouseMoveListener, addMouseReleaseListener
-from libraries.rggState import GlobalState
+from libraries.rggQt import QLineEdit, Qt, QDockWidget, QTextBrowser, QWidget, QBoxLayout, QDesktopServices, QUrl
+from libraries.rggSystem import signal
+from libraries.rggJson import loadString, jsonload
+from libraries.rggConstants import SAVE_DIR, UNICODE_STRING, LOG_DIR, BASE_STRING
 
 class chatLineEdit(QLineEdit):
 

@@ -22,12 +22,12 @@ Menu bar and menu items.
 from sys import version_info
 from os import path
 
-from libraries.rggQt import *
+from libraries.rggQt import QAction, QIcon, QMenu, QMessageBox, PYQT_VERSION_STR, QT_VERSION_STR
 from libraries.rggStyles import sheets
 from libraries.rggSystem import translate, mainWindow
 from libraries.rggJson import loadString, jsonload, jsonappend
 from libraries.rggRPC import client
-from libraries.rggConstants import *
+from libraries.rggConstants import SAVE_DIR, VERSION, DEV, REPOSITORY_LINK, LICENSING_INFO
 
 
 ICON_SELECT = 0

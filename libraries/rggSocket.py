@@ -18,9 +18,9 @@ from re import compile as recompile
 from hashlib import md5
 from sys import version_info
 
-from libraries.rggQt import * #QAbstractSocket, QTcpSocket
+from libraries.rggQt import QAbstractSocket, QTcpSocket
 from libraries.rggJson import jsondumps, jsonloads
-from libraries.rggSystem import fake, translate, mainWindow, signal
+from libraries.rggSystem import fake, mainWindow, signal
 from libraries.rggConstants import UNICODE_STRING, BASE_STRING
 
 # Major protocols used by the socket

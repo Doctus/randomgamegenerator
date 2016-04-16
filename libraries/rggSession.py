@@ -25,8 +25,8 @@ from sys import maxsize
 from libraries.rggPog import Pog
 from libraries.rggMap import Map
 from libraries.rggEvent import pogUpdateEvent, pogDeleteEvent
-from libraries.rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
-from libraries.rggSystem import mainWindow, clearLines, drawLine, findRandomAppend
+from libraries.rggJson import loadObject
+from libraries.rggSystem import clearLines, drawLine, findRandomAppend
 
 class Session(object):
 

@@ -57,7 +57,7 @@ if __name__ == '__main__':
 		else:
 			fatalError("PyQt4 not found. Please ensure it is installed and available.")
 
-	from sys import exit, version_info
+	from sys import version_info
 	from os import path
 
 	try:
@@ -79,9 +79,9 @@ if __name__ == '__main__':
 
 	QApplication.processEvents()
 
-	from libraries.rggSystem import injectMain, SAVE_DIR
+	from libraries.rggSystem import injectMain
 	from libraries.rggJson import loadString, jsonload
-	from libraries.rggConstants import *
+	from libraries.rggConstants import SAVE_DIR
 
 	QApplication.processEvents()
 

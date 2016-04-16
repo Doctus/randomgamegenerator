@@ -142,7 +142,7 @@ class clientResourceMapper(object):
 	def _update(self, filename, status):
 		"""Signal the change of status in a file."""
 		# Avoid the loop unless there's been an actual change
-		oldstatus = self._status[filename]
+		#oldstatus = self._status[filename]
 		exists = fileExists(filename)
 
 		#if oldstatus != status or exists != self._exists[filename]:

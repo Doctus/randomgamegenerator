@@ -19,7 +19,7 @@ By Doctus (kirikayuumura.noir@gmail.com)
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
 from libraries.rggResource import crm, RESOURCE_IMAGE, STATE_DONE
-from libraries.rggJson import loadString, loadInteger, loadObject, loadArray, loadCoordinates
+from libraries.rggJson import loadString, loadCoordinates
 from libraries.rggSystem import mainWindow
 
 class Map(object):

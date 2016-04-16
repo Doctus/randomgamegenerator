@@ -20,8 +20,8 @@ Parse and execute chat commands.
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
 from libraries.rggSystem import fake, translate
-from libraries.rggViews import say, announce, generateName, rollDice, reportCamera, storeChat, releaseChat, incrementDreams, getDreams
-from libraries.rggConstants import *
+from libraries.rggViews import say, generateName, localuser, rollDice, reportCamera, storeChat, releaseChat, incrementDreams, getDreams
+from libraries.rggConstants import BASE_STRING, UNICODE_STRING, LATE_RESPONSE_LEVEL
 from libraries.rggEvent import addChatInputListener
 from libraries.rggRemote import sendSay, sendEmote, sendWhisper
 
@@ -144,7 +144,7 @@ def whisper(message):
 			" Handle may be caps-sensitive."))
 	else:
 		target, rest = splitword(message)
-		if target.lower() == rggViews.localuser().username:
+		if target.lower() == localuser().username:
 			emote(translate('chat', "mutters something."))
 		elif not rest:
 			say(translate('chat', "What do you want to tell {target}?").format(target=target))

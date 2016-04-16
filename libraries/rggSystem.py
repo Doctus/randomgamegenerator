@@ -21,18 +21,14 @@ Qt and C++ services.
 '''
 from sys import maxsize
 from os import walk, stat, path, remove
-from random import choice, random
+from random import choice as rchoice
+from random import random
 from math import hypot, cos, sin, pi
 
 from libraries.rggQt import PYQT5
 
-try:
-	import urllib.request, urllib.error, urllib.parse
-except ImportError:
-	import urllib2 as urllib
-
-from libraries.rggQt import *
-from libraries.rggConstants import *
+from libraries.rggQt import QAction, QCoreApplication, QMessageBox, QMenu, QPoint, QInputDialog, QFileDialog
+from libraries.rggConstants import UNICODE_STRING
 
 class wAction(QAction):
 
@@ -300,7 +296,7 @@ def findRandomAppend():
 	# Can't spell swear words without vowels
 	# Left out l and v because they look enough like i and u
 	letters = '256789bcdfghjkmnpqrstwxz'
-	return choice(letters)
+	return rchoice(letters)
 
 
 def makeLocalFilename(filename):
@@ -412,15 +408,6 @@ def getZoom():
 def getMapPosition(screenCoordinates):
 	mapPosition = list(map(lambda p,c,d: p/d - c/d, screenCoordinates, cameraPosition(), (getZoom(), getZoom())))
 	return mapPosition
-
-def checkVersion():
-	'''DEPRECATED: always returns None'''
-	'''If this is a release, and a newer release is available, returns a link to that release. Otherwise returns None.'''
-	#if DEV: return None
-	#latest = str(urllib.request.urlopen('http://31.25.101.129/rgg_ver.php').read()).split()
-	#if latest[0] > VERSION:
-	#	return latest[1]
-	return None
 
 def purgeEmptyFiles(rootpath):
 	'''Recursively deletes all empty files in rootpath and its subdirectories. Never deletes directories.'''
