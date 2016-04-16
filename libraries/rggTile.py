@@ -23,11 +23,6 @@
 from OpenGL.GL import GL_TEXTURE_2D, glBindBuffer, glBufferSubData
 from OpenGL.GL.ARB.vertex_buffer_object import GL_ARRAY_BUFFER_ARB
 
-try:
-	from numpy import zeros
-except ImportError as e:
-	print("Numpy import error ({0}): {1}".format(e.errno, e.strerror))
-
 from libraries.rggConstants import UNICODE_STRING
 
 class tile(object):
@@ -43,12 +38,10 @@ class tile(object):
 		self.dynamicity = dynamicity
 		self.textureId = None
 		self.offset = None
-		self.VBO = None
 		self._hidden = hidden
 		self.glwidget = glwidget
 		self.createLayer = False
 		self.destroyed = False
-		self.VBOData = zeros((8, 2), 'f')
 		self.origtextrect = textureRect
 		self.rotation = 0.0
 
@@ -59,8 +52,6 @@ class tile(object):
 			w = float(textureRect[2])/float(origsize.width())
 			h = float(textureRect[3])/float(origsize.height())
 			self.textureRect = [x, y, w, h]
-
-		self.setVBOData()
 
 	def destroy(self):
 		if not self.destroyed:
@@ -132,12 +123,6 @@ class tile(object):
 	def setDrawRect(self, drawRect):
 		self.drawRect = drawRect
 
-		if self.glwidget.vbos:
-			self.setVBOData()
-
-			glBindBuffer(GL_ARRAY_BUFFER_ARB, self.VBO)
-			glBufferSubData(GL_ARRAY_BUFFER_ARB, int(self.offset*self.glwidget.vertByteCount/4), self.glwidget.vertByteCount, self.VBOData)
-
 	def displaceDrawRect(self, displacement):
 		self.drawRect = list(self.drawRect)
 		self.drawRect[0] = self.drawRect[0] + displacement[0]
@@ -154,12 +139,6 @@ class tile(object):
 			h = float(textureRect[3])/float(origsize.height())
 			self.textureRect = [x, y, w, h]
 
-		if self.glwidget.vbos:
-			self.setVBOData()
-
-			glBindBuffer(GL_ARRAY_BUFFER_ARB, self.VBO)
-			glBufferSubData(GL_ARRAY_BUFFER_ARB, int(self.offset*self.glwidget.vertByteCount/4), self.glwidget.vertByteCount, self.VBOData)
-
 	def displaceTextureRect(self, displacement):
 		if self.glwidget.texext == GL_TEXTURE_2D:
 			origsize = self.glwidget.getImageSize(self.imagepath)
@@ -171,42 +150,6 @@ class tile(object):
 		else:
 			self.textureRect[0] += displacement[0]
 			self.textureRect[1] += displacement[1]
-
-		if self.glwidget.vbos:
-			self.setVBOData()
-			glBindBuffer(GL_ARRAY_BUFFER_ARB, self.VBO)
-			glBufferSubData(GL_ARRAY_BUFFER_ARB, int(self.offset*self.glwidget.vertByteCount/4), self.glwidget.vertByteCount, self.VBOData)
-
-	def getVBOData(self):
-		return self.VBOData
-
-	def setVBOData(self):
-		x, y, w, h = self.textureRect
-		dx, dy, dw, dh = self.drawRect
-
-		self.VBOData[0, 0] = x #tex
-		self.VBOData[0, 1] = y+h
-
-		self.VBOData[1, 0] = dx #vert
-		self.VBOData[1, 1] = dy
-
-		self.VBOData[2, 0] = x+w #tex
-		self.VBOData[2, 1] = y+h
-
-		self.VBOData[3, 0] = dx+dw #vert
-		self.VBOData[3, 1] = dy
-
-		self.VBOData[4, 0] = x+w
-		self.VBOData[4, 1] = y
-
-		self.VBOData[5, 0] = dx+dw
-		self.VBOData[5, 1] = dy+dh
-
-		self.VBOData[6, 0] = x
-		self.VBOData[6, 1] = y
-
-		self.VBOData[7, 0] = dx
-		self.VBOData[7, 1] = dy+dh
 
 	def __str__(self):
 		text = "Image(", self.imagepath, self.drawRect, self.textureRect, self.layer, self.offset, self.textureId, self._hidden, ")"

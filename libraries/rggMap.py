@@ -107,10 +107,7 @@ class Map(object):
 		if self.tiles != None:
 			mainWindow.glwidget.deleteImages(self.tiles)
 
-		#print("deleted tiles")
-
 		self.tiles = [None]*self.mapsize[0]*self.mapsize[1]
-		mainWindow.glwidget.reserveVBOSize(self.mapsize[0] * self.mapsize[1])
 
 		for y in range(0, self.mapsize[1]):
 			for x in range(0, self.mapsize[0]):

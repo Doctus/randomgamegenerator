@@ -33,12 +33,9 @@ from OpenGL.GL import GL_TEXTURE_MIN_FILTER, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_W
 from OpenGL.GL import GL_GENERATE_MIPMAP, GL_CLAMP_TO_EDGE, GL_TEXTURE_WRAP_R, GL_TEXTURE_WRAP_T, GL_RGBA
 from OpenGL.GL import GL_UNSIGNED_BYTE, GL_QUADS, glVertex3f, glTexCoord2f, glTexParameteri
 from OpenGL.GL import glTexImage2D, glGenerateMipmap, glDeleteTextures, glRotatef
-#from OpenGL.GLU import
 from OpenGL.GL.EXT.texture_filter_anisotropic import GL_TEXTURE_MAX_ANISOTROPY_EXT
 from OpenGL.extensions import hasGLExtension
 from OpenGL.GL.ARB.vertex_buffer_object import GL_STATIC_DRAW_ARB
-#from OpenGL.GL.ARB.framebuffer_object import
-from OpenGL.arrays import ArrayDatatype as ADT
 
 #Only set these when creating non-development code
 OpenGL.ERROR_CHECKING = False
@@ -47,7 +44,6 @@ OpenGL.ERROR_LOGGING = False
 from math import cos, sin
 from os import path
 from sys import _getframe
-from numpy import zeros
 
 from libraries.rggQt import QGLWidget, pyqtSignal, Qt, QImage
 from libraries.rggTile import tile
@@ -103,7 +99,6 @@ class GLWidget(QGLWidget):
 		self.error = False
 		self.texts = []
 		self.textid = 0
-		self.vertByteCount = ADT.arrayByteCount(zeros((8, 2), 'f'))
 		self.logoon = "Off"
 
 		self.setAcceptDrops(True)
@@ -130,14 +125,10 @@ class GLWidget(QGLWidget):
 		glTranslatef(self.camera[0], self.camera[1], 0)
 		glScaled(self.zoom, self.zoom, 1)
 
-		if self.vbos:
-			glColor4f(1.0, 1.0, 1.0, 1.0)
-			glmod.drawVBO()
-		else:
-			glColor4f(1.0, 1.0, 1.0, 1.0)
-			for layer in self.layers:
-				for img in self.images[layer]:
-					self.drawImage(img)
+		glColor4f(1.0, 1.0, 1.0, 1.0)
+		for layer in self.layers:
+			for img in self.images[layer]:
+				self.drawImage(img)
 
 		glDisable(self.texext)
 		for layer in self.lines:
@@ -441,64 +432,7 @@ class GLWidget(QGLWidget):
 		self.images[layer].append(image)
 		self.allimgs.append(image)
 
-		if self.vbos:
-			image.VBO = self.VBO
-			if not self.fillBuffers(image):
-				self.calculateVBOList(image)
-
 		return image
-
-	def reserveVBOSize(self, size):
-		'''
-		Reserves a VBO with the specified size as the amount of VBO entries, and re-assigns all images with the new data.
-		'''
-		if self.vbos and size > self.VBOBuffer:
-			self.VBOBuffer = nextPowerOfTwo(size+1)
-			#print("reserving size", self.VBOBuffer)
-
-			self.fillBuffers(None, False) #Automatically does a calculateVBOList()
-
-	def fillBuffers(self, image = None, resize = True):
-		'''
-		if image == None, this function requests a new BO from the GPU with a calculated size
-		if image != None, this function adds the VBO data from image to the BO in the GPU, if there is enough space.
-		'''
-		size = len(self.allimgs)
-
-		glBindBufferARB(GL_ARRAY_BUFFER_ARB, self.VBO)
-
-		#print self.offset, (self.VBOBuffer*self.vertByteCount)
-
-		if self.VBOBuffer <= size or image == None or self.offset + self.vertByteCount >= self.VBOBuffer*self.vertByteCount:
-			if resize and self.VBOBuffer <= size:
-				#print("resizing from", size, "to", nextPowerOfTwo(size+1))
-				self.VBOBuffer = nextPowerOfTwo(size+1)
-
-			glBufferDataARB(GL_ARRAY_BUFFER_ARB, self.VBOBuffer*self.vertByteCount, None, GL_STATIC_DRAW_ARB)
-
-			self.offset = 0
-
-			for img in self.allimgs:
-				img.offset = int(float(self.offset)/self.vertByteCount*4)
-				VBOData = img.getVBOData()
-
-				glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, self.offset, self.vertByteCount, VBOData)
-				self.offset += self.vertByteCount
-
-			self.calculateVBOList()
-
-			glBindBuffer(GL_ARRAY_BUFFER_ARB, 0)
-			return True
-
-		else:
-			image.offset = int(float(self.offset)/self.vertByteCount*4)
-			VBOData = image.getVBOData()
-
-			glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, self.offset, self.vertByteCount, VBOData)
-			self.offset += self.vertByteCount
-
-			glBindBuffer(GL_ARRAY_BUFFER_ARB, 0)
-			return False
 
 	def deleteImage(self, image):
 		'''
@@ -514,9 +448,6 @@ class GLWidget(QGLWidget):
 
 		self.images[image.layer].remove(image)
 		self.allimgs.remove(image)
-
-		if self.vbos:
-			self.calculateVBOList(image, True)
 
 		image = None
 
@@ -535,9 +466,6 @@ class GLWidget(QGLWidget):
 
 			self.images[image.layer].remove(image)
 			self.allimgs.remove(image)
-
-		if self.vbos:
-			self.calculateVBOList()
 
 	def drawImage(self, image):
 
@@ -590,53 +518,12 @@ class GLWidget(QGLWidget):
 
 		glPopMatrix()
 
-	def calculateVBOList(self, image = None, delete = False):
-		'''
-		Create the VBO list to be passed on to the module for drawing
-		or if the change is only one image, modify it.
-		'''
-		if len(self.layers) > 0 and image != None:
-			if delete:
-				#print "delete"
-				temp = [self.layers.index(image.layer)]
-				for img in self.images[image.layer]:
-					if img.hidden or img == image:
-						continue
-					temp.append(int(img.textureId))
-					temp.append(img.offset)
-				glmod.setVBOlayer(tuple(temp))
-			elif image.createLayer:
-				layer = self.layers.index(image.layer)
-				glmod.insertVBOlayer((layer, int(image.textureId), image.offset))
-				#print "addLayer", (layer, image.textureId, image.offset)
-				image.createLayer = False
-			else:
-				layer = self.layers.index(image.layer)
-				#print "addEntry", (layer, image.textureId, image.offset)
-				glmod.addVBOentry((layer, int(image.textureId), image.offset))
-			return
-
-		vbolist = []
-		for layer in self.layers:
-			temp = []
-			for img in self.images[layer]:
-				if img.hidden:
-					continue
-				temp.append(img.textureId)
-				temp.append(img.offset)
-			vbolist.append(tuple(temp))
-
-		if len(vbolist) > 0:
-			#print "setVBO", vbolist
-			glmod.setVBO(tuple(vbolist))
-
 	def hideImage(self, image, hide):
 		'''
 		This function should only be called from image.py
 		Use Image.hide() instead.
 		'''
-		if self.vbos:
-			self.calculateVBOList(image, hide)
+		pass
 
 	def setLayer(self, image, newLayer):
 		'''
@@ -656,9 +543,6 @@ class GLWidget(QGLWidget):
 
 		self.images[oldLayer].remove(image)
 		self.images[newLayer].append(image)
-
-		if self.vbos:
-			self.calculateVBOList(image)
 
 	def getImageSize(self, image):
 		qimg = None

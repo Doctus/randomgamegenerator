@@ -1,4 +1,4 @@
-RGG v1.04 "Fate and Chance cast lots"
+RGG v1.50 "Mystery crept nearer from every side"
 
 https://github.com/Doctus/randomgamegenerator
 
@@ -66,6 +66,15 @@ Licensing
   and COPYING.LESSER files in the "doc" folder.
 
 Changelog
+
+v1.50 "Mystery crept nearer from every side"    [in dev], 2016
+
+   Fixes
+    * Prevented errors that could occur when clicking pogs
+      before the program loaded fully.
+
+   Features and Changes
+    * No longer explicitly dependent on numpy.
 
 v1.04 "Fate and Chance cast lots"               April 14, 2016
 

@@ -72,11 +72,6 @@ if __name__ == '__main__':
 	except ImportError:
 		fatalError("PyOpenGL not found. Please ensure it is installed and available.")
 
-	try:
-		from numpy import zeros
-	except ImportError:
-		fatalError("NumPy not found. Please ensure it is installed and available.")
-
 	QApplication.processEvents()
 
 	from libraries.rggSystem import injectMain
