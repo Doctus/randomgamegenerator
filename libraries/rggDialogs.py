@@ -32,7 +32,7 @@ from libraries.rggSystem import translate, findFiles, makePortableFilename
 from libraries.rggFields import integerField, floatField, stringField, dropDownField, validationError
 from libraries.rggNet import ConnectionData, localHost, localUser
 from libraries.rggJson import jsonload, jsondump, jsonappend, loadString, loadFloat, loadCoordinates, loadInteger
-from libraries.rggConstants import BASE_STRING, SAVE_DIR, IP_CACHE_TIME, PORTRAIT_DIR, IMAGE_NAME_FILTER
+from libraries.rggConstants import UNICODE_STRING, SAVE_DIR, IP_CACHE_TIME, PORTRAIT_DIR, IMAGE_NAME_FILTER
 from libraries.rggConstants import GFX_SETTINGS_FILE, ANI_FILTER_STRING, GFX_PREFIX, MIN_FILTER_STRING, MAG_FILTER_STRING
 from libraries.rggConstants import MIPMIN_FILTER_STRING, FSAA_SETTING_STRING, VBO_SETTING_STRING, ON_OFF_OPTIONS
 from libraries.rggConstants import TILESET_DIR, IMAGE_EXTENSIONS, STANDARD_FILTER_OPTIONS, MIP_FILTER_OPTIONS
@@ -164,17 +164,17 @@ class createSurveyDialog(QDialog):
 
 	def addNewItem(self):
 		if self.types.currentText() == "Multiple choice":
-			self.addedItems.append({"type":"Multiple choice", "prompt":BASE_STRING(self.multiChoicePrompt.text()), "options":list(BASE_STRING(self.multiChoiceOptions.toPlainText()).split("\n"))})
+			self.addedItems.append({"type":"Multiple choice", "prompt":UNICODE_STRING(self.multiChoicePrompt.text()), "options":list(UNICODE_STRING(self.multiChoiceOptions.toPlainText()).split("\n"))})
 			self.multiChoicePrompt.clear()
 			self.multiChoiceOptions.clear()
 		elif self.types.currentText() == "Fill-in":
-			self.addedItems.append({"type":"Fill-in", "prompt":BASE_STRING(self.fillInPrompt.text())})
+			self.addedItems.append({"type":"Fill-in", "prompt":UNICODE_STRING(self.fillInPrompt.text())})
 			self.fillInPrompt.clear()
 		elif self.types.currentText() == "Yes/no":
-			self.addedItems.append({"type":"Yes/no", "prompt":BASE_STRING(self.YesNoPrompt.text())})
+			self.addedItems.append({"type":"Yes/no", "prompt":UNICODE_STRING(self.YesNoPrompt.text())})
 			self.YesNoPrompt.clear()
 		elif self.types.currentText() == "Check all that apply":
-			self.addedItems.append({"type":"Check all that apply", "prompt":BASE_STRING(self.allThatApplyPrompt.text()), "options":list(BASE_STRING(self.allThatApplyOptions.toPlainText()).split("\n"))})
+			self.addedItems.append({"type":"Check all that apply", "prompt":UNICODE_STRING(self.allThatApplyPrompt.text()), "options":list(UNICODE_STRING(self.allThatApplyOptions.toPlainText()).split("\n"))})
 			self.allThatApplyPrompt.clear()
 			self.allThatApplyOptions.clear()
 
@@ -265,14 +265,14 @@ class respondSurveyDialog(QDialog):
 		answers = {}
 		for key, value in list(self.responseAssociation.items()):
 			if value[0] == "M" or value[0] == "Y":
-				answers[key] = BASE_STRING(value[1].checkedButton().text())
+				answers[key] = UNICODE_STRING(value[1].checkedButton().text())
 			elif value[0] == "F":
-				answers[key] = BASE_STRING(value[1].text())
+				answers[key] = UNICODE_STRING(value[1].text())
 			elif value[0] == "C":
 				results = []
 				for item in value[1]:
 					if item.isChecked():
-						results.append(BASE_STRING(item.text()))
+						results.append(UNICODE_STRING(item.text()))
 				answers[key] = "; ".join(results)
 		return answers
 
@@ -306,8 +306,8 @@ class resizeDialog(QDialog):
 		QDialog.__init__(self, mainWindow)
 		self.owlabel = QLabel("Current Width:")
 		self.ohlabel = QLabel("Current Height:")
-		self.owlabel2 = QLabel(BASE_STRING(origx))
-		self.ohlabel2 = QLabel(BASE_STRING(origy))
+		self.owlabel2 = QLabel(UNICODE_STRING(origx))
+		self.ohlabel2 = QLabel(UNICODE_STRING(origy))
 		self.setWindowTitle("Resize Pog")
 
 		self.wlabel = QLabel("New Width:")
@@ -380,16 +380,16 @@ class modifyPogAttributesDialog(QDialog):
 		self.currentProperties = {}
 		for tableRow in range(self.table.rowCount() + 1):
 			try:
-				assert len(BASE_STRING(self.table.item(tableRow, 0).text())) > 0
-				assert len(BASE_STRING(self.table.item(tableRow, 1).text())) > 0
-				self.currentProperties[BASE_STRING(self.table.item(tableRow, 0).text())] = BASE_STRING(self.table.item(tableRow, 1).text())
+				assert len(UNICODE_STRING(self.table.item(tableRow, 0).text())) > 0
+				assert len(UNICODE_STRING(self.table.item(tableRow, 1).text())) > 0
+				self.currentProperties[UNICODE_STRING(self.table.item(tableRow, 0).text())] = UNICODE_STRING(self.table.item(tableRow, 1).text())
 			except AttributeError:
 				pass
 			except KeyError:
 				pass
 			except AssertionError:
 				pass
-		if row == self.table.rowCount() - 1 and self.table.item(row, 0) and len(BASE_STRING(self.table.item(row, 0).text())) > 0:
+		if row == self.table.rowCount() - 1 and self.table.item(row, 0) and len(UNICODE_STRING(self.table.item(row, 0).text())) > 0:
 			self.table.setRowCount(self.table.rowCount() + 1)
 
 	def okPressed(self, checked):
