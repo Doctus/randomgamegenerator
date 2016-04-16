@@ -35,7 +35,6 @@ Requirements
 
   Python2 or Python3
   PyQt4 or PyQt5
-  NumPy
   PyOpenGL
 
   Optional:
