@@ -60,7 +60,7 @@ def initialize():
 	GlobalState.users[client.username] = GlobalState.localuser
 	GlobalState.keepalive = 4
 
-	GlobalState.mwidget.moveMapButton.clicked.connect(moveMap)
+	#GlobalState.mwidget.moveMapButton.clicked.connect(moveMap)
 
 	purgeEmptyImages()
 
