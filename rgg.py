@@ -45,7 +45,7 @@ if __name__ == '__main__':
 		progress.setWindowModality(2)
 		progress.setWindowFlags(progress.windowFlags() | 262144)
 
-		progress.setMinimumDuration(250)
+		progress.setMinimumDuration(1)
 
 		progress.setValue(1)
 

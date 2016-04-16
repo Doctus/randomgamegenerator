@@ -38,6 +38,8 @@ class transferMonitorWidget(QDockWidget):
 
 		mainWindow.addDockWidget(Qt.BottomDockWidgetArea, self)
 
+		self.hide()
+
 	def updateItem(self, client, filename, status):
 		'''Update the status of a transfer, creating a new table row for it if it's new.'''
 		if client.username + filename not in list(self.transferDict.keys()):

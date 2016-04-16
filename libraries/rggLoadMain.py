@@ -29,6 +29,7 @@ PROGRESS = [None,]
 def loadMain():
 	from libraries.rggQt import QApplication
 	progress = PROGRESS[0]
+	progress.forceShow()
 
 	from . import rggRPC, rggState, rggViews
 	from libraries.rggDockWidget import initialize as dockInitialize

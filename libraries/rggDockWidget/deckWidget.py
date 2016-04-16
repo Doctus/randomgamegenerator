@@ -66,6 +66,8 @@ class deckWidget(QDockWidget):
 
 		mainWindow.addDockWidget(Qt.BottomDockWidgetArea, self)
 
+		self.hide()
+
 	def addCard(self, *args, **kwargs):
 		self.deckDisplay.addItem(str(self.cardNameField.text()))
 
