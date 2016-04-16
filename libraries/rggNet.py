@@ -26,7 +26,7 @@ from getpass import getuser
 from libraries.rggQt import QTimer, QFile, QTcpServer, QHostAddress, QHostInfo
 from libraries.rggSocket import statefulSocket, generateChecksum, fileData
 from libraries.rggSystem import translate, mainWindow, signal, makeLocalFilename, findRandomAppend
-from libraries.rggConstants import UNICODE_STRING, BASE_STRING
+from libraries.rggConstants import UNICODE_STRING, BASE_STRING, NETWORK_VERSION, COMPATIBLE_NETWORK_VERSIONS
 
 MESSAGE_IDENTIFY = "IDENTIFY" # Identify this client
 MESSAGE_ACTIVATE = "ACTIVATE" # Assign username
@@ -635,7 +635,7 @@ class JsonClient(BaseClient):
 	def _socketConnected(self, socket):
 		"""Called when a socket is connected."""
 		if socket == self.obj:
-			self.obj.sendMessage(MESSAGE_IDENTIFY, protocol=PROTOCOL_OBJECT, username=self.username, passw=self.password)
+			self.obj.sendMessage(MESSAGE_IDENTIFY, protocol=PROTOCOL_OBJECT, username=self.username, passw=self.password, networkVersion=NETWORK_VERSION)
 		elif socket == self.xfer:
 			self.xfer.sendMessage(MESSAGE_IDENTIFY, protocol=PROTOCOL_TRANSFER, username=self.username)
 
@@ -1130,11 +1130,16 @@ class JsonServer(object):
 			message = message.format(command=command, parms=repr(kwargs), err=e)
 			self._forbidSocket(socket, message)
 
-	def _socketIdentified(self, socket, protocol, username, passw = None):
+	def _socketIdentified(self, socket, protocol, username, passw = None, networkVersion = "1"):
 		"""Socket identifies itself with protocol and username."""
 		if protocol not in (PROTOCOL_OBJECT, PROTOCOL_TRANSFER):
 			message = "Disallowed protocol identified {protocol} ({username})"
 			message = message.format(protocol=protocol, username=username)
+			self._forbidSocket(socket, message)
+			return
+		if networkVersion not in COMPATIBLE_NETWORK_VERSIONS:
+			message = "Incompatible network version (client should update RGG): {networkVersion} ({username})"
+			message = message.format(networkVersion=networkVersion, username=username)
 			self._forbidSocket(socket, message)
 			return
 		self._detachUnknown(socket)

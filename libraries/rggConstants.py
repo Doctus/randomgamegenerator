@@ -25,7 +25,9 @@ from sys import version_info
 
 # Version
 
-VERSION = "1.04"
+VERSION = "1.50"
+NETWORK_VERSION = "1.5"
+COMPATIBLE_NETWORK_VERSIONS = ("1", "1.5")
 DEV = True
 REPOSITORY_LINK = "https://github.com/Doctus/randomgamegenerator"
 LICENSING_INFO = "See readme.txt for licensing information."
