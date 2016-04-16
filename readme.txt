@@ -75,6 +75,8 @@ v1.50 "Mystery crept nearer from every side"    [in dev], 2016
    Features and Changes
     * No longer explicitly dependent on numpy.
 
+  ---
+
 v1.04 "Fate and Chance cast lots"               April 14, 2016
 
    Fixes
