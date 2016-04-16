@@ -21,8 +21,10 @@ Actions which occur in response to user commands.
 '''
 from os import path as ospath
 
-from libraries.rggConstants import *
-from libraries.rggDialogs import *
+from libraries.rggConstants import PING_INTERVAL_SECONDS, SAVE_DIR, LATE_RESPONSE_LEVEL, UNICODE_STRING, MAP_DIR
+from libraries.rggConstants import CHARSHEETS_DIR, POG_DIR, PORTRAIT_DIR, TILESET_DIR, COLOURS, CHAR_DIR
+from libraries.rggDialogs import hostDialog, newMapDialog, resizeDialog, modifyPogAttributesDialog, gfxSettingsDialog
+from libraries.rggDialogs import surveyResultsDialog, respondSurveyDialog, createSurveyDialog, joinDialog
 from libraries.rggDice import isRollValid, roll
 from libraries.rggEvent import addMouseMoveListener, addMousePressListener, addMouseReleaseListener
 from libraries.rggEvent import addKeyPressListener, addKeyReleaseListener, pogUpdateEvent, pogSelectionChangedEvent
@@ -30,13 +32,18 @@ from libraries.rggJson import jsondump, jsonload, jsonappend, loadString
 from libraries.rggMap import Map
 from libraries.rggMenuBar import ICON_SELECT, ICON_MOVE, ICON_DRAW, ICON_DELETE, menuBar
 from libraries.rggPog import Pog
-from libraries.rggQt import *
+from libraries.rggQt import QTimer, QCursor, QMessageBox, QColorDialog, Qt, QPixmap
 from libraries.rggResource import crm, srm
 from libraries.rggRPC import server, client, serverRPC, clientRPC
 from libraries.rggSession import Session
 from libraries.rggState import GlobalState
 from libraries.rggStyles import sheets
-from libraries.rggSystem import *
+from libraries.rggSystem import clearSelectionCircles, drawSelectionCircle, translate, promptString, promptInteger
+from libraries.rggSystem import promptYesNo, showErrorMessage, promptLoadFile, promptSaveFile, mainWindow
+from libraries.rggSystem import getZoom, setCameraPosition, cameraPosition, drawLine, drawSegmentedLine
+from libraries.rggSystem import drawCircle, drawRectangleMadeOfLines, drawRegularPolygon, deleteLine
+from libraries.rggSystem import clearPreviewLines, clearRectangles, drawRectangle, showPopupMenuAt, getMapPosition
+from libraries.rggSystem import promptButtonSelection, checkFileExtension, cameraSize, purgeEmptyFiles
 
 # Button enum
 BUTTON_LEFT = 0
@@ -75,21 +82,21 @@ def initialize():
 		setStyle("Default", False)
 
 	try:
-		js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
+		js = jsonload(ospath.join(SAVE_DIR, "ui_settings.rgs"))
 		if loadString('chatWidget.notify', js.get('notify')) == "Off":
 			GlobalState.alert = False
 	except:
 		pass
 
 	try:
-		js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
+		js = jsonload(ospath.join(SAVE_DIR, "ui_settings.rgs"))
 		if loadString('chatWidget.rightclick', js.get('rightclick')) == "Off":
 			GlobalState.rightclickmode = False
 	except:
 		pass
 
 	try:
-		js = jsonload(path.join(SAVE_DIR, "ui_settings.rgs"))
+		js = jsonload(ospath.join(SAVE_DIR, "ui_settings.rgs"))
 		if loadString('chatWidget.gridlock', js.get('gridlock')) == "On":
 			GlobalState.gridMode = True
 	except:
@@ -297,7 +304,7 @@ def allusers():
 def allusersbut(usernameOrUser):
 	user = getuser(usernameOrUser)
 	if not user:
-		raise RuntimeError("No user named {user}.".format(user=idOrNameOrUser))
+		raise RuntimeError("No user named {user}.".format(user=usernameOrUser))
 	all = allusers()
 	assert(user in all)
 	all.remove(user)
@@ -519,9 +526,7 @@ def killConnection():
 	client.close()
 	assert(localhandle() in usernames())
 	assert(localuser() == getuser(localhandle()))
-	users = {localhandle(): localuser()}
 	clearUserList()
-	#print "KILL"
 
 def disconnectGame():
 	"""Allows the user to disconnect from the internet."""
