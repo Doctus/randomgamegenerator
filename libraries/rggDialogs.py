@@ -34,7 +34,7 @@ from libraries.rggNet import ConnectionData, localHost, localUser
 from libraries.rggJson import jsonload, jsondump, jsonappend, loadString, loadFloat, loadCoordinates, loadInteger
 from libraries.rggConstants import UNICODE_STRING, SAVE_DIR, IP_CACHE_TIME, PORTRAIT_DIR, IMAGE_NAME_FILTER
 from libraries.rggConstants import GFX_SETTINGS_FILE, ANI_FILTER_STRING, GFX_PREFIX, MIN_FILTER_STRING, MAG_FILTER_STRING
-from libraries.rggConstants import MIPMIN_FILTER_STRING, FSAA_SETTING_STRING, VBO_SETTING_STRING, ON_OFF_OPTIONS
+from libraries.rggConstants import MIPMIN_FILTER_STRING, FSAA_SETTING_STRING, ON_OFF_OPTIONS
 from libraries.rggConstants import TILESET_DIR, IMAGE_EXTENSIONS, STANDARD_FILTER_OPTIONS, MIP_FILTER_OPTIONS
 
 
@@ -1029,12 +1029,12 @@ class gfxSettingsDialog(dialog):
 			js = jsonload(path.join(SAVE_DIR, GFX_SETTINGS_FILE))
 			for field in [ANI_FILTER_STRING,]:
 				self.fields[field] = loadFloat(GFX_PREFIX + field, js.get(field))
-			for field in [MIN_FILTER_STRING, MAG_FILTER_STRING, MIPMIN_FILTER_STRING, FSAA_SETTING_STRING, VBO_SETTING_STRING]:
+			for field in [MIN_FILTER_STRING, MAG_FILTER_STRING, MIPMIN_FILTER_STRING, FSAA_SETTING_STRING]:
 				self.fields[field] = loadString(GFX_PREFIX + field, js.get(field))
 		except IOError as e:
 			print("Graphics settings file could not be loaded: %s" % e)
 			self.fields = {ANI_FILTER_STRING:1.0, MIN_FILTER_STRING:"GL_NEAREST", MAG_FILTER_STRING:"GL_NEAREST",
-							MIPMIN_FILTER_STRING:"GL_NEAREST_MIPMAP_NEAREST", FSAA_SETTING_STRING:1, VBO_SETTING_STRING:1}
+							MIPMIN_FILTER_STRING:"GL_NEAREST_MIPMAP_NEAREST", FSAA_SETTING_STRING:1}
 
 		return dict(
 			anifilt=floatField(translate('gfxSettingsDialog', ANI_FILTER_STRING),
@@ -1046,9 +1046,7 @@ class gfxSettingsDialog(dialog):
 			mipminfilter=dropDownField(translate('gfxSettingsDialog', MIPMIN_FILTER_STRING), MIP_FILTER_OPTIONS,
 				value=data.get(MIPMIN_FILTER_STRING, self.fields[MIPMIN_FILTER_STRING])),
 			FSAA=dropDownField(translate('gfxSettingsDialog', FSAA_SETTING_STRING), ON_OFF_OPTIONS,
-				value=data.get(FSAA_SETTING_STRING, self.fields[FSAA_SETTING_STRING])),
-			VBO=dropDownField(translate('gfxSettingsDialog', VBO_SETTING_STRING), ON_OFF_OPTIONS,
-				value=data.get(VBO_SETTING_STRING, self.fields[VBO_SETTING_STRING])))
+				value=data.get(FSAA_SETTING_STRING, self.fields[FSAA_SETTING_STRING])))
 
 	def _interpretFields(self, fields):
 		"""Interpret the fields into a dictionary of clean items."""
@@ -1074,7 +1072,7 @@ class gfxSettingsDialog(dialog):
 
 		# Add fields
 		formLayout = QFormLayout()
-		for id in (ANI_FILTER_STRING, MIN_FILTER_STRING, MAG_FILTER_STRING, MIPMIN_FILTER_STRING, FSAA_SETTING_STRING, VBO_SETTING_STRING):
+		for id in (ANI_FILTER_STRING, MIN_FILTER_STRING, MAG_FILTER_STRING, MIPMIN_FILTER_STRING, FSAA_SETTING_STRING):
 			field = self.fields[id]
 			formLayout.addRow(translate('gfxSettingsDialog', '{0}: ', 'Row layout').format(field.name), field.widget(widget))
 

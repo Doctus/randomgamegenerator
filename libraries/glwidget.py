@@ -84,9 +84,6 @@ class GLWidget(QGLWidget):
 		self.camera = [0, 0]
 		self.layers = []
 		self.zoom = 1
-		self.VBO = None
-		self.vbos = False
-		self.VBOBuffer = 0
 		self.offset = 0
 		self.ctrl = False
 		self.shift = False
@@ -275,7 +272,7 @@ class GLWidget(QGLWidget):
 		Initialize GL
 		'''
 
-		self.fieldtemp = [1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", "On", "On", "Magic"]
+		self.fieldtemp = [1.0, "GL_NEAREST", "GL_NEAREST", "GL_NEAREST_MIPMAP_NEAREST", "On"]
 
 		try:
 			js = jsonload(path.join(SAVE_DIR, "gfx_settings.rgs"))
@@ -284,19 +281,9 @@ class GLWidget(QGLWidget):
 			self.fieldtemp[2] = loadString('gfx.magfilter', js.get('magfilter'))
 			self.fieldtemp[3] = loadString('gfx.mipminfilter', js.get('mipminfilter'))
 			self.fieldtemp[4] = loadString('gfx.FSAA', js.get('FSAA'))
-			self.fieldtemp[5] = loadString('gfx.VBO', js.get('VBO'))
 		except:
 			#print("no settings detected")
 			pass
-
-		try:
-			self.fieldtemp[6] = loadString('gfx.magic', js.get('Magic'))
-		except:
-			pass
-
-		if self.fieldtemp[6] == "More Magic":
-			try: glEnable(GL_MULTISAMPLE) #Supposed to fail
-			except: pass
 
 		#mipmap support and NPOT texture support block
 		if not hasGLExtension("GL_ARB_framebuffer_object"):
@@ -530,8 +517,6 @@ class GLWidget(QGLWidget):
 		This function should only be called from image.py
 		Use Image.layer instead.
 		'''
-		if self.vbos:
-			self.calculateVBOList(image, True)
 
 		oldLayer = image._layer
 		image._layer = newLayer
