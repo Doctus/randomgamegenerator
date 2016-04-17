@@ -21,16 +21,18 @@ Remote views.
 '''
 from os import path
 
+from libraries.rggConstants import PORTRAIT_DIR
 from libraries.rggResource import crm, srm, RESOURCE_IMAGE
+from libraries.rggRPC import clientRPC, serverRPC, receiveClientRPC, receiveServerRPC
+from libraries.rggState import GlobalState
 from libraries.rggSystem import translate, fake, makePortableFilename
 from libraries.rggViews import say, ICSay, linkedName, getPortraitSize
 from libraries.rggViews import localhandle, getuser, allusers, allusersbut
 from libraries.rggViews import User, addUserToList, getNetUserList, respondUserRemove
 from libraries.rggViews import clearUserList, reconnectTransferSocket, renameuser
-from libraries.rggViews import _closeAllMaps, setUwidgetLocal, adduser, respondSession
-from libraries.rggViews import getSession, respondChangeGM, getGM, respondUserList, removeuser
-from libraries.rggRPC import clientRPC, serverRPC, receiveClientRPC, receiveServerRPC
-from libraries.rggConstants import PORTRAIT_DIR
+from libraries.rggViews import _closeAllMaps, setUwidgetLocal, adduser
+from libraries.rggViews import respondChangeGM, getGM, respondUserList, removeuser
+from libraries.rggViews.session import respondSession
 
 @serverRPC
 def respondError(message, *args, **kwargs):
@@ -236,7 +238,7 @@ def serverConnect(server, username):
 	user = User(username)
 	adduser(user)
 	respondUserJoin(allusersbut(user), username)
-	respondSession(user, getSession().dump())
+	respondSession(user, GlobalState.session.dump())
 	respondChangeGM(user, getGM(), localhandle())
 	respondUserList(user, getNetUserList())
 

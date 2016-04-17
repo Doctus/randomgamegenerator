@@ -31,7 +31,10 @@ def loadMain():
 	progress = PROGRESS[0]
 	progress.forceShow()
 
-	from . import rggRPC, rggState, rggViews
+	from libraries.rggRPC import server, client
+	from libraries.rggState import GlobalState
+	from libraries.rggViews import initialize as viewsInitialize
+	from libraries.rggViews.session import autoloadSession
 	from libraries.rggDockWidget import initialize as dockInitialize
 	progress.setValue(2)
 	QApplication.processEvents()
@@ -41,21 +44,21 @@ def loadMain():
 
 	# Initialize view state.
 	progress.setLabelText("Initializing widgets...")
-	rggState.GlobalState.initialize(APPLICATION[0])
+	GlobalState.initialize(APPLICATION[0])
 	progress.setValue(4)
 	QApplication.processEvents()
 	dockInitialize(MAIN[0])
 	progress.setValue(5)
 	QApplication.processEvents()
-	rggViews.initialize()
+	viewsInitialize()
 
 	progress.setValue(6)
 	QApplication.processEvents()
 
 	progress.setLabelText("Initializing network capabilities...")
 
-	SERVER[0] = rggRPC.server
-	CLIENT[0] = rggRPC.client
+	SERVER[0] = server
+	CLIENT[0] = client
 
 	progress.setValue(7)
 	QApplication.processEvents()
@@ -72,7 +75,7 @@ def loadMain():
 
 	progress.setLabelText("Loading autosaved session...")
 
-	rggViews.autoloadSession()
+	autoloadSession()
 
 	progress.setValue(9)
 	QApplication.processEvents()

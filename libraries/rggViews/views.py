@@ -35,7 +35,6 @@ from libraries.rggPog import Pog
 from libraries.rggQt import QTimer, QCursor, QMessageBox, QColorDialog, Qt, QPixmap
 from libraries.rggResource import crm, srm
 from libraries.rggRPC import server, client, serverRPC, clientRPC
-from libraries.rggSession import Session
 from libraries.rggState import GlobalState
 from libraries.rggStyles import sheets
 from libraries.rggSystem import clearSelectionCircles, drawSelectionCircle, translate, promptString, promptInteger
@@ -514,7 +513,6 @@ def joinGame():
 		return valid
 
 	if dialog.exec_(mainWindow, accept):
-		_clearSession() #Just in case...
 		connection = dialog.save()
 		renameuser(localhandle(), connection.username)
 		client.setPassword(connection.password)
@@ -585,39 +583,9 @@ def closeAllMaps():
 		_closeAllMaps()
 		sendCloseAllMaps()
 
-@serverRPC
-def respondClearSession():
-	_clearSession()
-
-@clientRPC
-def sendClearSession(user):
-	respondClearSession(allusersbut(user))
-
-def _clearSession():
-	clearPogSelection()
-	GlobalState.cameraPog = None
-	GlobalState.pogmove = [0, 0]
-	GlobalState.moveablePogs = []
-	GlobalState.session.clear()
-
-def clearSession():
-	if promptYesNo(translate('views', 'Are you sure you want to clear the current session completely for all connected players?')) == 16384:
-		_clearSession()
-		sendClearSession()
-
 def internalAddMap(map):
 	GlobalState.session.addMap(map)
 	sendMapCreate(map.ID, map.dump(), map.tileset)
-
-@serverRPC
-def respondSession(sess):
-	if GlobalState.session is not None:
-		GlobalState.session.clear()
-	GlobalState.session = Session.load(sess)
-
-@clientRPC
-def sendSession(user, session):
-	respondSession(allusersbut(user), session)
 
 def newMap():
 	"""Allows the user to choose a new map."""
@@ -700,47 +668,6 @@ def closeMap():
 	map = mapIDs[selectedButton]
 
 	closeSpecificMap(map)
-
-def autoloadSession():
-	try:
-		obj = jsonload(ospath.join(MAP_DIR, "autosave.rgg"))
-		sess = Session.load(obj)
-		GlobalState.session = sess
-		#Don't bother sending since we shouldn't be connected to anything yet.
-	except:
-		GlobalState.session = Session()
-	if GlobalState.session is None: #catch a few further edge cases
-		GlobalState.session = Session()
-
-def loadSession():
-	"""Allows the user to load a new map."""
-	filename = promptLoadFile(translate('views', 'Open Game Session'),
-		translate('views', 'Random Game files (*.rgg)'),
-		MAP_DIR)
-	if not filename:
-		return
-	try:
-		if GlobalState.session is not None:
-			GlobalState.session.clear()
-		obj = jsonload(filename)
-		sess = Session.load(obj)
-		GlobalState.session = sess
-		sendSession(GlobalState.session.dump())
-	except Exception as e:
-		showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
-		print(e)
-
-def saveSession():
-	filename = promptSaveFile(translate('views', 'Save Game Session'),
-		translate('views', 'Random Game files (*.rgg)'),
-		MAP_DIR)
-	if not filename:
-		return
-
-	jsondump(GlobalState.session.dump(), checkFileExtension(filename, ".rgg"))
-
-def autosaveSession():
-	jsondump(GlobalState.session.dump(), ospath.join(MAP_DIR, "autosave.rgg"))
 
 @serverRPC
 def respondSurveyAnswers(surveyData, origin):
@@ -1242,7 +1169,7 @@ def sendPolygon(user, sides, centre, edge, colour, thickness):
 
 @serverRPC
 def respondDeleteLine(x, y, w, h):
-	getSession().deleteLine(x, y, w, h)
+	GlobalState.session.deleteLine(x, y, w, h)
 	deleteLine(x, y, w, h)
 
 @clientRPC

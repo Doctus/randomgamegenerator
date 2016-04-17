@@ -132,6 +132,6 @@ if __name__ == '__main__':
 		main.show()
 		application.exec_()
 	finally:
-		from libraries.rggViews import autosaveSession
+		from libraries.rggViews.session import autosaveSession
 		autosaveSession()
 		CLIENT[0].close()
