@@ -94,7 +94,7 @@ class pogManagerWidget(QDockWidget):
 
     def pogUpdateResponse(self, pog):
         for x in xrange(self.listWidget.count()):
-            if self.listWidget.item(x).getPog().ID == pog.ID:
+            if self.listWidget.item(x) is not None and self.listWidget.item(x).getPog().ID == pog.ID:
                 self.listWidget.item(x).setPog(pog)
                 self.update()
                 return
@@ -104,7 +104,7 @@ class pogManagerWidget(QDockWidget):
 
     def pogDeleteResponse(self, pog):
         for x in xrange(self.listWidget.count()):
-            if self.listWidget.item(x).getPog().ID == pog.ID:
+            if self.listWidget.item(x) is not None and self.listWidget.item(x).getPog().ID == pog.ID:
                 self.listWidget.takeItem(x)
                 self.update()
                 #return
