@@ -9,10 +9,8 @@ from libraries.rggSystem import translate, showErrorMessage, promptSaveFile, che
 from libraries.rggViews.views import allusersbut, clearPogSelection
 
 @serverRPC
-def respondSession(sess):
-	if GlobalState.session is not None:
-		GlobalState.session.clear()
-	GlobalState.session = Session.load(sess)
+def respondSession(session):
+	_loadSession(session)
 
 @clientRPC
 def sendSession(user, session):
@@ -25,6 +23,12 @@ def respondClearSession():
 @clientRPC
 def sendClearSession(user):
 	respondClearSession(allusersbut(user))
+
+def _loadSession(data):
+	if GlobalState.session is not None:
+		GlobalState.session.clear()
+	GlobalState.session = Session.load(data)
+	GlobalState.pogmanagerwidget.refresh()
 
 def _clearSession():
 	clearPogSelection()
@@ -44,8 +48,7 @@ def clearSession():
 def autoloadSession():
 	try:
 		obj = jsonload(ospath.join(MAP_DIR, "autosave.rgg"))
-		sess = Session.load(obj)
-		GlobalState.session = sess
+		_loadSession(obj)
 		#Don't bother sending since we shouldn't be connected to anything yet.
 	except:
 		GlobalState.session = Session()
@@ -61,9 +64,7 @@ def loadSession():
 		return
 	try:
 		obj = jsonload(filename)
-		sess = Session.load(obj)
-		_clearSession()
-		GlobalState.session = sess
+		_loadSession(obj)
 		sendSession(GlobalState.session.dump())
 	except Exception as e:
 		showErrorMessage(translate('views', "Unable to read {0}.").format(filename))
@@ -75,7 +76,6 @@ def saveSession():
 		MAP_DIR)
 	if not filename:
 		return
-
 	jsondump(GlobalState.session.dump(), checkFileExtension(filename, ".rgg"))
 
 def autosaveSession():

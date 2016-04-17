@@ -3,7 +3,7 @@ from libraries.rggEvent import addPogUpdateListener, addPogDeleteListener, addPo
 from libraries.rggQt import QListWidgetItem, QListWidget, QDockWidget, QAbstractItemView, Qt
 from libraries.rggState import GlobalState
 from libraries.rggSystem import showPopupMenuAtAbs
-from libraries.rggViews import pogActionList, processPogRightclick
+from libraries.rggViews.views import pogActionList, processPogRightclick
 
 class pogItem(QListWidgetItem):
 
