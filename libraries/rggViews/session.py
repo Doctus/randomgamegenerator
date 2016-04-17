@@ -39,6 +39,7 @@ def _clearSession():
 		GlobalState.session.clear()
 	except AttributeError:
 		GlobalState.session = Session()
+	GlobalState.pogmanagerwidget.refresh()
 
 def clearSession():
 	if promptYesNo(translate('views', 'Are you sure you want to clear the current session completely for all connected players?')) == 16384:
