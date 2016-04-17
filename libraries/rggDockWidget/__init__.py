@@ -7,8 +7,11 @@ from libraries.rggDockWidget.userListWidget import userListWidget
 from libraries.rggDockWidget.mapEditor import mapEditor
 from libraries.rggDockWidget.transferMonitorWidget import transferMonitorWidget
 from libraries.rggDockWidget.deckWidget import deckWidget
-from libraries.rggDockWidget.pogEditorWidget import pogEditorWidget
 from libraries.rggDockWidget.pogManager import pogManagerWidget
+
+from libraries.rggDockWidget.pogEditorWidget import AVAILABLE
+if AVAILABLE:
+	from libraries.rggDockWidget.pogEditorWidget import pogEditorWidget
 
 def initialize(mainWindow):
 	GlobalState.dwidget = diceRoller(mainWindow)
@@ -19,5 +22,6 @@ def initialize(mainWindow):
 	GlobalState.mwidget = mapEditor(mainWindow)
 	GlobalState.fwidget = transferMonitorWidget(mainWindow)
 	GlobalState.deckwidget = deckWidget(mainWindow)
-	GlobalState.pogeditorwidget = pogEditorWidget(mainWindow)
 	GlobalState.pogmanagerwidget = pogManagerWidget(mainWindow)
+	if AVAILABLE:
+		GlobalState.pogeditorwidget = pogEditorWidget(mainWindow)

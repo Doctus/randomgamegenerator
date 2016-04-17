@@ -1,5 +1,11 @@
-from PIL import Image as im
-from PIL import ImageQt as imqt
+try:
+	from PIL import Image as im
+	from PIL import ImageQt as imqt
+	AVAILABLE = True
+except:
+	im = None
+	imqt = None
+	AVAILABLE = False
 from libraries.rggConstants import POG_DIR, PORTRAIT_DIR
 from libraries.rggQt import QScrollArea, QDockWidget, QPushButton, QGridLayout, SIGNAL, QImage
 from libraries.rggQt import QBuffer, Qt, QWidget, QIODevice, QPixmap, QLabel, QPoint, QMenu, QAction
