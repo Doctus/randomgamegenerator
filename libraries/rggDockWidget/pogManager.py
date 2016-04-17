@@ -80,9 +80,6 @@ class pogManagerWidget(QDockWidget):
 
         self.pogSelectionChangedResponse()
 
-        #for pog in GlobalState.session.pogs.values():
-        #    self.pogUpdateResponse(pog)
-
         addPogUpdateListener(self, EARLY_RESPONSE_LEVEL)
         addPogDeleteListener(self, EARLY_RESPONSE_LEVEL)
         addPogSelectionChangedListener(self.pogSelectionChangedResponse, EARLY_RESPONSE_LEVEL)
@@ -123,5 +120,3 @@ class pogManagerWidget(QDockWidget):
                 item.setSelected(False)
 
         self.update()
-
-#TODO: refresh event on session load
