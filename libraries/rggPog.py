@@ -20,6 +20,7 @@
 from os import path
 from math import sqrt
 
+from libraries.rggConstants import UNICODE_STRING
 from libraries.rggResource import crm, RESOURCE_IMAGE, STATE_DONE
 from libraries.rggSystem import mainWindow
 from libraries.rggJson import loadString, loadInteger, loadObject, loadCoordinates
@@ -193,7 +194,7 @@ class Pog(object):
 
 	def tooltipText(self):
 		self.atttmp = []
-		if self.name is not None: self.atttmp.append(str(self.name))
+		if self.name is not None: self.atttmp.append(UNICODE_STRING(self.name))
 		for key in self._properties:
 			self.atttmp.append(": ".join([key, self._properties[key]]))
 		if self.atttmp is not []:
