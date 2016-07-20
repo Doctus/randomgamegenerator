@@ -661,11 +661,12 @@ class hostDialog(dialog):
 			currentTime = time()
 			if currentTime >= timestamp + IP_CACHE_TIME:
 				raise Exception
-			with open(path.join("data", "2of12inf.txt"), "rt") as f:
+			with open(path.join("data", "eff_large_wordlist.txt"), "rt") as f:
 				dat = f.readlines()
 				ipdat = ip.split(".")
-				vals = ((int(ipdat[0])*256+int(ipdat[1])),(int(ipdat[2])*256+int(ipdat[3])))
-				wordresult = " ".join((dat[vals[0]][:-1], dat[vals[1]][:-1]))
+				value = int(ipdat[0])*16777216 + int(ipdat[1])*65536 + + int(ipdat[2])*256 + int(ipdat[3])
+				wordValues = (value / 60466176, (value%60466176) / 7776, (value%7776))
+				wordresult = " ".join((dat[wordValues[0]][:-1], dat[wordValues[1]][:-1], dat[wordValues[2]][:-1]))
 				self.checkIPLabel.setText(ip)
 				self.wordIPLabel.setText(wordresult)
 		except Exception:
@@ -710,11 +711,12 @@ class hostDialog(dialog):
 			ipdict = {"cached_ip":ip, "cached_ip_timestamp":timestamp}
 			jsonappend(ipdict, path.join(SAVE_DIR, "net_server.rgs"))
 
-		with open(path.join("data", "2of12inf.txt"), "rt") as f:
+		with open(path.join("data", "eff_large_wordlist.txt"), "rt") as f:
 			dat = f.readlines()
 			ipdat = ip.split(".")
-			vals = ((int(ipdat[0])*256+int(ipdat[1])),(int(ipdat[2])*256+int(ipdat[3])))
-			wordresult = " ".join((dat[vals[0]][:-1], dat[vals[1]][:-1]))
+			value = int(ipdat[0])*16777216 + int(ipdat[1])*65536 + + int(ipdat[2])*256 + int(ipdat[3])
+			wordValues = (value / 60466176, (value%60466176) / 7776, (value%7776))
+			wordresult = " ".join((dat[wordValues[0]][:-1], dat[wordValues[1]][:-1], dat[wordValues[2]][:-1]))
 
 		self.checkIPLabel.setText(ip)
 		self.wordIPLabel.setText(wordresult)
@@ -836,13 +838,17 @@ class joinDialog(dialog):
 	def clean(self):
 		"""Check for errors and return well-formatted data."""
 		self.cleanData = self._interpretFields(self.fields)
-		if len(self.cleanData['host'].split()) == 2:
-			with open(path.join("data", "2of12inf.txt"), "r") as f:
+		if len(self.cleanData['host'].split()) == 3:
+			with open(path.join("data", "eff_large_wordlist.txt"), "r") as f:
 				inp = self.cleanData['host'].split()
 				_dat = f.readlines()
 				dat = [d.strip() for d in _dat]
-				wordindex = [dat.index(inp[0]), dat.index(inp[1])]
-				ipextract = str(".".join((str(wordindex[0]//256), str(wordindex[0]%256), str(wordindex[1]//256), str(wordindex[1]%256))))
+				wordindex = [dat.index(inp[0]), dat.index(inp[1]), dat.index(inp[2])]
+				value = wordindex[0]*60466176 + wordindex[1]*7776 + wordindex[2]
+				#value = int(ipdat[0])*16777216 + int(ipdat[1])*65536 + + int(ipdat[2])*256 + int(ipdat[3])
+				#wordValues = (value / 60466176, (value%60466176) / 7776, (value%7776))
+				IPs = (value//16777216, (value%16777216)//65536, (value%65536)//256, value%256)
+				ipextract = str(".".join([str(ip) for ip in IPs]))
 				self.cleanData['host'] = ipextract
 		return self.cleanData
 

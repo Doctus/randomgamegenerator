@@ -53,6 +53,10 @@ Credits
     Some portraits from:
       http://www5f.biglobe.ne.jp/~itazu/etolier/index.html
       Thank you!
+	  
+  Word list for IP encoding provided by:
+	Electronic Frontier Foundation
+	https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt
 
   Special Thanks:
     Kaijyuu, Bardum, Janra, Wallet, and Antistone for suggestions/testing
