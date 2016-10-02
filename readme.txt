@@ -64,9 +64,19 @@ Credits
 
 Licensing
 
-  RGG's libraries are licensed under the LGPL v3. For more information,
+  RGG's code is licensed under the LGPL v3. For more information,
   please see the notice at the top of each source file and the COPYING
   and COPYING.LESSER files in the "doc" folder.
+  
+  If you intend to use RGG in another project, please note that the
+  use of other libraries means the overall package might not be able
+  to make use of the permissions the LGPL provides over the GPL.
+  
+  RGG calls the following external libraries under these licenses:
+    Python (Python License)
+	PyQt (GPL v3)
+	PyOpenGL (BSD-style)
+	pillow (MIT-like PIL Software License)
 
 Changelog
 
