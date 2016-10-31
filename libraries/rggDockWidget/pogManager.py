@@ -93,7 +93,7 @@ class pogManagerWidget(QDockWidget):
         self.update()
 
     def pogUpdateResponse(self, pog):
-        for x in xrange(self.listWidget.count()):
+        for x in range(self.listWidget.count()):
             if self.listWidget.item(x) is not None and self.listWidget.item(x).getPog().ID == pog.ID:
                 self.listWidget.item(x).setPog(pog)
                 self.update()
@@ -103,7 +103,7 @@ class pogManagerWidget(QDockWidget):
         self.update()
 
     def pogDeleteResponse(self, pog):
-        for x in xrange(self.listWidget.count()):
+        for x in range(self.listWidget.count()):
             if self.listWidget.item(x) is not None and self.listWidget.item(x).getPog().ID == pog.ID:
                 self.listWidget.takeItem(x)
                 self.update()
@@ -112,7 +112,7 @@ class pogManagerWidget(QDockWidget):
     def pogSelectionChangedResponse(self):
         selectedPogs = GlobalState.pogSelection
 
-        for x in xrange(self.listWidget.count()):
+        for x in range(self.listWidget.count()):
             item = self.listWidget.item(x)
             if item.getPog() in selectedPogs:
                 item.setSelected(True)

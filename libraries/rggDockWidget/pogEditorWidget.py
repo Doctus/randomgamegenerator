@@ -7,10 +7,13 @@ except:
 	imqt = None
 	AVAILABLE = False
 from libraries.rggConstants import POG_DIR, PORTRAIT_DIR
-from libraries.rggQt import QScrollArea, QDockWidget, QPushButton, QGridLayout, SIGNAL, QImage
+from libraries.rggQt import QScrollArea, QDockWidget, QPushButton, QGridLayout, QImage
 from libraries.rggQt import QBuffer, Qt, QWidget, QIODevice, QPixmap, QLabel, QPoint, QMenu, QAction
 from libraries.rggSystem import promptSaveFile, promptLoadFile, promptInteger, promptCoordinates
-import cStringIO
+try:
+	import cStringIO
+except ImportError:
+	import io as cStringIO
 
 class pogEditScrollArea(QScrollArea):
 
@@ -44,17 +47,17 @@ class pogEditorWidget(QDockWidget):
 		self.scrollarea = pogEditScrollArea(mainWindow, self)
 
 		self.openButton = QPushButton("Open File", mainWindow)
-		self.connect(self.openButton, SIGNAL('clicked()'), self.promptOpenFile)
+		self.openButton.clicked.connect(self.promptOpenFile)
 		self.saveButton = QPushButton("Save Pog", mainWindow)
-		self.connect(self.saveButton, SIGNAL('clicked()'), self.promptSaveFile)
+		self.saveButton.clicked.connect(self.promptSaveFile)
 		self.savePortraitButton = QPushButton("Save Portrait", mainWindow)
-		self.connect(self.savePortraitButton, SIGNAL('clicked()'), self.promptSavePortrait)
+		self.savePortraitButton.clicked.connect(self.promptSavePortrait)
 		self.resetButton = QPushButton("Reset Changes", mainWindow)
-		self.connect(self.resetButton, SIGNAL('clicked()'), self.resetImage)
+		self.resetButton.clicked.connect(self.resetImage)
 		self.borderButton = QPushButton("Add Pog Border", mainWindow)
-		self.connect(self.borderButton, SIGNAL('clicked()'), self.addPogBorder)
+		self.borderButton.clicked.connect(self.addPogBorder)
 		self.resizeButton = QPushButton("Resize...", mainWindow)
-		self.connect(self.resizeButton, SIGNAL('clicked()'), self.promptResize)
+		self.resizeButton.clicked.connect(self.promptResize)
 
 		self.layout = QGridLayout()
 		self.layout.addWidget(self.scrollarea, 0, 0, 1, 3)

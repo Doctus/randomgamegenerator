@@ -715,7 +715,7 @@ class hostDialog(dialog):
 			dat = f.readlines()
 			ipdat = ip.split(".")
 			value = int(ipdat[0])*16777216 + int(ipdat[1])*65536 + + int(ipdat[2])*256 + int(ipdat[3])
-			wordValues = (value / 60466176, (value%60466176) / 7776, (value%7776))
+			wordValues = (int(value / 60466176), int((value%60466176) / 7776), int(value%7776))
 			wordresult = " ".join((dat[wordValues[0]][:-1], dat[wordValues[1]][:-1], dat[wordValues[2]][:-1]))
 
 		self.checkIPLabel.setText(ip)
@@ -847,7 +847,7 @@ class joinDialog(dialog):
 				value = wordindex[0]*60466176 + wordindex[1]*7776 + wordindex[2]
 				#value = int(ipdat[0])*16777216 + int(ipdat[1])*65536 + + int(ipdat[2])*256 + int(ipdat[3])
 				#wordValues = (value / 60466176, (value%60466176) / 7776, (value%7776))
-				IPs = (value//16777216, (value%16777216)//65536, (value%65536)//256, value%256)
+				IPs = (int(value//16777216), int((value%16777216)//65536), int((value%65536)//256), value%256)
 				ipextract = str(".".join([str(ip) for ip in IPs]))
 				self.cleanData['host'] = ipextract
 		return self.cleanData

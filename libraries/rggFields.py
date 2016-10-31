@@ -181,13 +181,13 @@ class stringField(dialogField):
 				return value
 		raise validationError(translate('stringField', 'You must enter text into the {0} field.').format(self.name))
 
-	def _createWidget(self, parent):
+	def _createWidget(self, parent=None):
 		value = ''
 		try:
 			value = self._cleanValue(self.value)
 		except:
 			pass
-		widget = QLineEdit(value, parent)
+		widget = QLineEdit(value)
 		self.widgett = widget
 		return widget
 
