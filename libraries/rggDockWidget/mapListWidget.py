@@ -55,6 +55,10 @@ class mapListWidget(QDockWidget):
 
 		mainWindow.addDockWidget(Qt.RightDockWidgetArea, self)
 
+	def refresh(self):
+		self.listWidget.clear()
+		self.update()
+
 	def mapAddedResponse(self, mappe):
 		for x in range(self.listWidget.count()):
 			if self.listWidget.item(x) is not None and self.listWidget.item(x).mappeID == mappe.ID:
