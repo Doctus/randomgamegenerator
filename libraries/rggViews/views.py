@@ -1255,6 +1255,12 @@ def centerOnPog(pog):
 	newpos = (-(pospog[0]*camzoom + cammod[0]), -(pospog[1]*camzoom + cammod[1]))
 	setCameraPosition(newpos)
 
+def centerOnMap(mapID):
+	"""Center the camera at the top-left of a map."""
+	mapTopLeft = GlobalState.session.getMap(mapID).drawOffset
+	camzoom = getZoom()
+	setCameraPosition([-1*mapTopLeft[0]*camzoom, -1*mapTopLeft[1]*camzoom])
+
 def reportCamera():
 	"""Reports the current camera coordinates."""
 	say(translate('views', 'x: {0}\ny: {1}', 'formats camera reporting.').format(*cameraPosition()))
@@ -1385,6 +1391,15 @@ def pogActionList(pog):
 			translate('views', 'Center Everyone')]
 	if isGM(): options.append(translate('views', 'Set as moveable for player'))
 	return options
+
+def mapActionList(mapID):
+	options = [translate('views', 'Center on Map')]
+	return options
+
+def processMapCommand(command, mapID):
+	if command == 0:
+		#Center
+		centerOnMap(mapID)
 
 # MOUSE ACTIONS
 

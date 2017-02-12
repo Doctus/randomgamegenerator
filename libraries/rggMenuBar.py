@@ -154,9 +154,9 @@ class menuBar(object):
 		self.selectIcon.setShortcut("Ctrl+T")
 		self.selectIcon.setToolTip("Select Tool (Ctrl+T)")
 
-		self.moveIcon = QAction(QIcon("./data/FAD-move-icon.png"), "Move Tool", main)
-		self.moveIcon.setShortcut("Ctrl+M")
-		self.moveIcon.setToolTip("Move Tool (Ctrl+M)")
+		#self.moveIcon = QAction(QIcon("./data/FAD-move-icon.png"), "Move Tool", main)
+		#self.moveIcon.setShortcut("Ctrl+M")
+		#self.moveIcon.setToolTip("Move Tool (Ctrl+M)")
 
 		self.drawIcon = QAction(QIcon("./data/FAD-freehand-icon.png"), "Draw Tool", main)
 		self.drawIcon.setShortcut("Ctrl+E")
@@ -274,7 +274,7 @@ class menuBar(object):
 		self.menubar.addMenu(self.helpMenu)
 		self.menubar.addSeparator()
 		self.menubar.addAction(self.selectIcon)
-		self.menubar.addAction(self.moveIcon)
+		#self.menubar.addAction(self.moveIcon)
 		self.menubar.addAction(self.drawIcon)
 		self.menubar.addAction(self.deleteIcon)
 
@@ -282,7 +282,7 @@ class menuBar(object):
 
 		self.selectIconClicked()
 		self.selectIcon.triggered.connect(self.selectIconClicked)
-		self.moveIcon.triggered.connect(self.moveIconClicked)
+		#self.moveIcon.triggered.connect(self.moveIconClicked)
 		self.drawIcon.triggered.connect(self.drawIconClicked)
 		self.deleteIcon.triggered.connect(self.deleteIconClicked)
 
@@ -294,7 +294,7 @@ class menuBar(object):
 
 	def resetIcons(self):
 		self.selectIcon.setIcon(QIcon("./data/FAD-select-icon.png"))
-		self.moveIcon.setIcon(QIcon("./data/FAD-move-icon.png"))
+		#self.moveIcon.setIcon(QIcon("./data/FAD-move-icon.png"))
 		self.drawIcon.setIcon(QIcon("./data/FAD-freehand-icon.png"))
 		self.deleteIcon.setIcon(QIcon("./data/FAD-eraser-icon.png"))
 

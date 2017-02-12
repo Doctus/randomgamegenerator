@@ -24,7 +24,7 @@ from sys import maxsize
 
 from libraries.rggPog import Pog
 from libraries.rggMap import Map
-from libraries.rggEvent import pogUpdateEvent, pogDeleteEvent
+from libraries.rggEvent import pogUpdateEvent, pogDeleteEvent, mapCreatedEvent, mapRemovedEvent
 from libraries.rggJson import loadObject
 from libraries.rggSystem import clearLines, drawLine, findRandomAppend
 
@@ -47,6 +47,7 @@ class Session(object):
 			mappe.drawOffset = (pos, 0)
 		self.maps[mappe.ID] = mappe
 		self.maphack += mappe.pixelSize[0] + 25
+		mapCreatedEvent(mappe)
 
 	def _addPog(self, pog):
 		'''Adds a pog to the session without informing rggEvent.'''
@@ -103,6 +104,8 @@ class Session(object):
 
 		self.maps[ID] = mappe
 
+		mapCreatedEvent(mappe)
+
 	def addDumpedMap(self, dump, ID):
 		'''Adds a map from a JSON dump with the specified ID.'''
 		mappe = Map.load(dump)
@@ -130,12 +133,14 @@ class Session(object):
 		'''Deletes a specified map and its tiles.'''
 		self.maps[ID]._deleteTiles()
 		del self.maps[ID]
+		mapRemovedEvent(ID)
 
 	def closeAllMaps(self):
 		'''Deletes all maps and their tiles.'''
 		self.maphack = 0
 		for mappe in list(self.maps.values()):
 			mappe._deleteTiles()
+			mapRemovedEvent(mappe.ID)
 		self.maps = {}
 
 	def findTopPog(self, position):

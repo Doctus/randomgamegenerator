@@ -33,6 +33,8 @@ _pogUpdateListeners = []
 _pogDeleteListeners = []
 _pogSelectionChangedListeners = []
 _mapChangedListeners = []
+_mapCreatedListeners = []
+_mapRemovedListeners = []
 
 # Add listener functions
 # Priority value should normally be a *_RESPONSE_LEVEL from rggConstants
@@ -80,6 +82,14 @@ def addPogSelectionChangedListener(listener, priority):
 def addMapChangedListener(listener, priority):
 	_mapChangedListeners.append((listener, priority))
 	_mapChangedListeners.sort(key=lambda item: item[1])
+
+def addMapCreatedListener(listener, priority):
+	_mapCreatedListeners.append((listener, priority))
+	_mapCreatedListeners.sort(key=lambda item: item[1])
+
+def addMapRemovedListener(listener, priority):
+	_mapRemovedListeners.append((listener, priority))
+	_mapRemovedListeners.sort(key=lambda item: item[1])
 
 # Event functions
 
@@ -147,4 +157,16 @@ def mapChangedEvent(newMap):
 
 	for listener, priority in _mapChangedListeners:
 		if listener(newMap):
+			return
+
+def mapCreatedEvent(newMap):
+
+	for listener, priority in _mapCreatedListeners:
+		if listener(newMap):
+			return
+
+def mapRemovedEvent(removedMapID):
+
+	for listener, priority in _mapRemovedListeners:
+		if listener(removedMapID):
 			return

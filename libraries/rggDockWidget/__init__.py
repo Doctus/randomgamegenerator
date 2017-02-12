@@ -8,6 +8,7 @@ from libraries.rggDockWidget.mapEditor import mapEditor
 from libraries.rggDockWidget.transferMonitorWidget import transferMonitorWidget
 from libraries.rggDockWidget.deckWidget import deckWidget
 from libraries.rggDockWidget.pogManager import pogManagerWidget
+from libraries.rggDockWidget.mapListWidget import mapListWidget
 
 from libraries.rggDockWidget.pogEditorWidget import AVAILABLE
 if AVAILABLE:
@@ -23,5 +24,6 @@ def initialize(mainWindow):
 	GlobalState.fwidget = transferMonitorWidget(mainWindow)
 	GlobalState.deckwidget = deckWidget(mainWindow)
 	GlobalState.pogmanagerwidget = pogManagerWidget(mainWindow)
+	GlobalState.mapmanagerwidget = mapListWidget(mainWindow)
 	if AVAILABLE:
 		GlobalState.pogeditorwidget = pogEditorWidget(mainWindow)
