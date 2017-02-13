@@ -21,8 +21,6 @@ Configuration values for internal constants.
     along with RandomGameGenerator.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from sys import version_info
-
 # Version
 
 VERSION = "1.50"
@@ -89,11 +87,5 @@ MIP_FILTER_OPTIONS = ["Off", "GL_NEAREST_MIPMAP_NEAREST", "GL_NEAREST_MIPMAP_LIN
 
 # Python 2 / 3 compatibility constants
 
-if version_info >= (3,):
-	BASE_STRING = str
-	UNICODE_STRING = str
-	JSON_MODE = "t"
-else:
-	BASE_STRING = basestring
-	UNICODE_STRING = unicode
-	JSON_MODE = "b"
+BASE_STRING = str
+UNICODE_STRING = str

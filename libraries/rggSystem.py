@@ -25,8 +25,6 @@ from random import choice as rchoice
 from random import random
 from math import hypot, cos, sin, pi
 
-from libraries.rggQt import PYQT5
-
 from libraries.rggQt import QAction, QCoreApplication, QMessageBox, QMenu, QPoint, QInputDialog, QFileDialog
 from libraries.rggConstants import UNICODE_STRING
 
@@ -205,10 +203,7 @@ def promptLoadFile(title, filter, dir=''):
 		filter)
 	if not filename:
 		return None
-	if PYQT5:
-		return UNICODE_STRING(filename[0])
-	else:
-		return UNICODE_STRING(filename)
+	return UNICODE_STRING(filename[0])
 
 def promptSaveFile(title, filter, dir=''):
 	filename = QFileDialog.getSaveFileName(mainWindow,
@@ -217,10 +212,7 @@ def promptSaveFile(title, filter, dir=''):
 		filter)
 	if not filename:
 		return None
-	if PYQT5:
-		return UNICODE_STRING(filename[0])
-	else:
-		return UNICODE_STRING(filename)
+	return UNICODE_STRING(filename[0])
 
 def promptButtonSelection(prompt, text=[], defaultButton = 0):
 	convertedText = ()

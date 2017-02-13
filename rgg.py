@@ -34,28 +34,26 @@ if __name__ == '__main__':
 		from sys import exit
 		exit()
 
+	from sys import version_info
+	if version_info < (3,):
+		fatalError("RGG must be run with Python 3, not Python 2.")
+
 	try:
-		try:
-			from PyQt5.QtWidgets import QProgressDialog, QApplication
-		except:
-			from PyQt4.QtGui import QProgressDialog, QApplication
-		application = QApplication(['RGG'])
-		progress = QProgressDialog("Loading...", "Exit", 0, 9)
-		progress.setWindowTitle("RGG Loading")
-		progress.setWindowModality(2)
-		progress.setWindowFlags(progress.windowFlags() | 262144)
-
-		progress.setMinimumDuration(1)
-
-		progress.setValue(1)
-
-		progress.setLabelText("Loading internals...")
+		from PyQt5.QtWidgets import QProgressDialog, QApplication
 	except:
-		from sys import version_info
-		if version_info >= (3,):
-			fatalError("PyQt5 not found. Please ensure it is installed and available.")
-		else:
-			fatalError("PyQt4 not found. Please ensure it is installed and available.")
+		fatalError("PyQt5 not found. Please ensure it is installed and available.")
+	application = QApplication(['RGG'])
+	progress = QProgressDialog("Loading...", "Exit", 0, 9)
+	progress.setWindowTitle("RGG Loading")
+	progress.setWindowModality(2)
+	progress.setWindowFlags(progress.windowFlags() | 262144)
+
+	progress.setMinimumDuration(1)
+
+	progress.setValue(1)
+
+	progress.setLabelText("Loading internals...")
+
 
 	from sys import version_info
 	from os import path
@@ -63,10 +61,7 @@ if __name__ == '__main__':
 	try:
 		from libraries.rggQt import QTranslator, QGLFormat, QTimer
 	except ImportError:
-		if version_info >= (3,):
-			fatalError("PyQt5 not found. Please ensure it is installed and available.")
-		else:
-			fatalError("PyQt4 not found. Please ensure it is installed and available.")
+		fatalError("PyQt5 could not be loaded fully. Please ensure it is properly installed and available.")
 	try:
 		import OpenGL
 	except ImportError:

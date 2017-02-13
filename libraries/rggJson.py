@@ -24,7 +24,7 @@ from json import dump, dumps, load, loads
 from gzip import open as gzipopen
 from libraries.rggFields import validationError
 from libraries.rggSystem import makeLocalFilename
-from libraries.rggConstants import BASE_STRING, JSON_MODE
+from libraries.rggConstants import BASE_STRING
 
 def jsondumps(obj):
 	"""Dumps the object into a string. Contains no newlines."""
@@ -38,7 +38,7 @@ def jsondumps(obj):
 
 def jsondump(obj, filename):
 	"""Dump object to file."""
-	with gzipopen(makeLocalFilename(filename), 'w'+JSON_MODE) as file:
+	with gzipopen(makeLocalFilename(filename), 'wt') as file:
 		dump(obj, file, sort_keys=True, indent=4)
 
 def jsonloads(str):
@@ -50,10 +50,10 @@ def jsonloads(str):
 def jsonload(filename):
 	"""Loads the object from a file. May throw."""
 	try:
-		with gzipopen(makeLocalFilename(filename), 'r'+JSON_MODE) as file:
+		with gzipopen(makeLocalFilename(filename), 'rt') as file:
 			obj = load(file)
 	except: #might be an old uncompressed save
-		with open(makeLocalFilename(filename), 'r'+JSON_MODE) as file:
+		with open(makeLocalFilename(filename), 'rt') as file:
 			obj = load(file)
 	assert(isinstance(obj, list) or isinstance(obj, dict))
 	return obj
