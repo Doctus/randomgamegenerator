@@ -33,8 +33,8 @@ Introduction
 
 Requirements
 
-  Python2 or Python3
-  PyQt4 or PyQt5
+  Python3
+  PyQt5
   PyOpenGL
 
   Optional:
@@ -53,7 +53,7 @@ Credits
     Some portraits from:
       http://www5f.biglobe.ne.jp/~itazu/etolier/index.html
       Thank you!
-	  
+
   Word list for IP encoding provided by:
 	Electronic Frontier Foundation
 	https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt
@@ -67,11 +67,11 @@ Licensing
   RGG's code is licensed under the LGPL v3. For more information,
   please see the notice at the top of each source file and the COPYING
   and COPYING.LESSER files in the "doc" folder.
-  
+
   If you intend to use RGG in another project, please note that the
   use of other libraries means the overall package might not be able
   to make use of the permissions the LGPL provides over the GPL.
-  
+
   RGG calls the following external libraries under these licenses:
     Python (Python License)
 	PyQt (GPL v3)
@@ -80,14 +80,18 @@ Licensing
 
 Changelog
 
-v1.50 "Mystery crept nearer from every side"    [in dev], 2016
+v1.50 "Mystery crept nearer from every side"    [in dev], 2017
 
    Fixes
     * Prevented errors that could occur when clicking pogs
       before the program loaded fully.
+    * Pog manager now updates properly on session loads/clears.
 
    Features and Changes
+    * Dropped Python2 and PyQt4 support.
     * No longer explicitly dependent on numpy.
+    * Breaking network changes are now handled gracefully.
+    * Added a map manager.
 
   ---
 
