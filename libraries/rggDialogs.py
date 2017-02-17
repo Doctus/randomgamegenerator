@@ -996,7 +996,10 @@ class newCharacterDialog(dialog):
 	def changePort(self, selection):
 		for i in selection.indexes():
 			portrait = i
-		self.fields['portrait'].widgett.setText(str(self.portraitModel.filePath(portrait))[self.ROOT_LEN:])
+		try:
+			self.fields['portrait'].widgett.setText(str(self.portraitModel.filePath(portrait))[self.ROOT_LEN:])
+		except AttributeError:
+			return None
 		preview = QPixmap(self.portraitModel.filePath(portrait))
 		if preview.isNull():
 			#Typically, this means a folder has been selected.
