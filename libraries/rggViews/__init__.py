@@ -8,3 +8,4 @@ from libraries.rggViews.views import deleteAllPogs, saveChars, loadChars, config
 from libraries.rggViews.views import createSurvey, promptSendFile, toggleAlerts, toggleTimestamps, toggleRightclick, toggleGridlock
 from libraries.rggViews.views import promptTimestampFormat, setThickness, setLineColour, setLanguage, setPortraitSize, changeStyle
 from libraries.rggViews.views import addMacro, playerOptions, kick, updateBanlist, placePog, pogActionList, processPogRightclick
+from libraries.rggViews.views import setScratchPadLock, unsetScratchPadLock, updateScratchPad

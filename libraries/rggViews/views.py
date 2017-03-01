@@ -1236,6 +1236,38 @@ def generateName(generator, args):
 # MISC
 
 @serverRPC
+def releaseScratchPadLock(name):
+	GlobalState.scratchPadWidget.releaseLock(name)
+
+@clientRPC
+def _setScratchPadLock(user, name):
+	releaseScratchPadLock(allusersbut(user), name)
+
+def setScratchPadLock():
+	GlobalState.scratchPadWidget.releaseLock(localhandle())
+	GlobalState.scratchPadWidget.getLock()
+	_setScratchPadLock(localhandle())
+	updateScratchPad()
+
+@clientRPC
+def _unsetScratchPadLock(user):
+	releaseScratchPadLock(allusers(), None)
+
+def unsetScratchPadLock():
+	_unsetScratchPadLock()
+
+@serverRPC
+def respondScratchPadUpdate(text):
+	GlobalState.scratchPadWidget.updateText(text)
+
+@clientRPC
+def _updateScratchPad(user, text):
+	respondScratchPadUpdate(allusers(), text)
+
+def updateScratchPad():
+	_updateScratchPad(GlobalState.scratchPadWidget.currentText)
+
+@serverRPC
 def respondCenterOnPog(pogID):
 	if pogID in list(GlobalState.session.pogs.keys()):
 		pog = GlobalState.session.pogs[pogID]

@@ -27,7 +27,8 @@ from libraries.rggViews import configureDrawTimer, hostGame, joinGame, disconnec
 from libraries.rggViews import createSurvey, promptSendFile, toggleAlerts, setLineColour
 from libraries.rggViews import toggleTimestamps, toggleRightclick, toggleGridlock
 from libraries.rggViews import setLanguage, setPortraitSize, changeStyle, partialTransferResponse
-from libraries.rggViews import transferFileResponse, placePog
+from libraries.rggViews import transferFileResponse, placePog, setScratchPadLock, unsetScratchPadLock
+from libraries.rggViews import updateScratchPad
 from libraries.rggViews.session import saveSession, loadSession, clearSession
 
 
@@ -45,6 +46,11 @@ def connectUserListWidgetEvents(widget):
 	widget.selectGM.connect(playerOptions)
 	widget.kickPlayer.connect(kick)
 	widget.requestBanlistUpdate.connect(updateBanlist)
+
+def connectScratchPadEvents(widget):
+	widget.getScratchPadLock.connect(setScratchPadLock)
+	widget.releaseScratchPadLock.connect(unsetScratchPadLock)
+	widget.updateScratchPad.connect(updateScratchPad)
 
 def connectMenuEvents(menu):
 	menu.newMapAct.triggered.connect(newMap)
@@ -111,3 +117,4 @@ def connectEvents(client, server, glWidget):
 	connectDiceWidgetEvents(GlobalState.dwidget)
 	connectUserListWidgetEvents(GlobalState.uwidget)
 	connectGLWidgetEvents(glWidget)
+	connectScratchPadEvents(GlobalState.scratchPadWidget)

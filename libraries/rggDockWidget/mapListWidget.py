@@ -71,6 +71,6 @@ class mapListWidget(QDockWidget):
 
 	def mapRemovedResponse(self, ID):
 		for x in range(self.listWidget.count()):
-			if self.listWidget.item(x) is not None and self.listWidget.item(x).mappeID == mappe.ID:
+			if self.listWidget.item(x) is not None and self.listWidget.item(x).mappeID == ID:
 				self.listWidget.takeItem(x)
 				self.update()
