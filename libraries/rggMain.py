@@ -55,8 +55,8 @@ class MainWindow(QMainWindow):
 	def readGeometry(self):
 		settings = QSettings("AttercopProductions", "RGG")
 		settings.beginGroup("MainWindow")
-		self.restoreGeometry(settings.value("geometry").toByteArray())
-		self.restoreState(settings.value("windowState").toByteArray())
+		self.restoreGeometry(settings.value("geometry"))
+		self.restoreState(settings.value("windowState"))
 		settings.endGroup()
 
 	def closeEvent(self, event):

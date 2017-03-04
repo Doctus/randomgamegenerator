@@ -67,8 +67,9 @@ def loadMain():
 
 	try:
 		MAIN[0].readGeometry()
-	except:
-		pass
+	except Exception as e:
+		print("Error restoring window geometry (this is likely harmless). Error was:")
+		print(e)
 
 	progress.setValue(8)
 	QApplication.processEvents()
