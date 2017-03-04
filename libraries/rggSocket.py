@@ -323,6 +323,8 @@ class statefulSocket(object):
 
 	def _rawread(self, length):
 		"""Reads a line from the socket."""
+		if length <= 0:
+			return None
 		assert(length > 0)
 		data = self.socket.read(length)
 		if len(data) == length:
