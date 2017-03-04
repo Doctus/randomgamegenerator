@@ -1283,7 +1283,10 @@ def centerOnPog(pog):
 	camsiz = cameraSize()
 	camzoom = getZoom()
 	pospog = pog.position
-	cammod = [(-camsiz[0]/2)+pog._tile.getW()/2, (-camsiz[1]/2)+pog._tile.getH()/2]
+	if not pog._tile:
+		cammod = [(-camsiz[0]/2), (-camsiz[1]/2)]
+	else:
+		cammod = [(-camsiz[0]/2)+pog._tile.getW()/2, (-camsiz[1]/2)+pog._tile.getH()/2]
 	newpos = (-(pospog[0]*camzoom + cammod[0]), -(pospog[1]*camzoom + cammod[1]))
 	setCameraPosition(newpos)
 

@@ -295,7 +295,11 @@ class statefulSocket(object):
 
 	def _rawsend(self, serial):
 		"""Sends serialized data."""
-		result = self.socket.write(bytes(serial, "utf-8"))
+		try:
+			result = bytes(serial, "utf-8")
+		except TypeError:
+			result = serial
+		result = self.socket.write(result)
 		if result == len(serial):
 			# I guess flush forces synchronous sending.
 			#self.socket.flush()

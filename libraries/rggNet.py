@@ -396,7 +396,9 @@ class BaseClient(object):
 				self._rejectFile(socket, **kwargs)
 		except TypeError as e:
 			message = "[{0}] Invalid parameters to remote command {command}: {parms}; {err}"
+			import traceback
 			print(message.format(socket.context, command=command, parms=repr(kwargs), err=e))
+			traceback.print_exc()
 
 	def _activateSocket(self, socket, username):
 		"""Activates the socket."""
