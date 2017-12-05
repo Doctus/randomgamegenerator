@@ -64,7 +64,10 @@ Credits
 
 Licensing
 
-  RGG's code is licensed under the LGPL v3. For more information,
+  RGG is free software distributed under the GPL v3. See LICENSE or the
+  COPYING file in the "doc" folder for more information.
+
+  All code original to RGG is licensed under the LGPL v3. For details,
   please see the notice at the top of each source file and the COPYING
   and COPYING.LESSER files in the "doc" folder.
 
